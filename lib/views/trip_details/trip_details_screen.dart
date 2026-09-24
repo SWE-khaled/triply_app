@@ -3,6 +3,7 @@ import '../../controllers/trip_details_controller.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/trip.dart';
 import '../../models/trip_details.dart';
+import '../booking/booking_screen.dart';
 import 'widgets/booking_bar.dart';
 import 'widgets/details_header.dart';
 import 'widgets/details_info.dart';
@@ -30,7 +31,13 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    details = controller.getByTripId(widget.trip.id, title: widget.trip.title);
+    details = controller.getByTripId(
+      widget.trip.id,
+      title: widget.trip.title,
+      imageUrl: widget.trip.imageUrl,
+      priceEgp: widget.trip.priceEgp,
+      guideName: widget.trip.guideName,
+    );
   }
 
   void _placeholder(String msg) {
@@ -84,8 +91,12 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     const SizedBox(height: 16),
                     BookingBar(
                       details: details,
-                      onBookNow: () => _placeholder(
-                          'Booking not available yet'),
+                      onBookNow: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              BookingScreen(trip: widget.trip),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 14),
                     GuideCard(

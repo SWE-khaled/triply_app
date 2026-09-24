@@ -6,9 +6,16 @@ class TripDetailsController {
   final List<TripDetails> _all =
       mockTripDetailsJson.map((e) => TripDetails.fromJson(e)).toList();
 
-  /// Returns details for [tripId], or a generic fallback built from
-  /// the first mock entry so screens without mock data still render.
-  TripDetails getByTripId(String tripId, {String? title}) {
+  /// Returns details for [tripId]. Any trip without mock data falls back
+  /// to the first entry but keeps the trip's own card fields
+  /// (title/image/price/guide) so it never shows another trip's content.
+  TripDetails getByTripId(
+    String tripId, {
+    String? title,
+    String? imageUrl,
+    double? priceEgp,
+    String? guideName,
+  }) {
     for (final d in _all) {
       if (d.tripId == tripId) return d;
     }
@@ -29,13 +36,13 @@ class TripDetailsController {
       itinerary: base.itinerary,
       notes: base.notes,
       meetingPoint: base.meetingPoint,
-      priceEgp: base.priceEgp,
-      guideName: base.guideName,
+      priceEgp: priceEgp ?? base.priceEgp,
+      guideName: guideName ?? base.guideName,
       guideAvatarUrl: base.guideAvatarUrl,
       guideRating: base.guideRating,
       guideReviews: base.guideReviews,
       topRatedGuide: base.topRatedGuide,
-      imageUrl: base.imageUrl,
+      imageUrl: imageUrl ?? base.imageUrl,
     );
   }
 }
