@@ -44,8 +44,3 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Ignore everything inside lib folder
-lib/*
-
-# Unignore main.dart only
-!lib/main.dart
