@@ -46,6 +46,3 @@ app.*.map.json
 
 # Ignore everything inside lib folder
 lib/*
-
-# Unignore main.dart only
-!lib/main.dart
