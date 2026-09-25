@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../controllers/trips_controller.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/app_bottom_nav.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../models/trip.dart';
 import '../trip_details/trip_details_screen.dart';
 import 'widgets/trip_card.dart';
@@ -19,26 +20,25 @@ class _TripsScreenState extends State<TripsScreen> {
   TripStatus selectedTab = TripStatus.upcoming;
   int bottomIndex = 1; // My Trips
 
-  static const List<String> tabLabels = [
-    'Upcoming',
-    'Ongoing',
-    'Completed',
-    'Cancelled',
-  ];
-
-  static const List<TripStatus> tabValues = [
-    TripStatus.upcoming,
-    TripStatus.ongoing,
-    TripStatus.completed,
-    TripStatus.cancelled,
-  ];
+  //todo this tab
+  // static const List<String> tabLabels = [
+  //   'Upcoming',
+  //   'Ongoing',
+  //   'Completed',
+  //   'Cancelled',
+  // ];
+  //
+  // static const List<TripStatus> tabValues = [
+  //   TripStatus.upcoming,
+  //   TripStatus.ongoing,
+  //   TripStatus.completed,
+  //   TripStatus.cancelled,
+  // ];
 
   void _openDetails(Trip trip) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => TripDetailsScreen(trip: trip),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => TripDetailsScreen(trip: trip)));
   }
 
   @override
@@ -53,7 +53,7 @@ class _TripsScreenState extends State<TripsScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Text(
-                'My Trips',
+                'Trips',
                 style: GoogleFonts.poppins(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -71,72 +71,73 @@ class _TripsScreenState extends State<TripsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 14),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: AppColors.tabUnselectedBg,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children:
-                      List.generate(tabValues.length, (i) {
-                    final selected =
-                        tabValues[i] == selectedTab;
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(
-                              () => selectedTab = tabValues[i]);
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10),
-                          decoration: BoxDecoration(
-                            color: selected
-                                ? AppColors.tabSelectedBg
-                                : Colors.transparent,
-                            borderRadius:
-                                BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            tabLabels[i],
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: selected
-                                  ? AppColors.background
-                                  : AppColors.subtitle,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
+            //todo delete this tab
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 16),
+            //   child: Container(
+            //     padding: const EdgeInsets.all(5),
+            //     decoration: BoxDecoration(
+            //       color: AppColors.tabUnselectedBg,
+            //       borderRadius: BorderRadius.circular(12),
+            //     ),
+            //     child: Row(
+            //       children:
+            //           List.generate(tabValues.length, (i) {
+            //         final selected =
+            //             tabValues[i] == selectedTab;
+            //         return Expanded(
+            //           child: GestureDetector(
+            //             onTap: () {
+            //               setState(
+            //                   () => selectedTab = tabValues[i]);
+            //             },
+            //             behavior: HitTestBehavior.opaque,
+            //             child: AnimatedContainer(
+            //               duration: const Duration(milliseconds: 200),
+            //               alignment: Alignment.center,
+            //               padding: const EdgeInsets.symmetric(
+            //                   vertical: 10),
+            //               decoration: BoxDecoration(
+            //                 color: selected
+            //                     ? AppColors.tabSelectedBg
+            //                     : Colors.transparent,
+            //                 borderRadius:
+            //                     BorderRadius.circular(12),
+            //               ),
+            //               child: Text(
+            //                 tabLabels[i],
+            //                 style: GoogleFonts.poppins(
+            //                   fontSize: 12,
+            //                   fontWeight: FontWeight.w600,
+            //                   color: selected
+            //                       ? AppColors.background
+            //                       : AppColors.subtitle,
+            //                 ),
+            //               ),
+            //             ),
+            //           ),
+            //         );
+            //       }),
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 12),
             Expanded(
               child: trips.isEmpty
                   ? const Center(
                       child: Text(
                         'No trips here yet',
                         style: TextStyle(
-                            color: AppColors.subtitle, fontSize: 13),
+                          color: AppColors.subtitle,
+                          fontSize: 13,
+                        ),
                       ),
                     )
                   : ListView.separated(
-                      padding:
-                          const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                       itemCount: trips.length,
-                      separatorBuilder: (_, _) =>
-                          const SizedBox(height: 12),
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final trip = trips[index];
                         return TripCard(
@@ -158,11 +159,10 @@ class _TripsScreenState extends State<TripsScreen> {
         onTap: (i) {
           if (i == bottomIndex) return;
           // TODO: navigate when Home/Map/Community/Profile screens exist.
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Screen not available yet'),
-              duration: Duration(seconds: 1),
-            ),
+          showAppSnackBar(
+            context,
+            'Screen not available yet',
+            icon: Icons.info_outline,
           );
         },
       ),
