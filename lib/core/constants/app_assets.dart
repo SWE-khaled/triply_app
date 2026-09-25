@@ -6,4 +6,5 @@ class AppAssets {
   // Example:
   static const String iconChat = 'assets/images/svg/chat_icon.svg';
   static const String iconPeople = 'assets/images/svg/people_icon.svg';
+  static const String iconConfirm = 'assets/images/svg/confirm_Icon.svg';
 }

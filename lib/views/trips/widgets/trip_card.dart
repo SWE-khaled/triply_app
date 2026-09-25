@@ -37,6 +37,7 @@ class TripCard extends StatelessWidget {
             children: [
               SizedBox(
                 width: 105,
+                height: 148,
                 child: Image.network(
                   trip.imageUrl,
                   fit: BoxFit.cover,
@@ -48,86 +49,101 @@ class TripCard extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: Text(
-                              trip.title,
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.title,
-                                height: 1.25,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  trip.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.title,
+                                    height: 1.25,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 6),
+                              GestureDetector(
+                                onTap: onChat,
+                                child: Container(
+                                  width: 28,
+                                  height: 28,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFFF1F4F5),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    AppAssets.iconChat,
+                                    width: 14,
+                                    height: 14,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 6),
-                          GestureDetector(
-                            onTap: onChat,
-                            child: Container(
-                              width: 28,
-                              height: 28,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(0xFFF1F4F5),
+                          const SizedBox(height: 3),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                size: 13,
+                                color: AppColors.pin,
                               ),
-                              child: SvgPicture.asset(
-                                AppAssets.iconChat,
-                                width: 14,
-                                height: 14,
-                                fit: BoxFit.contain,
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  trip.dateLabel,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.dateText,
+                                  ),
+                                ),
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          RichText(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Guide: ',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    color: AppColors.guideLabel,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: trip.guideName,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.dateText,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on,
-                              size: 13, color: AppColors.pin),
-                          const SizedBox(width: 3),
-                          Expanded(
-                            child: Text(
-                              trip.dateLabel,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.dateText,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Guide: ',
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: AppColors.guideLabel,
-                              ),
-                            ),
-                            TextSpan(
-                              text: trip.guideName,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.guideName,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -138,8 +154,7 @@ class TripCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
@@ -147,7 +162,7 @@ class TripCard extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.guideName,
+                                  color: AppColors.dateText,
                                   height: 1.2,
                                 ),
                               ),
@@ -165,8 +180,7 @@ class TripCard extends StatelessWidget {
                           const SizedBox(width: 16),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
@@ -181,33 +195,32 @@ class TripCard extends StatelessWidget {
                                 Text(
                                   formatEgp(trip.priceEgp),
                                   style: GoogleFonts.poppins(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.price,
-                                    height: 1.2,
+                                    height: 1.15,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 4,),
+                          const SizedBox(width: 4),
                           ElevatedButton(
                             onPressed: onViewDetails,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  AppColors.accentOrange,
+                              backgroundColor: AppColors.accentOrange,
                               foregroundColor: Colors.white,
-                              minimumSize: const Size(0, 36),
-                              padding:
-                                  const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 10),
+                              minimumSize: const Size(0, 28),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(14),
                               ),
                               elevation: 0,
                               textStyle: GoogleFonts.poppins(
-                                fontSize: 12,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

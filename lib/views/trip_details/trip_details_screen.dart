@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../controllers/favorites_controller.dart';
 import '../../controllers/trip_details_controller.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/trip.dart';
 import '../../models/trip_details.dart';
@@ -26,7 +28,12 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   int selectedTab = 0;
   bool isFavorite = false;
 
-  static const List<String> tabs = ['About', 'Highlights', 'Itinerary', 'Notes'];
+  static const List<String> tabs = [
+    'About',
+    'Highlights',
+    'Itinerary',
+    'Notes',
+  ];
 
   @override
   void initState() {
@@ -38,12 +45,22 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       priceEgp: widget.trip.priceEgp,
       guideName: widget.trip.guideName,
     );
+    // Restore persisted state so reopening this trip shows the heart active.
+    isFavorite = FavoritesController.isFavorite(widget.trip.id);
+  }
+
+  void _onFavorite() {
+    final nowFavorite = FavoritesController.toggle(widget.trip.id);
+    setState(() => isFavorite = nowFavorite);
+    showAppSnackBar(
+      context,
+      nowFavorite ? 'Added to favourites' : 'Removed from favourites',
+      icon: nowFavorite ? Icons.favorite : Icons.heart_broken_outlined,
+    );
   }
 
   void _placeholder(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), duration: const Duration(seconds: 1)),
-    );
+    showAppSnackBar(context, msg, icon: Icons.info_outline);
   }
 
   @override
@@ -57,18 +74,15 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               imageUrl: details.imageUrl,
               isFavorite: isFavorite,
               onBack: () => Navigator.of(context).pop(),
-              onFavorite: () =>
-                  setState(() => isFavorite = !isFavorite),
-              onShare: () =>
-                  _placeholder('Share not available yet'),
+              onFavorite: _onFavorite,
+              onShare: () => _placeholder('Share not available yet'),
             ),
             Container(
               width: double.infinity,
               transform: Matrix4.translationValues(0, -24, 0),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -76,12 +90,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DetailsInfo(details: details),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
                     DetailsTabs(
                       tabs: tabs,
                       selectedIndex: selectedTab,
-                      onSelected: (i) =>
-                          setState(() => selectedTab = i),
+                      onSelected: (i) => setState(() => selectedTab = i),
                     ),
                     const SizedBox(height: 14),
                     DetailsTabContent(
@@ -93,16 +106,15 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       details: details,
                       onBookNow: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) =>
-                              BookingScreen(trip: widget.trip),
+                          builder: (_) => BookingScreen(trip: widget.trip),
                         ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     GuideCard(
                       details: details,
-                      onTap: () => _placeholder(
-                          'Guide profile not available yet'),
+                      onTap: () =>
+                          _placeholder('Guide profile not available yet'),
                     ),
                   ],
                 ),

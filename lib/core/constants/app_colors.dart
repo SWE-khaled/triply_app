@@ -13,7 +13,6 @@ class AppColors {
   static const Color accentOrange = Color(0xFFE2703A);
   static const Color dateText = Color(0xFF526B72);
   static const Color guideLabel = Color(0xFF8A9EA3);
-  static const Color guideName = Color(0xFF526B72);
   static const Color pin = Color(0xFFE2703A);
   static const Color bottomNavSelected = Color(0xFF0E4B4A);
   static const Color bottomNavUnselected = Color(0xFFB0BEC5);
