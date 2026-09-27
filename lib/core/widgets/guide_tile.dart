@@ -43,7 +43,7 @@ class GuideTile extends StatelessWidget {
                             style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primaryTeal)),
+                                color: AppColors.guidesName)),
                       ),
                       const Icon(Icons.verified, size: 16, color: AppColors.primaryTeal),
                     ],

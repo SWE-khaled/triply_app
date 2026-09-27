@@ -20,21 +20,21 @@ const List<Map<String, String>> mockPopularDestinations = [
   {
     'name': 'Giza Pyramids',
     'subtitle': 'Giza · Historical',
-    'image_url': 'https://picsum.photos/seed/giza/200/200',
+    'image_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi3xmuK5KiYF8KD8GsDkenLC8aypmvHxgOoyDviuSsg&s=10',
   },
   {
     'name': 'Khan El Khalili',
     'subtitle': 'Cairo · Shopping',
-    'image_url': 'https://picsum.photos/seed/khan/200/200',
+    'image_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3d1F6I1VkP9vmN-ohhQ8-drlpILaCIPeM517yMRzzkQ&s=10',
   },
   {
     'name': 'Aswan',
     'subtitle': 'Upper Egypt · Historical',
-    'image_url': 'https://picsum.photos/seed/aswan/200/200',
+    'image_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxpGWwQqw3qmyLkJ-E7ES-6saHVet3wOF97NptrHsspw&s=10',
   },
   {
     'name': 'Luxor Temple',
     'subtitle': 'Luxor · Historical',
-    'image_url': 'https://picsum.photos/seed/luxor-temple/200/200',
+    'image_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3mi0gq5U7fxAhIeDz5nVpsscMDryijss4LikyF-njvg&s=10',
   },
 ];

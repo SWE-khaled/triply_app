@@ -5,13 +5,13 @@ abstract class AppTextStyles {
   static const TextStyle heroTitle = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
-    color: Colors.white,
+    color: Color.fromARGB(255, 255, 255, 255),
     height: 1.2,
   );
   static const TextStyle heroSubtitle = TextStyle(
     fontSize: 12,
     letterSpacing: 1.2,
-    color: Colors.white70,
+    color: Color.fromARGB(179, 255, 255, 255),
     fontWeight: FontWeight.w500,
   );
   static const TextStyle sectionTitle = TextStyle(
@@ -20,7 +20,7 @@ abstract class AppTextStyles {
     color: AppColors.textDark,
   );
   static const TextStyle seeAll = TextStyle(
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.primaryTeal,
   );

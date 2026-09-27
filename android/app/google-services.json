@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "396641823945",
+    "project_id": "triply-f9b82",
+    "storage_bucket": "triply-f9b82.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:396641823945:android:a85fe3db728476489a7118",
+        "android_client_info": {
+          "package_name": "com.example.triply"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "396641823945-8ocqjhhbk0mj82k9ds085dov653m3jcu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.triply",
+            "certificate_hash": "1da2504c31119a2d5f7604741f0869f1418a29de"
+          }
+        },
+        {
+          "client_id": "396641823945-7b3gsb1dhstnu09f8celj86sr35ljp7r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVRDcCwBfcOB9oCA1pi3lqoAcxl94SjEM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "396641823945-7b3gsb1dhstnu09f8celj86sr35ljp7r.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "396641823945-3um5pcg2ckh3bb482nfeib4tnres28uc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.triply"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

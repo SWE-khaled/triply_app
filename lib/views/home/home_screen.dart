@@ -9,6 +9,8 @@ import '../../core/widgets/place_card.dart';
 import '../../core/widgets/search_input.dart';
 import '../../core/widgets/section_header.dart';
 import '../../core/widgets/trip_card.dart';
+import 'package:provider/provider.dart';
+import '../../features/auth/providers/auth_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -168,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage('https://picsum.photos/seed/egypt-hero/900/700'),
+          image: NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBQ8iDG5Hk8guqcSGPtMI6kq6YchZ67Ig8j5hvwBSiHA&s=10'),
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.only(
@@ -191,13 +193,19 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: [
                 const Expanded(
-                  child: Text('triply',
+                  child: Text('Triply',
                       style: TextStyle(
                           fontSize: 32,
-                          fontStyle: FontStyle.italic,
+                          fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white)),
+                          color: Color.fromARGB(255, 255, 255, 255))),
+                          
                 ),
+                   IconButton(
+      onPressed: () => context.read<AuthProvider>().signOut(),
+      icon: const Icon(Icons.logout, color: Colors.white),
+    ),
+                
                 IconButton(
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoutes.notifications);
@@ -206,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const CircleAvatar(
                   backgroundImage:
-                      NetworkImage('https://picsum.photos/seed/avatar/100/100'),
+                      NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0qfcS_hq5zSrH786rVTKjT5_jfEyoNqoGpocrp53R0Q&s=10'),
                 ),
               ],
             ),

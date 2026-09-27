@@ -14,7 +14,7 @@ class CommunityBanner extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: const DecorationImage(
-          image: NetworkImage('https://picsum.photos/seed/luxor/800/400'),
+          image: NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBQ8iDG5Hk8guqcSGPtMI6kq6YchZ67Ig8j5hvwBSiHA&s=10'),
           fit: BoxFit.cover,
         ),
       ),

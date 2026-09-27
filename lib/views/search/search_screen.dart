@@ -85,6 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
+            SizedBox(height: 6,),
             SizedBox(
               height: 40,
               child: ListView(
@@ -100,7 +101,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
-            const Divider(height: 16),
+          
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -129,7 +130,7 @@ class _SearchScreenState extends State<SearchScreen> {
               style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primaryTeal)),
+                  color: AppColors.guidesName)),
           const SizedBox(height: 12),
           for (final d in controller.results)
             DestinationRow(
@@ -152,7 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primaryTeal)),
+                    color: AppColors.guidesName)),
             GestureDetector(
               onTap: controller.clearRecents,
               child: const Text('Clear all',
@@ -203,7 +204,7 @@ class _SearchScreenState extends State<SearchScreen> {
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryTeal)),
+                color: AppColors.guidesName)),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,
@@ -232,7 +233,7 @@ class _SearchScreenState extends State<SearchScreen> {
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.primaryTeal)),
+                color: AppColors.guidesName)),
         const SizedBox(height: 12),
         for (final d in controller.popularDestinations)
           DestinationRow(
