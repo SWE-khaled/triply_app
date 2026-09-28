@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../features/home/model/guide.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
+import '../model/guide.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 
 class GuideTile extends StatelessWidget {
   final Guide guide;

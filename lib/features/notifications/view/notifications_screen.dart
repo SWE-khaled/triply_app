@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../controller/notifications_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/circle_back_button.dart';
-import '../../../core/widgets/notification_tile.dart';
+import '../widget/notification_tile.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});

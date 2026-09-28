@@ -3,12 +3,12 @@ import '../controller/home_controller.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
-import '../../../core/widgets/community_banner.dart';
-import '../../../core/widgets/guide_tile.dart';
-import '../../../core/widgets/place_card.dart';
-import '../../../core/widgets/search_input.dart';
-import '../../../core/widgets/section_header.dart';
-import '../../../core/widgets/trip_card.dart';
+import '../widget/community_banner.dart';
+import '../widget/guide_tile.dart';
+import '../widget/place_card.dart';
+import '../widget/search_input.dart';
+import '../widget/section_header.dart';
+import '../widget/trip_card.dart';
 import 'package:provider/provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
