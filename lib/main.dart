@@ -13,6 +13,9 @@ import 'features/auth/providers/auth_provider.dart';
 import 'features/home/view/home_screen.dart';
 import 'features/notifications/view/notifications_screen.dart';
 import 'features/search/view/search_screen.dart';
+import 'features/UserProfile/view/profile_screen.dart';
+import 'features/UserProfile/view/privacy_security_screen.dart';
+import 'features/UserProfile/view/emergency_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +49,6 @@ class MyApp extends StatelessWidget {
           },
         ),
         routes: {
-          
           AppRoutes.home: (context) => const HomeScreen(),
           AppRoutes.search: (context) => const SearchScreen(),
           AppRoutes.notifications: (context) => const NotificationsScreen(),
@@ -57,6 +59,9 @@ class MyApp extends StatelessWidget {
               const ForgotPasswordScreen(),
           AppRoutes.passwordResetSuccess: (context) =>
               const PasswordResetSuccessScreen(),
+          AppRoutes.profile: (context) => const ProfileScreen(),
+          AppRoutes.privacySecurity: (context) => const PrivacySecurityScreen(),
+          AppRoutes.emergency: (context) => const EmergencyScreen(),
         },
       ),
     );
