@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../models/notification_item.dart';
-import '../data/mock/mock_notifications.dart';
+import '../model/notification_item.dart';
+import '../../../data/mock/mock_notifications.dart';
 
 class NotificationsController extends ChangeNotifier {
   List<NotificationItem> items = [];

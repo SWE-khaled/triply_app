@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import '../models/place.dart';
-import '../models/search_filter.dart';
-import '../data/mock/mock_places.dart';
-import '../data/mock/mock_search.dart';
+import '../../home/model/place.dart';
+import '../model/search_filter.dart';
+import '../../../data/mock/mock_places.dart';
+import '../../../data/mock/mock_search.dart';
 
 class SearchController extends ChangeNotifier {
   String query = '';

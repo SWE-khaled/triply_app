@@ -10,9 +10,9 @@ import 'firebase_options.dart';
 import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/providers/auth_provider.dart';
-import 'views/home/home_screen.dart';
-import 'views/notifications/notifications_screen.dart';
-import 'views/search/search_screen.dart';
+import 'features/home/view/home_screen.dart';
+import 'features/notifications/view/notifications_screen.dart';
+import 'features/search/view/search_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,11 +62,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-//assets/images
-
-//core { constant - theme - simaller Widget - Network }
-
-// feature /Home {Model -Controllers -View(home_screen) }
-// feature /Map {Model -Controllers -View(map_screen) }
-
-//Profile 

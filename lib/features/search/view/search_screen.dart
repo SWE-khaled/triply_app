@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../controllers/search_controller.dart' as c;
-import '../../models/search_filter.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/widgets/app_filter_chip.dart';
-import '../../core/widgets/circle_back_button.dart';
-import '../../core/widgets/destination_row.dart';
-import '../../core/widgets/empty_state.dart';
+import '../controller/search_controller.dart' as c;
+import '../model/search_filter.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_filter_chip.dart';
+import '../../../core/widgets/circle_back_button.dart';
+import '../../../core/widgets/destination_row.dart';
+import '../../../core/widgets/empty_state.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
