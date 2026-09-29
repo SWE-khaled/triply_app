@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import '../controller/home_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:triply/features/UserProfile/view/profile_screen.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../controller/home_controller.dart';
 import '../widget/community_banner.dart';
 import '../widget/guide_tile.dart';
 import '../widget/place_card.dart';
 import '../widget/search_input.dart';
 import '../widget/section_header.dart';
 import '../widget/trip_card.dart';
-import 'package:provider/provider.dart';
-import '../../auth/providers/auth_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,12 +43,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().user;
+    final photoUrl = user?.photoURL;
+    final name = user?.displayName ?? '';
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeroHeader(context),
+            _buildHeroHeader(context, photoUrl, name),
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -168,7 +173,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildHeroHeader(BuildContext context) {
+  Widget _buildHeroHeader(
+    BuildContext context,
+    String? photoUrl,
+    String name,
+  ) {
+    final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
+
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -201,17 +212,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Triply',
                     style: TextStyle(
                       fontSize: 32,
-                      fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 255, 255, 255),
+                      color: Colors.white,
                     ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () => context.read<AuthProvider>().signOut(),
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                ),
-
                 IconButton(
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoutes.notifications);
@@ -221,9 +226,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.white,
                   ),
                 ),
-                const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0qfcS_hq5zSrH786rVTKjT5_jfEyoNqoGpocrp53R0Q&s=10',
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                    );
+                  },
+                  child: CircleAvatar(
+                    backgroundImage: hasPhoto ? NetworkImage(photoUrl) : null,
+                    child: hasPhoto
+                        ? null
+                        : Text(name.isNotEmpty ? name[0].toUpperCase() : '?'),
                   ),
                 ),
               ],

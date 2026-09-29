@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:triply/features/UserProfile/widget/edit_profile_sheet.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
@@ -9,7 +10,7 @@ import '../widget/account_option_tile.dart';
 import '../widget/profile_header.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +50,17 @@ class _ProfileBody extends StatelessWidget {
                   ProfileHeader(
                     name: name,
                     photoUrl: photoUrl,
-                    onEdit: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Edit profile is not available yet'),
+                    onEdit: () => showModalBottomSheet<bool>(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                      ),
+                      builder: (_) => EditProfileSheet(
+                        name: firebaseUser?.displayName ?? '',
+                        photoUrl: photoUrl,
                       ),
                     ),
                   ),

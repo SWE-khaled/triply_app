@@ -14,8 +14,9 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider() {
     _authRepository.authStateChanges.listen((user) {
       _user = user;
-      _status =
-          user != null ? AuthStatus.authenticated : AuthStatus.unauthenticated;
+      _status = user != null
+          ? AuthStatus.authenticated
+          : AuthStatus.unauthenticated;
       notifyListeners();
     });
   }
@@ -44,10 +45,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> signIn({required String email, required String password}) async {
     _setLoading();
     try {
       await _authRepository.signInWithEmail(email: email, password: password);
@@ -84,6 +82,13 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _authRepository.signOut();
+  }
+
+  Future<void> refreshUser() async {
+    final current = FirebaseAuth.instance.currentUser;
+    await current?.reload();
+    _user = FirebaseAuth.instance.currentUser;
+    notifyListeners();
   }
 
   void clearError() {
