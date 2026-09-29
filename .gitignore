@@ -1,3 +1,10 @@
+# Secrets — never commit real keys
+.env
+.env.example
+.env.local
+ios/Secrets.xcconfig
+
+
 # Miscellaneous
 *.class
 *.log
@@ -43,9 +50,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# Ignore everything inside lib folder
-lib/*
-
-# Unignore main.dart only
-!lib/main.dart
