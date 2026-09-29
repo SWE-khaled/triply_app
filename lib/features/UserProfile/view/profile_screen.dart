@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triply/features/UserProfile/widget/edit_profile_sheet.dart';
+import 'package:triply/features/community/view/community_view.dart';
+import 'package:triply/features/home/view/home_screen.dart';
+import 'package:triply/features/map/view/map_view.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
@@ -228,17 +231,22 @@ class _ProfileBody extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: AppBottomNav(
+      bottomNavigationBar:  AppBottomNav(
         currentIndex: 4,
         onTap: (index) {
-          if (index == 4) return;
           if (index == 0) {
-            Navigator.of(context).pop();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Not in Figma yet (mock only)')),
-            );
+          Navigator.push(context,MaterialPageRoute(builder: ((context)=>HomeScreen())));
           }
+          //else if (index == 1) {
+          //Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen())));  trips
+          //} 
+          else if (index == 2) {
+            Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); 
+          }
+           else if (index == 3) {
+            Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen())));//community
+         }           
+
         },
       ),
     );

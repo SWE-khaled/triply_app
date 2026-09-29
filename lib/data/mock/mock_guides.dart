@@ -1,20 +1,24 @@
-const List<Map<String, dynamic>> mockGuidesRaw = [
+const List<Map<String, dynamic>> mockGuides = [
   {
-    'id': 'g1',
+    'id': 'omar_elrashidy',
     'name': 'Omar El-Rashidy',
     'specialty': 'Ancient Egypt & Archaeology',
-    'avatar_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0PmcW6QpVxtWXOhqIIs8Cdwmjvyf79fPD9Y33Vxxe1A&s=10',
     'rating': 4.97,
-    'review_count': 342,
+    'reviews_count': 342,
     'price_per_hour': 85,
+    'avatar_url':
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop',
+    'verified': true,
   },
   {
-    'id': 'g2',
+    'id': 'nour_abdallah',
     'name': 'Nour Abdallah',
     'specialty': 'Nile Valley & Temples',
-    'avatar_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTn3ks9muKfvUBP6kzcSeLZ1Oe8KMyRWTkHJrx7pmi2nw&s=10',
     'rating': 4.93,
-    'review_count': 218,
+    'reviews_count': 218,
     'price_per_hour': 75,
+    'avatar_url':
+        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop',
+    'verified': true,
   },
 ];

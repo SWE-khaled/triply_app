@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/features/community/view/community_view.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
 
@@ -31,7 +32,9 @@ class CommunityBanner extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: onJoinTap,
+              onPressed: (){
+                  Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen())));//community
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accentOrange,
                 foregroundColor: Colors.white,

@@ -1,18 +1,15 @@
-const List<Map<String, dynamic>> mockTripsRaw = [
+const List<Map<String, dynamic>> mockTrips = [
   {
-    'id': 't1',
+    'id': 'pyramids_dawn_sphinx',
+    'place_id': 'giza_pyramids',
     'title': 'Pyramids at Dawn & Sphinx',
-    'image_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSM59_9SFVJiOfdgc3GbCz0kbWJI-l8l6mKgyUG2plkMg&s=10',
-    'duration': '4 hours',
-    'location': 'Giza Plateau',
-    'price': 120,
-  },
-  {
-    'id': 't2',
-    'title': 'Nile Felucca & Nubian Village',
-    'image_url': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_e4NkdS1ch8cd2EL5ftMaKoZhqzLxN1g793aAv7_0hg&s=10',
-    'duration': '5 hours',
-    'location': 'Aswan',
-    'price': 95,
-  },
+    'date_time': 'Oct 15, 2026 · 6:00 AM',
+    'guide_name': 'Omar El-Rashidy',
+    'people_count': 6,
+    'price': 6000,
+    'currency': 'EGP',
+    'image_url':
+        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
+  }
 ];
+

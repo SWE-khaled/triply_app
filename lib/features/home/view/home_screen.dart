@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triply/features/UserProfile/view/profile_screen.dart';
+import 'package:triply/features/community/view/community_view.dart';
+import 'package:triply/features/map/view/map_view.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
@@ -58,8 +60,11 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SectionHeader(
                 title: 'Popular Places',
-                // TODO(Figma): no destination in Figma yet.
-                onSeeAllTap: () {},
+                
+                onSeeAllTap: () {
+         
+            Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen())));
+                },
               ),
             ),
             const SizedBox(height: 12),
@@ -136,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Travelers in Egypt', style: AppTextStyles.sectionTitle),
-                  Text('Join >', style: AppTextStyles.seeAll),
+                
                 ],
               ),
             ),
@@ -160,24 +165,23 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) {
           if (index == 0) {
             controller.setBottomNavIndex(index);
-          } else if (index == 4) {
-            Navigator.pushNamed(context, AppRoutes.profile);
-          } else {
-            // TODO(Figma): Trips/Map/Community/Profile screens not in Figma.
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Not in Figma yet (mock only)')),
-            );
+          //}else if (index == 1) {
+            //Navigator.pushNamed(context, AppRoutes.);
+          } else if (index == 2) {
+            Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); //map
           }
+           else if (index == 3) {
+            Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen())));//community
+         }           
+           else if (index == 4) {
+            Navigator.pushNamed(context, AppRoutes.profile);
+          } 
         },
       ),
     );
   }
 
-  Widget _buildHeroHeader(
-    BuildContext context,
-    String? photoUrl,
-    String name,
-  ) {
+  Widget _buildHeroHeader(BuildContext context, String? photoUrl, String name) {
     final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
 
     return Container(

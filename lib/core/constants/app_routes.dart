@@ -1,5 +1,9 @@
 abstract class AppRoutes {
   static const String home = '/home';
+ // static const String map = '/map';
+  //static const String community = '/community';
+  //static const String trip = '/trip';
+
   static const String search = '/search';
   static const String notifications = '/notifications';
   static const onboarding = '/onboarding';

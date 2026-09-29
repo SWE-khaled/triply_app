@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:triply/data/mock/mock_palces_raw.dart';
 import '../../home/model/place.dart';
 import '../model/search_filter.dart';
-import '../../../data/mock/mock_places.dart';
 import '../../../data/mock/mock_search.dart';
 
 class SearchController extends ChangeNotifier {

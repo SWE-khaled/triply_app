@@ -1,10 +1,16 @@
 import 'package:flutter/foundation.dart';
+import 'package:triply/data/mock/mock_guide_raw.dart';
+import 'package:triply/data/mock/mock_palces_raw.dart';
 import '../model/place.dart';
 import '../model/guide.dart';
 import '../model/trip.dart';
-import '../../../data/mock/mock_places.dart';
-import '../../../data/mock/mock_guides.dart';
-import '../../../data/mock/mock_trips.dart';
+import '../../../data/mock/mock_trips_raw.dart';
+
+
+
+
+
+
 
 class HomeController extends ChangeNotifier {
   List<Place> places = [];
