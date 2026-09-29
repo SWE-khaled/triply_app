@@ -39,7 +39,8 @@ class MyApp extends StatelessWidget {
             switch (authProvider.status) {
               case AuthStatus.initial:
                 return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
+                  body: Center(child: CircularProgressIndicator()
+                  ),
                 );
               case AuthStatus.authenticated:
                 return const HomeScreen();
