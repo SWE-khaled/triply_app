@@ -43,7 +43,7 @@ class _TripsScreenState extends State<TripsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Text('My Trips', style: AppTextStyles.screenTitle),
+              child: Text('Trips', style: AppTextStyles.screenTitle),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
