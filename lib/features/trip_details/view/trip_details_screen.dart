@@ -16,7 +16,14 @@ import '../widgets/guide_card.dart';
 class TripDetailsScreen extends StatelessWidget {
   final Trip trip;
 
-  const TripDetailsScreen({super.key, required this.trip});
+  /// True when opened from My Trips (already booked): hides Book Now.
+  final bool isBooked;
+
+  const TripDetailsScreen({
+    super.key,
+    required this.trip,
+    this.isBooked = false,
+  });
 
   static const List<String> tabs = [
     'About',
@@ -90,6 +97,7 @@ class TripDetailsScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         BookingBar(
                           details: details,
+                          showBookNow: !isBooked,
                           onBookNow: () => Navigator.of(
                             context,
                           ).push(AppRoutes.booking(trip)),

@@ -8,7 +8,15 @@ class BookingBar extends StatelessWidget {
   final TripDetails details;
   final VoidCallback onBookNow;
 
-  const BookingBar({super.key, required this.details, required this.onBookNow});
+  /// Hidden when the trip is already booked (My Trips flow).
+  final bool showBookNow;
+
+  const BookingBar({
+    super.key,
+    required this.details,
+    required this.onBookNow,
+    this.showBookNow = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,26 +79,27 @@ class BookingBar extends StatelessWidget {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: onBookNow,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accentOrange,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+            if (showBookNow)
+              ElevatedButton(
+                onPressed: onBookNow,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.accentOrange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                  textStyle: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                elevation: 0,
-                textStyle: GoogleFonts.poppins(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
+                child: const Text('Book Now'),
               ),
-              child: const Text('Book Now'),
-            ),
           ],
         ),
       ],

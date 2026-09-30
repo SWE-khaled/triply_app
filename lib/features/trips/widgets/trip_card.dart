@@ -75,24 +75,7 @@ class TripCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              GestureDetector(
-                                onTap: onChat,
-                                child: Container(
-                                  width: 28,
-                                  height: 28,
-                                  alignment: Alignment.center,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(0xFFF1F4F5),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    AppAsset.iconChat,
-                                    width: 14,
-                                    height: 14,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
+
                             ],
                           ),
                           const SizedBox(height: 3),

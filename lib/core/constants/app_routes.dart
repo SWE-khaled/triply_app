@@ -9,6 +9,8 @@ import '../../features/trip_details/view/trip_details_screen.dart';
 import '../../features/booking/cubit/booking_cubit.dart';
 import '../../features/booking/view/booking_screen.dart';
 import '../../features/booking/view/booking_confirmed_screen.dart';
+import '../../features/my_trips/cubit/my_trips_cubit.dart';
+import '../../features/my_trips/view/my_trips_screen.dart';
 import '../../features/popular/cubit/popular_cubit.dart';
 import '../../features/popular/view/popular_trips_screen.dart';
 
@@ -33,11 +35,11 @@ class AppRoutes {
     );
   }
 
-  static Route<void> tripDetails(Trip trip) {
+  static Route<void> tripDetails(Trip trip, {bool isBooked = false}) {
     return MaterialPageRoute(
       builder: (_) => BlocProvider(
         create: (_) => TripDetailsCubit()..loadTrip(trip),
-        child: TripDetailsScreen(trip: trip),
+        child: TripDetailsScreen(trip: trip, isBooked: isBooked),
       ),
     );
   }
@@ -49,6 +51,22 @@ class AppRoutes {
         child: BookingScreen(trip: trip),
       ),
     );
+  }
+
+  static Route<void> myTrips() {
+    return MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => MyTripsCubit(),
+        child: const MyTripsScreen(),
+      ),
+    );
+  }
+
+  /// Post-booking destination: always lands on My Trips, where the
+  /// fresh cubit reads the booking store — the booked trip is visible.
+  static void goToMyTrips(BuildContext context) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    Navigator.of(context).push(myTrips());
   }
 
   static Route<void> bookingConfirmed({

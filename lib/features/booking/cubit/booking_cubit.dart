@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../data/my_bookings.dart';
 import '../model/booking.dart';
 import 'booking_state.dart';
 
@@ -40,7 +41,7 @@ class BookingCubit extends Cubit<BookingState> {
   double total(double unitPrice) => subtotal(unitPrice) + fee(unitPrice);
 
   Booking confirm({required String tripId, required double unitPrice}) {
-    return Booking(
+    final booking = Booking(
       tripId: tripId,
       seats: state.seats,
       specialRequests: state.specialRequests,
@@ -48,5 +49,8 @@ class BookingCubit extends Cubit<BookingState> {
       serviceFee: fee(unitPrice),
       total: total(unitPrice),
     );
+    // Makes the trip appear in My Trips (Upcoming).
+    MyBookings.record(tripId, booking.seats);
+    return booking;
   }
 }

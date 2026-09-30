@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_asset.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/helper/price_format.dart';
 import '../../../core/widgets/app_snackbar.dart';
@@ -199,9 +200,8 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  // Back to the trip details (confirmed replaced booking,
-                  // so one pop returns to TripDetailsScreen).
-                  onPressed: () => Navigator.of(context).pop(),
+                  // Post-booking destination is My Trips (flow spec).
+                  onPressed: () => AppRoutes.goToMyTrips(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.tabSelectedBg,
                     foregroundColor: Colors.white,
@@ -215,7 +215,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: const Text('Back to Trip'),
+                  child: const Text('Back to My Trips'),
                 ),
               ),
             ],

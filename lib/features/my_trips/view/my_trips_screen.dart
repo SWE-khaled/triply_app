@@ -4,31 +4,42 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../cubit/trips_cubit.dart';
-import '../cubit/trips_state.dart';
-import '../models/trip.dart';
-import '../widgets/empty_trips.dart';
-import '../widgets/trip_card.dart';
+import '../../../core/widgets/app_bottom_nav.dart';
+import '../../../core/widgets/app_snackbar.dart';
+import '../../trips/models/trip.dart';
+import '../../trips/widgets/empty_trips.dart';
+import '../../trips/widgets/trip_card.dart';
+import '../cubit/my_trips_cubit.dart';
+import '../cubit/my_trips_state.dart';
 
-class TripsScreen extends StatefulWidget {
-  const TripsScreen({super.key});
+/// Booked trips only. Opened after booking and from the bottom nav.
+/// Details opened from here hide Book Now (already booked).
+class MyTripsScreen extends StatefulWidget {
+  const MyTripsScreen({super.key});
 
   @override
-  State<TripsScreen> createState() => _TripsScreenState();
+  State<MyTripsScreen> createState() => _MyTripsScreenState();
 }
 
-class _TripsScreenState extends State<TripsScreen> {
+class _MyTripsScreenState extends State<MyTripsScreen> {
   int bottomIndex = 1; // Trips
 
-  static const List<String> tabLabels = ['Upcoming', 'Completed'];
+  static const List<String> tabLabels = [
+    'Upcoming',
+    'Ongoing',
+    'Completed',
+    'Cancelled',
+  ];
 
   static const List<TripStatus> tabValues = [
     TripStatus.upcoming,
+    TripStatus.ongoing,
     TripStatus.completed,
+    TripStatus.cancelled,
   ];
 
   void _openDetails(Trip trip) {
-    Navigator.of(context).push(AppRoutes.tripDetails(trip));
+    Navigator.of(context).push(AppRoutes.tripDetails(trip, isBooked: true));
   }
 
   @override
@@ -41,7 +52,7 @@ class _TripsScreenState extends State<TripsScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Text('Trips', style: AppTextStyles.screenTitle),
+              child: Text('My Trips', style: AppTextStyles.screenTitle),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
@@ -59,14 +70,14 @@ class _TripsScreenState extends State<TripsScreen> {
                   color: AppColors.tabUnselectedBg,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: BlocBuilder<TripsCubit, TripsState>(
+                child: BlocBuilder<MyTripsCubit, MyTripsState>(
                   builder: (context, state) {
                     return Row(
                       children: List.generate(tabValues.length, (i) {
                         final selected = tabValues[i] == state.selectedTab;
                         return Expanded(
                           child: GestureDetector(
-                            onTap: () => context.read<TripsCubit>().selectTab(
+                            onTap: () => context.read<MyTripsCubit>().selectTab(
                               tabValues[i],
                             ),
                             behavior: HitTestBehavior.opaque,
@@ -101,7 +112,7 @@ class _TripsScreenState extends State<TripsScreen> {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: BlocBuilder<TripsCubit, TripsState>(
+              child: BlocBuilder<MyTripsCubit, MyTripsState>(
                 builder: (context, state) {
                   final trips = state.trips;
                   if (trips.isEmpty) {
@@ -129,6 +140,19 @@ class _TripsScreenState extends State<TripsScreen> {
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: bottomIndex,
+        // Only Trips exists; other tabs are placeholders.
+        onTap: (i) {
+          if (i == bottomIndex) return;
+          // TODO: navigate when Home/Places/Community/Profile screens exist.
+          showAppSnackBar(
+            context,
+            'Screen not available yet',
+            icon: Icons.info_outline,
+          );
+        },
       ),
     );
   }

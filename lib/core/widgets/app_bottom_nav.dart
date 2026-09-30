@@ -11,8 +11,8 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     const items = [
       (Icons.home_outlined, 'Home'),
-      (Icons.calendar_today_outlined, 'My Trips'),
-      (Icons.location_on_outlined, 'Map'),
+      (Icons.calendar_today_outlined, 'Trips'),
+      (Icons.location_on_outlined, 'Places'),
       (Icons.chat_bubble_outline, 'Community'),
       (Icons.person_outline, 'Profile'),
     ];
