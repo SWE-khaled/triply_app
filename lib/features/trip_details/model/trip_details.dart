@@ -76,8 +76,7 @@ class TripDetails {
       groupType: json['groupType'] as String,
       languages: json['languages'] as String,
       about: json['about'] as String,
-      highlights:
-          (json['highlights'] as List).map((e) => e as String).toList(),
+      highlights: (json['highlights'] as List).map((e) => e as String).toList(),
       itinerary: (json['itinerary'] as List)
           .map((e) => ItineraryStop.fromJson(e as Map<String, dynamic>))
           .toList(),

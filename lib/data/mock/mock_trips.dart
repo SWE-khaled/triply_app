@@ -9,6 +9,8 @@ const List<Map<String, dynamic>> mockTripsJson = [
     'priceEgp': 6000,
     'imageUrl': 'https://picsum.photos/seed/pyramids/300/400',
     'status': 'upcoming',
+    'category': 'historical',
+    'capacity': 12,
   },
   {
     'id': 't2',
@@ -19,6 +21,8 @@ const List<Map<String, dynamic>> mockTripsJson = [
     'priceEgp': 4750,
     'imageUrl': 'https://picsum.photos/seed/nile/300/400',
     'status': 'upcoming',
+    'category': 'activities',
+    'capacity': 12,
   },
   {
     'id': 't3',
@@ -29,5 +33,7 @@ const List<Map<String, dynamic>> mockTripsJson = [
     'priceEgp': 7500,
     'imageUrl': 'https://picsum.photos/seed/valley/300/400',
     'status': 'upcoming',
+    'category': 'historical',
+    'capacity': 10,
   },
 ];

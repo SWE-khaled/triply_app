@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import '../theme/app_colors.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int>? onTap;
 
-  const AppBottomNav({
-    super.key,
-    required this.currentIndex,
-    this.onTap,
-  });
+  const AppBottomNav({super.key, required this.currentIndex, this.onTap});
 
   @override
   Widget build(BuildContext context) {

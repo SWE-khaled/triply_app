@@ -9,6 +9,8 @@ class Trip {
   final double priceEgp;
   final String imageUrl;
   final TripStatus status;
+  final String category;
+  final int capacity;
 
   const Trip({
     required this.id,
@@ -19,6 +21,8 @@ class Trip {
     required this.priceEgp,
     required this.imageUrl,
     required this.status,
+    required this.category,
+    required this.capacity,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -34,6 +38,8 @@ class Trip {
         (e) => e.name == json['status'],
         orElse: () => TripStatus.upcoming,
       ),
+      category: (json['category'] ?? 'historical') as String,
+      capacity: (json['capacity'] ?? 12) as int,
     );
   }
 
@@ -47,6 +53,8 @@ class Trip {
       'priceEgp': priceEgp,
       'imageUrl': imageUrl,
       'status': status.name,
+      'category': category,
+      'capacity': capacity,
     };
   }
 }

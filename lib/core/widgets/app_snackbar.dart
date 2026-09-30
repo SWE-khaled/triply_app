@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../constants/app_colors.dart';
+import '../theme/app_colors.dart';
 
 /// Shared styled SnackBar so every message looks the same.
 /// Same arch: pure UI helper in core, no state, no packages.
