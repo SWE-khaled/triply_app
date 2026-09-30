@@ -19,11 +19,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
       home:
-      //todo
-      // BlocProvider(
-      //   create: (_) => PopularCubit(),
-      //   child: const PopularTripsScreen(),
-      // ),
       BlocProvider(
         create: (_) => TripsCubit(),
         child: const TripsScreen(),
