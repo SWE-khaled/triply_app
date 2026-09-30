@@ -1,12 +1,11 @@
-/// Booking draft + confirmed booking for the Booking flow.
-/// UI consumes this Model via the controller, never raw Maps.
+
 class Booking {
   final String id;
   final String guideId;
-  final String dateLabel; // yyyy-MM-dd, e.g. "2026-09-25"
-  final String timeSlot; // e.g. "7:00 AM"
-  final String durationLabel; // e.g. "6 hours" / "Full Day"
-  final int durationHours; // Full Day = 8 for pricing
+  final String dateLabel;
+  final String timeSlot;
+  final String durationLabel;
+  final int durationHours;
   final int travelers;
   final String meetingPoint;
   final String notes;

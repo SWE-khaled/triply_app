@@ -49,3 +49,6 @@ app.*.map.json
 
 # Unignore main.dart only
 !lib/main.dart
+
+# Secrets — never commit
+.env

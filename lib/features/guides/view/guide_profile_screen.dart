@@ -250,7 +250,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           _divider(),
           _StatItem(
             value:
-            '${_profilePrice(guide.pricePerHour)}${guide.currency == '\$' ? ' EGP ' : guide.currency}',
+            '${guide.pricePerHour}${guide.currency}',
             label: 'Price/hr',
           ),
         ],
@@ -258,13 +258,6 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  String _profilePrice(double perHour) {
-    // Mock display conversion: $75 -> EGP 3750 (x50) to match Figma example.
-    if (_controller.guide.currency == '\$') {
-      return (perHour * 50).toStringAsFixed(0);
-    }
-    return perHour.toStringAsFixed(0);
-  }
 
   Widget _divider() {
     return Container(width: 1, height: 32, color: Color(0xFF8A9EA3));

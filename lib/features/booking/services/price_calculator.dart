@@ -1,5 +1,4 @@
-/// Pure pricing helpers for the Booking flow (no widgets, no state).
-/// Matches Figma example: $85 x 6h x 2 travelers = $1020, fee 5% = $51.
+
 class PriceCalculator {
   PriceCalculator._();
 

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:triply/features/booking/controller/booking_controller.dart';
 import 'package:triply/features/booking/widgets/booking_widgets.dart';
+import 'package:triply/features/checkout/controller/checkout_controller.dart';
+import 'package:triply/features/checkout/model/booking_model.dart';
+import 'package:triply/features/checkout/view/paymob_webview_screen.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-/// Figma: BookingScreen — 4 states driven by [BookingController.stepIndex]:
-/// 0 Date & Time, 1 Details, 2 Confirm, 3 Confirmed (success).
 class BookingScreen extends StatefulWidget {
   final String guideId;
 
@@ -377,6 +378,9 @@ class _BookingScreenState extends State<BookingScreen> {
             value:
                 '${guide.currency}${_controller.total.toStringAsFixed(0)}',
             bold: true),
+        _paymentMethodCard(),
+        const SizedBox(height: 12),
+        _termsNote(),
       ],
     );
   }
@@ -625,8 +629,8 @@ class _BookingScreenState extends State<BookingScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                // No payment backend — builds local Booking model only.
-                onPressed: () => _controller.confirm(),
+                // Connected: forwards the live booking state to checkout.
+                onPressed: () => _openCheckout(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -643,6 +647,115 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
       ),
     );
+  }
+
+  Widget _paymentMethodCard() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.credit_card, color: AppColors.primary, size: 26),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Payment Method',
+                  style: TextStyle(fontSize: 12, color: AppColors.subtitle),
+                ),
+                const SizedBox(height: 2),
+                const Text(
+                  'Credit / Debit Card',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.title,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                const Text(
+                  'Card details are entered securely in the next step.',
+                  style: TextStyle(fontSize: 12, color: AppColors.subtitle),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  Widget _termsNote() {
+    return const Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.verified_user_outlined, size: 18, color: AppColors.primary),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            'Secure payment. Free cancellation up to 48 hours before the tour. By confirming you agree to the Terms & Cancellation Policy.',
+            style: TextStyle(fontSize: 12, color: AppColors.subtitle),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+  Future<void> _openCheckout(BuildContext context) async {
+    final guide = _controller.guide;
+    final summary = CheckoutBookingSummary(
+      guideId: _controller.guideId,
+      guideName: guide.name,
+      guideSpecialty: guide.specialty,
+      guideAvatarUrl: guide.avatarUrl,
+      dateLabel: _controller.dateLabel,
+      timeSlot: _controller.timeSlot ?? '',
+      durationLabel: _controller.durationLabel,
+      travelers: _controller.travelers,
+      meetingPoint: _controller.meetingPoint,
+      pricePerHour: guide.pricePerHour,
+      currency: guide.currency,
+      serviceFee: _controller.serviceFee,
+      total: _controller.total,
+    );
+    final checkout = CheckoutController(summary: summary);
+    // Captured before the async gap (avoids BuildContext across awaits).
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+    );
+    final token = await checkout.startPayment();
+    if (!mounted) return;
+    navigator.pop(); // Dismiss the loading dialog.
+    if (token != null) {
+      final guideName = guide.name;
+      checkout.dispose(); // WebView only needs the token strings below.
+      navigator.push(
+        MaterialPageRoute(
+          builder: (_) => PaymobWebviewScreen(
+            paymentToken: token,
+            guideName: guideName,
+          ),
+        ),
+      );
+    } else {
+      final message = checkout.payError ?? 'Payment failed. Please try again.';
+      checkout.dispose();
+      messenger.showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
   }
 
   Widget _sectionLabel(String text) {
