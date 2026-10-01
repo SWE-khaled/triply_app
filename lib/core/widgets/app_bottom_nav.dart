@@ -2,27 +2,60 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class AppBottomNav extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
 
-  const AppBottomNav({super.key, required this.currentIndex, required this.onTap});
+  final int currentIndex;
+  final ValueChanged<int>? onTap;
+
+  const AppBottomNav({super.key, required this.currentIndex, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: AppColors.primaryTeal,
-      unselectedItemColor: AppColors.textGrey,
-      selectedFontSize: 12,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: 'Trips'),
-        BottomNavigationBarItem(icon: Icon(Icons.place_outlined), label: 'Map'),
-        BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Community'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-      ],
+    const items = [
+      (Icons.home_outlined, 'Home'),
+      (Icons.calendar_today_outlined, 'My Trip'),
+      (Icons.location_on_outlined, 'Places'),
+      (Icons.chat_bubble_outline, 'Community'),
+      (Icons.person_outline, 'Profile'),
+    ];
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: AppColors.cardBorder)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(items.length, (i) {
+              final selected = i == currentIndex;
+              final color = selected
+                  ? AppColors.bottomNavSelected
+                  : AppColors.bottomNavUnselected;
+              return GestureDetector(
+                onTap: onTap == null ? null : () => onTap!(i),
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(items[i].$1, size: 22, color: color),
+                    const SizedBox(height: 2),
+                    Text(
+                      items[i].$2,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: color,
+                        fontWeight:
+                            selected ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
     );
   }
 }

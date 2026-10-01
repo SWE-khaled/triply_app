@@ -4,6 +4,8 @@ import 'package:triply/features/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/community/view/community_view.dart';
 import 'package:triply/features/guides/view/guides_list_screen.dart';
 import 'package:triply/features/map/view/map_view.dart';
+import 'package:triply/features/my_trips/view/my_trips_screen.dart';
+import 'package:triply/features/popular/view/popular_trips_screen.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_text_styles.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
@@ -118,7 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SectionHeader(
                 title: 'Popular Trips',
                 // TODO(Figma): no destination in Figma yet.
-                onSeeAllTap: () {},
+                onSeeAllTap: () {
+                  
+                },
               ),
             ),
             const SizedBox(height: 12),
@@ -169,9 +173,11 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) {
           if (index == 0) {
             controller.setBottomNavIndex(index);
-          //}else if (index == 1) {
-            //Navigator.pushNamed(context, AppRoutes.);
-          } else if (index == 2) {
+          }
+          //else if (index == 1) {
+          //  Navigator.push(context,MaterialPageRoute(builder: ((context)=>MyTripsScreen())));//My trip
+          //}
+           else if (index == 2) {
             Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); //map
           }
            else if (index == 3) {
