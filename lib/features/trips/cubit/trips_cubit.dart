@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/mock/mock_trips.dart';
+import '../../../data/mock/mock_trips_public.dart';
 import '../models/trip.dart';
 import 'trips_state.dart';
 

@@ -7,22 +7,22 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/trip_details_source.dart';
 import '../../trip_details/model/trip_details.dart';
 import '../../trips/models/trip.dart';
-import '../cubit/booking_cubit.dart';
-import '../cubit/booking_state.dart';
+import '../cubit/booking_public_cubit.dart';
+import '../cubit/booking_public_state.dart';
 import '../widgets/booking_summary_card.dart';
 import '../widgets/price_breakdown.dart';
 import '../widgets/seats_stepper.dart';
 
-class BookingScreen extends StatefulWidget {
+class BookingPublicScreen extends StatefulWidget {
   final Trip trip;
 
-  const BookingScreen({super.key, required this.trip});
+  const BookingPublicScreen({super.key, required this.trip});
 
   @override
-  State<BookingScreen> createState() => _BookingScreenState();
+  State<BookingPublicScreen> createState() => _BookingPublicScreenState();
 }
 
-class _BookingScreenState extends State<BookingScreen> {
+class _BookingPublicScreenState extends State<BookingPublicScreen> {
   late final TripDetails details;
   final TextEditingController requestsController = TextEditingController();
 
@@ -39,7 +39,7 @@ class _BookingScreenState extends State<BookingScreen> {
     // Seats left = capacity - people already on the trip (card number).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<BookingCubit>().setMaxSpots(
+      context.read<BookingPublicCubit>().setMaxSpots(
         widget.trip.capacity - widget.trip.peopleCount,
       );
     });
@@ -52,7 +52,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   void _confirm(BuildContext context) {
-    final cubit = context.read<BookingCubit>();
+    final cubit = context.read<BookingPublicCubit>();
     final booking = cubit.confirm(
       tripId: widget.trip.id,
       unitPrice: details.priceEgp,
@@ -103,9 +103,9 @@ class _BookingScreenState extends State<BookingScreen> {
           ],
         ),
       ),
-      body: BlocBuilder<BookingCubit, BookingState>(
+      body: BlocBuilder<BookingPublicCubit, BookingPublicState>(
         builder: (context, state) {
-          final cubit = context.read<BookingCubit>();
+          final cubit = context.read<BookingPublicCubit>();
           final total = cubit.total(details.priceEgp);
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -192,9 +192,9 @@ class _BookingScreenState extends State<BookingScreen> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: BlocBuilder<BookingCubit, BookingState>(
+          child: BlocBuilder<BookingPublicCubit, BookingPublicState>(
             builder: (context, state) {
-              final total = context.read<BookingCubit>().total(
+              final total = context.read<BookingPublicCubit>().total(
                 details.priceEgp,
               );
               return SizedBox(

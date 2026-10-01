@@ -12,7 +12,7 @@ import '../../trips/widgets/trip_card.dart';
 import '../cubit/my_trips_cubit.dart';
 import '../cubit/my_trips_state.dart';
 
-/// Booked trips only. Opened after booking and from the bottom nav.
+/// Booked trips only. Opened after booking_public and from the bottom nav.
 /// Details opened from here hide Book Now (already booked).
 class MyTripsScreen extends StatefulWidget {
   const MyTripsScreen({super.key});

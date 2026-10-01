@@ -1,8 +1,8 @@
 /// Session-only record of confirmed bookings (mock phase, no backend).
 /// TripsCubit-style consumers read this; BookingCubit writes it.
 /// Later: replaced by API orders — Views/Cubits keep the same calls.
-class MyBookings {
-  MyBookings._();
+class MyBookingsPublic {
+  MyBookingsPublic._();
 
   static final Map<String, int> _seatsByTrip = <String, int>{};
 

@@ -1,4 +1,4 @@
-class Booking {
+class BookingPublic {
   final String tripId;
   final int seats;
   final String specialRequests;
@@ -6,7 +6,7 @@ class Booking {
   final double serviceFee;
   final double total;
 
-  const Booking({
+  const BookingPublic({
     required this.tripId,
     required this.seats,
     required this.specialRequests,
@@ -15,8 +15,8 @@ class Booking {
     required this.total,
   });
 
-  factory Booking.fromJson(Map<String, dynamic> json) {
-    return Booking(
+  factory BookingPublic.fromJson(Map<String, dynamic> json) {
+    return BookingPublic(
       tripId: json['tripId'] as String,
       seats: json['seats'] as int,
       specialRequests: (json['specialRequests'] ?? '') as String,

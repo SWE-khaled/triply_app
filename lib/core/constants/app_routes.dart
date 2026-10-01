@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/booking_public/cubit/booking_public_cubit.dart';
+import '../../features/booking_public/view/booking_confirmed_screen.dart';
+import '../../features/booking_public/view/booking_public_screen.dart';
 import '../../features/trip_details/model/trip_details.dart';
 import '../../features/trips/cubit/trips_cubit.dart';
 import '../../features/trips/models/trip.dart';
 import '../../features/trips/view/trips_screen.dart';
 import '../../features/trip_details/cubit/trip_details_cubit.dart';
 import '../../features/trip_details/view/trip_details_screen.dart';
-import '../../features/booking/cubit/booking_cubit.dart';
-import '../../features/booking/view/booking_screen.dart';
-import '../../features/booking/view/booking_confirmed_screen.dart';
 import '../../features/my_trips/cubit/my_trips_cubit.dart';
 import '../../features/my_trips/view/my_trips_screen.dart';
 import '../../features/popular/cubit/popular_cubit.dart';
@@ -47,8 +47,8 @@ class AppRoutes {
   static Route<void> booking(Trip trip) {
     return MaterialPageRoute(
       builder: (_) => BlocProvider(
-        create: (_) => BookingCubit(),
-        child: BookingScreen(trip: trip),
+        create: (_) => BookingPublicCubit(),
+        child: BookingPublicScreen(trip: trip),
       ),
     );
   }
@@ -62,8 +62,8 @@ class AppRoutes {
     );
   }
 
-  /// Post-booking destination: always lands on My Trips, where the
-  /// fresh cubit reads the booking store — the booked trip is visible.
+  /// Post-booking_public destination: always lands on My Trips, where the
+  /// fresh cubit reads the booking_public store — the booked trip is visible.
   static void goToMyTrips(BuildContext context) {
     Navigator.of(context).popUntil((route) => route.isFirst);
     Navigator.of(context).push(myTrips());

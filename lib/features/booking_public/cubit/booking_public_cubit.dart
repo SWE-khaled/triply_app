@@ -1,15 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/my_bookings.dart';
-import '../model/booking.dart';
-import 'booking_state.dart';
+import '../../../data/my_bookings_public.dart';
+import '../model/booking_public.dart';
+import 'booking_public_state.dart';
 
-/// Owns seats/requests state + pricing (mock phase, local math only).
-class BookingCubit extends Cubit<BookingState> {
+class BookingPublicCubit extends Cubit<BookingPublicState> {
   static const double serviceRate = 0.05;
   static const int minSeats = 1;
 
-  BookingCubit()
-    : super(const BookingState(seats: 1, specialRequests: '', maxSpots: 6));
+  BookingPublicCubit()
+      : super(const BookingPublicState(seats: 1, specialRequests: '', maxSpots: 6));
 
   /// Links the card's group size to availability:
   /// spots left = trip capacity - people already on the trip.
@@ -40,8 +39,8 @@ class BookingCubit extends Cubit<BookingState> {
 
   double total(double unitPrice) => subtotal(unitPrice) + fee(unitPrice);
 
-  Booking confirm({required String tripId, required double unitPrice}) {
-    final booking = Booking(
+  BookingPublic confirm({required String tripId, required double unitPrice}) {
+    final booking = BookingPublic(
       tripId: tripId,
       seats: state.seats,
       specialRequests: state.specialRequests,
@@ -50,7 +49,7 @@ class BookingCubit extends Cubit<BookingState> {
       total: total(unitPrice),
     );
     // Makes the trip appear in My Trips (Upcoming).
-    MyBookings.record(tripId, booking.seats);
+    MyBookingsPublic.record(tripId, booking.seats);
     return booking;
   }
 }
