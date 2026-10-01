@@ -1,5 +1,6 @@
 name: triply
 description: "A new Flutter project."
+
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -24,12 +25,13 @@ dependencies:
 
   # State management & networking
   provider: ^6.1.2
-  http: ^1.2.0
+  http: ^1.6.0
 
   # Utilities
-  flutter_dotenv: ^5.2.1
+  flutter_dotenv: ^6.0.1
   url_launcher: ^6.3.1
   image_picker: ^1.1.2
+  webview_flutter: ^4.14.1
 
   cupertino_icons: ^1.0.8
 
@@ -41,5 +43,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-assets:
-   - .env
+  assets:
+    - .env

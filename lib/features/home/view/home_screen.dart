@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:triply/features/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/community/view/community_view.dart';
+import 'package:triply/features/guides/view/guides_list_screen.dart';
 import 'package:triply/features/map/view/map_view.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/theme/app_text_styles.dart';
@@ -91,7 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SectionHeader(
                 title: 'Local Guides',
                 // TODO(Figma): no destination in Figma yet.
-                onSeeAllTap: () {},
+                onSeeAllTap: () {
+                Navigator.push(context,MaterialPageRoute(builder: ((context)=>GuidesListScreen())));
+
+                },
               ),
             ),
             const SizedBox(height: 12),
