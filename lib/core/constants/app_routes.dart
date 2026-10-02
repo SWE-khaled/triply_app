@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../features/booking_public/cubit/booking_public_cubit.dart';
-import '../../features/booking_public/view/booking_confirmed_screen.dart';
-import '../../features/booking_public/view/booking_public_screen.dart';
-import '../../features/trip_details/model/trip_details.dart';
-import '../../features/trips/cubit/trips_cubit.dart';
-import '../../features/trips/models/trip.dart';
-import '../../features/trips/view/trips_screen.dart';
-import '../../features/trip_details/cubit/trip_details_cubit.dart';
-import '../../features/trip_details/view/trip_details_screen.dart';
-import '../../features/my_trips/cubit/my_trips_cubit.dart';
-import '../../features/my_trips/view/my_trips_screen.dart';
-import '../../features/popular/cubit/popular_cubit.dart';
-import '../../features/popular/view/popular_trips_screen.dart';
+import '../../features/tourist/booking_public/cubit/booking_public_cubit.dart';
+import '../../features/tourist/booking_public/view/booking_confirmed_screen.dart';
+import '../../features/tourist/booking_public/view/booking_public_screen.dart';
+import '../../features/tourist/trip_details/model/trip_details.dart';
+import '../../features/tourist/trips/cubit/trips_cubit.dart';
+import '../../features/tourist/trips/models/trip.dart';
+import '../../features/tourist/trips/view/trips_screen.dart';
+import '../../features/tourist/trip_details/cubit/trip_details_cubit.dart';
+import '../../features/tourist/trip_details/view/trip_details_screen.dart';
+import '../../features/tourist/my_trips/cubit/my_trips_cubit.dart';
+import '../../features/tourist/my_trips/view/my_trips_screen.dart';
+import '../../features/tourist/popular/cubit/popular_cubit.dart';
+import '../../features/tourist/popular/view/popular_trips_screen.dart';
 
 /// Single route table: named routes (String constants) + route builders.
 /// Views navigate via these builders, never inline MaterialPageRoute.
