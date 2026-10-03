@@ -53,7 +53,7 @@ class AppTextStyles {
   static TextStyle get screenTitle => GoogleFonts.poppins(
         fontSize: 28,
         fontWeight: FontWeight.bold,
-        color: AppColors.titleDark,
+        color: AppColors.primary,
       );
 
   static TextStyle get screenSubtitle =>

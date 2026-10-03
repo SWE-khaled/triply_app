@@ -7,6 +7,7 @@ import 'package:triply/features/common/auth/screens/forgot_password_screen.dart'
 import 'package:triply/features/common/auth/screens/onboarding_screen.dart';
 import 'package:triply/features/common/auth/screens/password_reset_success_screen.dart';
 import 'package:triply/features/common/auth/screens/sign_in_screen.dart';
+import 'features/tour_guide/my_trips/view/guide_trips_screen.dart';
 import 'firebase_options.dart';
 import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
@@ -46,9 +47,9 @@ class MyApp extends StatelessWidget {
                   ),
                 );
               case AuthStatus.authenticated:
-                return const HomeScreen();
+                return const GuideTripsScreen();
               default:
-                return const OnboardingScreen();
+                return const GuideTripsScreen();
             }
           },
         ),
