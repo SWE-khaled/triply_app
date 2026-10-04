@@ -268,7 +268,8 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
         onTap: (i) {
           if (i == bottomIndex) return;
           if (i == 2) {
-            Navigator.of(context).push(AppRoutes.guideProfile());
+            // Guide's own profile (Nour Abdallah in mock data).
+            Navigator.of(context).push(AppRoutes.guideProfile('g2'));
             return;
           }
           // TODO: navigate when guide Home exists.

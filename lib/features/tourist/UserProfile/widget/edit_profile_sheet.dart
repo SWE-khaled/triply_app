@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../common/auth/providers/auth_provider.dart';
 
 class EditProfileSheet extends StatefulWidget {
@@ -73,10 +74,28 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
       return;
     }
 
-    final auth = context.read<AuthProvider>();
     setState(() => _loading = true);
     try {
-      final user = FirebaseAuth.instance.currentUser!;
+      final auth = context.read<AuthProvider>();
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        if (mounted) {
+          setState(() => _loading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Please sign in first'),
+              action: SnackBarAction(
+                label: 'Sign in',
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed(AppRoutes.signIn);
+                },
+              ),
+            ),
+          );
+        }
+        return;
+      }
       String? newPhotoUrl;
 
       if (_pickedImage != null) {

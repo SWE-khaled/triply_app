@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:triply/core/widgets/guide_shared_widgets.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 
-class GuideCard extends StatelessWidget {
+class CardProfile extends StatelessWidget {
   final Guide guide;
   final VoidCallback? onTap;
   final VoidCallback? onChatPressed;
 
-  const GuideCard({
+  const CardProfile({
     super.key,
     required this.guide,
     this.onTap,
@@ -20,7 +20,7 @@ class GuideCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding:  EdgeInsets.all(12),
+        padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -43,7 +43,7 @@ class GuideCard extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     guide.name.isNotEmpty ? guide.name[0] : '?',
-                    style:  TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF0E5261),
@@ -59,65 +59,80 @@ class GuideCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                       Text(
-                          guide.name,
-                          style:  TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF0E5261),
-                          ),
+                      Text(
+                        guide.name,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF0E5261),
                         ),
-                      SizedBox(width: 15,),
+                      ),
+                      SizedBox(width: 15),
                       if (guide.isVerified)
-                         Icon(Icons.verified,
-                            size: 14, color: Color(0xFF4DA7A0)),
+                        Icon(
+                          Icons.verified,
+                          size: 14,
+                          color: Color(0xFF4DA7A0),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
                     guide.specialty,
-                    style:  TextStyle(
-                        fontSize: 12, color: Color(0xFF8A9EA3)),
+                    style: TextStyle(fontSize: 12, color: Color(0xFF8A9EA3)),
                   ),
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 6,
                     runSpacing: 4,
                     children: guide.languages
-                        .map((l) => LanguageChip(label: l, backgroundColor: Color(0xFF4DA7A0).withValues(alpha: .1), textColor: Color(0xFF4DA7A0),))
+                        .map(
+                          (l) => LanguageChip(
+                            label: l,
+                            backgroundColor: Color(
+                              0xFF4DA7A0,
+                            ).withValues(alpha: .1),
+                            textColor: Color(0xFF4DA7A0),
+                          ),
+                        )
                         .toList(),
                   ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       RatingRow(
-                          rating: guide.rating,
-                          reviewCount: guide.reviewCount, ratingColor: Color(0xFF0E5261), reviewCountColor: Color(0xFFAAB8BC),),
+                        rating: guide.rating,
+                        reviewCount: guide.reviewCount,
+                        ratingColor: Color(0xFF0E5261),
+                        reviewCountColor: Color(0xFFAAB8BC),
+                      ),
                       const Spacer(),
                       Text.rich(
                         TextSpan(
                           children: [
-                             TextSpan(
+                            TextSpan(
                               text: 'From ',
                               style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFFE07A4F)),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFFE07A4F),
+                              ),
                             ),
                             TextSpan(
                               text:
                                   '${guide.currency}${guide.pricePerHour.toStringAsFixed(0)}',
-                              style:  TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
-                                color:Color(0xFFE07A4F) ,
+                                color: Color(0xFFE07A4F),
                               ),
                             ),
                             const TextSpan(
                               text: '/hr',
                               style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFFAAB8BC)),
+                                fontSize: 12,
+                                color: Color(0xFFAAB8BC),
+                              ),
                             ),
                           ],
                         ),
@@ -127,21 +142,6 @@ class GuideCard extends StatelessWidget {
                 ],
               ),
             ),
-            // const SizedBox(width: 8),
-            // InkWell(
-            //   onTap: onChatPressed,
-            //   borderRadius: BorderRadius.circular(20),
-            //   child: Container(
-            //     width: 32,
-            //     height: 32,
-            //     decoration:  BoxDecoration(
-            //       color: Color(0xFF4DA7A0).withOpacity(.15),
-            //       shape: BoxShape.circle,
-            //     ),
-            //     child:  Icon(Icons.chat_outlined,
-            //         size: 16, color: Color(0xFF4DA7A0)),
-            //   ),
-            // ),
           ],
         ),
       ),

@@ -65,7 +65,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           Positioned.fill(
             child: ColorFiltered(
               colorFilter: ColorFilter.mode(
-                Color(0xFF0E5261).withOpacity(0.3), // Adjust color and opacity
+                Color(0xFF0E5261).withValues(alpha: 0.3), // Adjust color and opacity
                 BlendMode.srcATop, // Or BlendMode.darken / BlendMode.multiply
               ),
               child: Image.network(
@@ -210,7 +210,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                 rating: guide.rating,
                 reviewCount: guide.reviewCount,
                 ratingColor: Colors.white,
-                reviewCountColor: Colors.white.withOpacity(.8),
+                reviewCountColor: Colors.white.withValues(alpha: .8),
               ),
               if (guide.location.isNotEmpty) ...[
                 SizedBox(width: 8),
@@ -441,7 +441,7 @@ class _CircleIconButton extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.4),
+          color: Colors.white.withValues(alpha: .4),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: Colors.white, size: 25),

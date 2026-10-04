@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../features/tourist/booking_public/cubit/booking_public_cubit.dart';
 import '../../features/tourist/booking_public/view/booking_confirmed_screen.dart';
 import '../../features/tourist/booking_public/view/booking_public_screen.dart';
@@ -15,9 +14,10 @@ import '../../features/tourist/my_trips/view/my_trips_screen.dart';
 import '../../features/tourist/popular/cubit/popular_cubit.dart';
 import '../../features/tourist/popular/view/popular_trips_screen.dart';
 import '../../features/tour_guide/my_trips/view/guide_trips_screen.dart';
+import '../../features/tour_guide/earnings/view/earnings_screen.dart';
+import '../../features/tour_guide/profile/view/profile_tour_guide_screen.dart';
 import '../../features/tour_guide/create_trip/view/create_trip_screen.dart';
 import '../../features/tour_guide/trip_details/model/guide_trip_details.dart';
-import '../../features/tour_guide/profile/view/profile_screen.dart';
 import '../../features/tour_guide/trip_details/view/guide_trip_details_screen.dart';
 import '../../features/tour_guide/my_trips/model/guide_trip.dart';
 import '../../features/tour_guide/travelers/view/travelers_screen.dart';
@@ -104,10 +104,6 @@ class AppRoutes {
     return MaterialPageRoute(builder: (_) => TravelersScreen(trip: trip));
   }
 
-  static Route<void> guideProfile() {
-    return MaterialPageRoute(builder: (_) => const GuideProfileScreen());
-  }
-
   static Route<bool?> createTrip() {
     // Screen self-provides its cubit.
     return MaterialPageRoute<bool?>(builder: (_) => const CreateTripScreen());
@@ -141,6 +137,17 @@ class AppRoutes {
         submitLabel: 'Save Changes',
       ),
     );
+  }
+
+  static Route<void> guideProfile(String guideId) {
+    return MaterialPageRoute(
+      builder: (_) => ProfileTourGuideScreen(guideId: guideId),
+    );
+  }
+
+  static Route<void> earnings() {
+    // Screen self-provides its cubit; route adds no provider.
+    return MaterialPageRoute(builder: (_) => const EarningsScreen());
   }
 
   /// Post-booking destination: always lands on My Trips, where the
