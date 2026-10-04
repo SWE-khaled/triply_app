@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/data/mock/tourist/mock_guides.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_snackbar.dart';
+import '../../guides/view/guide_profile_screen.dart';
 import '../../trips/models/trip.dart';
 import '../cubit/trip_details_cubit.dart';
 import '../cubit/trip_details_state.dart';
@@ -32,11 +33,15 @@ class TripDetailsScreen extends StatelessWidget {
     'Notes',
   ];
 
-  void _onFavorite(BuildContext context, bool nowFavorite) {
-    showAppSnackBar(
-      context,
-      nowFavorite ? 'Added to favourites' : 'Removed from favourites',
-      icon: nowFavorite ? Icons.favorite : Icons.heart_broken_outlined,
+  void _openGuideProfile(BuildContext context, String guideName) {
+    final guide = mockGuides.firstWhere(
+      (g) => g.name == guideName,
+      orElse: () => mockGuides.first,
+    );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => GuideProfileScreen(guideId: guide.id),
+      ),
     );
   }
 
@@ -55,17 +60,7 @@ class TripDetailsScreen extends StatelessWidget {
               children: [
                 DetailsHeader(
                   imageUrl: details.imageUrl,
-                  isFavorite: state.isFavorite,
                   onBack: () => Navigator.of(context).pop(),
-                  onFavorite: () => _onFavorite(
-                    context,
-                    context.read<TripDetailsCubit>().toggleFavorite(trip.id),
-                  ),
-                  onShare: () => showAppSnackBar(
-                    context,
-                    'Share not available yet',
-                    icon: Icons.info_outline,
-                  ),
                 ),
                 Container(
                   width: double.infinity,
@@ -105,11 +100,8 @@ class TripDetailsScreen extends StatelessWidget {
                         const SizedBox(height: 14),
                         GuideCard(
                           details: details,
-                          onTap: () => showAppSnackBar(
-                            context,
-                            'Guide profile not available yet',
-                            icon: Icons.info_outline,
-                          ),
+                          onTap: () =>
+                              _openGuideProfile(context, details.guideName),
                         ),
                       ],
                     ),

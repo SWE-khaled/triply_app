@@ -5,7 +5,9 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
-import '../../../../core/widgets/app_snackbar.dart';
+import '../../community/view/community_view.dart';
+import '../../home/view/home_screen.dart';
+import '../../map/view/map_view.dart';
 import '../../trips/models/trip.dart';
 import '../../trips/widgets/empty_trips.dart';
 import '../../trips/widgets/trip_card.dart';
@@ -45,6 +47,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
@@ -118,10 +121,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                   if (trips.isEmpty) {
                     return EmptyTrips(
                       tabName: tabLabels[tabValues.indexOf(state.selectedTab)],
+                      title: 'No Trips Yet',
                     );
                   }
                   return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
                     itemCount: trips.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
@@ -143,15 +147,20 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
       ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: bottomIndex,
-        // Only Trips exists; other tabs are placeholders.
         onTap: (i) {
           if (i == bottomIndex) return;
-          // TODO: navigate when Home/Places/Community/Profile screens exist.
-          showAppSnackBar(
-            context,
-            'Screen not available yet',
-            icon: Icons.info_outline,
-          );
+          if (i == 0) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const HomeScreen()));
+          } else if (i == 2) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const MapScreen()));
+          } else if (i == 3) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const CommunityScreen()));
+          } else if (i == 4) {
+            Navigator.pushNamed(context, AppRoutes.profile);
+          }
         },
       ),
     );

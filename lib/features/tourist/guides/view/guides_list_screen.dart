@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/tourist/guides/controller/guides_controller.dart';
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
 import 'package:triply/features/tourist/guides/widgets/guide_card.dart';
@@ -84,24 +85,7 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
       padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
         children: [
-          InkWell(
-            onTap: () {},
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              width: 41,
-              height: 41,
-              decoration: BoxDecoration(
-                color: Color(0xFFF5F5F5),
-                shape: BoxShape.circle,
-              ),
-              child: InkWell
-              (
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.chevron_left, color: Color(0xFF0E5261),)),
-            ),
-          ),
+          const CircleBackButton(size: 41),
           SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

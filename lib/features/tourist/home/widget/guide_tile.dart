@@ -29,7 +29,23 @@ class GuideTile extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(guide.avatarUrl,
-                  width: 56, height: 56, fit: BoxFit.cover),
+                  width: 56,
+                  height: 56,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    width: 56,
+                    height: 56,
+                    color: const Color(0xFFF0F3F3),
+                    alignment: Alignment.center,
+                    child: Text(
+                      guide.name.isNotEmpty ? guide.name[0].toUpperCase() : '?',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryTeal,
+                      ),
+                    ),
+                  )),
             ),
             const SizedBox(width: 12),
             Expanded(

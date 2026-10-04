@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/network_image_fallback.dart';
 
 class DestinationRow extends StatelessWidget {
   final String title;
@@ -30,8 +31,12 @@ class DestinationRow extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.network(imageUrl,
-                  width: 48, height: 48, fit: BoxFit.cover),
+              child: NetworkImageFallback(
+                imageUrl: imageUrl,
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

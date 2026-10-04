@@ -6,6 +6,7 @@ import 'package:triply/features/tourist/checkout/model/booking_model.dart';
 import 'package:triply/features/tourist/checkout/view/paymob_webview_screen.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/circle_back_button.dart';
 
 class BookingScreen extends StatefulWidget {
   final String guideId;
@@ -103,16 +104,11 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Widget _backButton(VoidCallback onTap) {
-    return InkWell(
+    return CircleBackButton(
+      icon: Icons.chevron_left,
+      iconColor: const Color(0xFF0E5261),
+      backgroundColor: const Color(0xFFF3F4F6),
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: const BoxDecoration(
-            color: Color(0xFFF3F4F6), shape: BoxShape.circle),
-        child: const Icon(Icons.chevron_left, color: Color(0xFF0E5261)),
-      ),
     );
   }
 

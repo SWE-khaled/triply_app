@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/data/trip_details_source.dart';
 import '../../trip_details/model/trip_details.dart';
 import '../../trips/models/trip.dart';
@@ -74,13 +75,9 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.chevron_left,
-            color: AppColors.title,
-            size: 26,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CircleBackButton(),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

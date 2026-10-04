@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/circle_back_button.dart';
 import '../cubit/trips_cubit.dart';
 import '../cubit/trips_state.dart';
 import '../models/trip.dart';
@@ -40,8 +41,14 @@ class _TripsScreenState extends State<TripsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Text('Trips', style: AppTextStyles.screenTitle),
+              padding: const EdgeInsets.fromLTRB(16, 20, 20, 0),
+              child: Row(
+                children: [
+                  const CircleBackButton(),
+                  const SizedBox(width: 12),
+                  Text('Trips', style: AppTextStyles.screenTitle),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),

@@ -52,9 +52,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
       }
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:
-            Text(result.isStory ? 'Posted!': 'Posted!',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 14),),
+      const SnackBar(
+        content: Text(
+          'Posted!',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
       ),
     );
   }
@@ -71,7 +73,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
       setState(() => controller.addMyStory(picked.path));
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Posted!',style: TextStyle(fontWeight: FontWeight.w600,fontSize: 14),)),
+        const SnackBar(
+          content: Text(
+            'Posted!',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+        ),
       );
     } catch (e) {
       if (!mounted) return;
@@ -81,19 +88,21 @@ class _CommunityScreenState extends State<CommunityScreen> {
     }
   }
 
-  /// Opens the viewer with ONLY the tapped user's stories â€” never mixed.
+  /// Opens the viewer with ONLY the tapped user's stories - never mixed.
   void _openStoryViewerForUser(String userId) {
     final userStories = controller.storiesOf(userId);
     if (userStories.isEmpty) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => StoryViewerScreen(
-          stories: userStories,
-          controller: controller,
-        ),
-      ),
-    ).then((_) {
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => StoryViewerScreen(
+              stories: userStories,
+              controller: controller,
+            ),
+          ),
+        )
+        .then((_) {
       // Refresh rings after possible deletions inside the viewer.
       if (mounted) setState(() {});
     });
@@ -105,8 +114,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
     final rings = controller.userRings;
 
     return Scaffold(
+      extendBody: true, // content extends under the glass nav
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false, // <-- let the content reach the bottom of the screen
         child: Column(
           children: [
             Padding(
@@ -127,16 +138,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   ),
                 ],
               ),
-              
             ),
-            SizedBox(height: 4,),
+            const SizedBox(height: 4),
             Expanded(
               child: ListView(
+                padding: const EdgeInsets.only(bottom: 100), // <-- space for nav
                 children: [
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Padding(
-                      padding: const EdgeInsets.only(left:5),
+                      padding: const EdgeInsets.only(left: 5),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -166,7 +177,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   const SizedBox(height: 8),
                   for (final post in controller.posts) ...[
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(12,8,12,0),
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
                       child: PostCard(
                         post: post,
                         onLike: () {
@@ -178,8 +189,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           if (!deleted && mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content:
-                                    Text("You can't delete others post!"),
+                                content: Text("You can't delete others post!"),
                               ),
                             );
                           }
@@ -201,19 +211,21 @@ class _CommunityScreenState extends State<CommunityScreen> {
         currentIndex: 3,
         onTap: (index) {
           if (index == 0) {
-            
-              Navigator.push(context,MaterialPageRoute(builder: ((context)=>HomeScreen())));
-           }
-           // else if (index == 1) {
-           // Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); //trip
-          
-          //} 
-          else if (index == 2) {
-            Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); //map
-          } 
-            else if (index == 4) {
-            Navigator.push(context,MaterialPageRoute(builder: ((context)=>ProfileScreen())));//community
-           }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => MapScreen()),
+            ); // map
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ); // profile
+          }
         },
       ),
     );

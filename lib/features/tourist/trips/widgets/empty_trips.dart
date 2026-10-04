@@ -6,8 +6,9 @@ import '../../../../core/theme/app_colors.dart';
 /// Title is dynamic per tab, e.g. "No Upcoming trips".
 class EmptyTrips extends StatelessWidget {
   final String tabName;
+  final String? title;
 
-  const EmptyTrips({super.key, required this.tabName});
+  const EmptyTrips({super.key, required this.tabName, this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class EmptyTrips extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No $tabName trips',
+              title ?? 'No $tabName trips',
               style: GoogleFonts.poppins(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,

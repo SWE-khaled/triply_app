@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/tourist/guides/controller/guide_profile_controller.dart';
 import 'package:triply/core/widgets/guide_shared_widgets.dart';
 import 'package:triply/features/tourist/booking/view/booking_screen.dart';
@@ -85,8 +86,10 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           Positioned(
             top: MediaQuery.of(context).padding.top + 8,
             left: 16,
-            child: _CircleIconButton(
+            child: CircleBackButton(
               icon: Icons.chevron_left,
+              iconColor: Colors.white,
+              backgroundColor: Colors.white.withValues(alpha: 0.4),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ),
@@ -426,26 +429,3 @@ class _StatItem extends StatelessWidget {
   }
 }
 
-class _CircleIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  const _CircleIconButton({required this.icon, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.4),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 25),
-      ),
-    );
-  }
-}

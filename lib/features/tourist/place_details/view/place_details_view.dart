@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../controller/place_detail_controller.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/widgets/circle_icon_button.dart';
+import '../../../../core/constants/app_routes.dart';
+import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
+import '../../guides/view/guide_profile_screen.dart';
 import '../widget/about_tab.dart';
 import '../widget/guides_tab.dart';
 import '../widget/stories_tab.dart';
@@ -51,34 +53,12 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       horizontal: 16,
                       vertical: 8,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CircleIconButton(
-                          icon: Icons.chevron_left,
-                          onTap: () => Navigator.of(context).maybePop(),
-                          iconSize: 24,
-                        ),
-                        Row(
-                          children: [
-                            CircleIconButton(
-                              icon: place.isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              iconColor: place.isFavorite
-                                  ? Colors.red
-                                  : Colors.black,
-                              onTap: () {
-                                setState(() {
-                                  controller.toggleFavorite();
-                                });
-                              },
-                            ),
-                           
-                          ],
-                        ),
-                      ],
-                    ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const CircleBackButton(),
+                        ],
+                      ),
                   ),
                 ),
               ],
@@ -209,14 +189,27 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                     else if (controller.selectedTabIndex == 1)
                       GuidesTab(
                         guides: controller.guides,
-                        // Placeholder: no Guide-detail in Figma.
-                        onGuideTap: (_) {},
+                        onGuideTap: (guide) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => GuideProfileScreen(
+                                guideId:
+                                    controller.guideProfileIdFor(guide),
+                              ),
+                            ),
+                          );
+                        },
                       )
                     else if (controller.selectedTabIndex == 2)
                       TripsTab(
                         trips: controller.trips,
-                        // Placeholders: no Trip-detail in Figma.
-                        onViewDetails: (_) {},
+                        onViewDetails: (trip) {
+                          Navigator.of(context).push(
+                            AppRoutes.tripDetails(
+                              controller.publicTripFor(trip),
+                            ),
+                          );
+                        },
                         onChat: (_) {},
                       )
                     else

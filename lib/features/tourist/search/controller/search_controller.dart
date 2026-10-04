@@ -1,25 +1,55 @@
 import 'package:flutter/foundation.dart';
-import 'package:triply/core/data/mock/tourist/mock_palces_raw.dart';
-import '../../home/model/place.dart';
+import 'package:triply/core/data/mock/tourist/mock_places.dart';
+import '../../map/model/place.dart';
 import '../model/search_filter.dart';
 import '../../../../core/data/mock/tourist/mock_search.dart';
 
+/// Searches the existing Map places list (single source of truth).
+/// Popular searches / destinations reference Map places by id.
 class SearchController extends ChangeNotifier {
   String query = '';
   SearchFilter activeFilter = SearchFilter.all;
   List<String> recentSearches = List.of(mockRecentSearches);
   final List<Place> allPlaces =
-      mockPlacesRaw.map(Place.fromJson).toList();
+      mockPlaces.map(Place.fromJson).toList();
   bool submitted = false;
 
-  List<Map<String, String>> get popularDestinations => mockPopularDestinations;
-  List<String> get popularSearches => mockPopularSearches;
+  static const _popularSearchIds = [
+    'giza_pyramids',
+    'luxor_temple',
+    'khan_el_khalili',
+    'karnak_temple',
+    'abu_simbel',
+    'citadel_saladin',
+  ];
 
-  List<Map<String, String>> get results {
+  static const _popularDestinationIds = [
+    'giza_pyramids',
+    'khan_el_khalili',
+    'luxor_temple',
+    'abu_simbel',
+  ];
+
+  Place _byId(String id) => allPlaces.firstWhere(
+        (p) => p.id == id,
+        orElse: () => allPlaces.first,
+      );
+
+  List<Place> get popularSearches =>
+      [for (final id in _popularSearchIds) _byId(id)];
+
+  List<Place> get popularDestinations =>
+      [for (final id in _popularDestinationIds) _byId(id)];
+
+  List<Place> get results {
     if (!submitted || query.trim().isEmpty) return [];
     final q = query.trim().toLowerCase();
-    return mockPopularDestinations
-        .where((d) => (d['name'] ?? '').toLowerCase().contains(q))
+    return allPlaces
+        .where((p) =>
+            p.name.toLowerCase().contains(q) ||
+            p.city.toLowerCase().contains(q) ||
+            p.category.toLowerCase().contains(q) ||
+            p.address.toLowerCase().contains(q))
         .toList();
   }
 
@@ -41,6 +71,13 @@ class SearchController extends ChangeNotifier {
   void submit(String value) {
     query = value;
     submitted = true;
+    final v = value.trim();
+    if (v.isNotEmpty && !recentSearches.contains(v)) {
+      recentSearches.insert(0, v);
+      if (recentSearches.length > 10) {
+        recentSearches.removeLast();
+      }
+    }
     notifyListeners();
   }
 

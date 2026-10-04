@@ -40,6 +40,7 @@ class _ProfileBody extends StatelessWidget {
     final photoUrl = firebaseUser?.photoURL;
 
     return Scaffold(
+      extendBody: true,
       backgroundColor: const Color.fromARGB(255, 252, 248, 241),
       body: SingleChildScrollView(
         child: Column(

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:triply/features/tourist/place_details/view/place_details_view.dart';
 import '../controller/search_controller.dart' as c;
-import '../model/search_filter.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../widget/app_filter_chip.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../widget/destination_row.dart';
 import '../widget/empty_state.dart';
@@ -85,23 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 6,),
-            SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  for (final f in SearchFilter.values)
-                    AppFilterChip(
-                      label: f.label,
-                      selected: controller.activeFilter == f,
-                      onSelected: () => controller.setFilter(f),
-                    ),
-                ],
-              ),
-            ),
-          
+            const SizedBox(height: 6,),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -132,13 +115,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   fontWeight: FontWeight.bold,
                   color: AppColors.guidesName)),
           const SizedBox(height: 12),
-          for (final d in controller.results)
+          for (final place in controller.results)
             DestinationRow(
-              title: d['name'] ?? '',
-              subtitle: d['subtitle'] ?? '',
-              imageUrl: d['image_url'] ?? '',
-              // TODO(Figma): no details screen in Figma.
-              onTap: () {},
+              title: place.name,
+              subtitle: '${place.city} · ${place.category}',
+              imageUrl: place.imageUrl,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PlaceDetailScreen(placeId: place.id),
+                  ),
+                );
+              },
             ),
         ],
       );
@@ -210,11 +198,11 @@ class _SearchScreenState extends State<SearchScreen> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final p in controller.popularSearches)
+            for (final place in controller.popularSearches)
               GestureDetector(
                 onTap: () {
-                  textController.text = p;
-                  controller.submit(p);
+                  textController.text = place.name;
+                  controller.submit(place.name);
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -223,7 +211,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     border: Border.all(color: const Color(0xFFE0E0E0)),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(p, style: const TextStyle(fontSize: 13)),
+                  child: Text(place.name, style: const TextStyle(fontSize: 13)),
                 ),
               ),
           ],
@@ -235,13 +223,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 fontWeight: FontWeight.bold,
                 color: AppColors.guidesName)),
         const SizedBox(height: 12),
-        for (final d in controller.popularDestinations)
+        for (final place in controller.popularDestinations)
           DestinationRow(
-            title: d['name'] ?? '',
-            subtitle: d['subtitle'] ?? '',
-            imageUrl: d['image_url'] ?? '',
-            // TODO(Figma): no details screen in Figma.
-            onTap: () {},
+            title: place.name,
+            subtitle: '${place.city} · ${place.category}',
+            imageUrl: place.imageUrl,
+            onTap: () {
+              textController.text = place.name;
+              controller.submit(place.name);
+            },
           ),
       ],
     );

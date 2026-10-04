@@ -5,6 +5,7 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
+import '../../../../core/widgets/circle_back_button.dart';
 import '../../trips/models/trip.dart';
 import '../../trips/widgets/trip_card.dart';
 import '../cubit/popular_cubit.dart';
@@ -26,10 +27,16 @@ class PopularTripsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Text(
-                'Popular Trips',
-                style: AppTextStyles.screenTitle,
+              padding: const EdgeInsets.fromLTRB(16, 20, 20, 0),
+              child: Row(
+                children: [
+                  const CircleBackButton(),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Popular Trips',
+                    style: AppTextStyles.screenTitle,
+                  ),
+                ],
               ),
             ),
             Padding(

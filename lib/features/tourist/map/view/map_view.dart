@@ -5,6 +5,7 @@ import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/tourist/home/view/home_screen.dart';
 
 import '../controller/map_controller.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../model/place.dart';
 import '../../community/view/community_view.dart';
@@ -111,8 +112,10 @@ class _MapScreenState extends State<MapScreen> {
     final selected = controller.selectedPlace;
 
     return Scaffold(
+      extendBody: true, // map extends under the glass nav
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false, // <-- let the map reach the bottom of the screen
         child: Column(
           children: [
             Padding(
@@ -156,7 +159,7 @@ class _MapScreenState extends State<MapScreen> {
                     Positioned(
                       left: 16,
                       right: 16,
-                      bottom: 12,
+                      bottom: 100, // keeps the card above the nav
                       child: PlacePreviewCard(
                         place: selected,
                         onTap: () => _openPlaceDetail(selected),
@@ -167,7 +170,7 @@ class _MapScreenState extends State<MapScreen> {
                     const Positioned(
                       left: 16,
                       right: 16,
-                      bottom: 12,
+                      bottom: 100,
                       child: Card(
                         child: Padding(
                           padding: EdgeInsets.all(16),
@@ -182,21 +185,26 @@ class _MapScreenState extends State<MapScreen> {
         ),
       ),
       bottomNavigationBar: AppBottomNav(
-        currentIndex: 4,
+        currentIndex: 2,
         onTap: (index) {
           if (index == 0) {
-          Navigator.push(context,MaterialPageRoute(builder: ((context)=>HomeScreen())));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          } else if (index == 1) {
+            Navigator.of(context).push(AppRoutes.myTrips());
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CommunityScreen()),
+            );
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            );
           }
-          //else if (index == 1) {
-          //Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen())));  trips
-          //} 
-          else if (index == 3) {
-            Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen()))); 
-          }
-           else if (index == 4) {
-            Navigator.push(context,MaterialPageRoute(builder: ((context)=>ProfileScreen())));
-         }           
-
         },
       ),
     );
