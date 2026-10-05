@@ -44,6 +44,7 @@ class AppColors {
   // ---- Tabs ----
   static const Color tabSelectedBg = Color(0xFF0E5261);
   static final Color tabUnselectedBg = Colors.black.withValues(alpha: 0.06);
+  static final Color tabUnselected = Color(0xffFBF7EF);
 
   // ---- Bottom nav ----
   static const Color bottomNavSelected = Color(0xFF0E4B4A);

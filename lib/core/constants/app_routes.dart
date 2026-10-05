@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import '../../features/tour_guide/create_trip_tg/view/create_trip_screen.dart';
+import '../../features/tour_guide/earnings_tg/view/earnings_screen.dart';
+import '../../features/tour_guide/my_trips_tg/model/guide_trip.dart';
+import '../../features/tour_guide/my_trips_tg/view/guide_trips_screen.dart';
+import '../../features/tour_guide/profile_tg/view/profile_tour_guide_screen.dart';
+import '../../features/tour_guide/travelers_tg/view/travelers_screen.dart';
+import '../../features/tour_guide/trip_details_tg/model/guide_trip_details.dart';
+import '../../features/tour_guide/trip_details_tg/view/guide_trip_details_screen.dart';
 import '../../features/tourist/booking_public/cubit/booking_public_cubit.dart';
 import '../../features/tourist/booking_public/view/booking_confirmed_screen.dart';
 import '../../features/tourist/booking_public/view/booking_public_screen.dart';
@@ -14,6 +21,7 @@ import '../../features/tourist/my_trips/cubit/my_trips_cubit.dart';
 import '../../features/tourist/my_trips/view/my_trips_screen.dart';
 import '../../features/tourist/popular/cubit/popular_cubit.dart';
 import '../../features/tourist/popular/view/popular_trips_screen.dart';
+
 
 /// Single route table: named routes (String constants) + route builders.
 /// Views navigate via these builders, never inline MaterialPageRoute.
@@ -80,6 +88,69 @@ class AppRoutes {
     );
   }
 
+  static Route<void> guideTrips() {
+    // Screen self-provides its cubit; route adds no provider.
+    return MaterialPageRoute(builder: (_) => const GuideTripsScreen());
+  }
+
+  static Route<void> guideTripDetails(GuideTrip trip) {
+    // Screen self-provides its cubit; route adds no provider.
+    return MaterialPageRoute(
+      builder: (_) => GuideTripDetailsScreen(trip: trip),
+    );
+  }
+
+  static Route<void> travelers(GuideTrip trip) {
+    // Screen self-provides its cubit; route adds no provider.
+    return MaterialPageRoute(builder: (_) => TravelersScreen(trip: trip));
+  }
+
+  static Route<bool?> createTrip() {
+    // Screen self-provides its cubit.
+    return MaterialPageRoute<bool?>(builder: (_) => const CreateTripScreen());
+  }
+
+  static Route<bool?> editTrip({
+    required GuideTrip trip,
+    required GuideTripDetails details,
+  }) {
+    // Same form in edit mode (pre-filled); saves persist for the session.
+    return MaterialPageRoute<bool?>(
+      builder: (_) => CreateTripScreen(
+        initialDetails: details,
+        initialTrip: trip,
+        formTitle: 'Edit Trip',
+        submitLabel: 'Save Changes',
+      ),
+    );
+  }
+
+  static Route<bool?> manageTrip({
+    required GuideTrip trip,
+    required GuideTripDetails details,
+  }) {
+    // Same form as edit (Figma-identical); saves persist for the session.
+    return MaterialPageRoute<bool?>(
+      builder: (_) => CreateTripScreen(
+        initialDetails: details,
+        initialTrip: trip,
+        formTitle: 'Manage Trip',
+        submitLabel: 'Save Changes',
+      ),
+    );
+  }
+
+  static Route<void> guideProfile(String guideId) {
+    return MaterialPageRoute(
+      builder: (_) => ProfileTourGuideScreen(guideId: guideId),
+    );
+  }
+
+  static Route<void> earnings() {
+    // Screen self-provides its cubit; route adds no provider.
+    return MaterialPageRoute(builder: (_) => const EarningsScreen());
+  }
+
   /// Post-booking destination: always lands on My Trips, where the
   /// fresh cubit reads the booking store — the booked trip is visible.
   static void goToMyTrips(BuildContext context) {
@@ -109,5 +180,4 @@ class AppRoutes {
     Navigator.of(context).popUntil((route) => route.isFirst);
     Navigator.of(context).push(tripDetails(trip));
   }
-
 }

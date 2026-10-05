@@ -1,0 +1,51 @@
+// Raw mock source. Convert via GuideTrip.fromJson() before the UI.
+const List<Map<String, dynamic>> mockGuideTripsJson = [
+  {
+    'id': 'g1',
+    'title': 'Pyramids Sunset Tour',
+    'location': 'Giza',
+    'scheduleLabel': 'Today, 5:00 PM',
+    'priceEgp': 1650,
+    'imageUrl': 'https://picsum.photos/seed/sunset/300/400',
+    'status': 'active',
+  },
+  {
+    'id': 'g2',
+    'title': 'Cairo Old Town Experience',
+    'location': 'Old Cairo',
+    'scheduleLabel': 'Tomorrow, 10:00 AM',
+    'priceEgp': 1250,
+    'imageUrl': 'https://picsum.photos/seed/oldtown/300/400',
+    'status': 'active',
+  },
+  {
+    'id': 'g3',
+    'title': 'Siwa Oasis Adventure',
+    'location': 'Siwa',
+    'scheduleLabel': 'Nov 12, 2026 · 7:00 AM',
+    'priceEgp': 3200,
+    'imageUrl': 'https://picsum.photos/seed/siwa/300/400',
+    'status': 'pending',
+  },
+  {
+    'id': 'g4',
+    'title': 'Aswan Nile Cruise',
+    'location': 'Aswan',
+    'scheduleLabel': 'Oct 2, 2026 · 4:00 PM',
+    'priceEgp': 2800,
+    'imageUrl': 'https://picsum.photos/seed/aswan/300/400',
+    'status': 'completed',
+  },
+  {
+    'id': 'g5',
+    'title': 'Cairo Hidden Alleys',
+    'location': 'Old Cairo',
+    'scheduleLabel': 'Oct 20, 2026 · 8:00 PM',
+    'priceEgp': 1350,
+    'imageUrl': 'https://picsum.photos/seed/alleys/600/400',
+    'status': 'rejected',
+    'duration': '4 hours',
+    'rejectionReason':
+        'The meeting point is not specific enough and the itinerary needs clear times for every stop. Please update both sections before submitting again.',
+  },
+];
