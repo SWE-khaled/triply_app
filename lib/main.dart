@@ -18,7 +18,6 @@ import 'features/tourist/search/view/search_screen.dart';
 import 'features/tourist/UserProfile/view/profile_screen.dart';
 import 'features/tourist/UserProfile/view/privacy_security_screen.dart';
 import 'features/tourist/UserProfile/view/emergency_screen.dart';
-
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
