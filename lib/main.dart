@@ -19,10 +19,14 @@ import 'features/tourist/UserProfile/view/privacy_security_screen.dart';
 import 'features/tourist/UserProfile/view/emergency_screen.dart';
 
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   try { await dotenv.load(fileName: '.env'); } catch (_) {}
   runApp(const MyApp());
+
+
+  
 }
 
 class MyApp extends StatelessWidget {
