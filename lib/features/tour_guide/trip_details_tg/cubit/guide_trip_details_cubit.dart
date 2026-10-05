@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/guide_trip_details_source.dart';
-import '../../my_trips/model/guide_trip.dart';
+import '../../../../core/data/guide_trip_details_source.dart';
+import '../../my_trips_tg/model/guide_trip.dart';
 import 'guide_trip_details_state.dart';
 
 /// Owns guide trip details loading + tab selection.

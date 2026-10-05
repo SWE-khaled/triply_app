@@ -1,5 +1,5 @@
-import 'mock/mock_guide_trip_details.dart';
-import '../features/tour_guide/trip_details/model/guide_trip_details.dart';
+import '../../features/tour_guide/trip_details_tg/model/guide_trip_details.dart';
+import 'mock/tourguide/mock_guide_trip_details.dart';
 
 /// Shared mock-phase lookup: mock JSON -> Model.
 /// Future API swap: build GuideTripDetails from API JSON here instead.

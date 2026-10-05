@@ -1,4 +1,4 @@
-// Mock profile data: local only, not server data.
+// Mock profile_tg data: local only, not server data.
 const Map<String, int> mockProfileStats = {
   'trips': 0,
   'places': 0,

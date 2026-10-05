@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/mock/mock_travelers.dart';
+import '../../../../core/data/mock/tourguide/mock_travelers.dart';
 import '../model/traveler.dart';
 import 'travelers_state.dart';
 

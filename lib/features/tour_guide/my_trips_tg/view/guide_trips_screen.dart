@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/app_snackbar.dart';
-import '../../../../data/guide_trip_details_source.dart';
+import '../../../../core/data/guide_trip_details_source.dart';
 import '../cubit/guide_trips_cubit.dart';
 import '../cubit/guide_trips_state.dart';
 import '../model/guide_trip.dart';
@@ -268,7 +268,7 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
         onTap: (i) {
           if (i == bottomIndex) return;
           if (i == 2) {
-            // Guide's own profile (Nour Abdallah in mock data).
+            // Guide's own profile_tg (Nour Abdallah in mock data).
             Navigator.of(context).push(AppRoutes.guideProfile('g2'));
             return;
           }

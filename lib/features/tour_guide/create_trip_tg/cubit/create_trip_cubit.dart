@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../data/guide_trip_details_source.dart';
-import '../../../../data/guide_trips_store.dart';
-import '../../my_trips/model/guide_trip.dart';
-import '../../trip_details/model/guide_trip_details.dart';
+import '../../../../core/data/guide_trip_details_source.dart';
+import '../../../../core/data/guide_trips_store.dart';
+import '../../my_trips_tg/model/guide_trip.dart';
+import '../../trip_details_tg/model/guide_trip_details.dart';
 import '../model/guide_trip_draft.dart';
 import 'create_trip_state.dart';
 

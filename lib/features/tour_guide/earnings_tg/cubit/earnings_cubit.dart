@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/mock/mock_earnings.dart';
+import '../../../../core/data/mock/tourguide/mock_earnings.dart';
 import '../model/earnings.dart';
 import 'earnings_state.dart';
 

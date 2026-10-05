@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../data/guide_trips_store.dart';
-import '../../../../data/mock/mock_guide_trips.dart';
+import '../../../../core/data/guide_trips_store.dart';
+import '../../../../core/data/mock/tourguide/mock_guide_trips.dart';
 import '../model/guide_trip.dart';
 import 'guide_trips_state.dart';
 

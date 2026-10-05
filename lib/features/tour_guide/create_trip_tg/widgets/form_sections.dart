@@ -131,7 +131,7 @@ class LogisticsSection extends StatelessWidget {
         const SizedBox(height: 6),
         GuideFormField(
           controller: maxTravelersCtrl,
-          hint: 'e.g. 8 travelers',
+          hint: 'e.g. 8 travelers_tg',
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: 12),

@@ -1,4 +1,5 @@
-import '../features/tour_guide/my_trips/model/guide_trip.dart';
+
+import '../../features/tour_guide/my_trips_tg/model/guide_trip.dart';
 
 /// Session-only created + edited trips (mock phase, no backend).
 /// GuideTripsCubit merges these over the static mock list.

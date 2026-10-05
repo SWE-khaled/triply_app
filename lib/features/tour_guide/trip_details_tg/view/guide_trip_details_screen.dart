@@ -7,9 +7,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
+import '../../my_trips_tg/model/guide_trip.dart';
 import '../cubit/guide_trip_details_cubit.dart';
 import '../cubit/guide_trip_details_state.dart';
-import '../../my_trips/model/guide_trip.dart';
 import '../widgets/guide_details_info.dart';
 import '../widgets/guide_details_tab_content.dart';
 

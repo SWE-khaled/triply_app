@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
-import '../../my_trips/model/guide_trip.dart';
+import '../../my_trips_tg/model/guide_trip.dart';
 import '../cubit/travelers_cubit.dart';
 import '../cubit/travelers_state.dart';
 import '../widgets/traveler_card.dart';
@@ -83,7 +83,7 @@ class _TravelersView extends StatelessWidget {
                     BlocBuilder<TravelersCubit, TravelersState>(
                       builder: (context, state) {
                         return Text(
-                          '${trip.scheduleLabel} · ${state.travelers.length} travelers',
+                          '${trip.scheduleLabel} · ${state.travelers.length} travelers_tg',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: Colors.white.withValues(alpha: 0.75),
@@ -112,7 +112,7 @@ class _TravelersView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Center(
                         child: Text(
-                          'No travelers yet',
+                          'No travelers_tg yet',
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: AppColors.subtitle,
@@ -128,7 +128,7 @@ class _TravelersView extends StatelessWidget {
                           traveler: state.travelers[i],
                           onViewProfile: () => showAppSnackBar(
                             context,
-                            'Traveler profile is not available yet',
+                            'Traveler profile_tg is not available yet',
                             icon: Icons.info_outline,
                           ),
                         ),

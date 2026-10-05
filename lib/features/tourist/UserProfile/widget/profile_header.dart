@@ -33,7 +33,7 @@ class ProfileHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'My profile',
+                'My profile_tg',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

@@ -107,7 +107,7 @@ class TripDetailsScreen extends StatelessWidget {
                           details: details,
                           onTap: () => showAppSnackBar(
                             context,
-                            'Guide profile not available yet',
+                            'Guide profile_tg not available yet',
                             icon: Icons.info_outline,
                           ),
                         ),
