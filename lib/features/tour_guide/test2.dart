@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'role_selection/view/role_selection_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,15 +12,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo App',
+      title: 'Triply Tour Guide',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+          seedColor: const Color(0xFF0E5261),
           brightness: Brightness.light,
         ),
         useMaterial3: true,
       ),
-      home: const CounterHomePage(title: 'Interactive Counter'),
+      home: const RoleSelectionScreen(),
     );
   }
 }
