@@ -8,6 +8,7 @@ import 'package:triply/features/common/auth/screens/onboarding_screen.dart';
 import 'package:triply/features/common/auth/screens/password_reset_success_screen.dart';
 import 'package:triply/features/common/auth/screens/sign_in_screen.dart';
 import 'firebase_options.dart';
+import 'features/tour_guide/role_selection/view/role_selection_screen.dart';
 import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'features/common/auth/providers/auth_provider.dart';
@@ -24,9 +25,6 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   try { await dotenv.load(fileName: '.env'); } catch (_) {}
   runApp(const MyApp());
-
-
-  
 }
 
 class MyApp extends StatelessWidget {
@@ -46,13 +44,13 @@ class MyApp extends StatelessWidget {
             switch (authProvider.status) {
               case AuthStatus.initial:
                 return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()
-                  ),
+                  body: Center(child: CircularProgressIndicator()),
                 );
-              case AuthStatus.authenticated:
-                return const HomeScreen();
+              // On auth state change we stay at RoleSelection so the user
+              // can be redirected to the correct flow (tourist vs guide).
+              // Each auth flow handles its own post-login navigation.
               default:
-                return const OnboardingScreen();
+                return const RoleSelectionScreen();
             }
           },
         ),

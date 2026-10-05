@@ -21,11 +21,12 @@ dependencies:
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.1
   firebase_storage: ^12.3.0
-  cloud_firestore: ^5.5.0
+  cloud_firestore: ^5.6.12
   google_sign_in: ^6.2.1
 
   # State management & networking
   provider: ^6.1.2
+  flutter_bloc: ^9.1.1
   http: ^1.6.0
 
   # Utilities
@@ -33,12 +34,13 @@ dependencies:
   url_launcher: ^6.3.1
   image_picker: ^1.1.2
   webview_flutter: ^4.14.1
+  cloudinary_public: ^0.23.1
+  file_picker: ^13.1.0
 
   # UI
   cupertino_icons: ^1.0.8
   google_fonts: ^6.3.2
   flutter_svg: ^2.3.0
-  flutter_bloc: ^9.1.1
   lucide_icons_flutter: ^3.0.0
   iconsax_flutter: ^1.0.0
 
