@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/data/mock/tourist/mock_emergency_contacts.dart';
 import '../../../../core/data/mock/tourist/mock_profile.dart';
+import '../../../../core/data/my_bookings_public.dart';
 import '../model/emergency_contact.dart';
 
 class ProfileController extends ChangeNotifier {
@@ -9,7 +10,12 @@ class ProfileController extends ChangeNotifier {
 
   List<String> get languages => mockLanguages;
 
-  Map<String, int> get stats => mockProfileStats;
+  /// Trips count is driven by the real My Trips bookings
+  /// (increments with every added trip); other stats stay mock.
+  Map<String, int> get stats => {
+        ...mockProfileStats,
+        'trips': MyBookingsPublic.count,
+      };
 
   List<EmergencyContact> get emergencyContacts =>
       mockEmergencyContactsRaw.map(EmergencyContact.fromJson).toList();

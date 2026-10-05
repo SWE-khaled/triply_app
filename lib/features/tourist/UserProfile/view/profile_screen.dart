@@ -8,6 +8,7 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../common/auth/providers/auth_provider.dart';
+import '../../../common/auth/data/auth_repository.dart';
 import '../controller/profile_controller.dart';
 import '../widget/account_option_tile.dart';
 import '../widget/profile_header.dart';
@@ -38,6 +39,9 @@ class _ProfileBody extends StatelessWidget {
         ? firebaseUser!.email!.trim()
         : 'No email linked';
     final photoUrl = firebaseUser?.photoURL;
+    final phoneFuture = firebaseUser == null
+        ? Future<String?>.value()
+        : AuthRepository().getUserPhone(firebaseUser.uid);
 
     return Scaffold(
       extendBody: true,
@@ -227,6 +231,27 @@ class _ProfileBody extends StatelessWidget {
                   ),
                 ),
               ),
+            ),
+            FutureBuilder<String?>(
+              future: phoneFuture,
+              builder: (context, snapshot) {
+                final phone = snapshot.data;
+                if (phone == null || phone.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4, left: 16, right: 16),
+                  child: Center(
+                    child: Text(
+                      phone,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textGrey,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 24),
           ],

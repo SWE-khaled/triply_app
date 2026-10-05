@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
@@ -13,6 +14,7 @@ import '../../trips/widgets/empty_trips.dart';
 import '../../trips/widgets/trip_card.dart';
 import '../cubit/my_trips_cubit.dart';
 import '../cubit/my_trips_state.dart';
+import '../widgets/booking_badges.dart';
 
 /// Booked trips only. Opened after booking_public and from the bottom nav.
 /// Details opened from here hide Book Now (already booked).
@@ -130,12 +132,34 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final trip = trips[index];
-                      return TripCard(
-                        trip: trip,
-                        onTap: () => _openDetails(trip),
-                        onViewDetails: () => _openDetails(trip),
-                        // Chat: placeholder — no chat screen exists yet.
-                        onChat: () {},
+                      final isPrivate =
+                          MyBookingsPublic.isPrivate(trip.id);
+                      final isPending =
+                          MyBookingsPublic.isPending(trip.id);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 4, bottom: 6),
+                            child: Row(
+                              children: [
+                                BookingKindIcon(isPrivate: isPrivate),
+                                if (isPending) ...[
+                                  const SizedBox(width: 12),
+                                  const PendingApprovalLabel(),
+                                ],
+                              ],
+                            ),
+                          ),
+                          TripCard(
+                            trip: trip,
+                            onTap: () => _openDetails(trip),
+                            onViewDetails: () => _openDetails(trip),
+                            // Chat: placeholder — no chat screen exists yet.
+                            onChat: () {},
+                          ),
+                        ],
                       );
                     },
                   );

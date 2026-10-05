@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -14,13 +15,43 @@ class AuthRepository {
     required String email,
     required String password,
     required String fullName,
+    String? phone,
   }) async {
     final credential = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
     await credential.user?.updateDisplayName(fullName);
+    // Best-effort user profile save (never fails sign-up when offline
+    // or when Firestore rules/connection are unavailable).
+    try {
+      final uid = credential.user?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance.collection('users').doc(uid).set(
+          {
+            'fullName': fullName,
+            'email': email,
+            if (phone != null && phone.isNotEmpty) 'phone': phone,
+            'createdAt': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      }
+    } catch (_) {}
     return credential;
+  }
+
+  /// Saved phone number (e.g. +2010...) or null when absent/unreachable.
+  Future<String?> getUserPhone(String uid) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      final phone = doc.data()?['phone'];
+      if (phone is String && phone.trim().isNotEmpty) return phone.trim();
+    } catch (_) {}
+    return null;
   }
 
   Future<UserCredential> signInWithEmail({

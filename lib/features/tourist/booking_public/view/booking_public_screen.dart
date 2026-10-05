@@ -6,6 +6,9 @@ import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/data/trip_details_source.dart';
+import '../../checkout/controller/checkout_controller.dart';
+import '../../checkout/model/booking_model.dart';
+import '../../checkout/view/paymob_webview_screen.dart';
 import '../../trip_details/model/trip_details.dart';
 import '../../trips/models/trip.dart';
 import '../cubit/booking_public_cubit.dart';
@@ -52,18 +55,69 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
     super.dispose();
   }
 
-  void _confirm(BuildContext context) {
+  /// Confirm & Pay: runs checkout + Paymob first; the trip is only
+  /// recorded (added to My Trips) after a successful payment.
+  Future<void> _confirm(BuildContext context) async {
     final cubit = context.read<BookingPublicCubit>();
-    final booking = cubit.confirm(
-      tripId: widget.trip.id,
-      unitPrice: details.priceEgp,
+    final trip = widget.trip;
+    final seats = cubit.state.seats;
+    final summary = CheckoutBookingSummary(
+      guideId: '',
+      guideName: trip.guideName,
+      guideSpecialty: '',
+      guideAvatarUrl: '',
+      dateLabel: trip.dateLabel,
+      timeSlot: '',
+      durationLabel: details.duration,
+      travelers: seats,
+      meetingPoint: details.meetingPoint,
+      pricePerHour: details.priceEgp,
+      currency: 'EGP',
+      serviceFee: cubit.fee(details.priceEgp),
+      total: cubit.total(details.priceEgp),
     );
-    Navigator.of(context).pushReplacement(
-      AppRoutes.bookingConfirmed(
-        trip: widget.trip,
-        details: details,
-        seats: booking.seats,
-        total: booking.total,
+    final checkout = CheckoutController(summary: summary);
+    // Captured before the async gap (avoids BuildContext across awaits).
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+    );
+    final token = await checkout.startPayment();
+    if (!mounted) return;
+    navigator.pop(); // Dismiss the loading dialog.
+    if (token == null) {
+      final message =
+          checkout.payError ?? 'Payment failed. Please try again.';
+      checkout.dispose();
+      messenger.showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
+    checkout.dispose(); // WebView only needs the token strings below.
+    navigator.push(
+      MaterialPageRoute(
+        builder: (_) => PaymobWebviewScreen(
+          paymentToken: token,
+          guideName: trip.guideName,
+          onSuccess: () {
+            final booking = cubit.confirm(
+              tripId: trip.id,
+              unitPrice: details.priceEgp,
+            );
+            navigator.pushReplacement(
+              AppRoutes.bookingConfirmed(
+                trip: trip,
+                details: details,
+                seats: booking.seats,
+                total: booking.total,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

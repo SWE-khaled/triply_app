@@ -6,6 +6,9 @@ class BookingPublic {
   final double serviceFee;
   final double total;
 
+  /// Admin-approval status. New bookings always start as 'pending'.
+  final String status;
+
   const BookingPublic({
     required this.tripId,
     required this.seats,
@@ -13,6 +16,7 @@ class BookingPublic {
     required this.unitPrice,
     required this.serviceFee,
     required this.total,
+    this.status = 'pending',
   });
 
   factory BookingPublic.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,7 @@ class BookingPublic {
       unitPrice: (json['unitPrice'] as num).toDouble(),
       serviceFee: (json['serviceFee'] as num).toDouble(),
       total: (json['total'] as num).toDouble(),
+      status: (json['status'] ?? 'pending') as String,
     );
   }
 
@@ -34,6 +39,7 @@ class BookingPublic {
       'unitPrice': unitPrice,
       'serviceFee': serviceFee,
       'total': total,
+      'status': status,
     };
   }
 }

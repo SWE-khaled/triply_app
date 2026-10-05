@@ -9,10 +9,16 @@ class PaymobWebviewScreen extends StatefulWidget {
   final String paymentToken;
   final String guideName;
 
+  /// Called after a successful payment when the user taps Done, so the
+  /// caller can record the booking (e.g. add the trip to My Trips).
+  /// When null, the previous behavior is kept (pop back to the summary).
+  final VoidCallback? onSuccess;
+
   const PaymobWebviewScreen({
     super.key,
     required this.paymentToken,
     this.guideName = '',
+    this.onSuccess,
   });
 
   @override
@@ -148,9 +154,13 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
               Navigator.of(context).pop(); // dialog
               Navigator.of(context).pop(); // webview
               if (success) {
-                // Back to the summary screen; the host app can pop
-                // further to the booking confirmation as needed.
-                Navigator.of(context).pop();
+                if (widget.onSuccess != null) {
+                  widget.onSuccess!();
+                } else {
+                  // Back to the summary screen; the host app can pop
+                  // further to the booking confirmation as needed.
+                  Navigator.of(context).pop();
+                }
               }
             },
             style: ElevatedButton.styleFrom(

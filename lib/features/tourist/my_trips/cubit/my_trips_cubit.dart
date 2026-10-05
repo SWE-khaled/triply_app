@@ -15,10 +15,34 @@ class MyTripsCubit extends Cubit<MyTripsState> {
         ),
       );
 
-  static List<Trip> _booked(TripStatus status) => mockTripsJson
-      .map((e) => Trip.fromJson(e))
-      .where((t) => t.status == status && MyBookingsPublic.isBooked(t.id))
-      .toList();
+  static List<Trip> _booked(TripStatus status) {
+    final public = mockTripsJson
+        .map((e) => Trip.fromJson(e))
+        .where((t) => t.status == status && MyBookingsPublic.isBooked(t.id))
+        .toList();
+    // Private guide bookings appear under Upcoming as synthetic trips
+    // (built from the stored booking, never duplicated mock data).
+    if (status == TripStatus.upcoming) {
+      for (final record in MyBookingsPublic.privateRecords) {
+        final entry = record.value;
+        public.add(
+          Trip(
+            id: record.key,
+            title: entry.title ?? 'Private tour',
+            dateLabel: entry.dateLabel ?? '',
+            guideName: entry.guideName ?? '',
+            peopleCount: entry.seats,
+            priceEgp: entry.totalPaid,
+            imageUrl: entry.imageUrl ?? '',
+            status: TripStatus.upcoming,
+            category: 'private',
+            capacity: entry.seats,
+          ),
+        );
+      }
+    }
+    return public;
+  }
 
   void selectTab(TripStatus status) {
     emit(state.copyWith(selectedTab: status, trips: _booked(status)));

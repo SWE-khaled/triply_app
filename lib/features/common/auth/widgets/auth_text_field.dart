@@ -9,6 +9,10 @@ class AuthTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
 
+  /// Optional leading widget (e.g. a country-code prefix). Rendered inside
+  /// the field next to [icon] without changing the existing design.
+  final Widget? prefix;
+
   const AuthTextField({
     super.key,
     required this.controller,
@@ -17,6 +21,7 @@ class AuthTextField extends StatefulWidget {
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.prefix,
   });
 
   @override
@@ -38,6 +43,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
         hintText: widget.hintText,
         hintStyle: const TextStyle(color: AuthColors.textGrey),
         prefixIcon: Icon(widget.icon, color: AuthColors.iconGrey),
+        prefix: widget.prefix,
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(

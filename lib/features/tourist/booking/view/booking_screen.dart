@@ -5,6 +5,8 @@ import 'package:triply/features/tourist/checkout/controller/checkout_controller.
 import 'package:triply/features/tourist/checkout/model/booking_model.dart';
 import 'package:triply/features/tourist/checkout/view/paymob_webview_screen.dart';
 
+import '../../../../core/data/my_bookings_public.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 
@@ -742,6 +744,26 @@ class _BookingScreenState extends State<BookingScreen> {
           builder: (_) => PaymobWebviewScreen(
             paymentToken: token,
             guideName: guideName,
+            onSuccess: () {
+              if (!mounted) return;
+              final booking = _controller.confirm();
+              // Recorded only after successful payment: appears in
+              // My Trips (Upcoming) with pending approval status.
+              MyBookingsPublic.recordPrivate(
+                guideId: _controller.guideId,
+                guideName: guide.name,
+                title: 'Private tour with ${guide.name}',
+                imageUrl: guide.coverUrl.isNotEmpty
+                    ? guide.coverUrl
+                    : guide.avatarUrl,
+                dateLabel: _controller.timeSlot == null
+                    ? _controller.dateLabel
+                    : '${_controller.dateLabel} · ${_controller.timeSlot}',
+                travelers: booking.travelers,
+                totalPaid: booking.total,
+              );
+              AppRoutes.goToMyTrips(navigator.context);
+            },
           ),
         ),
       );

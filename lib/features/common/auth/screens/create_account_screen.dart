@@ -20,6 +20,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -27,9 +28,37 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  /// Egyptian mobile validation: 10 digits starting with 10/11/12/15
+  /// (accepts 01…, +20…, 0020… forms too).
+  static String? validateEgyptianPhone(String? value) {
+    if (_egyptianLocalDigits(value) == null) {
+      return 'Enter a valid Egyptian mobile (e.g. 1012345678)';
+    }
+    return null;
+  }
+
+  /// Normalizes to international format: +20XXXXXXXXXX.
+  static String normalizeEgyptianPhone(String value) {
+    return '+20${_egyptianLocalDigits(value)!}';
+  }
+
+  static String? _egyptianLocalDigits(String? value) {
+    var digits = (value ?? '').replaceAll(RegExp(r'\D'), '');
+    if (digits.startsWith('0020')) {
+      digits = digits.substring(4);
+    } else if (digits.startsWith('20') && digits.length == 12) {
+      digits = digits.substring(2);
+    } else if (digits.startsWith('0') && digits.length == 11) {
+      digits = digits.substring(1);
+    }
+    if (!RegExp(r'^1[0125]\d{8}$').hasMatch(digits)) return null;
+    return digits;
   }
 
   Future<void> _handleCreateAccount(AuthProvider authProvider) async {
@@ -38,6 +67,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       fullName: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
+      phone: normalizeEgyptianPhone(_phoneController.text),
     );
     if (success && mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
@@ -93,6 +123,27 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       validator: (value) => (value == null || !value.contains('@'))
                           ? 'Enter a valid email'
                           : null,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Phone Number',
+                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+                    AuthTextField(
+                      controller: _phoneController,
+                      hintText: '1012345678',
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      prefix: const Padding(
+                        padding: EdgeInsets.only(right: 2),
+                        child: Text(
+                          '🇪🇬 +20',
+                          style: TextStyle(
+                            color: AuthColors.textDark,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                      validator: validateEgyptianPhone,
                     ),
                     const SizedBox(height: 20),
                     const Text('Password',

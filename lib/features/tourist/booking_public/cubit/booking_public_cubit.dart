@@ -48,8 +48,9 @@ class BookingPublicCubit extends Cubit<BookingPublicState> {
       serviceFee: fee(unitPrice),
       total: total(unitPrice),
     );
-    // Makes the trip appear in My Trips (Upcoming).
-    MyBookingsPublic.record(tripId, booking.seats);
+    // Makes the trip appear in My Trips (Upcoming, pending approval).
+    // Only called after a successful payment (see BookingPublicScreen).
+    MyBookingsPublic.record(tripId, booking.seats, totalPaid: booking.total);
     return booking;
   }
 }

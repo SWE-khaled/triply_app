@@ -30,6 +30,7 @@ class AuthProvider extends ChangeNotifier {
     required String fullName,
     required String email,
     required String password,
+    String? phone,
   }) async {
     _setLoading();
     try {
@@ -37,6 +38,7 @@ class AuthProvider extends ChangeNotifier {
         email: email,
         password: password,
         fullName: fullName,
+        phone: phone,
       );
       return true;
     } catch (e) {

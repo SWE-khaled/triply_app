@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/constants/app_routes.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/tourist/guides/controller/guide_profile_controller.dart';
+import 'package:triply/features/tourist/guides/model/trip.dart' as guide_trip;
+import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import 'package:triply/core/widgets/guide_shared_widgets.dart';
 import 'package:triply/features/tourist/booking/view/booking_screen.dart';
 import 'package:triply/features/tourist/guides/widgets/trip_card.dart';
@@ -316,8 +319,28 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  Widget _buildTrips(List trips) {
-    return Padding(
+  /// Opens the existing Trip Details for a guide trip; the public
+  /// booking flow starts from there (no direct jump into booking).
+  void _openTripDetails(BuildContext context, guide_trip.Trip trip) {
+    Navigator.of(context).push(
+      AppRoutes.tripDetails(
+        trips_model.Trip(
+          id: trip.id,
+          title: trip.title,
+          dateLabel: trip.dateLabel,
+          guideName: _controller.guide.name,
+          peopleCount: 1,
+          priceEgp: trip.price,
+          imageUrl: trip.imageUrl,
+          status: trips_model.TripStatus.upcoming,
+          category: 'historical',
+          capacity: 12,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrips(List trips) {    return Padding(
       padding: EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,8 +364,14 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
               physics: NeverScrollableScrollPhysics(),
               itemCount: trips.length,
               separatorBuilder: (_, _) => const SizedBox(height: 14),
-              itemBuilder: (context, i) =>
-                  TripCard(trip: trips[i], onTap: () {}),
+              itemBuilder: (context, i) => TripCard(
+                trip: trips[i],
+                // Opens the trip details first; booking starts from there.
+                onTap: () => _openTripDetails(
+                  context,
+                  trips[i] as guide_trip.Trip,
+                ),
+              ),
             ),
         ],
       ),
