@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/widgets/trip_image.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../model/guide_trip.dart';
@@ -37,14 +38,7 @@ class GuideTripCard extends StatelessWidget {
                 SizedBox(
                   width: 110,
                   height: 140,
-                  child: Image.network(
-                    trip.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => Container(
-                      color: const Color(0xFFE6ECEF),
-                      child: const Icon(Icons.image, color: AppColors.subtitle),
-                    ),
-                  ),
+                  child: TripImage(imageUrl: trip.imageUrl),
                 ),
                 Expanded(
                   child: Padding(

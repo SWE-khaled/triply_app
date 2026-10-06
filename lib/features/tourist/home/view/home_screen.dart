@@ -11,7 +11,7 @@ import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
-import '../../../common/auth/providers/auth_provider.dart';
+import '../../../common/AuthTourist/providers/auth_provider.dart';
 import '../controller/home_controller.dart';
 import '../model/trip.dart';
 import '../widget/community_banner.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
-import '../../../common/auth/screens/onboarding_screen.dart';
+import '../../../common/AuthTourist/screens/onboarding_screen.dart';
 import '../../onboarding/view/tour_guide_onboarding_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {

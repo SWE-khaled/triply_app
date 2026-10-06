@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
+import '../../../../core/widgets/trip_image.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
 import '../cubit/guide_trip_details_cubit.dart';
 import '../cubit/guide_trip_details_state.dart';
@@ -80,17 +81,9 @@ class GuideTripDetailsScreen extends StatelessWidget {
                     SizedBox(
                       height: 300,
                       width: double.infinity,
-                      child: Image.network(
-                        details.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Container(
-                          color: const Color(0xFFE6ECEF),
-                          child: const Icon(
-                            Icons.image,
-                            color: AppColors.subtitle,
-                            size: 40,
-                          ),
-                        ),
+                      child: TripImage(
+                        imageUrl: details.imageUrl,
+                        fallbackIconSize: 40,
                       ),
                     ),
                     Container(

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
+import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 import '../../../../core/services/cloudinary_service.dart';
-import '../../home/view/tour_guide_home_screen.dart';
-import '../data/tour_guide_auth_service.dart';
+
 
 class TourGuideVerificationScreen extends StatefulWidget {
   const TourGuideVerificationScreen({super.key});
@@ -30,9 +31,10 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
 
       if (result.isNotEmpty) {
         final file = result.first;
-        
+
         // Validate file size (10 MB = 10 * 1024 * 1024 bytes)
-        if (file.size > 10485760) {
+        final fileSize = file.lengthSync() ?? await file.length();
+        if (fileSize != null && fileSize > 10485760) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('File must be smaller than 10MB.')),
@@ -89,7 +91,7 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const TourGuideHomeScreen()),
+        MaterialPageRoute(builder: (_) => const GuideDashboardScreen()),
         (route) => false,
       );
     } catch (e) {
@@ -146,7 +148,7 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                     onPressed: _isLoading ? null : () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => const TourGuideHomeScreen()),
+                        MaterialPageRoute(builder: (_) => const GuideDashboardScreen()),
                         (route) => false,
                       );
                     },
@@ -431,8 +433,4 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
       ),
     );
   }
-}
-
-extension on PlatformFile {
-  get size => null;
 }

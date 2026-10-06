@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_colors.dart';
 
 /// Cream tint from Figma (banner, earnings card, public pill). Local const
 /// only — the global theme in `core/theme/` is left untouched.

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_colors.dart';
 
 /// Cream/tan tints from Figma (public pill). Local consts only — the global
 /// theme in `core/theme/` is left untouched.

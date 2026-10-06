@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
-import '../../my_trips_tg/widgets/guide_bottom_nav.dart';
+import '../../homeandNotificationTr/widget/guide_bottom_nav.dart';
 import '../controller/profile_controller.dart';
 import '../widgets/edit_profile_sheet.dart';
 import '../widgets/profile_header.dart';
@@ -128,13 +129,16 @@ class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
       ),
       bottomNavigationBar: GuideBottomNav(
         currentIndex: bottomIndex,
-        onTap: (i) {
-          if (i == bottomIndex) return;
-          if (i == 1) {
-            Navigator.of(context).pop();
-            return;
-          }
-          _todo('This section');
+        onTap: (index) {
+         if (index==0){
+          // Back to the previous guide screen (dashboard or trips pushed this).
+         Navigator.push(context, MaterialPageRoute(builder: (context)=>GuideDashboardScreen()));
+         }
+         else if(index==1)
+         {
+          Navigator.of(context).push(AppRoutes.guideTrips());
+         }
+
         },
       ),
     );

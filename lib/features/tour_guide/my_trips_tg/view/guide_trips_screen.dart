@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_routes.dart';
@@ -9,7 +10,7 @@ import '../../../../core/data/guide_trip_details_source.dart';
 import '../cubit/guide_trips_cubit.dart';
 import '../cubit/guide_trips_state.dart';
 import '../model/guide_trip.dart';
-import '../widgets/guide_bottom_nav.dart';
+import '../../homeandNotificationTr/widget/guide_bottom_nav.dart';
 import '../widgets/guide_trip_card.dart';
 import '../widgets/rejected_guide_trip_card.dart';
 
@@ -272,8 +273,11 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
             Navigator.of(context).push(AppRoutes.guideProfile('g2'));
             return;
           }
-          // TODO: navigate when guide Home exists.
-          _todo('This section');
+          if (i == 0) {
+            // Back to guide Home (dashboard pushed this screen).
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>GuideDashboardScreen()));
+            return;
+          }
         },
       ),
     );

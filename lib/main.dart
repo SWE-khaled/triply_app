@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:triply/features/common/auth/screens/create_account_screen.dart';
-import 'package:triply/features/common/auth/screens/forgot_password_screen.dart';
-import 'package:triply/features/common/auth/screens/onboarding_screen.dart';
-import 'package:triply/features/common/auth/screens/password_reset_success_screen.dart';
-import 'package:triply/features/common/auth/screens/sign_in_screen.dart';
-import 'features/tour_guide/my_trips_tg/view/guide_trips_screen.dart';
+import 'package:triply/features/common/AuthTourist/screens/create_account_screen.dart';
+import 'package:triply/features/common/AuthTourist/screens/forgot_password_screen.dart';
+import 'package:triply/features/common/AuthTourist/screens/onboarding_screen.dart';
+import 'package:triply/features/common/AuthTourist/screens/password_reset_success_screen.dart';
+import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import 'firebase_options.dart';
 import 'features/tour_guide/role_selection/view/role_selection_screen.dart';
 import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
-import 'features/common/auth/providers/auth_provider.dart';
+import 'features/common/AuthTourist/providers/auth_provider.dart';
 import 'features/tourist/home/view/home_screen.dart';
 import 'features/tourist/notifications/view/notifications_screen.dart';
 import 'features/tourist/search/view/search_screen.dart';
@@ -50,7 +49,7 @@ class MyApp extends StatelessWidget {
               // can be redirected to the correct flow (tourist vs guide).
               // Each auth flow handles its own post-login navigation.
               default:
-                return const RoleSelectionScreen();
+               return const RoleSelectionScreen();
             }
           },
         ),

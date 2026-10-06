@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/circle_back_button.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/circle_back_button.dart';
 import '../controller/guide_notifications_controller.dart';
 import '../widget/guide_notification_tile.dart';
 

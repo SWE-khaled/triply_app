@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/network_image_fallback.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/network_image_fallback.dart';
 import '../model/guide_dashboard_booking_request.dart';
 
 /// Cream tint from Figma (public badge). Local const only — the global

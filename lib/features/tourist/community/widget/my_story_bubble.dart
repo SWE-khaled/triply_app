@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../common/auth/providers/auth_provider.dart'; // عدّل المسار لو مختلف
+import '../../../common/AuthTourist/providers/auth_provider.dart'; // عدّل المسار لو مختلف
 
 class MyStoryBubble extends StatelessWidget {
   final bool hasStory;

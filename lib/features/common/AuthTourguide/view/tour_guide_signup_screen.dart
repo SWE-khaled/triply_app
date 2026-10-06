@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:triply/features/common/AuthTourguide/providers/tour_guide_auth_provider.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
-import '../../auth/providers/tour_guide_auth_provider.dart';
 import 'tour_guide_login_screen.dart';
 import 'tour_guide_verification_screen.dart';
 

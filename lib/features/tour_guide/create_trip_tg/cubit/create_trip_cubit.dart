@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -299,12 +300,59 @@ class CreateTripCubit extends Cubit<CreateTripState> {
   }
 
   /// Validates, stores as pending, returns the created trip.
-  /// Returns null + error message when invalid.
+  /// Also saves the entered details so View/Edit read this exact trip
+  /// (same source of truth, no mock fallback). Returns null + error
+  /// message when invalid.
   ({GuideTrip? trip, String? error}) submitTrip() {
     final error = validate();
     if (error != null) return (trip: null, error: error);
     final trip = buildTrip();
     GuideTripsStore.add(trip);
+    final price = trip.priceEgp;
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    GuideTripDetailsSource.save(
+      GuideTripDetails(
+        id: 'details-${trip.id}',
+        tripId: trip.id,
+        tag: labelCtrl.text.trim(),
+        title: trip.title,
+        rating: 0,
+        reviewsCount: 0,
+        location: trip.location,
+        duration: durationCtrl.text.trim(),
+        groupType: '',
+        languages: languagesCtrl.text.trim(),
+        about: aboutCtrl.text.trim(),
+        highlights: state.highlights
+            .map((h) => h.text.trim())
+            .where((t) => t.isNotEmpty)
+            .toList(),
+        itinerary: state.itinerary
+            .where(
+              (s) => s.time.trim().isNotEmpty || s.activity.trim().isNotEmpty,
+            )
+            .map(
+              (s) => GuideItineraryStop(
+                time: s.time.trim(),
+                title: s.activity.trim(),
+              ),
+            )
+            .toList(),
+        notes: notesCtrl.text
+            .split('\n')
+            .map((n) => n.trim())
+            .where((n) => n.isNotEmpty)
+            .toList(),
+        included: includedCtrl.text.trim(),
+        meetingPoint: meetingCtrl.text.trim(),
+        priceEgp: price,
+        guideName: firebaseUser?.displayName?.trim() ?? '',
+        guideAvatarUrl: firebaseUser?.photoURL?.trim() ?? '',
+        guideRating: 0,
+        guideReviews: 0,
+        imageUrl: trip.imageUrl,
+      ),
+    );
     return (trip: trip, error: null);
   }
 }

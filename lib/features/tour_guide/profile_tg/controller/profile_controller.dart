@@ -37,7 +37,12 @@ class ProfileController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get displayName => _nameOverride ?? guide.name;
+  String get displayName {
+    final firebaseName =
+        FirebaseAuth.instance.currentUser?.displayName?.trim() ?? '';
+    if (firebaseName.isNotEmpty) return firebaseName;
+    return _nameOverride ?? guide.name;
+  }
 
   String? get coverImagePath => _coverPath;
 
@@ -59,7 +64,12 @@ class ProfileController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String get displayAvatar => _photoOverride ?? guide.avatarUrl;
+  String get displayAvatar {
+    final firebasePhoto =
+        FirebaseAuth.instance.currentUser?.photoURL?.trim() ?? '';
+    if (firebasePhoto.isNotEmpty) return firebasePhoto;
+    return _photoOverride ?? guide.avatarUrl;
+  }
 
   /// Picks a gallery cover for local preview only (no upload yet).
   /// Returns an error message when picking fails, else null.

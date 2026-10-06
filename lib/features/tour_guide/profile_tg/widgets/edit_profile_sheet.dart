@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_routes.dart';
-import '../../../common/auth/providers/auth_provider.dart';
+import '../../../common/AuthTourist/providers/auth_provider.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;

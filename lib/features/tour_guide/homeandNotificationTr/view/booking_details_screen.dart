@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/circle_back_button.dart';
-import '../../../../core/widgets/network_image_fallback.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/circle_back_button.dart';
+import '../../../../../core/widgets/network_image_fallback.dart';
 import '../controller/booking_details_controller.dart';
 import '../widget/booking_type_pill.dart';
 

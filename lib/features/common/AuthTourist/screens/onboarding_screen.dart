@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:triply/features/common/AuthTourist/screens/create_account_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
-import '../../../common/AuthTourguide/view/tour_guide_login_screen.dart';
 
-class TourGuideOnboardingScreen extends StatefulWidget {
-  const TourGuideOnboardingScreen({super.key});
+class OnboardingScreen extends StatefulWidget {
+  const  OnboardingScreen ({super.key});
 
   @override
-  State<TourGuideOnboardingScreen> createState() =>
-      _TourGuideOnboardingScreenState();
+  State<OnboardingScreen > createState() =>
+      _OnboardingScreen ();
 }
 
-class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
+class _OnboardingScreen  extends State< OnboardingScreen > {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   bool _precached = false;
@@ -19,31 +19,31 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
   // resolution) with high-quality images, or better, local assets:
   //   'image': 'assets/images/onboarding/guide_1.jpg'
   // and switch _buildImage() to use Image.asset.
-  final List<Map<String, dynamic>> _slides = [
-    {
-      'title': 'Share Egypt\nYour Way',
-      'subtitle':
-          'Turn your knowledge of Egypt into unforgettable\nexperiences for travelers.',
-      'image':
-          'https://i.pinimg.com/originals/d1/c3/95/d1c3953a9139828e37a900bf7d92d47b.jpg?nii=t',
-    },
-    {
-      'title': 'Create\nExperiences',
-      'subtitle':
-          'Create trips and guide services that travelers can\ndiscover and book.',
-      'image':
-          'https://i.pinimg.com/736x/89/a5/5a/89a55a6c68a452991cb93fa4c6c71c5c.jpg',
-      'pills': ['Create Trips', 'Offer Guide Services', 'Promote Experiences'],
-    },
-    {
-      'title': 'Grow Your\nGuide Business',
-      'subtitle':
-          'Manage bookings, communicate with travelers, host\nyour trips and track your earnings — all in one place.',
-      'image':
-          'https://i.pinimg.com/736x/0c/3c/22/0c3c22bdc3c2d57bd5df89af8ec7c396.jpg',
-      'pills': ['Bookings', 'Messages', 'Trips', 'Earnings'],
-    },
-  ];
+ final List<Map<String, dynamic>> _slides = [
+  {
+    'title': 'Discover Egypt\nYour Way',
+    'subtitle':
+        'Explore Egypt, discover amazing places, and create\nunforgettable memories along the way.',
+    'image':
+        'https://i.pinimg.com/1200x/80/b3/a4/80b3a4fc0871c2e9250799c6666a8a90.jpg',
+  },
+  {
+    'title': 'Find & Book\nExperiences',
+    'subtitle':
+        'Discover unique trips, local guides, and experiences\nmade for the way you want to travel.',
+    'image':
+        'https://i.pinimg.com/736x/a3/10/08/a310089ffdca5b243745e2876b5ca2e5.jpg',
+    'pills': ['Discover Trips', 'Find Guides', 'Book Experiences'],
+  },
+  {
+    'title': 'Enjoy Your\nJourney',
+    'subtitle':
+        'Manage your bookings, connect with guides, explore\nnew places and enjoy every moment of your trip.',
+    'image':
+        'https://i.pinimg.com/736x/6a/61/4f/6a614f0a26c359dbd89c9fa53cf0b842.jpg',
+    'pills': ['My Trips', 'Messages', 'Bookings', 'Experiences'],
+  },
+];
 
   @override
   void didChangeDependencies() {
@@ -263,7 +263,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const TourGuideLoginScreen(),
+                          builder: (_) => const CreateAccountScreen(),
                         ),
                       );
                     }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/circle_icon_button.dart';
-import '../../../../core/widgets/network_image_fallback.dart';
+import 'package:provider/provider.dart';
+import 'package:triply/core/constants/app_routes.dart';
+import 'package:triply/features/common/AuthTourist/providers/auth_provider.dart';
+import '../../../common/AuthTourguide/view/tour_guide_verification_screen.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/circle_icon_button.dart';
+import '../../../../../core/widgets/network_image_fallback.dart';
 import '../controller/guide_dashboard_controller.dart';
 import '../widget/dashboard_booking_request_card.dart';
 import '../widget/guide_bottom_nav.dart';
@@ -44,14 +47,20 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
   }
 
   void _openNotifications() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const GuideNotificationsScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const GuideNotificationsScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
     final stats = controller.stats;
+    // Same source of truth as Profile: Firebase user photo first,
+    // mock avatar only as fallback. Rebuilds via AuthProvider.
+    final firebasePhoto =
+        context.watch<AuthProvider>().user?.photoURL?.trim() ?? '';
+    final avatarUrl =
+        firebasePhoto.isNotEmpty ? firebasePhoto : stats.avatarUrl;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -63,7 +72,7 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _header(stats.avatarUrl),
+                    _header(avatarUrl),
                     const SizedBox(height: 16),
                     _verificationBanner(),
                     const SizedBox(height: 20),
@@ -175,8 +184,13 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
             ),
             GuideBottomNav(
               currentIndex: 0,
-              // TODO(Figma): My Trips / Profile destinations not in scope.
-              onTap: (i) {},
+              onTap: (index) {
+                if (index == 1) {
+                  Navigator.push(context, AppRoutes.guideTrips());
+                } else if (index == 2) {
+                  Navigator.push(context, AppRoutes.guideProfile("g2"));
+                }
+              },
             ),
           ],
         ),
@@ -221,73 +235,84 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
           ],
         ),
         const SizedBox(width: 8),
-        ClipOval(
-          child: NetworkImageFallback(
-            imageUrl: avatarUrl,
-            width: 40,
-            height: 40,
-            fallbackIcon: Icons.person_outline,
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context, AppRoutes.guideProfile("g2"));
+          },
+          behavior: HitTestBehavior.opaque,
+          child: ClipOval(
+            child: NetworkImageFallback(
+              imageUrl: avatarUrl,
+              width: 40,
+              height: 40,
+              fallbackIcon: Icons.person_outline,
+            ),
           ),
         ),
       ],
     );
   }
 
+  void _openVerification() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const TourGuideVerificationScreen()),
+    );
+  }
+
   Widget _verificationBanner() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: _cream,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: _openVerification,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: _cream,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.cardBorder),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.person_outline,
+                size: 22,
+                color: AppColors.title,
+              ),
             ),
-            child: const Icon(
-              Icons.person_outline,
-              size: 22,
-              color: AppColors.title,
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Verification required',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.title,
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Verification required',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.title,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Verify your guide license to publish trips.',
-                  style: TextStyle(fontSize: 12, color: AppColors.subtitle),
-                ),
-              ],
+                  SizedBox(height: 2),
+                  Text(
+                    'Verify your guide license to publish trips.',
+                    style: TextStyle(fontSize: 12, color: AppColors.subtitle),
+                  ),
+                ],
+              ),
             ),
-          ),
-          GestureDetector(
-            // TODO(Figma): no verification destination in Figma.
-            onTap: () {},
-            behavior: HitTestBehavior.opaque,
-            child: const Icon(
+            const Icon(
               Icons.chevron_right,
               size: 20,
               color: AppColors.title,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

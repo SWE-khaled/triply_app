@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../model/guide_dashboard_booking_request.dart';
 import '../model/guide_dashboard_stats.dart';
-import '../../../../core/data/mock/tourguide/mock_guide_dashboard.dart';
+import '../../../../../core/data/mock/tourguide/mock_guide_dashboard.dart';
 
 class DashboardController extends ChangeNotifier {
   late final GuideDashboardStats stats;

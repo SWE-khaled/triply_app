@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_colors.dart';
 import '../model/guide_notification.dart';
 
 /// Cream tint from Figma (icon circles). Local const only — the global
