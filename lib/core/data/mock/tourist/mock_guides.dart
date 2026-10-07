@@ -1,4 +1,4 @@
-import 'package:triply/features/tourist/guides/model/guide.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/guide.dart';
 
 /// Raw mock source (List<Map>). Converted to [Guide] models before UI.
 /// Later replaced by API JSON -> Guide.fromJson with no UI change.
@@ -112,3 +112,4 @@ const List<String> mockGuideLanguageFilters = [
   'Arabic',
   'French',
 ];
+

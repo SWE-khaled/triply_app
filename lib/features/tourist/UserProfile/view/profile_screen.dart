@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:triply/features/tourist/UserProfile/widget/edit_profile_sheet.dart';
-import 'package:triply/features/tourist/community/view/community_view.dart';
-import 'package:triply/features/tourist/home/view/home_screen.dart';
-import 'package:triply/features/tourist/map/view/map_view.dart';
+import 'package:admin_dashboard/features/tourist/UserProfile/widget/edit_profile_sheet.dart';
+import 'package:admin_dashboard/features/tourist/community/view/community_view.dart';
+import 'package:admin_dashboard/features/tourist/home/view/home_screen.dart';
+import 'package:admin_dashboard/features/tourist/map/view/map_view.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
@@ -393,3 +393,4 @@ class _ProfileBody extends StatelessWidget {
     }
   }
 }
+

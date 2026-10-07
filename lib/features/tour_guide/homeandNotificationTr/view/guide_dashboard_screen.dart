@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:triply/core/constants/app_routes.dart';
-import 'package:triply/features/common/AuthTourist/providers/auth_provider.dart';
+import 'package:admin_dashboard/core/constants/app_routes.dart';
+import 'package:admin_dashboard/features/common/AuthTourist/providers/auth_provider.dart';
 import '../../../common/AuthTourguide/view/tour_guide_verification_screen.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/circle_icon_button.dart';
@@ -379,3 +379,4 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
     );
   }
 }
+

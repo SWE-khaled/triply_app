@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart';
-import 'package:triply/features/tourist/guides/model/guide.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_guides.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/guide.dart';
 
 /// Feature-focused controller for GuidesListScreen.
 /// Holds search + language filter state, exposes filtered Models.
@@ -40,3 +40,4 @@ class GuidesController extends ChangeNotifier {
     notifyListeners();
   }
 }
+

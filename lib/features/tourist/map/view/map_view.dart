@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:latlong2/latlong.dart' as latlng;
-import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
-import 'package:triply/features/tourist/home/view/home_screen.dart';
+import 'package:admin_dashboard/features/tourist/UserProfile/view/profile_screen.dart';
+import 'package:admin_dashboard/features/tourist/home/view/home_screen.dart';
 
 import '../controller/map_controller.dart';
 import '../../../../core/constants/app_routes.dart';

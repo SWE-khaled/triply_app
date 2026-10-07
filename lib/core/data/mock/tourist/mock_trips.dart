@@ -1,4 +1,4 @@
-import 'package:triply/features/tourist/guides/model/trip.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/trip.dart';
 
 /// Raw mock source (List<Map>). Converted to [Trip] models before UI.
 const List<Map<String, dynamic>> _rawTrips = [
@@ -51,3 +51,4 @@ final List<Trip> mockTrips =
 
 List<Trip> mockTripsForGuide(String guideId) =>
     mockTrips.where((t) => t.guideId == guideId).toList();
+

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triply/core/theme/app_colors.dart';
+import 'package:admin_dashboard/core/theme/app_colors.dart';
 
 /// Cream tint from Figma (active tab circle). Local const only — the global
 /// theme in `core/theme/` is left untouched.

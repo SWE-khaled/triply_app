@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart';
-import 'package:triply/core/data/mock/tourist/mock_trips.dart';
-import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/tourist/guides/model/guide.dart';
-import 'package:triply/features/tourist/guides/model/trip.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_guides.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_trips.dart';
+import 'package:admin_dashboard/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/guide.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/trip.dart';
 
 /// Feature-focused controller for GuideProfileScreen.
 /// Reads local mock data only. Bookmark is UI-local (no favorites screen
@@ -127,3 +127,4 @@ class ProfileController extends ChangeNotifier {
     }
   }
 }
+

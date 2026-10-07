@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:triply/core/widgets/circle_back_button.dart';
-import 'package:triply/features/tourist/guides/controller/guides_controller.dart';
-import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
-import 'package:triply/features/tourist/guides/widgets/guide_card.dart';
+import 'package:admin_dashboard/core/widgets/circle_back_button.dart';
+import 'package:admin_dashboard/features/tourist/guides/controller/guides_controller.dart';
+import 'package:admin_dashboard/features/tourist/guides/view/guide_profile_screen.dart';
+import 'package:admin_dashboard/features/tourist/guides/widgets/guide_card.dart';
 
 class GuidesListScreen extends StatefulWidget {
   const GuidesListScreen({super.key});
@@ -212,3 +212,4 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
+

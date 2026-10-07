@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/tourist/guides/model/trip.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/trip.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
@@ -91,3 +91,4 @@ class TourCard extends StatelessWidget {
     );
   }
 }
+

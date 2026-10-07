@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:triply/core/constants/app_routes.dart';
-import 'package:triply/core/widgets/circle_back_button.dart';
-import 'package:triply/features/tourist/guides/controller/guide_profile_controller.dart';
-import 'package:triply/features/tourist/guides/model/trip.dart' as guide_trip;
-import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
-import 'package:triply/core/widgets/guide_shared_widgets.dart';
-import 'package:triply/features/tourist/booking/view/booking_screen.dart';
-import 'package:triply/features/tourist/guides/widgets/trip_card.dart';
+import 'package:admin_dashboard/core/constants/app_routes.dart';
+import 'package:admin_dashboard/core/widgets/circle_back_button.dart';
+import 'package:admin_dashboard/features/tourist/guides/controller/guide_profile_controller.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/trip.dart' as guide_trip;
+import 'package:admin_dashboard/features/tourist/trips/models/trip.dart' as trips_model;
+import 'package:admin_dashboard/core/widgets/guide_shared_widgets.dart';
+import 'package:admin_dashboard/features/tourist/booking/view/booking_screen.dart';
+import 'package:admin_dashboard/features/tourist/guides/widgets/trip_card.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
@@ -457,4 +457,5 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
+
 

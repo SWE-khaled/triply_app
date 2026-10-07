@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
+import 'package:admin_dashboard/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
+import 'package:admin_dashboard/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
@@ -168,3 +168,4 @@ class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
     );
   }
 }
+

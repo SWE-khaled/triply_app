@@ -1,8 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
-import 'package:triply/features/tourist/home/view/home_screen.dart';
-import 'package:triply/features/tourist/map/view/map_view.dart';
+import 'package:admin_dashboard/features/tourist/UserProfile/view/profile_screen.dart';
+import 'package:admin_dashboard/features/tourist/home/view/home_screen.dart';
+import 'package:admin_dashboard/features/tourist/map/view/map_view.dart';
 
 import '../controller/community_controller.dart';
 import '../../../../core/constants/app_colors.dart';

@@ -15,7 +15,7 @@ class AppBottomNav extends StatelessWidget {
 
   const AppBottomNav({super.key, required this.currentIndex, this.onTap});
 
-  static const _icons = [
+  static final List<IconData> _icons = [
     LucideIcons.house,
     LucideIcons.route,
     LucideIcons.mapPin,

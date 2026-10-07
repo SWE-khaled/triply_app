@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart' as guides_src;
-import 'package:triply/core/data/mock/tourist/mock_palces_raw.dart';
-import 'package:triply/core/data/mock/tourist/mock_places.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_guides.dart' as guides_src;
+import 'package:admin_dashboard/core/data/mock/tourist/mock_palces_raw.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_places.dart';
 import '../model/place.dart';
 import '../model/guide.dart';
 import '../model/trip.dart';
@@ -85,3 +85,4 @@ class HomeController extends ChangeNotifier {
     notifyListeners();
   }
 }
+

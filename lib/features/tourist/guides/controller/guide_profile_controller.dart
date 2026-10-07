@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart';
-import 'package:triply/core/data/mock/tourist/mock_trips.dart';
-import 'package:triply/features/tourist/guides/model/guide.dart';
-import 'package:triply/features/tourist/guides/model/trip.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_guides.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_trips.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/guide.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/trip.dart';
 
 /// Feature-focused controller for GuideProfileScreen.
 /// Reads local mock data only. Bookmark is UI-local (no favorites screen
@@ -29,3 +29,4 @@ class GuideProfileController extends ChangeNotifier {
     notifyListeners();
   }
 }
+

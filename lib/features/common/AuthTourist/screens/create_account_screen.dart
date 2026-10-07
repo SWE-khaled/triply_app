@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
+import 'package:admin_dashboard/features/common/AuthTourist/screens/sign_in_screen.dart';
 import '../constants/auth_colors.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_button.dart';
@@ -261,3 +261,4 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     );
   }
 }
+

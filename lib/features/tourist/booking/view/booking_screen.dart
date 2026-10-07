@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/tourist/booking/controller/booking_controller.dart';
-import 'package:triply/features/tourist/booking/widgets/booking_widgets.dart';
-import 'package:triply/features/tourist/checkout/controller/checkout_controller.dart';
-import 'package:triply/features/tourist/checkout/model/booking_model.dart';
-import 'package:triply/features/tourist/checkout/view/paymob_webview_screen.dart';
+import 'package:admin_dashboard/features/tourist/booking/controller/booking_controller.dart';
+import 'package:admin_dashboard/features/tourist/booking/widgets/booking_widgets.dart';
+import 'package:admin_dashboard/features/tourist/checkout/controller/checkout_controller.dart';
+import 'package:admin_dashboard/features/tourist/checkout/model/booking_model.dart';
+import 'package:admin_dashboard/features/tourist/checkout/view/paymob_webview_screen.dart';
 
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/constants/app_routes.dart';
@@ -833,3 +833,4 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 }
+

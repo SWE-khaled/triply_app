@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/common/AuthTourguide/providers/tour_guide_auth_provider.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_header.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
-import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
+import 'package:admin_dashboard/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
+import 'package:admin_dashboard/features/common/AuthTourguide/providers/tour_guide_auth_provider.dart';
+import 'package:admin_dashboard/features/common/AuthTourist/constants/auth_colors.dart';
+import 'package:admin_dashboard/features/common/AuthTourist/widgets/auth_button.dart';
+import 'package:admin_dashboard/features/common/AuthTourist/widgets/auth_header.dart';
+import 'package:admin_dashboard/features/common/AuthTourist/widgets/auth_text_field.dart';
+import 'package:admin_dashboard/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import 'tour_guide_signup_screen.dart';
 import 'tour_guide_verification_screen.dart';
 // Tourist home (for role-based redirect when a tourist logs in here)
@@ -204,3 +204,4 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
     );
   }
 }
+

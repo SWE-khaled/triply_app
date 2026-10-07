@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/tourist/place_details/view/place_details_view.dart';
+import 'package:admin_dashboard/features/tourist/place_details/view/place_details_view.dart';
 import '../controller/search_controller.dart' as c;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
@@ -237,3 +237,4 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
+

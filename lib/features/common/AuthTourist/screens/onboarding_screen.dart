@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
+import 'package:admin_dashboard/features/common/AuthTourist/screens/sign_in_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/tourist/community/view/community_view.dart';
+import 'package:admin_dashboard/features/tourist/community/view/community_view.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -86,3 +86,4 @@ class _Stat extends StatelessWidget {
     );
   }
 }
+

@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart';
-import 'package:triply/core/data/mock/tourist/mock_places.dart';
-import 'package:triply/features/tourist/booking/model/booking.dart';
-import 'package:triply/features/tourist/guides/model/guide.dart';
-import 'package:triply/features/tourist/booking/services/price_calculator.dart';
-import 'package:triply/features/tourist/map/model/place.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_guides.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_places.dart';
+import 'package:admin_dashboard/features/tourist/booking/model/booking.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/guide.dart';
+import 'package:admin_dashboard/features/tourist/booking/services/price_calculator.dart';
+import 'package:admin_dashboard/features/tourist/map/model/place.dart';
 
 /// Feature-focused controller for the 4-step Booking flow.
 /// Local mock state only — no backend, no delays.
@@ -167,3 +167,4 @@ class BookingController extends ChangeNotifier {
     return booking;
   }
 }
+

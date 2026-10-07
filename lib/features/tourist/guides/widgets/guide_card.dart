@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:triply/core/widgets/guide_shared_widgets.dart';
-import 'package:triply/features/tourist/guides/model/guide.dart';
+import 'package:admin_dashboard/core/widgets/guide_shared_widgets.dart';
+import 'package:admin_dashboard/features/tourist/guides/model/guide.dart';
 
 class GuideCard extends StatelessWidget {
   final Guide guide;
@@ -148,3 +148,4 @@ class GuideCard extends StatelessWidget {
     );
   }
 }
+

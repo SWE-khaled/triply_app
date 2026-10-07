@@ -1,74 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart';
-import 'package:triply/features/common/AuthTourist/screens/create_account_screen.dart';
-import 'package:triply/features/common/AuthTourist/screens/forgot_password_screen.dart';
-import 'package:triply/features/common/AuthTourist/screens/onboarding_screen.dart';
-import 'package:triply/features/common/AuthTourist/screens/password_reset_success_screen.dart';
-import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
-import 'firebase_options.dart';
-import 'features/tour_guide/role_selection/view/role_selection_screen.dart';
-import 'core/constants/app_routes.dart';
-import 'core/theme/app_theme.dart';
-import 'features/common/AuthTourist/providers/auth_provider.dart';
-import 'features/tourist/home/view/home_screen.dart';
-import 'features/tourist/notifications/view/notifications_screen.dart';
-import 'features/tourist/search/view/search_screen.dart';
-import 'features/tourist/UserProfile/view/profile_screen.dart';
-import 'features/tourist/UserProfile/view/privacy_security_screen.dart';
-import 'features/tourist/UserProfile/view/emergency_screen.dart';
-Future<void> main() async {
+import 'core/theme/d_app_theme.dart';
+import 'features/admin_dashboard/d_home/view/d_home_view.dart';
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  try { await dotenv.load(fileName: '.env'); } catch (_) {}
-  runApp(const MyApp());
+void main() {
+  runApp(const TriplyAdminApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TriplyAdminApp extends StatelessWidget {
+  const TriplyAdminApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-    
-      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
-      child: MaterialApp(
-        title: 'Triply',
-        debugShowCheckedModeBanner: false,
-        theme: buildAppTheme(),
-        home: Consumer<AuthProvider>(
-          builder: (context, authProvider, _) {
-            switch (authProvider.status) {
-              case AuthStatus.initial:
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              // On auth state change we stay at RoleSelection so the user
-              // can be redirected to the correct flow (tourist vs guide).
-              // Each auth flow handles its own post-login navigation.
-              default:
-               return const RoleSelectionScreen();
-            }
-          },
-        ),
-        routes: {
-          AppRoutes.home: (context) => const HomeScreen(),
-          AppRoutes.search: (context) => const SearchScreen(),
-          AppRoutes.notifications: (context) => const NotificationsScreen(),
-          AppRoutes.onboarding: (context) => const OnboardingScreen(),
-          AppRoutes.signIn: (context) => const SignInScreen(),
-          AppRoutes.createAccount: (context) => const CreateAccountScreen(),
-          ForgotPasswordScreen.routeName: (context) =>
-              const ForgotPasswordScreen(),
-          AppRoutes.passwordResetSuccess: (context) =>
-              const PasswordResetSuccessScreen(),
-          AppRoutes.profile: (context) => const ProfileScreen(),
-          AppRoutes.privacySecurity: (context) => const PrivacySecurityScreen(),
-          AppRoutes.emergency: (context) => const EmergencyScreen(),
-        },
-      ),
+    return MaterialApp(
+      title: 'Triply Admin Console',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      home: const HomeView(),
     );
   }
 }
+

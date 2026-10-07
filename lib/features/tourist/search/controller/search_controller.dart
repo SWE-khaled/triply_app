@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:triply/core/data/mock/tourist/mock_places.dart';
+import 'package:admin_dashboard/core/data/mock/tourist/mock_places.dart';
 import '../../map/model/place.dart';
 import '../model/search_filter.dart';
 import '../../../../core/data/mock/tourist/mock_search.dart';
@@ -96,3 +96,4 @@ class SearchController extends ChangeNotifier {
     notifyListeners();
   }
 }
+
