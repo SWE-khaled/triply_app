@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../common/AuthTourist/providers/auth_provider.dart';
 import '../../../common/AuthTourist/data/auth_repository.dart';
+import '../../../tour_guide/role_selection/view/role_selection_screen.dart';
 import '../controller/profile_controller.dart';
 import '../widget/account_option_tile.dart';
 import '../widget/profile_header.dart';
@@ -263,9 +264,9 @@ class _ProfileBody extends StatelessWidget {
           if (index == 0) {
           Navigator.push(context,MaterialPageRoute(builder: ((context)=>HomeScreen())));
           }
-          //else if (index == 1) {
-          //Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen())));  trips
-          //} 
+          else if (index == 1) {
+            Navigator.of(context).push(AppRoutes.myTrips());
+          }
           else if (index == 2) {
             Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); 
           }
@@ -380,9 +381,10 @@ class _ProfileBody extends StatelessWidget {
     try {
       await context.read<AuthProvider>().signOut();
       if (!context.mounted) return;
-      Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(AppRoutes.signIn, (_) => false);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+        (_) => false,
+      );
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(

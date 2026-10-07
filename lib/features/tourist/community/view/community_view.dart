@@ -6,6 +6,7 @@ import 'package:triply/features/tourist/map/view/map_view.dart';
 
 import '../controller/community_controller.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/circle_icon_button.dart';
 import '../widget/my_story_bubble.dart';
@@ -139,7 +140,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.only(bottom: 100), // <-- space for nav
@@ -189,7 +190,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           if (!deleted && mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("You can't delete others post!"),
+                                backgroundColor: AppColors.primaryTeal,
+                                content: Text("You can't delete others post!",style: TextStyle(color: Colors.white),),
                               ),
                             );
                           }
@@ -215,6 +217,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
               context,
               MaterialPageRoute(builder: (_) => const HomeScreen()),
             );
+          } else if (index == 1) {
+            Navigator.of(context).push(AppRoutes.myTrips());
           } else if (index == 2) {
             Navigator.push(
               context,

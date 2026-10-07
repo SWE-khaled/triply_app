@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/data/mock/tourist/mock_guides.dart';
+import '../../../common/AuthTourist/data/auth_repository.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../guides/view/guide_profile_screen.dart';
@@ -182,10 +183,18 @@ class TripDetailsScreen extends StatelessWidget {
                           ).push(AppRoutes.booking(trip)),
                         ),
                         const SizedBox(height: 14),
-                        GuideCard(
-                          details: details,
-                          onTap: () =>
-                              _openGuideProfile(context, details.guideName),
+                        FutureBuilder<String?>(
+                          future: AuthRepository().getGuidePhoneByName(
+                            details.guideName,
+                          ),
+                          builder: (context, snapshot) => GuideCard(
+                            details: details,
+                            guidePhone: snapshot.data,
+                            onTap: () => _openGuideProfile(
+                              context,
+                              details.guideName,
+                            ),
+                          ),
                         ),
                         if (isBooked) ...[
                           const SizedBox(height: 16),

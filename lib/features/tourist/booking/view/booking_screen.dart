@@ -131,6 +131,52 @@ class _BookingScreenState extends State<BookingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _sectionLabel('SELECT PLACE'),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.cardBorder),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _controller.selectedPlace?.id,
+              hint: const Text(
+                'Choose a place to visit',
+                style: TextStyle(fontSize: 14, color: AppColors.title),
+              ),
+              isExpanded: true,
+              items: _controller.places
+                  .map(
+                    (p) => DropdownMenuItem(
+                      value: p.id,
+                      child: Text(
+                        '${p.name} · ${p.city}',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 14, color: AppColors.title),
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (id) {
+                if (id == null) return;
+                _controller.setSelectedPlace(
+                  _controller.places.firstWhere((p) => p.id == id),
+                );
+              },
+            ),
+          ),
+        ),
+        if (_controller.selectedPlace != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Guide rate: EGP ${_controller.guide.pricePerHour.toInt()}/hr · ${_controller.selectedPlace!.name}',
+            style: const TextStyle(fontSize: 12, color: AppColors.subtitle),
+          ),
+        ],
+        const SizedBox(height: 16),
         _sectionLabel('SELECT DATE'),
         const SizedBox(height: 8),
         InkWell(

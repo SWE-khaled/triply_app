@@ -40,7 +40,7 @@ class MyStoryBubble extends StatelessWidget {
                   ),
                 ),
                 child: CircleAvatar(
-                  radius: 32,
+                  radius: 36,
                   backgroundColor: AppColors.chipGrey,
                   backgroundImage: hasPhoto ? NetworkImage(photoUrl) : null,
                   onBackgroundImageError: hasPhoto ? (_, _) {} : null,

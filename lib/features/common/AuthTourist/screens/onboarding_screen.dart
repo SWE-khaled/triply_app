@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/common/AuthTourist/screens/create_account_screen.dart';
+import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -263,7 +263,7 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const CreateAccountScreen(),
+                          builder: (_) => const SignInScreen(),
                         ),
                       );
                     }

@@ -7,7 +7,15 @@ class GuideCard extends StatelessWidget {
   final TripDetails details;
   final VoidCallback onTap;
 
-  const GuideCard({super.key, required this.details, required this.onTap});
+  /// Registered guide phone from Firestore; row hidden when null/empty.
+  final String? guidePhone;
+
+  const GuideCard({
+    super.key,
+    required this.details,
+    required this.onTap,
+    this.guidePhone,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +130,27 @@ class GuideCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (guidePhone != null && guidePhone!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.phone,
+                          size: 12,
+                          color: AppColors.starGold,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          guidePhone!,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.titleDetails,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),

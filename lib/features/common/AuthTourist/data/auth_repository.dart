@@ -54,6 +54,31 @@ class AuthRepository {
     return null;
   }
 
+  /// Phone of a registered guide matched by display name (same name
+  /// matching the trip screens already use), or null when no registered
+  /// guide with a saved phone exists. Never invents a number.
+  Future<String?> getGuidePhoneByName(String guideName) async {
+    final name = guideName.trim();
+    if (name.isEmpty) return null;
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'guide')
+          .get();
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        if ((data['name'] as String?)?.trim() == name) {
+          final phone = data['phone'];
+          if (phone is String && phone.trim().isNotEmpty) {
+            return phone.trim();
+          }
+          return null;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   Future<UserCredential> signInWithEmail({
     required String email,
     required String password,

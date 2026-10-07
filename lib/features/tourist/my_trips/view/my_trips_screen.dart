@@ -50,123 +50,130 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Text('My Trips', style: AppTextStyles.screenTitle),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
-              child: Text(
-                'Your Egypt journey, tracked',
-                style: AppTextStyles.screenSubtitle,
+      // Transparent slot so no solid container paints behind the floating
+      // glass nav; the body container below provides the background.
+      backgroundColor: Colors.transparent,
+      body: Container(
+        color: AppColors.background,
+        child: SafeArea(
+          // Let the content extend under the floating glass nav bar.
+          bottom: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Text('My Trips', style: AppTextStyles.screenTitle),
               ),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: AppColors.tabUnselectedBg,
-                  borderRadius: BorderRadius.circular(12),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
+                child: Text(
+                  'Your Egypt journey, tracked',
+                  style: AppTextStyles.screenSubtitle,
                 ),
-                child: BlocBuilder<MyTripsCubit, MyTripsState>(
-                  builder: (context, state) {
-                    return Row(
-                      children: List.generate(tabValues.length, (i) {
-                        final selected = tabValues[i] == state.selectedTab;
-                        return Expanded(
-                          child: GestureDetector(
-                            onTap: () => context.read<MyTripsCubit>().selectTab(
-                              tabValues[i],
-                            ),
-                            behavior: HitTestBehavior.opaque,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: selected
-                                    ? AppColors.tabSelectedBg
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                tabLabels[i],
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: AppColors.tabUnselectedBg,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: BlocBuilder<MyTripsCubit, MyTripsState>(
+                    builder: (context, state) {
+                      return Row(
+                        children: List.generate(tabValues.length, (i) {
+                          final selected = tabValues[i] == state.selectedTab;
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () => context
+                                  .read<MyTripsCubit>()
+                                  .selectTab(tabValues[i]),
+                              behavior: HitTestBehavior.opaque,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                alignment: Alignment.center,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
                                   color: selected
-                                      ? AppColors.background
-                                      : AppColors.subtitle,
+                                      ? AppColors.tabSelectedBg
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  tabLabels[i],
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: selected
+                                        ? AppColors.background
+                                        : AppColors.subtitle,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          );
+                        }),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: BlocBuilder<MyTripsCubit, MyTripsState>(
+                  builder: (context, state) {
+                    final trips = state.trips;
+                    if (trips.isEmpty) {
+                      return EmptyTrips(
+                        tabName:
+                            tabLabels[tabValues.indexOf(state.selectedTab)],
+                        title: 'No Trips Yet',
+                      );
+                    }
+                    return ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
+                      itemCount: trips.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final trip = trips[index];
+                        final isPrivate = MyBookingsPublic.isPrivate(trip.id);
+                        final isPending = MyBookingsPublic.isPending(trip.id);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 4, bottom: 6),
+                              child: Row(
+                                children: [
+                                  BookingKindIcon(isPrivate: isPrivate),
+                                  if (isPending) ...[
+                                    const SizedBox(width: 12),
+                                    const PendingApprovalLabel(),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            TripCard(
+                              trip: trip,
+                              onTap: () => _openDetails(trip),
+                              onViewDetails: () => _openDetails(trip),
+                              // Chat: placeholder — no chat screen exists yet.
+                              onChat: () {},
+                            ),
+                          ],
                         );
-                      }),
+                      },
                     );
                   },
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: BlocBuilder<MyTripsCubit, MyTripsState>(
-                builder: (context, state) {
-                  final trips = state.trips;
-                  if (trips.isEmpty) {
-                    return EmptyTrips(
-                      tabName: tabLabels[tabValues.indexOf(state.selectedTab)],
-                      title: 'No Trips Yet',
-                    );
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
-                    itemCount: trips.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final trip = trips[index];
-                      final isPrivate =
-                          MyBookingsPublic.isPrivate(trip.id);
-                      final isPending =
-                          MyBookingsPublic.isPending(trip.id);
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 4, bottom: 6),
-                            child: Row(
-                              children: [
-                                BookingKindIcon(isPrivate: isPrivate),
-                                if (isPending) ...[
-                                  const SizedBox(width: 12),
-                                  const PendingApprovalLabel(),
-                                ],
-                              ],
-                            ),
-                          ),
-                          TripCard(
-                            trip: trip,
-                            onTap: () => _openDetails(trip),
-                            onViewDetails: () => _openDetails(trip),
-                            // Chat: placeholder — no chat screen exists yet.
-                            onChat: () {},
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: AppBottomNav(
@@ -174,14 +181,20 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
         onTap: (i) {
           if (i == bottomIndex) return;
           if (i == 0) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
           } else if (i == 2) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const MapScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MapScreen()),
+            );
           } else if (i == 3) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const CommunityScreen()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CommunityScreen()),
+            );
           } else if (i == 4) {
             Navigator.pushNamed(context, AppRoutes.profile);
           }

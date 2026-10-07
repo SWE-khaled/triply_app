@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:triply/core/data/mock/tourist/mock_guides.dart';
+import 'package:triply/core/data/mock/tourist/mock_places.dart';
 import 'package:triply/features/tourist/booking/model/booking.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 import 'package:triply/features/tourist/booking/services/price_calculator.dart';
+import 'package:triply/features/tourist/map/model/place.dart';
 
 /// Feature-focused controller for the 4-step Booking flow.
 /// Local mock state only — no backend, no delays.
@@ -40,6 +42,17 @@ class BookingController extends ChangeNotifier {
   int _travelers = 2;
   String _meetingPoint = 'Hotel Lobby';
   String _notes = '';
+  Place? _selectedPlace;
+
+  List<Place> get places =>
+      mockPlaces.map((e) => Place.fromJson(e)).toList();
+
+  Place? get selectedPlace => _selectedPlace;
+
+  void setSelectedPlace(Place? place) {
+    _selectedPlace = place;
+    notifyListeners();
+  }
 
   int get stepIndex => _stepIndex;
   DateTime? get date => _date;
