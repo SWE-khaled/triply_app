@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/app_bottom_nav.dart';
-import '../../d_overview/view/overview_view.dart';
-import '../../d_trips/view/trips_view.dart';
-import '../../d_users/view/users_view.dart';
-import '../../d_bookings/view/bookings_view.dart';
-import '../../d_user_posts/view/user_posts_view.dart';
-import '../../d_guides/view/guides_view.dart';
-import '../../d_trip_applications/view/trip_applications_view.dart';
-import '../../d_app_settings/view/app_settings_view.dart';
+import '../../../core/theme/d_app_colors.dart';
+import '../../../core/theme/d_app_text_styles.dart';
+import '../../../core/widgets/d_app_bottom_nav.dart';
+import '../../d_overview/view/d_overview_view.dart';
+import '../../d_trips/view/d_trips_view.dart';
+import '../../d_users/view/d_users_view.dart';
+import '../../d_bookings/view/d_bookings_view.dart';
+import '../../d_user_posts/view/d_user_posts_view.dart';
+import '../../d_guides/view/d_guides_view.dart';
+import '../../d_trip_applications/view/d_trip_applications_view.dart';
+import '../../d_app_settings/view/d_app_settings_view.dart';
 // ignore_for_file: unused_import
 
 /// Root admin shell — sidebar + indexed page body.

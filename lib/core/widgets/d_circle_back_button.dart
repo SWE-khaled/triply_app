@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../theme/d_app_colors.dart';
+import '../theme/d_app_text_styles.dart';
 
 /// Shared status badge chip used across all admin tables.
 /// [status] can be: 'active', 'approved', 'confirmed', 'pending',

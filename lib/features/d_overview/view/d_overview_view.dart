@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
-import '../../../data/mock/mock_guides.dart';
-import '../../d_home/view/home_view.dart';
+import '../../../core/theme/d_app_colors.dart';
+import '../../../core/theme/d_app_text_styles.dart';
+import '../../../data/mock/d_mock_guides.dart';
+import '../../d_home/view/d_home_view.dart';
 
 /// Overview / Dashboard page.
 class OverviewView extends StatefulWidget {
