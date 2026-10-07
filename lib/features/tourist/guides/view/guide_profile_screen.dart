@@ -198,7 +198,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                 ),
               ),
               if (guide.isVerified) ...[
-                SizedBox(width: 8),
+                SizedBox(width: 4),
                 Icon(Icons.verified, size: 16, color: Color(0xFF4DA7A0)),
               ],
             ],

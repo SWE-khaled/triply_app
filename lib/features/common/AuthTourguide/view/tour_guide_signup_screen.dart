@@ -4,6 +4,7 @@ import 'package:triply/features/common/AuthTourguide/providers/tour_guide_auth_p
 import '../../../../core/constants/tour_guide_colors.dart';
 import 'tour_guide_login_screen.dart';
 import 'tour_guide_verification_screen.dart';
+import 'package:flutter/services.dart';
 
 class TourGuideSignupScreen extends StatefulWidget {
   const TourGuideSignupScreen({super.key});
@@ -41,7 +42,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
       name: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
-      phone: _phoneController.text.trim(),
+      phone: '+20${_phoneController.text.trim()}',
       licenseNumber: '',
       languages: const ['Arabic', 'English'], // default; can extend later
     );
@@ -115,25 +116,75 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                       const SizedBox(height: 8),
                       _formField(
                         controller: _nameController,
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 16, right: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.person_outline,
+                                color: TourGuideColors.iconGrey,
+                              ),
+                            ],
+                          ),
+                        ),
                         hintText: 'Your full legal name',
-                        validator: (v) =>
-                            (v == null || v.trim().length < 3)
-                                ? 'Enter your full name (min 3 characters)'
-                                : null,
+                        validator: (v) => (v == null || v.trim().length < 3)
+                            ? 'Enter your full name (min 3 characters)'
+                            : null,
                       ),
                       const SizedBox(height: 18),
 
                       // Phone
+                      // Phone
                       _label('Phone number'),
                       const SizedBox(height: 8),
                       _formField(
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
                         controller: _phoneController,
-                        hintText: '+20 1XX XXX XXXX',
+                        hintText: '1012345678',
                         keyboardType: TextInputType.phone,
-                        validator: (v) =>
-                            (v == null || v.trim().length < 10)
-                                ? 'Enter a valid phone number'
-                                : null,
+
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 16, right: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.phone_outlined,
+                                color: TourGuideColors.iconGrey,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '🇪🇬 +20',
+                                style: TextStyle(
+                                  color: TourGuideColors.deepNile,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        validator: (v) {
+                          final digits = (v ?? '').replaceAll(
+                            RegExp(r'\D'),
+                            '',
+                          );
+
+                          if (digits.isEmpty) {
+                            return 'Enter your phone number';
+                          }
+
+                          if (!RegExp(r'^1[0125]\d{8}$').hasMatch(digits)) {
+                            return 'Enter a valid Egyptian mobile number';
+                          }
+
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 18),
 
@@ -142,6 +193,18 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                       const SizedBox(height: 8),
                       _formField(
                         controller: _emailController,
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 16, right: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.mail_outline,
+                                color: TourGuideColors.iconGrey,
+                              ),
+                            ],
+                          ),
+                        ),
                         hintText: 'guide@email.com',
                         keyboardType: TextInputType.emailAddress,
                         validator: (v) {
@@ -161,6 +224,18 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                       const SizedBox(height: 8),
                       _formField(
                         controller: _passwordController,
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 16, right: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.lock_outline,
+                                color: TourGuideColors.iconGrey,
+                              ),
+                            ],
+                          ),
+                        ),
                         hintText: 'Enter your password',
                         obscureText: _obscurePassword,
                         validator: (v) {
@@ -192,6 +267,18 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                       const SizedBox(height: 8),
                       _formField(
                         controller: _confirmPasswordController,
+                        prefixIcon: const Padding(
+                          padding: EdgeInsets.only(left: 16, right: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.lock_outline,
+                                color: TourGuideColors.iconGrey,
+                              ),
+                            ],
+                          ),
+                        ),
                         hintText: 'Repeat your password',
                         obscureText: _obscureConfirmPassword,
                         validator: (v) {
@@ -212,9 +299,8 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                             size: 20,
                           ),
                           onPressed: () => setState(
-                            () =>
-                                _obscureConfirmPassword =
-                                    !_obscureConfirmPassword,
+                            () => _obscureConfirmPassword =
+                                !_obscureConfirmPassword,
                           ),
                         ),
                       ),
@@ -338,19 +424,23 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
     required String hintText,
     bool obscureText = false,
     TextInputType? keyboardType,
+    Widget? prefixIcon,
     Widget? suffixIcon,
+    List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       validator: validator,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       style: const TextStyle(fontSize: 15, color: TourGuideColors.deepNile),
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(color: Color(0xFFB0C4C8), fontSize: 15),
+        prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         filled: true,
         fillColor: Colors.white,

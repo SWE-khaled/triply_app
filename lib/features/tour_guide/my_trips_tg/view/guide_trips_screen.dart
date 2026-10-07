@@ -19,12 +19,18 @@ import '../widgets/rejected_guide_trip_card.dart';
 /// works — never rely on an ancestor provider.
 /// Create/View/Manage destinations don't exist in Figma yet → toasts.
 class GuideTripsScreen extends StatelessWidget {
-  const GuideTripsScreen({super.key});
+  /// Tab pre-selected on entry (e.g. from Dashboard cards).
+  final GuideTripStatus initialStatus;
+
+  const GuideTripsScreen({
+    super.key,
+    this.initialStatus = GuideTripStatus.active,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => GuideTripsCubit(),
+      create: (_) => GuideTripsCubit(initialStatus: initialStatus),
       child: const _GuideTripsView(),
     );
   }

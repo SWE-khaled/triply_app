@@ -14,6 +14,7 @@ class StatCard extends StatelessWidget {
   final String label;
   final bool highlighted;
   final bool valueTeal;
+  final VoidCallback? onTap;
 
   const StatCard({
     super.key,
@@ -22,11 +23,12 @@ class StatCard extends StatelessWidget {
     required this.label,
     this.highlighted = false,
     this.valueTeal = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: highlighted ? _cream : Colors.white,
@@ -61,6 +63,12 @@ class StatCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+    if (onTap == null) return card;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: card,
     );
   }
 }

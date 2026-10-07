@@ -10,9 +10,8 @@ import '../../../common/AuthTourist/providers/auth_provider.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;
-  final String? photoUrl;
-
-  const EditProfileSheet({super.key, required this.name, this.photoUrl});
+  final String displayAvatar;
+  const EditProfileSheet({super.key, required this.name,required this.displayAvatar});
 
   @override
   State<EditProfileSheet> createState() => _EditProfileSheetState();
@@ -122,9 +121,9 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     ImageProvider? avatar;
     if (_pickedImage != null) {
       avatar = FileImage(_pickedImage!);
-    } else if (widget.photoUrl != null && widget.photoUrl!.isNotEmpty) {
-      avatar = NetworkImage(widget.photoUrl!);
-    }
+    } else if (widget.displayAvatar.isNotEmpty) {
+  avatar = NetworkImage(widget.displayAvatar);
+}
 
     return Padding(
       padding: EdgeInsets.fromLTRB(

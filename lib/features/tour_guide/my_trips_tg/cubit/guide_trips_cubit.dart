@@ -6,11 +6,11 @@ import 'guide_trips_state.dart';
 
 /// Guide-side trip management (mock -> Model). Owns status filter.
 class GuideTripsCubit extends Cubit<GuideTripsState> {
-  GuideTripsCubit()
+  GuideTripsCubit({GuideTripStatus initialStatus = GuideTripStatus.active})
     : super(
         GuideTripsState(
-          selectedStatus: GuideTripStatus.active,
-          trips: _filter(GuideTripStatus.active),
+          selectedStatus: initialStatus,
+          trips: _filter(initialStatus),
         ),
       );
 

@@ -80,7 +80,7 @@ class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
       isScrollControlled: true,
       builder: (_) => EditProfileSheet(
         name: _controller.displayName,
-        photoUrl: _controller.guide.avatarUrl,
+         displayAvatar: _controller.displayAvatar,
       ),
     );
     // The sheet persists to Firebase; pull the saved values in.
@@ -110,7 +110,7 @@ class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
                 ProfileStatsCard(
                   reviews: guide.reviewCount.toString(),
                   languages: guide.languages.length.toString(),
-                  price: 'EGP ${guide.pricePerHour}${guide.currency}',
+                  price: '${guide.pricePerHour}${guide.currency}',
                 ),
                 ProfileMenuSection(
                   languages: guide.languages,

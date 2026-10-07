@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
+import 'package:flutter/services.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -72,8 +73,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     if (success && mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
     } else if (mounted && authProvider.errorMessage != null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(authProvider.errorMessage!)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(authProvider.errorMessage!)));
     }
   }
 
@@ -99,8 +101,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Full Name',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text(
+                      'Full Name',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 8),
                     AuthTextField(
                       controller: _nameController,
@@ -108,31 +112,42 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       icon: Icons.person_outline,
                       validator: (value) =>
                           (value == null || value.trim().isEmpty)
-                              ? 'Enter your full name'
-                              : null,
+                          ? 'Enter your full name'
+                          : null,
                     ),
                     const SizedBox(height: 20),
-                    const Text('Email',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text(
+                      'Email',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 8),
                     AuthTextField(
                       controller: _emailController,
                       hintText: 'your@email.com',
                       icon: Icons.mail_outline,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) => (value == null || !value.contains('@'))
+                      validator: (value) =>
+                          (value == null || !value.contains('@'))
                           ? 'Enter a valid email'
                           : null,
                     ),
                     const SizedBox(height: 20),
-                    const Text('Phone Number',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text(
+                      'Phone Number',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 8),
                     AuthTextField(
                       controller: _phoneController,
                       hintText: '1012345678',
                       icon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
+
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+
                       prefix: const Padding(
                         padding: EdgeInsets.only(right: 2),
                         child: Text(
@@ -143,11 +158,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           ),
                         ),
                       ),
+
                       validator: validateEgyptianPhone,
                     ),
                     const SizedBox(height: 20),
-                    const Text('Password',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text(
+                      'Password',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 8),
                     AuthTextField(
                       controller: _passwordController,
@@ -159,13 +177,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           : null,
                     ),
                     const SizedBox(height: 20),
-                    const Text('Confirm Password',
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                    const Text(
+                      'Confirm Password',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                     const SizedBox(height: 8),
                     AuthTextField(
                       controller: _confirmPasswordController,
                       hintText: '••••••••',
-                      icon: Icons.check_circle_outline,
+                      icon: Icons.lock_outline,
                       isPassword: true,
                       validator: (value) => value != _passwordController.text
                           ? 'Passwords do not match'
@@ -174,27 +194,34 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     const SizedBox(height: 20),
                     RichText(
                       text: const TextSpan(
-                        style: TextStyle(color: AuthColors.textGrey, fontSize: 13),
+                        style: TextStyle(
+                          color: AuthColors.textGrey,
+                          fontSize: 13,
+                        ),
                         children: [
                           TextSpan(text: 'By signing up, you agree to our '),
                           TextSpan(
-                              text: 'Terms of Service',
-                              style: TextStyle(
-                                  color: AuthColors.signInDark,
-                                  fontWeight: FontWeight.bold)),
+                            text: 'Terms of Service',
+                            style: TextStyle(
+                              color: AuthColors.signInDark,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           TextSpan(text: ' and '),
                           TextSpan(
-                              text: 'Privacy Policy',
-                              style: TextStyle(
-                                  color: AuthColors.signInDark,
-                                  fontWeight: FontWeight.bold)),
+                            text: 'Privacy Policy',
+                            style: TextStyle(
+                              color: AuthColors.signInDark,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
                     AuthButton(
                       label: 'Create Account',
-                      backgroundColor:AuthColors.darkTeal,
+                      backgroundColor: AuthColors.darkTeal,
                       isLoading: authProvider.isLoading,
                       onPressed: () => _handleCreateAccount(authProvider),
                     ),
@@ -202,17 +229,24 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     Center(
                       child: Wrap(
                         children: [
-                          const Text('Already have an account? ',
-                              style: TextStyle(color: AuthColors.textGrey)),
+                          const Text(
+                            'Already have an account? ',
+                            style: TextStyle(color: AuthColors.textGrey),
+                          ),
                           GestureDetector(
                             onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const SignInScreen())),
-                            child: const Text('Sign in',
-                                style: TextStyle(
-                                    color: AuthColors.signInDark,
-                                    fontWeight: FontWeight.bold)),
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignInScreen(),
+                              ),
+                            ),
+                            child: const Text(
+                              'Sign in',
+                              style: TextStyle(
+                                color: AuthColors.signInDark,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
                       ),

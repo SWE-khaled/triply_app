@@ -74,7 +74,7 @@ class TripCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 6),
+                              
 
                             ],
                           ),
@@ -132,8 +132,8 @@ class TripCard extends StatelessWidget {
                         children: [
                           SvgPicture.asset(
                             AppAsset.iconPeople,
-                            width: 16,
-                            height: 16,
+                            width: 14,
+                            height: 14,
                           ),
                           const SizedBox(width: 4),
                           Column(
@@ -143,7 +143,7 @@ class TripCard extends StatelessWidget {
                               Text(
                                 '${trip.peopleCount}',
                                 style: GoogleFonts.poppins(
-                                  fontSize: 13,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.dateText,
                                   height: 1.2,
@@ -160,7 +160,7 @@ class TripCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +169,7 @@ class TripCard extends StatelessWidget {
                                 Text(
                                   'EGP',
                                   style: GoogleFonts.poppins(
-                                    fontSize: 11,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.price,
                                     height: 1.2,
@@ -178,7 +178,7 @@ class TripCard extends StatelessWidget {
                                 Text(
                                   formatEgp(trip.priceEgp),
                                   style: GoogleFonts.poppins(
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.price,
                                     height: 1.15,
@@ -196,7 +196,7 @@ class TripCard extends StatelessWidget {
                               minimumSize: const Size(0, 28),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
-                                vertical: 4,
+                                vertical: 8,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),

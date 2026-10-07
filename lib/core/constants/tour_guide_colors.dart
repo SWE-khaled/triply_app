@@ -9,5 +9,6 @@ class TourGuideColors {
   static const Color textPrimary = Color(0xFF0E5261);
   static const Color textSecondary = Color(0xFF6E8B90);
   static const Color textDark = Color(0xFF111827);
-  static const Color borderColor = Color(0x1A0E5261); // 10% opacity
+  static const Color borderColor = Color(0x1A0E5261);
+  static const Color iconGrey = Color(0xFF9AA5A9); // 10% opacity
 }

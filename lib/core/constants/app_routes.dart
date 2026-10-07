@@ -88,9 +88,13 @@ class AppRoutes {
     );
   }
 
-  static Route<void> guideTrips() {
+  static Route<void> guideTrips({
+    GuideTripStatus initialStatus = GuideTripStatus.active,
+  }) {
     // Screen self-provides its cubit; route adds no provider.
-    return MaterialPageRoute(builder: (_) => const GuideTripsScreen());
+    return MaterialPageRoute(
+      builder: (_) => GuideTripsScreen(initialStatus: initialStatus),
+    );
   }
 
   static Route<void> guideTripDetails(GuideTrip trip) {

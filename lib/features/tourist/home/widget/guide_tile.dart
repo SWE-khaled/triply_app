@@ -21,31 +21,37 @@ class GuideTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFEEEEEE)),
           boxShadow: const [
-            BoxShadow(color: AppColors.cardShadow, blurRadius: 8, offset: Offset(0, 2)),
+            BoxShadow(
+              color: AppColors.cardShadow,
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
           ],
         ),
         child: Row(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(guide.avatarUrl,
+              child: Image.network(
+                guide.avatarUrl,
+                width: 56,
+                height: 56,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(
                   width: 56,
                   height: 56,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    width: 56,
-                    height: 56,
-                    color: const Color(0xFFF0F3F3),
-                    alignment: Alignment.center,
-                    child: Text(
-                      guide.name.isNotEmpty ? guide.name[0].toUpperCase() : '?',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryTeal,
-                      ),
+                  color: const Color(0xFFF0F3F3),
+                  alignment: Alignment.center,
+                  child: Text(
+                    guide.name.isNotEmpty ? guide.name[0].toUpperCase() : '?',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryTeal,
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -54,14 +60,22 @@ class GuideTile extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: Text(guide.name,
-                            style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.guidesName)),
+                      Flexible(
+                        child: Text(
+                          guide.name,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.guidesName,
+                          ),
+                        ),
                       ),
-                      const Icon(Icons.verified, size: 16, color: AppColors.primaryTeal),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.verified,
+                        size: 16,
+                        color: AppColors.primaryTeal,
+                      ),
                     ],
                   ),
                   Text(guide.specialty, style: AppTextStyles.bodyGrey),
@@ -69,11 +83,15 @@ class GuideTile extends StatelessWidget {
                   Row(
                     children: [
                       const Icon(Icons.star, size: 14, color: Colors.amber),
-                      Text(' ${guide.rating} (${guide.reviewCount})',
-                          style: AppTextStyles.bodyGrey),
+                      Text(
+                        ' ${guide.rating} (${guide.reviewCount})',
+                        style: AppTextStyles.bodyGrey,
+                      ),
                       const Spacer(),
-                      Text('From \$${guide.pricePerHour.toInt()}',
-                          style: AppTextStyles.price),
+                      Text(
+                        'From \$${guide.pricePerHour.toInt()}',
+                        style: AppTextStyles.price,
+                      ),
                       const Text('/hr', style: AppTextStyles.bodyGrey),
                     ],
                   ),

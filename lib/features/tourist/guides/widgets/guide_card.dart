@@ -67,7 +67,7 @@ class GuideCard extends StatelessWidget {
                             color: Color(0xFF0E5261),
                           ),
                         ),
-                      SizedBox(width: 15,),
+                      SizedBox(width: 4,),
                       if (guide.isVerified)
                          Icon(Icons.verified,
                             size: 14, color: Color(0xFF4DA7A0)),

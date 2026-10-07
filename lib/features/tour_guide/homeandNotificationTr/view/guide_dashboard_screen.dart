@@ -7,9 +7,11 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/circle_icon_button.dart';
 import '../../../../../core/widgets/network_image_fallback.dart';
 import '../controller/guide_dashboard_controller.dart';
+import '../../my_trips_tg/model/guide_trip.dart';
 import '../widget/dashboard_booking_request_card.dart';
 import '../widget/guide_bottom_nav.dart';
 import '../widget/stat_card.dart';
+import '../../../../../core/data/mock/tourist/mock_guides.dart';
 import 'booking_details_screen.dart';
 import 'guide_notifications_screen.dart';
 
@@ -27,6 +29,11 @@ class GuideDashboardScreen extends StatefulWidget {
 
 class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
   late final DashboardController controller;
+
+  /// Guide profile opened from this dashboard (avatar + bottom nav).
+  /// Single literal so the welcome-name fallback below always matches
+  /// the profile being displayed.
+  static const _profileGuideId = 'g2';
 
   @override
   void initState() {
@@ -46,6 +53,16 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
     super.dispose();
   }
 
+  /// Mock fallback identical to ProfileController.guide for [_profileGuideId].
+  String get _fallbackGuideName {
+    return mockGuides
+        .firstWhere(
+          (g) => g.id == _profileGuideId,
+          orElse: () => mockGuides.first,
+        )
+        .name;
+  }
+
   void _openNotifications() {
     Navigator.of(
       context,
@@ -55,12 +72,17 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final stats = controller.stats;
-    // Same source of truth as Profile: Firebase user photo first,
-    // mock avatar only as fallback. Rebuilds via AuthProvider.
-    final firebasePhoto =
-        context.watch<AuthProvider>().user?.photoURL?.trim() ?? '';
+    // Same sources of truth as the Profile page (ProfileController):
+    // Firebase user first (EditProfileSheet persists the name/photo there
+    // and calls AuthProvider.refreshUser, so this rebuilds on change),
+    // mock guide "g2" only as fallback. Rebuilds via AuthProvider.
+    final authUser = context.watch<AuthProvider>().user;
+    final firebasePhoto = authUser?.photoURL?.trim() ?? '';
     final avatarUrl =
         firebasePhoto.isNotEmpty ? firebasePhoto : stats.avatarUrl;
+    final firebaseName = authUser?.displayName?.trim() ?? '';
+    final guideName =
+        firebaseName.isNotEmpty ? firebaseName : _fallbackGuideName;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -86,7 +108,7 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Welcome back, ${stats.guideName}',
+                      'Welcome back, $guideName',
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.subtitle,
@@ -100,6 +122,7 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                             icon: Icons.people_outline,
                             value: '${stats.totalBookings}',
                             label: 'Total Bookings',
+                            onTap: () {}
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -108,6 +131,14 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                             icon: Icons.calendar_today_outlined,
                             value: '${stats.upcomingTrips}',
                             label: 'Upcoming Trips',
+                            // No Upcoming tab exists in My Trips; Active
+                            // holds the scheduled upcoming trips.
+                            onTap: () => Navigator.push(
+                              context,
+                              AppRoutes.guideTrips(
+                                initialStatus: GuideTripStatus.active,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -120,6 +151,12 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                             icon: Icons.work_outline,
                             value: '${stats.activeTrips}',
                             label: 'Active Trips',
+                            onTap: () => Navigator.push(
+                              context,
+                              AppRoutes.guideTrips(
+                                initialStatus: GuideTripStatus.active,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -128,6 +165,12 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                             icon: Icons.layers_outlined,
                             value: '${stats.completedTrips}',
                             label: 'Completed Trips',
+                            onTap: () => Navigator.push(
+                              context,
+                              AppRoutes.guideTrips(
+                                initialStatus: GuideTripStatus.completed,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -142,6 +185,10 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                             label: 'Earnings',
                             highlighted: true,
                             valueTeal: true,
+                            onTap: () => Navigator.push(
+                              context,
+                              AppRoutes.earnings(),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -150,6 +197,12 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                             icon: Icons.notifications_none_outlined,
                             value: '${stats.pendingRequests}',
                             label: 'Pending Requests',
+                            onTap: () => Navigator.push(
+                              context,
+                              AppRoutes.guideTrips(
+                                initialStatus: GuideTripStatus.pending,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -188,7 +241,10 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                 if (index == 1) {
                   Navigator.push(context, AppRoutes.guideTrips());
                 } else if (index == 2) {
-                  Navigator.push(context, AppRoutes.guideProfile("g2"));
+                  Navigator.push(
+                    context,
+                    AppRoutes.guideProfile(_profileGuideId),
+                  );
                 }
               },
             ),
@@ -237,7 +293,10 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
         const SizedBox(width: 8),
         GestureDetector(
           onTap: () {
-            Navigator.push(context, AppRoutes.guideProfile("g2"));
+            Navigator.push(
+              context,
+              AppRoutes.guideProfile(_profileGuideId),
+            );
           },
           behavior: HitTestBehavior.opaque,
           child: ClipOval(
