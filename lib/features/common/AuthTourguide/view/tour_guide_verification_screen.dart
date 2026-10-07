@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
+import 'package:triply/features/common/AuthTourguide/view/tour_guide_login_screen.dart';
 import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 import '../../../../core/services/cloudinary_service.dart';
@@ -128,7 +129,7 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                 children: [
                   // Back Button
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>TourGuideLoginScreen())),
                     child: Container(
                       width: 44,
                       height: 44,

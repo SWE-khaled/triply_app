@@ -30,6 +30,7 @@ class CreateTripCubit extends Cubit<CreateTripState> {
   final includedCtrl = TextEditingController();
   final notesCtrl = TextEditingController();
   final languagesCtrl = TextEditingController();
+  final phoneCtrl = TextEditingController();
 
   CreateTripCubit() : super(CreateTripState.initial());
 
@@ -49,6 +50,7 @@ class CreateTripCubit extends Cubit<CreateTripState> {
       includedCtrl,
       notesCtrl,
       languagesCtrl,
+      phoneCtrl,
     ]) {
       c.dispose();
     }
@@ -198,6 +200,7 @@ class CreateTripCubit extends Cubit<CreateTripState> {
           state.coverImagePath ??
           'https://picsum.photos/seed/${tripNameCtrlText.hashCode}/800/600',
       status: GuideTripStatus.pending,
+      phone: phoneCtrl.text.trim(),
     );
   }
 
@@ -239,6 +242,9 @@ class CreateTripCubit extends Cubit<CreateTripState> {
         priceEgp: price,
         imageUrl: state.coverImagePath ?? existingTrip.imageUrl,
         status: existingTrip.status,
+        phone: phoneCtrl.text.trim().isEmpty
+            ? existingTrip.phone
+            : phoneCtrl.text.trim(),
       ),
     );
     GuideTripDetailsSource.save(

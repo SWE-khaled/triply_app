@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/data/guide_trips_store.dart';
+import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
 import '../model/guide_dashboard_booking_request.dart';
 import '../model/guide_dashboard_stats.dart';
@@ -16,9 +17,25 @@ class DashboardController extends ChangeNotifier {
   late GuideDashboardStats stats;
   List<BookingRequest> bookings = [];
 
+  /// True until Firestore confirms approval. Unverified guides keep
+  /// seeing the verification banner; approved guides do not.
+  bool showVerificationBanner = true;
+
   DashboardController() {
     GuideTripsStore.addListener(_rebuild);
     _rebuild();
+    _loadVerificationStatus();
+  }
+
+  Future<void> _loadVerificationStatus() async {
+    try {
+      final approved =
+          await TourGuideAuthService().isVerificationApproved();
+      showVerificationBanner = !approved;
+    } catch (_) {
+      showVerificationBanner = true;
+    }
+    notifyListeners();
   }
 
   void _rebuild() {

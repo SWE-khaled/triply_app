@@ -6,12 +6,23 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../../common/AuthTourist/providers/auth_provider.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;
   final String displayAvatar;
-  const EditProfileSheet({super.key, required this.name,required this.displayAvatar});
+  final String about;
+  final String location;
+  final String phone;
+  const EditProfileSheet({
+    super.key,
+    required this.name,
+    required this.displayAvatar,
+    this.about = '',
+    this.location = '',
+    this.phone = '',
+  });
 
   @override
   State<EditProfileSheet> createState() => _EditProfileSheetState();
@@ -19,6 +30,9 @@ class EditProfileSheet extends StatefulWidget {
 
 class _EditProfileSheetState extends State<EditProfileSheet> {
   late final TextEditingController _nameController;
+  late final TextEditingController _aboutController;
+  late final TextEditingController _locationController;
+  late final TextEditingController _phoneController;
   File? _pickedImage;
   bool _loading = false;
 
@@ -26,11 +40,17 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.name);
+    _aboutController = TextEditingController(text: widget.about);
+    _locationController = TextEditingController(text: widget.location);
+    _phoneController = TextEditingController(text: widget.phone);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _aboutController.dispose();
+    _locationController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -103,6 +123,12 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
       await user.updateDisplayName(newName);
       if (newPhotoUrl != null) await user.updatePhotoURL(newPhotoUrl);
+      await TourGuideAuthService().updateProfileFields(
+        name: newName,
+        about: _aboutController.text.trim(),
+        location: _locationController.text.trim(),
+        phone: _phoneController.text.trim(),
+      );
       await auth.refreshUser();
 
       if (mounted) Navigator.pop(context, true);
@@ -132,14 +158,15 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         16,
         MediaQuery.of(context).viewInsets.bottom + 20,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Edit profile',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Edit profile',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
           GestureDetector(
             onTap: _loading ? null : _pickImage,
             child: Stack(
@@ -180,6 +207,32 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               border: OutlineInputBorder(),
             ),
           ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _aboutController,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              labelText: 'About',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _locationController,
+            decoration: const InputDecoration(
+              labelText: 'Location',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+              labelText: 'Phone number',
+              border: OutlineInputBorder(),
+            ),
+          ),
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
@@ -195,7 +248,8 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   : const Text('Save'),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

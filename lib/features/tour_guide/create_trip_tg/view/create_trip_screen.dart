@@ -43,6 +43,7 @@ class CreateTripScreen extends StatelessWidget {
         final cubit = CreateTripCubit();
         final details = initialDetails;
         if (details != null) cubit.prefill(details);
+        cubit.phoneCtrl.text = initialTrip?.phone ?? '';
         return cubit;
       },
       child: _CreateTripView(
@@ -227,6 +228,7 @@ class _CreateTripView extends StatelessWidget {
                 aboutCtrl: cubit.aboutCtrl,
                 locationCtrl: cubit.locationCtrl,
                 labelCtrl: cubit.labelCtrl,
+                phoneCtrl: cubit.phoneCtrl,
               ),
               const SizedBox(height: 12),
               ScheduleSection(

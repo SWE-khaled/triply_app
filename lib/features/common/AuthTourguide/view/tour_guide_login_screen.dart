@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/common/AuthTourguide/providers/tour_guide_auth_provider.dart';
-import '../../../../core/constants/tour_guide_colors.dart';
+import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
+import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
+import 'package:triply/features/common/AuthTourist/widgets/auth_header.dart';
+import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
+import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import 'tour_guide_signup_screen.dart';
 import 'tour_guide_verification_screen.dart';
 // Tourist home (for role-based redirect when a tourist logs in here)
@@ -18,7 +23,6 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -48,10 +52,18 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
         ),
       );
     } else if (role == 'guide') {
-      // Guide → Go to guide verification/home flow
+      // Verified guides go straight home; others complete verification.
+      // Verification state lives in Firestore, so it survives logout/login.
+      final approved =
+          await TourGuideAuthService().isVerificationApproved();
+      if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const TourGuideVerificationScreen()),
+        MaterialPageRoute(
+          builder: (_) => approved
+              ? const GuideDashboardScreen()
+              : const TourGuideVerificationScreen(),
+        ),
         (route) => false,
       );
     } else {
@@ -71,267 +83,123 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
       child: Consumer<TourGuideAuthProvider>(
         builder: (context, provider, _) {
           return Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 32.0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Back Button
-                      _BackButton(),
-                      const SizedBox(height: 40),
-                      const Text(
-                        'Welcome back, Guide',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w900,
-                          color: TourGuideColors.deepNile,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Sign in to manage your trips and travelers.',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Color(0xFF7A9B9F),
-                        ),
-                      ),
-                      const SizedBox(height: 36),
-
-                      // Email
-                      _buildFieldLabel('Email address'),
-                      const SizedBox(height: 8),
-                      _buildFormField(
-                        controller: _emailController,
-                        hintText: 'guide@email.com',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!v.contains('@') || !v.contains('.')) {
-                            return 'Enter a valid email address';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Password
-                      _buildFieldLabel('Password'),
-                      const SizedBox(height: 8),
-                      _buildFormField(
-                        controller: _passwordController,
-                        hintText: 'Enter your password',
-                        obscureText: _obscurePassword,
-                        validator: (v) {
-                          if (v == null || v.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          if (v.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: const Color(0xFFB0C4C8),
-                            size: 20,
-                          ),
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      // Log In Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: TourGuideColors.deepNile,
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            elevation: 0,
-                          ),
-                          onPressed: provider.isLoading
-                              ? null
-                              : () => _handleLogin(provider),
-                          child: provider.isLoading
-                              ? const SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'Log In',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-
-                      // OR Divider
-                      Row(
-                        children: [
-                          Expanded(child: Divider(color: Colors.grey.shade200)),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'OR',
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const AuthHeader(
+                  title: 'Triply',
+                  subtitle: 'Sign in to manage your trips and travelers.',
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Welcome back, Guide',
                               style: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                          Expanded(child: Divider(color: Colors.grey.shade200)),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-
-                      // Create Account Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            side: const BorderSide(
-                              color: Color(0xFFE0E0E0),
-                              width: 1,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const TourGuideSignupScreen(),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Sign in to manage your trips and travelers.',
+                              style: TextStyle(
+                                color: AuthColors.textGrey,
+                                fontSize: 15,
                               ),
-                            );
-                          },
-                          child: const Text(
-                            'Create Guide Account',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: TourGuideColors.deepNile,
                             ),
-                          ),
+                            const SizedBox(height: 28),
+                            const Text(
+                              'Email address',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 8),
+                            AuthTextField(
+                              controller: _emailController,
+                              hintText: 'guide@email.com',
+                              icon: Icons.mail_outline,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (v) {
+                                if (v == null || v.trim().isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!v.contains('@') || !v.contains('.')) {
+                                  return 'Enter a valid email address';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Password',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 8),
+                            AuthTextField(
+                              controller: _passwordController,
+                              hintText: 'Enter your password',
+                              icon: Icons.lock_outline,
+                              isPassword: true,
+                              validator: (v) {
+                                if (v == null || v.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                if (v.length < 6) {
+                                  return 'Password must be at least 6 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 24),
+                            AuthButton(
+                              label: 'Log In',
+                              isLoading: provider.isLoading,
+                              onPressed: () => _handleLogin(provider),
+                            ),
+                            const SizedBox(height: 24),
+                            Center(
+                              child: Wrap(
+                                children: [
+                                  const Text(
+                                    "Don't have an account? ",
+                                    style:
+                                        TextStyle(color: AuthColors.textGrey),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const TourGuideSignupScreen(),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Create Guide Account',
+                                      style: TextStyle(
+                                        color: AuthColors.signInDark,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildFieldLabel(String label) {
-    return Text(
-      label,
-      style: const TextStyle(
-        fontWeight: FontWeight.w600,
-        color: TourGuideColors.deepNile,
-        fontSize: 14,
-      ),
-    );
-  }
-
-  Widget _buildFormField({
-    required TextEditingController controller,
-    required String hintText,
-    bool obscureText = false,
-    TextInputType? keyboardType,
-    Widget? suffixIcon,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      validator: validator,
-      style: const TextStyle(fontSize: 15, color: TourGuideColors.deepNile),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: const TextStyle(color: Color(0xFFB0C4C8), fontSize: 15),
-        suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE8E8E8), width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: TourGuideColors.deepNile,
-            width: 1.5,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Shared back button widget ──────────────────────────────────────────────
-class _BackButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pop(context),
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
-        ),
-        child: const Icon(
-          Icons.arrow_back,
-          color: TourGuideColors.deepNile,
-          size: 20,
-        ),
       ),
     );
   }

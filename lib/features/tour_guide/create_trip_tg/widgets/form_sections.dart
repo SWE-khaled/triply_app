@@ -8,6 +8,7 @@ class BasicsSection extends StatelessWidget {
   final TextEditingController aboutCtrl;
   final TextEditingController locationCtrl;
   final TextEditingController labelCtrl;
+  final TextEditingController phoneCtrl;
 
   const BasicsSection({
     super.key,
@@ -15,6 +16,7 @@ class BasicsSection extends StatelessWidget {
     required this.aboutCtrl,
     required this.locationCtrl,
     required this.labelCtrl,
+    required this.phoneCtrl,
   });
 
   @override
@@ -48,6 +50,14 @@ class BasicsSection extends StatelessWidget {
             controller: labelCtrl,
             hint: 'Guided Tour',
           ),
+        ),
+        const SizedBox(height: 12),
+        const GuideFormLabel(text: 'Enter Your Number'),
+        const SizedBox(height: 6),
+        GuideFormField(
+          controller: phoneCtrl,
+          hint: 'e.g. +20 101 234 5678',
+          keyboardType: TextInputType.phone,
         ),
       ],
     );

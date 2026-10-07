@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:triply/core/data/mock/tourist/mock_guides.dart';
 import 'package:triply/core/data/mock/tourist/mock_trips.dart';
+import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 import 'package:triply/features/tourist/guides/model/trip.dart';
 
@@ -19,7 +20,44 @@ class ProfileController extends ChangeNotifier {
   String? _coverPath;
   String? _photoOverride;
 
+  /// Permanent profile fields from the guide's Firestore document
+  /// (users/{uid}: phone, about, location). Loaded once per screen via
+  /// [loadRemoteProfile]; survive navigation and relogin.
+  String? _remotePhone;
+  String? _remoteAbout;
+  String? _remoteLocation;
+  bool _remoteLoaded = false;
+
   ProfileController({required this.guideId});
+
+  /// Reads phone/about/location from Firestore. Safe to call repeatedly;
+  /// failures leave previous values (or fallbacks) in place.
+  Future<void> loadRemoteProfile() async {
+    try {
+      final profile = await TourGuideAuthService().fetchMyProfile();
+      final phone = profile?.phone.trim() ?? '';
+      _remotePhone = phone.isNotEmpty ? phone : null;
+      final about = profile?.about.trim() ?? '';
+      _remoteAbout = about.isNotEmpty ? about : null;
+      final location = profile?.location.trim() ?? '';
+      _remoteLocation = location.isNotEmpty ? location : null;
+      _remoteLoaded = true;
+    } catch (_) {
+      // Keep fallbacks (e.g. offline or missing document): never crash.
+    }
+    notifyListeners();
+  }
+
+  bool get remoteLoaded => _remoteLoaded;
+
+  /// Firestore phone or null (UI hides the row when null).
+  String? get displayPhone => _remotePhone;
+
+  /// Firestore About or the mock guide About as fallback.
+  String get displayAbout => _remoteAbout ?? guide.about;
+
+  /// Firestore location or the mock guide location as fallback.
+  String get displayLocation => _remoteLocation ?? guide.location;
 
   Guide get guide {
     return mockGuides.firstWhere(

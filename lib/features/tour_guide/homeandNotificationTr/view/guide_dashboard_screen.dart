@@ -96,8 +96,11 @@ class _GuideDashboardScreenState extends State<GuideDashboardScreen> {
                   children: [
                     _header(avatarUrl),
                     const SizedBox(height: 16),
-                    _verificationBanner(),
-                    const SizedBox(height: 20),
+                    if (controller.showVerificationBanner) ...[
+                      _verificationBanner(),
+                      const SizedBox(height: 20),
+                    ] else
+                      const SizedBox(height: 4),
                     const Text(
                       'Dashboard',
                       style: TextStyle(

@@ -9,6 +9,9 @@ class GuideTrip {
   final String imageUrl;
   final GuideTripStatus status;
 
+  /// Guide contact number for this trip (entered in Add/Edit Trip).
+  final String phone;
+
   /// Rejected-state extras (null for all other statuses).
   final String? duration;
   final String? rejectionReason;
@@ -21,6 +24,7 @@ class GuideTrip {
     required this.priceEgp,
     required this.imageUrl,
     required this.status,
+    this.phone = '',
     this.duration,
     this.rejectionReason,
   });
@@ -37,6 +41,7 @@ class GuideTrip {
         (e) => e.name == json['status'],
         orElse: () => GuideTripStatus.active,
       ),
+      phone: json['phone'] as String? ?? '',
       duration: json['duration'] as String?,
       rejectionReason: json['rejectionReason'] as String?,
     );
@@ -51,6 +56,7 @@ class GuideTrip {
       'priceEgp': priceEgp,
       'imageUrl': imageUrl,
       'status': status.name,
+      'phone': phone,
       'duration': duration,
       'rejectionReason': rejectionReason,
     };

@@ -67,6 +67,14 @@ class TourGuideAuthProvider extends ChangeNotifier {
 
   // ──────────────── Helpers ────────────────
 
+  /// Signs out the current session. Verification/profile documents in
+  /// Firestore are permanent and survive relogin.
+  Future<void> signOut() async {
+    await _service.signOut();
+    _status = TourGuideAuthStatus.initial;
+    notifyListeners();
+  }
+
   void clearError() {
     _errorMessage = null;
     _status = TourGuideAuthStatus.initial;
