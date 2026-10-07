@@ -63,6 +63,13 @@ class MyBookingsPublic {
 
   static bool isBooked(String tripId) => _entries.containsKey(tripId);
 
+  /// Cancels a booking (removes it from My Trips). Returns the refunded
+  /// total that was paid for it, or 0 when there was no such booking.
+  static double cancelBooking(String tripId) {
+    final removed = _entries.remove(tripId);
+    return removed?.totalPaid ?? 0;
+  }
+
   static Set<String> get bookedIds => Set.unmodifiable(_entries.keys);
 
   static int seatsFor(String tripId) => _entries[tripId]?.seats ?? 0;

@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
+import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_snackbar.dart';
 import '../../community/view/community_view.dart';
 import '../../home/view/home_screen.dart';
 import '../../map/view/map_view.dart';
@@ -44,6 +46,46 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
 
   void _openDetails(Trip trip) {
     Navigator.of(context).push(AppRoutes.tripDetails(trip, isBooked: true));
+  }
+
+  Future<void> _confirmDelete(Trip trip) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete trip'),
+        content: const Text(
+          'Are you sure you want to delete this trip? '
+          'The paid amount will be refunded to your visa.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: AppColors.accentOrange),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    final isPrivate = MyBookingsPublic.isPrivate(trip.id);
+    final refunded = MyBookingsPublic.cancelBooking(trip.id);
+    if (!context.mounted) return;
+    context.read<MyTripsCubit>().refresh();
+    final amount = isPrivate
+        ? '\$${refunded.toStringAsFixed(0)}'
+        : 'EGP ${formatEgp(refunded)}';
+    showAppSnackBar(
+      context,
+      'Trip deleted. $amount has been refunded to your visa.',
+      icon: Icons.check_circle,
+      duration: const Duration(seconds: 5),
+    );
   }
 
   @override
@@ -145,22 +187,42 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 4, bottom: 6),
-                              child: Row(
-                                children: [
-                                  BookingKindIcon(isPrivate: isPrivate),
-                                  if (isPending) ...[
-                                    const SizedBox(width: 12),
-                                    const PendingApprovalLabel(),
-                                  ],
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 4, bottom: 6),
+                            child: Row(
+                              children: [
+                                BookingKindIcon(isPrivate: isPrivate),
+                                if (isPending) ...[
+                                  const SizedBox(width: 12),
+                                  const PendingApprovalLabel(),
                                 ],
-                              ),
+                                const Spacer(),
+                                GestureDetector(
+                                  onTap: () => _confirmDelete(trip),
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.background,
+                                      border: Border.all(
+                                          color: AppColors.cardBorder),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.delete_outline,
+                                      size: 18,
+                                      color: AppColors.accentOrange,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            TripCard(
-                              trip: trip,
-                              onTap: () => _openDetails(trip),
+                          ),
+                          TripCard(
+                            trip: trip,
+                            currencyLabel: isPrivate ? '\$' : 'EGP',
+                            onTap: () => _openDetails(trip),
                               onViewDetails: () => _openDetails(trip),
                               // Chat: placeholder — no chat screen exists yet.
                               onChat: () {},

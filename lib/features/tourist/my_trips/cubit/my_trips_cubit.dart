@@ -22,14 +22,16 @@ class MyTripsCubit extends Cubit<MyTripsState> {
         .map((t) {
           // Show the actually booked seat count, not the mock headcount.
           final seats = MyBookingsPublic.seatsFor(t.id);
-          if (seats <= 0) return t;
+          // Show the actually paid total, not the single-person price.
+          final paidTotal = MyBookingsPublic.totalPaidFor(t.id);
+          if (seats <= 0 && paidTotal <= 0) return t;
           return Trip(
             id: t.id,
             title: t.title,
             dateLabel: t.dateLabel,
             guideName: t.guideName,
-            peopleCount: seats,
-            priceEgp: t.priceEgp,
+            peopleCount: seats > 0 ? seats : t.peopleCount,
+            priceEgp: paidTotal > 0 ? paidTotal : t.priceEgp,
             imageUrl: t.imageUrl,
             status: t.status,
             category: t.category,

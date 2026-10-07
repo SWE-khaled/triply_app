@@ -12,12 +12,16 @@ class TripCard extends StatelessWidget {
   final VoidCallback? onViewDetails;
   final VoidCallback? onChat;
 
+  /// Currency label for the price (e.g. '\$' for private guide bookings).
+  final String currencyLabel;
+
   const TripCard({
     super.key,
     required this.trip,
     this.onTap,
     this.onViewDetails,
     this.onChat,
+    this.currencyLabel = 'EGP',
   });
 
   @override
@@ -166,9 +170,9 @@ class TripCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'EGP',
-                                  style: GoogleFonts.poppins(
+                              Text(
+                                currencyLabel,
+                                style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.price,
