@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/features/admin_dashboard/d_home/view/d_home_view.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 import '../../../common/AuthTourist/screens/onboarding_screen.dart';
 import '../../onboarding/view/tour_guide_onboarding_screen.dart';
@@ -102,12 +103,17 @@ class RoleSelectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               // Footer
-              Center(
-                child: Text(
-                  'Triply Admin Portal',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 13,
+              InkWell(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeView()));
+                },
+                child: Center(
+                  child: Text(
+                    'Triply Admin Portal',
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ),
