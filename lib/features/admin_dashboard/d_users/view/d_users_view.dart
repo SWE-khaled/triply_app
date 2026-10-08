@@ -16,11 +16,23 @@ class UsersView extends StatefulWidget {
 class _UsersViewState extends State<UsersView> {
   final TextEditingController _search = TextEditingController();
   late List<MockUser> _users;
+  String _query = '';
 
   @override
   void initState() {
     super.initState();
     _users = List.from(mockUsers);
+  }
+
+  List<MockUser> get _filtered {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return _users;
+    return _users.where((u) {
+      return u.name.toLowerCase().contains(q) ||
+          u.email.toLowerCase().contains(q) ||
+          u.phone.toLowerCase().contains(q) ||
+          u.type.toLowerCase().contains(q);
+    }).toList();
   }
 
   void _showViewDialog(MockUser user) {
@@ -70,6 +82,7 @@ class _UsersViewState extends State<UsersView> {
             SearchFilterRow(
               hintText: 'Search users...',
               controller: _search,
+              onChanged: (v) => setState(() => _query = v),
             ),
             const SizedBox(height: 20),
 
@@ -90,11 +103,16 @@ class _UsersViewState extends State<UsersView> {
             ),
             const Divider(color: AppColors.divider, height: 1),
 
-            ..._users.map((u) => _UserRow(
+            ..._filtered.map((u) => _UserRow(
               user: u,
               onView: () => _showViewDialog(u),
               onToggleStatus: () => _toggleUserStatus(u),
             )),
+            if (_filtered.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No users found.')),
+              ),
           ],
         ),
       ),
@@ -130,23 +148,38 @@ class _UserRow extends StatelessWidget {
             children: [
               Expanded(
                 flex: 3,
-                child: Text(user.name, style: AppTextStyles.tableCell),
+                child: Text(user.name,
+                    style: AppTextStyles.tableCell,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 3,
-                child: Text(user.email, style: AppTextStyles.tableCellMuted),
+                child: Text(user.email,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 3,
-                child: Text(user.phone, style: AppTextStyles.tableCellMuted),
+                child: Text(user.phone,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 2,
-                child: Text(user.type, style: AppTextStyles.tableCellMuted),
+                child: Text(user.type,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 2,
-                child: Text(user.activity, style: AppTextStyles.tableCellMuted),
+                child: Text(user.activity,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 2,
@@ -183,9 +216,9 @@ class _ViewUserDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: SizedBox(
-        width: 520,
-        child: Padding(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(28),
           child: Column(
             mainAxisSize: MainAxisSize.min,

@@ -28,11 +28,15 @@ class AdminSidebar extends StatelessWidget {
   final ValueChanged<int> onItemSelected;
   final VoidCallback? onLogout;
 
+  /// Displayed admin name (footer). Defaults to the previous hardcoded name.
+  final String adminName;
+
   const AdminSidebar({
     super.key,
     required this.selectedIndex,
     required this.onItemSelected,
     this.onLogout,
+    this.adminName = 'Amr Khaled',
   });
 
   @override
@@ -79,7 +83,7 @@ class AdminSidebar extends StatelessWidget {
           ),
 
           // ── Bottom: admin profile + log out ───────────
-          _SidebarFooter(onLogout: onLogout),
+          _SidebarFooter(onLogout: onLogout, adminName: adminName),
         ],
       ),
     );
@@ -136,7 +140,8 @@ class _NavTile extends StatelessWidget {
 
 class _SidebarFooter extends StatelessWidget {
   final VoidCallback? onLogout;
-  const _SidebarFooter({this.onLogout});
+  final String adminName;
+  const _SidebarFooter({this.onLogout, this.adminName = 'Amr Khaled'});
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +180,7 @@ class _SidebarFooter extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Amr Khaled', style: AppTextStyles.sidebarUserName),
+                  Text(adminName, style: AppTextStyles.sidebarUserName),
                   Text('Super Admin', style: AppTextStyles.sidebarUserRole),
                 ],
               ),

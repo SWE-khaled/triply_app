@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/admin_dashboard/d_home/view/d_home_view.dart';
+import 'package:triply/features/admin_dashboard/d_auth/view/admin_login_view.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 import '../../../common/AuthTourist/screens/onboarding_screen.dart';
 import '../../onboarding/view/tour_guide_onboarding_screen.dart';
@@ -105,7 +105,7 @@ class RoleSelectionScreen extends StatelessWidget {
               // Footer
               InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeView()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const AdminLoginView()));
                 },
                 child: Center(
                   child: Text(

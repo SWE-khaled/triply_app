@@ -16,11 +16,24 @@ class TripApplicationsView extends StatefulWidget {
 class _TripApplicationsViewState extends State<TripApplicationsView> {
   final TextEditingController _search = TextEditingController();
   late List<MockTripApplication> _apps;
+  String _query = '';
 
   @override
   void initState() {
     super.initState();
     _apps = List.from(mockTripApplications);
+  }
+
+  List<MockTripApplication> get _filtered {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return _apps;
+    return _apps.where((a) {
+      return a.tripTitle.toLowerCase().contains(q) ||
+          a.guide.toLowerCase().contains(q) ||
+          a.location.toLowerCase().contains(q) ||
+          a.status.toLowerCase().contains(q) ||
+          a.type.toLowerCase().contains(q);
+    }).toList();
   }
 
   void _approve(int index) {
@@ -187,19 +200,25 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
             SearchFilterRow(
               hintText: 'Search trip applications...',
               controller: _search,
+              onChanged: (v) => setState(() => _query = v),
             ),
             const SizedBox(height: 20),
 
             // Application rows (no headers — each is a standalone row)
-            ..._apps.asMap().entries.map(
+            ..._filtered.asMap().entries.map(
                   (entry) => _ApplicationItem(
                     app: entry.value,
-                    onApprove: () => _approve(entry.key),
-                    onReject: () => _reject(entry.key),
+                    onApprove: () => _approve(_apps.indexOf(entry.value)),
+                    onReject: () => _reject(_apps.indexOf(entry.value)),
                     onReview: () => _showReviewDialog(entry.value),
                     isFirst: entry.key == 0,
                   ),
                 ),
+            if (_filtered.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No applications found.')),
+              ),
           ],
         ),
       ),
@@ -241,10 +260,15 @@ class _ApplicationItem extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(app.tripTitle, style: AppTextStyles.tableCell.copyWith(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        )),
+                        Expanded(
+                          child: Text(app.tripTitle,
+                              style: AppTextStyles.tableCell.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1),
+                        ),
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -268,6 +292,8 @@ class _ApplicationItem extends StatelessWidget {
                     Text(
                       'By ${app.guide} · ${app.date} · ${app.price}',
                       style: AppTextStyles.tableCellMuted,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                     if (app.status == 'rejected' && app.rejectionReason != null && app.rejectionReason!.isNotEmpty) ...[
                       const SizedBox(height: 6),

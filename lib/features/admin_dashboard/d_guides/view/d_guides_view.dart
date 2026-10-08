@@ -192,8 +192,14 @@ class _GuideRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(guide.name, style: AppTextStyles.tableCell),
-                    Text(guide.email, style: AppTextStyles.tableCellMuted),
+                    Text(guide.name,
+                        style: AppTextStyles.tableCell,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1),
+                    Text(guide.email,
+                        style: AppTextStyles.tableCellMuted,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1),
                   ],
                 ),
               ),
@@ -202,7 +208,12 @@ class _GuideRow extends StatelessWidget {
                 flex: 4,
                 child: Row(
                   children: [
-                    Text(guide.document, style: AppTextStyles.tableCellMuted),
+                    Expanded(
+                      child: Text(guide.document,
+                          style: AppTextStyles.tableCellMuted,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1),
+                    ),
                     const SizedBox(width: 6),
                     InkWell(
                       onTap: () => _showDetails(context),
@@ -214,7 +225,10 @@ class _GuideRow extends StatelessWidget {
               // City
               Expanded(
                 flex: 2,
-                child: Text(guide.city, style: AppTextStyles.tableCellMuted),
+                child: Text(guide.city,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               // Status chip
               Expanded(
@@ -261,12 +275,30 @@ class _GuideDetailsDialog extends StatelessWidget {
   final MockGuide guide;
   const _GuideDetailsDialog({required this.guide});
 
+  void _showTripDialog(BuildContext context, MockUploadedTrip trip) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(trip.title,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('Status: ${trip.status}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: SizedBox(
-        width: 580,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 580),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(28),
           child: Column(
@@ -416,17 +448,23 @@ class _GuideDetailsDialog extends StatelessWidget {
                               border: Border.all(color: AppColors.divider),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(t.title, style: AppTextStyles.tableCell),
-                                Text(t.status,
-                                    style: AppTextStyles.tableCellMuted),
-                                const SizedBox(height: 8),
-                                Text('View full trip',
-                                    style: AppTextStyles.linkText),
-                              ],
-                            ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(t.title,
+                                      style: AppTextStyles.tableCell,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2),
+                                  Text(t.status,
+                                      style: AppTextStyles.tableCellMuted),
+                                  const SizedBox(height: 8),
+                                  InkWell(
+                                    onTap: () => _showTripDialog(context, t),
+                                    child: Text('View full trip',
+                                        style: AppTextStyles.linkText),
+                                  ),
+                                ],
+                              ),
                           ),
                         ),
                       )
@@ -459,7 +497,10 @@ class _InfoField extends StatelessWidget {
         children: [
           Text(label, style: AppTextStyles.tableCellMuted),
           const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.fieldValue),
+          Text(value,
+              style: AppTextStyles.fieldValue,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2),
         ],
       ),
     );

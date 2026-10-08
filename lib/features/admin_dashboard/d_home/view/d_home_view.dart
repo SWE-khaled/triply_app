@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/features/tour_guide/role_selection/view/role_selection_screen.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_app_bottom_nav.dart';
+import '../../d_auth/cubit/admin_auth_cubit.dart';
+import '../../d_auth/cubit/admin_auth_state.dart';
 import '../../d_overview/view/d_overview_view.dart';
 import '../../d_trips/view/d_trips_view.dart';
 import '../../d_users/view/d_users_view.dart';
@@ -23,15 +27,15 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _selectedIndex = 0;
 
-  static const List<_PageMeta> _pages = [
-    _PageMeta('Overview', 'Welcome back, Amr Khaled'),
-    _PageMeta('Trips', 'Welcome back, Amr Khaled'),
-    _PageMeta('Users', 'Welcome back, Amr Khaled'),
-    _PageMeta('Bookings', 'Welcome back, Amr Khaled'),
-    _PageMeta('User Posts', 'Welcome back, Amr Khaled'),
-    _PageMeta('Guides', 'Welcome back, Amr Khaled'),
-    _PageMeta('Trip Applications', 'Welcome back, Amr Khaled'),
-    _PageMeta('App Settings', 'Welcome back, Amr Khaled'),
+  static const List<String> _titles = [
+    'Overview',
+    'Trips',
+    'Users',
+    'Bookings',
+    'User Posts',
+    'Guides',
+    'Trip Applications',
+    'App Settings',
   ];
 
   static const List<Widget> _bodies = [
@@ -45,9 +49,38 @@ class _HomeViewState extends State<HomeView> {
     AppSettingsView(),
   ];
 
+  Future<void> _confirmLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Log out'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    context.read<AdminAuthCubit>().logout();
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+      (_) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final meta = _pages[_selectedIndex];
+    final adminName =
+        context.watch<AdminAuthCubit>().state.session?.name ?? 'Admin';
+    final meta = _PageMeta(_titles[_selectedIndex], 'Welcome back, $adminName');
     final isDesktop = MediaQuery.of(context).size.width >= 800;
 
     // ── Desktop layout: permanent sidebar on the left ────────────────────
@@ -59,9 +92,8 @@ class _HomeViewState extends State<HomeView> {
             AdminSidebar(
               selectedIndex: _selectedIndex,
               onItemSelected: (i) => setState(() => _selectedIndex = i),
-              onLogout: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Logged out')),
-              ),
+              adminName: adminName,
+              onLogout: () => _confirmLogout(context),
             ),
             Expanded(
               child: Column(
@@ -86,19 +118,18 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: AppColors.background,
       drawer: Drawer(
         width: 240,
-        child: AdminSidebar(
-          selectedIndex: _selectedIndex,
-          onItemSelected: (i) {
-            setState(() => _selectedIndex = i);
-            Navigator.of(context).pop(); // close drawer
-          },
-          onLogout: () {
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Logged out')),
-            );
-          },
-        ),
+          child: AdminSidebar(
+            selectedIndex: _selectedIndex,
+            adminName: adminName,
+            onItemSelected: (i) {
+              setState(() => _selectedIndex = i);
+              Navigator.of(context).pop(); // close drawer
+            },
+            onLogout: () {
+              Navigator.of(context).pop();
+              _confirmLogout(context);
+            },
+          ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -233,8 +264,9 @@ class AdminCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final narrow = MediaQuery.of(context).size.width < 800;
     return Container(
-      margin: const EdgeInsets.fromLTRB(32, 0, 32, 32),
+      margin: EdgeInsets.fromLTRB(narrow ? 16 : 32, 0, narrow ? 16 : 32, 32),
       decoration: BoxDecoration(
         color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(16),
@@ -308,12 +340,14 @@ class SearchFilterRow extends StatelessWidget {
   final String hintText;
   final TextEditingController? controller;
   final VoidCallback? onFilterTap;
+  final ValueChanged<String>? onChanged;
 
   const SearchFilterRow({
     super.key,
     required this.hintText,
     this.controller,
     this.onFilterTap,
+    this.onChanged,
   });
 
   @override
@@ -323,6 +357,7 @@ class SearchFilterRow extends StatelessWidget {
         Expanded(
           child: TextField(
             controller: controller,
+            onChanged: onChanged,
             style: AppTextStyles.tableCell,
             decoration: InputDecoration(
               hintText: hintText,

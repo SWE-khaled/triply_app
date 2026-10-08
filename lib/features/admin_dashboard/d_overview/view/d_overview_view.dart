@@ -126,6 +126,19 @@ class _OverviewViewState extends State<OverviewView> {
             // ── Bottom row: Pending Actions + Guide Applications ──
             LayoutBuilder(
               builder: (context, constraints) {
+                if (constraints.maxWidth < 700) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _PendingActionsCard(guidesCount: pendingGuidesCount, tripsCount: pendingTripsCount),
+                      const SizedBox(height: 16),
+                      _GuideApplicationsCard(
+                        guides: _guides,
+                        onUpdateStatus: _updateGuideStatus,
+                      ),
+                    ],
+                  );
+                }
                 final leftW = (constraints.maxWidth - 16) * 0.4;
                 final rightW = (constraints.maxWidth - 16) * 0.6;
                 return Row(
@@ -216,9 +229,15 @@ class _StatCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Text(value, style: AppTextStyles.statValue),
+          Text(value,
+              style: AppTextStyles.statValue,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1),
           const SizedBox(height: 4),
-          Text(label, style: AppTextStyles.statLabel),
+          Text(label,
+              style: AppTextStyles.statLabel,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1),
         ],
       ),
     );
@@ -434,8 +453,14 @@ class _MiniGuideRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(guide.name, style: AppTextStyles.tableCell),
-                    Text(guide.email, style: AppTextStyles.tableCellMuted),
+                    Text(guide.name,
+                        style: AppTextStyles.tableCell,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1),
+                    Text(guide.email,
+                        style: AppTextStyles.tableCellMuted,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1),
                   ],
                 ),
               ),
@@ -443,7 +468,12 @@ class _MiniGuideRow extends StatelessWidget {
                 flex: 3,
                 child: Row(
                   children: [
-                    Text(guide.document, style: AppTextStyles.tableCellMuted),
+                    Expanded(
+                      child: Text(guide.document,
+                          style: AppTextStyles.tableCellMuted,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1),
+                    ),
                     const SizedBox(width: 6),
                     Text('View file', style: AppTextStyles.linkText),
                   ],
@@ -451,7 +481,10 @@ class _MiniGuideRow extends StatelessWidget {
               ),
               Expanded(
                 flex: 2,
-                child: Text(guide.city, style: AppTextStyles.tableCellMuted),
+                child: Text(guide.city,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 2,

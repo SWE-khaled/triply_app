@@ -15,11 +15,21 @@ class UserPostsView extends StatefulWidget {
 class _UserPostsViewState extends State<UserPostsView> {
   final TextEditingController _search = TextEditingController();
   late List<MockPost> _posts;
+  String _query = '';
 
   @override
   void initState() {
     super.initState();
     _posts = List.from(mockPosts);
+  }
+
+  List<MockPost> get _filtered {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return _posts;
+    return _posts.where((p) {
+      return p.title.toLowerCase().contains(q) ||
+          p.author.toLowerCase().contains(q);
+    }).toList();
   }
 
   void _removePost(MockPost post) {
@@ -51,29 +61,36 @@ class _UserPostsViewState extends State<UserPostsView> {
             SearchFilterRow(
               hintText: 'Search user posts...',
               controller: _search,
+              onChanged: (v) => setState(() => _query = v),
             ),
             const SizedBox(height: 24),
 
             // Posts grid
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final cardW = (constraints.maxWidth - 32) / 3;
-                return Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: _posts
-                      .map((p) => SizedBox(
-                            width: cardW,
-                            child: _PostCard(
-                              post: p,
-                              onRemove: () => _removePost(p),
-                              onView: () => _viewPost(p),
-                            ),
-                          ))
-                      .toList(),
-                );
-              },
-            ),
+            if (_filtered.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No posts found.')),
+              )
+            else
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cardW = (constraints.maxWidth - 32) / 3;
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: _filtered
+                        .map((p) => SizedBox(
+                              width: cardW,
+                              child: _PostCard(
+                                post: p,
+                                onRemove: () => _removePost(p),
+                                onView: () => _viewPost(p),
+                              ),
+                            ))
+                        .toList(),
+                  );
+                },
+              ),
           ],
         ),
       ),

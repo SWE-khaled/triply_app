@@ -17,6 +17,7 @@ class TripsView extends StatefulWidget {
 class _TripsViewState extends State<TripsView> {
   final TextEditingController _search = TextEditingController();
   late List<MockTrip> _trips;
+  String _query = '';
 
   @override
   void initState() {
@@ -24,7 +25,16 @@ class _TripsViewState extends State<TripsView> {
     _trips = List.from(mockTrips);
   }
 
-
+  List<MockTrip> get _filtered {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return _trips;
+    return _trips.where((t) {
+      return t.title.toLowerCase().contains(q) ||
+          t.guide.toLowerCase().contains(q) ||
+          t.date.toLowerCase().contains(q) ||
+          t.status.toLowerCase().contains(q);
+    }).toList();
+  }
 
   void _showViewDialog(MockTrip trip) {
     showDialog(
@@ -70,7 +80,10 @@ class _TripsViewState extends State<TripsView> {
             const SizedBox(height: 20),
 
             // Search + Filter
-            SearchFilterRow(hintText: 'Search trips...', controller: _search),
+            SearchFilterRow(
+                hintText: 'Search trips...',
+                controller: _search,
+                onChanged: (v) => setState(() => _query = v)),
             const SizedBox(height: 20),
 
             // Table header
@@ -91,13 +104,18 @@ class _TripsViewState extends State<TripsView> {
             const Divider(color: AppColors.divider, height: 1),
 
             // Table rows
-            ..._trips.map(
+            ..._filtered.map(
               (t) => _TripRow(
                 trip: t,
                 onView: () => _showViewDialog(t),
                 onCancel: () => _cancelTrip(t),
               ),
             ),
+            if (_filtered.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No trips found.')),
+              ),
           ],
         ),
       ),
@@ -135,15 +153,24 @@ class _TripRow extends StatelessWidget {
             children: [
               Expanded(
                 flex: 4,
-                child: Text(trip.title, style: AppTextStyles.tableCell),
+                child: Text(trip.title,
+                    style: AppTextStyles.tableCell,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 3,
-                child: Text(trip.guide, style: AppTextStyles.tableCellMuted),
+                child: Text(trip.guide,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 2,
-                child: Text(trip.date, style: AppTextStyles.tableCellMuted),
+                child: Text(trip.date,
+                    style: AppTextStyles.tableCellMuted,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1),
               ),
               Expanded(
                 flex: 2,
@@ -195,9 +222,9 @@ class _ViewTripDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: SizedBox(
-        width: 520,
-        child: Padding(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(28),
           child: Column(
             mainAxisSize: MainAxisSize.min,
