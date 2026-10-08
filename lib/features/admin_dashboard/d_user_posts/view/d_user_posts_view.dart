@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/d_app_colors.dart';
-import '../../../core/theme/d_app_text_styles.dart';
-import '../../../data/mock/d_mock_places.dart';
+import '../../../../core/theme/d_app_colors.dart';
+import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../data/mock/d_mock_places.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// User Posts management screen — grid of post cards.

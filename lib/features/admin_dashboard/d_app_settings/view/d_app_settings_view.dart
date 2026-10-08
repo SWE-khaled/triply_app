@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/d_app_colors.dart';
-import '../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/d_app_colors.dart';
+import '../../../../core/theme/d_app_text_styles.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// App Settings screen.

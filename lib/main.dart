@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/d_app_theme.dart';
-import 'features/d_home/view/d_home_view.dart';
+import 'features/admin_dashboard/d_home/view/d_home_view.dart';
 
 void main() {
   runApp(const TriplyAdminApp());

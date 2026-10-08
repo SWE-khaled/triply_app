@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/d_app_colors.dart';
-import '../../../core/theme/d_app_text_styles.dart';
-import '../../../core/widgets/d_app_bottom_nav.dart';
+import '../../../../core/theme/d_app_colors.dart';
+import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/widgets/d_app_bottom_nav.dart';
 import '../../d_overview/view/d_overview_view.dart';
 import '../../d_trips/view/d_trips_view.dart';
 import '../../d_users/view/d_users_view.dart';

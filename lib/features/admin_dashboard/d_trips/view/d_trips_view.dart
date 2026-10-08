@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/d_app_colors.dart';
-import '../../../core/theme/d_app_text_styles.dart';
-import '../../../core/widgets/d_circle_back_button.dart';
-import '../../../data/mock/d_mock_trips.dart';
+import '../../../../core/theme/d_app_colors.dart';
+import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/widgets/d_circle_back_button.dart';
+import '../../../../data/mock/d_mock_trips.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Trips management screen.
