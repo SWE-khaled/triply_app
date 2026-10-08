@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/tourist/booking/controller/booking_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/constants/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/circle_back_button.dart';
+import '../cubit/booking_cubit.dart';
+import '../cubit/booking_state.dart';
 import 'package:triply/features/tourist/booking/widgets/booking_widgets.dart';
 import 'package:triply/features/tourist/checkout/controller/checkout_controller.dart';
 import 'package:triply/features/tourist/checkout/model/booking_model.dart';
 import 'package:triply/features/tourist/checkout/view/paymob_webview_screen.dart';
 
 import '../../../../core/data/my_bookings_public.dart';
-import '../../../../core/constants/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/circle_back_button.dart';
 
 class BookingScreen extends StatefulWidget {
   final String guideId;
@@ -20,31 +22,36 @@ class BookingScreen extends StatefulWidget {
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  late final BookingController _controller;
+  late final BookingCubit _controller;
   late final TextEditingController _notesController;
 
   @override
   void initState() {
     super.initState();
-    _controller = BookingController(guideId: widget.guideId);
+    // Owned here (like the old controller) so every helper keeps working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    _controller = BookingCubit(guideId: widget.guideId);
     _notesController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller.close();
     _notesController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocProvider.value(
+      value: _controller,
+      child: BlocBuilder<BookingCubit, BookingState>(
+        builder: (context, _) {
+          return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, _) {
+        child: Builder(
+          builder: (context) {
             if (_controller.stepIndex == 3) return _buildSuccess();
             return Column(
               children: [
@@ -60,6 +67,9 @@ class _BookingScreenState extends State<BookingScreen> {
             );
           },
         ),
+      ),
+    );
+        },
       ),
     );
   }
@@ -226,9 +236,9 @@ class _BookingScreenState extends State<BookingScreen> {
             crossAxisSpacing: 10,
             mainAxisExtent: 44,
           ),
-          itemCount: BookingController.timeSlots.length,
+          itemCount: BookingCubit.timeSlots.length,
           itemBuilder: (context, i) {
-            final t = BookingController.timeSlots[i];
+            final t = BookingCubit.timeSlots[i];
             return SelectableChip(
               label: t,
               selected: _controller.timeSlot == t,
@@ -248,9 +258,9 @@ class _BookingScreenState extends State<BookingScreen> {
             crossAxisSpacing: 10,
             mainAxisExtent: 44,
           ),
-          itemCount: BookingController.durations.length,
+          itemCount: BookingCubit.durations.length,
           itemBuilder: (context, i) {
-            final d = BookingController.durations[i];
+            final d = BookingCubit.durations[i];
             return SelectableChip(
               label: d,
               selected: _controller.durationLabel == d,
@@ -291,10 +301,10 @@ class _BookingScreenState extends State<BookingScreen> {
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: BookingController.meetingPoints.length,
+          itemCount: BookingCubit.meetingPoints.length,
           separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, i) {
-            final m = BookingController.meetingPoints[i];
+            final m = BookingCubit.meetingPoints[i];
             return MeetingPointTile(
               label: m,
               selected: _controller.meetingPoint == m,

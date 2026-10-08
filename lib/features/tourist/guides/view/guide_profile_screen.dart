@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/constants/app_routes.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
-import 'package:triply/features/tourist/guides/controller/guide_profile_controller.dart';
+import 'package:triply/features/tourist/guides/cubit/guide_profile_cubit.dart';
+import 'package:triply/features/tourist/guides/cubit/guide_profile_state.dart';
 import 'package:triply/features/tourist/guides/model/trip.dart' as guide_trip;
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import 'package:triply/core/widgets/guide_shared_widgets.dart';
@@ -20,17 +22,19 @@ class GuideProfileScreen extends StatefulWidget {
 }
 
 class _GuideProfileScreenState extends State<GuideProfileScreen> {
-  late final GuideProfileController _controller;
+  late final GuideProfileCubit _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = GuideProfileController(guideId: widget.guideId);
+    // Owned here (like the old controller) so helpers keep working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    _controller = GuideProfileCubit(guideId: widget.guideId);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller.close();
     super.dispose();
   }
 
@@ -38,9 +42,10 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: ListenableBuilder(
-        listenable: _controller,
-        builder: (context, _) {
+      body: BlocProvider.value(
+        value: _controller,
+        child: BlocBuilder<GuideProfileCubit, GuideProfileState>(
+          builder: (context, _) {
           final guide = _controller.guide;
           final trips = _controller.trips;
           return CustomScrollView(
@@ -54,7 +59,8 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
               SliverToBoxAdapter(child: SizedBox(height: 96)),
             ],
           );
-        },
+          },
+        ),
       ),
       bottomNavigationBar: _buildBottomBar(),
     );

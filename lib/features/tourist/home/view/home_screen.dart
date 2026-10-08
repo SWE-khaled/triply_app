@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/tourist/community/view/community_view.dart';
 import 'package:triply/features/tourist/guides/view/guides_list_screen.dart';
@@ -12,7 +12,8 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../common/AuthTourist/providers/auth_provider.dart';
-import '../controller/home_controller.dart';
+import '../cubit/home_cubit.dart';
+import '../cubit/home_state.dart';
 import '../model/trip.dart';
 import '../widget/community_banner.dart';
 import '../widget/guide_tile.dart';
@@ -29,23 +30,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final HomeController controller;
+  late final HomeCubit controller;
 
   @override
   void initState() {
     super.initState();
-    controller = HomeController();
-    controller.addListener(_onControllerChanged);
-  }
-
-  void _onControllerChanged() {
-    if (mounted) setState(() {});
+    // Owned here (like the old controller) so helpers keep working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    controller = HomeCubit();
   }
 
   @override
   void dispose() {
-    controller.removeListener(_onControllerChanged);
-    controller.dispose();
+    controller.close();
     super.dispose();
   }
 
@@ -55,9 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final photoUrl = user?.photoURL;
     final name = user?.displayName ?? '';
 
-    return Scaffold(
-      extendBody: true,
-      body: SingleChildScrollView(
+    return BlocProvider.value(
+      value: controller,
+      child: Scaffold(
+        extendBody: true,
+        body: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, _) => SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -183,24 +183,28 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 84),
           ],
         ),
+          ),
+        ),
+      bottomNavigationBar: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, _) => AppBottomNav(
+          currentIndex: controller.bottomNavIndex,
+          onTap: (index) {
+            if (index == 0) {
+              controller.setBottomNavIndex(index);
+            }else if (index == 1) {
+            Navigator.of(context).push(AppRoutes.myTrips());
+            } else if (index == 2) {
+              Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); //map
+            }
+             else if (index == 3) {
+              Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen())));//community
+           }
+             else if (index == 4) {
+              Navigator.pushNamed(context, AppRoutes.profile);
+            }
+          },
+        ),
       ),
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: controller.bottomNavIndex,
-        onTap: (index) {
-          if (index == 0) {
-            controller.setBottomNavIndex(index);
-          }else if (index == 1) {
-          Navigator.of(context).push(AppRoutes.myTrips());
-          } else if (index == 2) {
-            Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); //map
-          }
-           else if (index == 3) {
-            Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen())));//community
-         }           
-           else if (index == 4) {
-            Navigator.pushNamed(context, AppRoutes.profile);
-          } 
-        },
       ),
     );
   }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:latlong2/latlong.dart' as latlng;
 import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/tourist/home/view/home_screen.dart';
 
-import '../controller/map_controller.dart';
+import '../cubit/map_cubit.dart';
+import '../cubit/map_state.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../model/place.dart';
@@ -28,19 +30,22 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  late final MapController controller;
+  late final MapCubit controller;
   late final TextEditingController searchController;
   final fmap.MapController _mapController = fmap.MapController();
 
   @override
   void initState() {
     super.initState();
-    controller = MapController();
+    // Owned here (like the old controller) so helpers keep working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    controller = MapCubit();
     searchController = TextEditingController();
   }
 
   @override
   void dispose() {
+    controller.close();
     searchController.dispose();
     super.dispose();
   }
@@ -60,7 +65,7 @@ class _MapScreenState extends State<MapScreen> {
         height: 40,
         child: MapPlaceMarker(
           onTap: () {
-            setState(() => controller.selectPlace(place));
+            controller.selectPlace(place);
           },
         ),
       );
@@ -93,17 +98,17 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _onSearchChanged(String v) {
-    setState(() => controller.setSearchQuery(v));
+    controller.setSearchQuery(v);
     _focusSelected();
   }
 
   void _onSearchSubmitted(String v) {
-    setState(() => controller.submitSearch(v));
+    controller.submitSearch(v);
     _focusSelected();
   }
 
   void _onFilterSelected(MapFilter filter) {
-    setState(() => controller.selectFilter(filter));
+    controller.selectFilter(filter);
     _focusSelected();
   }
 
@@ -111,12 +116,15 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     final selected = controller.selectedPlace;
 
-    return Scaffold(
-      extendBody: true, // map extends under the glass nav
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        bottom: false, // <-- let the map reach the bottom of the screen
-        child: Column(
+    return BlocProvider.value(
+      value: controller,
+      child: Scaffold(
+        extendBody: true, // map extends under the glass nav
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          bottom: false, // <-- let the map reach the bottom of the screen
+          child: BlocBuilder<MapCubit, MapState>(
+            builder: (context, _) => Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -127,7 +135,7 @@ class _MapScreenState extends State<MapScreen> {
                 onSubmitted: _onSearchSubmitted,
                 onClear: () {
                   searchController.clear();
-                  setState(() => controller.clearSearch());
+                  controller.clearSearch();
                   _focusSelected();
                 },
               ),
@@ -182,8 +190,9 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           ],
+            ),
+          ),
         ),
-      ),
       bottomNavigationBar: AppBottomNav(
         currentIndex: 2,
         onTap: (index) {
@@ -207,6 +216,6 @@ class _MapScreenState extends State<MapScreen> {
           }
         },
       ),
-    );
+    ));
   }
 }

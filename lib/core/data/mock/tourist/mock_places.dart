@@ -3767,54 +3767,6 @@ const List<Map<String, dynamic>> mockPlaces = [
     'is_favorite': false,
   },
   {
-    'id': 'el_halw_el_shami',
-    'name': 'El Halw El Shami',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Multiple Branches, Cairo, Egypt',
-    'latitude': 30.0470,
-    'longitude': 31.2380,
-    'rating': 4.6,
-    'reviews_count': 2980,
-    'short_description':
-        'Popular sweets shop for Levantine and Egyptian desserts...',
-    'about':
-        'A well-loved dessert chain serving kunafa, basbousa, and Syrian-style pastries drenched in syrup, a favorite for after-dinner treats.',
-    'highlights': [
-      'Fresh Kunafa',
-      'Syrian-style Pastries',
-      'Syrup-soaked Desserts',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'studio_misr_cafe',
-    'name': 'Studio Misr Café',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Downtown Cairo, Egypt',
-    'latitude': 30.0490,
-    'longitude': 31.2430,
-    'rating': 4.4,
-    'reviews_count': 890,
-    'short_description':
-        'Nostalgic downtown cafe evoking old Cairo cinema history...',
-    'about':
-        'A vintage-styled cafe near Cairo\'s historic cinema district, serving Egyptian coffee and shisha in a nostalgic, film-era atmosphere.',
-    'highlights': [
-      'Vintage Cinema Theme',
-      'Shisha & Coffee',
-      'Downtown Nostalgia',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
     'id': 'crave_restaurant',
     'name': 'Crave',
     'city': 'Cairo',

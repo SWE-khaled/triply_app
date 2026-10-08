@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
-import 'package:triply/features/tourist/guides/controller/guides_controller.dart';
+import 'package:triply/features/tourist/guides/cubit/guides_cubit.dart';
+import 'package:triply/features/tourist/guides/cubit/guides_state.dart';
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
 import 'package:triply/features/tourist/guides/widgets/guide_card.dart';
 
@@ -12,19 +14,21 @@ class GuidesListScreen extends StatefulWidget {
 }
 
 class _GuidesListScreenState extends State<GuidesListScreen> {
-  late final GuidesController _controller;
+  late final GuidesCubit _controller;
   late final TextEditingController _searchFieldController;
 
   @override
   void initState() {
     super.initState();
-    _controller = GuidesController();
+    // Owned here (like the old controller) so helpers keep working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    _controller = GuidesCubit();
     _searchFieldController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller.close();
     _searchFieldController.dispose();
     super.dispose();
   }
@@ -34,9 +38,10 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, _) {
+        child: BlocProvider.value(
+          value: _controller,
+          child: BlocBuilder<GuidesCubit, GuidesState>(
+            builder: (context, _) {
             final guides = _controller.filteredGuides;
             return CustomScrollView(
               slivers: [
@@ -74,7 +79,8 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
                   ),
               ],
             );
-          },
+            },
+          ),
         ),
       ),
     );

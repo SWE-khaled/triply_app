@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../controller/community_controller.dart';
+import '../cubit/community_cubit.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../model/community_story.dart';
 import '../widget/story_progress_bars.dart';
@@ -12,12 +13,10 @@ import '../widget/story_viewer_header.dart';
 class StoryViewerScreen extends StatefulWidget {
   final List<CommunityStory> stories;
   final int initialIndex;
-  final CommunityController controller;
 
   const StoryViewerScreen({
     super.key,
     required this.stories,
-    required this.controller,
     this.initialIndex = 0,
   });
 
@@ -124,7 +123,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     return;
   }
 
-  final deleted = widget.controller.deleteStory(story);
+  final deleted =
+      context.read<CommunityCubit>().deleteStory(story);
 
   if (!mounted) return;
 

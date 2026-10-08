@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
-import '../controller/profile_controller.dart';
+import '../cubit/profile_cubit.dart';
 import '../model/emergency_contact.dart';
 import '../widget/emergency_contact_card.dart';
 
@@ -13,8 +13,8 @@ class EmergencyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProfileController(),
+    return BlocProvider(
+      create: (_) => ProfileCubit(),
       child: const _EmergencyBody(),
     );
   }
@@ -71,7 +71,7 @@ class _EmergencyBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contacts = context.watch<ProfileController>().emergencyContacts;
+    final contacts = context.read<ProfileCubit>().emergencyContacts;
     return Scaffold(
       backgroundColor: AppColors.inputFill,
       body: SafeArea(

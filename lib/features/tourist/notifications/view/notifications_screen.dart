@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../controller/notifications_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/notifications_cubit.dart';
+import '../cubit/notifications_state.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../widget/notification_tile.dart';
@@ -12,28 +14,28 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  late final NotificationsController controller;
+  late final NotificationsCubit controller;
 
   @override
   void initState() {
     super.initState();
-    controller = NotificationsController();
-    controller.addListener(_refresh);
-  }
-
-  void _refresh() {
-    if (mounted) setState(() {});
+    // Owned here (like the old controller) so the body below keeps working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    controller = NotificationsCubit();
   }
 
   @override
   void dispose() {
-    controller.removeListener(_refresh);
-    controller.dispose();
+    controller.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: controller,
+      child: BlocBuilder<NotificationsCubit, NotificationsState>(
+        builder: (context, _) {
     final unread = controller.unreadCount;
     return Scaffold(
       body: SafeArea(
@@ -103,6 +105,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ],
           ),
         ),
+      ),
+    );
+        },
       ),
     );
   }

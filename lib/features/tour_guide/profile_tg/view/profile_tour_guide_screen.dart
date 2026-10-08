@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/app_routes.dart';
@@ -6,7 +7,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../homeandNotificationTr/view/guide_notifications_screen.dart';
 import '../../homeandNotificationTr/widget/guide_bottom_nav.dart';
-import '../controller/profile_controller.dart';
+import '../cubit/profile_tg_cubit.dart';
+import '../cubit/profile_tg_state.dart';
 import '../view/guide_availability_screen.dart';
 import '../view/guide_settings_screen.dart';
 import '../widgets/edit_profile_sheet.dart';
@@ -17,31 +19,24 @@ import '../../role_selection/view/role_selection_screen.dart';
 
 /// Guide profile_tg: thin composer over section widgets.
 /// Dialogs + navigation stay here; rows live in widgets/.
-class ProfileTourGuideScreen extends StatefulWidget {
+class ProfileTourGuideScreen extends StatelessWidget {
   final String guideId;
 
   const ProfileTourGuideScreen({super.key, required this.guideId});
 
   @override
-  State<ProfileTourGuideScreen> createState() => _ProfileTourGuideScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => ProfileTgCubit(guideId: guideId)..loadRemoteProfile(),
+      child: const _ProfileTourGuideView(),
+    );
+  }
 }
 
-class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
-  late final ProfileController _controller;
-  int bottomIndex = 2; // Profile
+class _ProfileTourGuideView extends StatelessWidget {
+  const _ProfileTourGuideView();
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = ProfileController(guideId: widget.guideId);
-    _controller.loadRemoteProfile();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  static const int bottomIndex = 2; // Profile
 
   Future<void> _confirmLogout(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -78,22 +73,23 @@ class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
     }
   }
 
-  Future<void> _editName() async {
+  Future<void> _editName(BuildContext context) async {
+    final cubit = context.read<ProfileTgCubit>();
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       builder: (_) => EditProfileSheet(
-        name: _controller.displayName,
-        displayAvatar: _controller.displayAvatar,
-        about: _controller.displayAbout,
-        location: _controller.displayLocation,
-        phone: _controller.displayPhone ?? '',
+        name: cubit.displayName,
+        displayAvatar: cubit.displayAvatar,
+        about: cubit.displayAbout,
+        location: cubit.displayLocation,
+        phone: cubit.displayPhone ?? '',
       ),
     );
     // The sheet persists to Firebase/Firestore; pull the saved values in.
-    if (saved == true && mounted) {
-      _controller.pullFirebaseName();
-      _controller.loadRemoteProfile();
+    if (saved == true && context.mounted) {
+      cubit.pullFirebaseName();
+      cubit.loadRemoteProfile();
     }
   }
 
@@ -102,20 +98,20 @@ class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
-        child: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, _) {
-            final guide = _controller.guide;
+        child: BlocBuilder<ProfileTgCubit, ProfileTgState>(
+          builder: (context, state) {
+            final cubit = context.read<ProfileTgCubit>();
+            final guide = cubit.guide;
             return SingleChildScrollView(
               child: Column(
                 children: [
                   ProfileHeader(
                     guide: guide,
-                    displayName: _controller.displayName,
-                    displayAvatar: _controller.displayAvatar,
-                    displayLocation: _controller.displayLocation,
-                    displayPhone: _controller.displayPhone,
-                    onEdit: _editName,
+                    displayName: cubit.displayName,
+                    displayAvatar: cubit.displayAvatar,
+                    displayLocation: cubit.displayLocation,
+                    displayPhone: cubit.displayPhone,
+                    onEdit: () => _editName(context),
                   ),
                   const SizedBox(height: 30),
                   ProfileStatsCard(
@@ -125,7 +121,7 @@ class _ProfileTourGuideScreenState extends State<ProfileTourGuideScreen> {
                   ),
                   ProfileMenuSection(
                     languages: guide.languages,
-                    about: _controller.displayAbout,
+                    about: cubit.displayAbout,
                     onAvailability: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => const GuideAvailabilityScreen(),

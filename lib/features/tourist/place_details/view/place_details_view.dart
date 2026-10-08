@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../controller/place_detail_controller.dart';
+import '../cubit/place_detail_cubit.dart';
+import '../cubit/place_detail_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/circle_back_button.dart';
@@ -21,17 +23,29 @@ class PlaceDetailScreen extends StatefulWidget {
 }
 
 class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
-  late final PlaceDetailController controller;
+  late final PlaceDetailCubit controller;
   final List<String> tabs = const ['About', 'Guides', 'Trips', 'Stories'];
 
   @override
   void initState() {
     super.initState();
-    controller = PlaceDetailController(placeId: widget.placeId);
+    // Owned here (like the old controller) so the body below keeps working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    controller = PlaceDetailCubit(placeId: widget.placeId);
+  }
+
+  @override
+  void dispose() {
+    controller.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: controller,
+      child: BlocBuilder<PlaceDetailCubit, PlaceDetailState>(
+        builder: (context, _) {
     final place = controller.place;
 
     return Scaffold(
@@ -225,6 +239,9 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+        },
       ),
     );
   }

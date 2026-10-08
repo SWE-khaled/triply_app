@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -15,6 +17,12 @@ class CloudinaryService {
     try {
       if (file.path == null) {
         throw Exception('File path is null');
+      }
+      final localFile = File(file.path!);
+      if (!localFile.existsSync() || localFile.lengthSync() == 0) {
+        throw Exception(
+          'Selected file is empty or unreadable. Please pick the file again.',
+        );
       }
 
       // Specify the folder path as requested

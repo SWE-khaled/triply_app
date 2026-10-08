@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/circle_back_button.dart';
 import '../../../../../core/widgets/network_image_fallback.dart';
-import '../controller/booking_details_controller.dart';
+import '../cubit/booking_details_cubit.dart';
+import '../cubit/booking_details_state.dart';
+import '../model/booking_details.dart';
 import '../widget/booking_type_pill.dart';
 
 /// Cream tint from Figma (back button). Local const only — the global
@@ -12,39 +15,25 @@ const Color _cream = Color(0xFFFAF5EA);
 
 /// Traveler profile + trip booking details for one New Booking.
 /// Opened from [DashboardScreen] with a booking id.
-class BookingDetailsScreen extends StatefulWidget {
+class BookingDetailsScreen extends StatelessWidget {
   final String bookingId;
 
   const BookingDetailsScreen({super.key, required this.bookingId});
 
   @override
-  State<BookingDetailsScreen> createState() => _BookingDetailsScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => BookingDetailsCubit(bookingId: bookingId),
+      child: const _BookingDetailsView(),
+    );
+  }
 }
 
-class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
-  late final BookingDetailsController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = BookingDetailsController(bookingId: widget.bookingId);
-    controller.addListener(_refresh);
-  }
-
-  void _refresh() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    controller.removeListener(_refresh);
-    controller.dispose();
-    super.dispose();
-  }
+class _BookingDetailsView extends StatelessWidget {
+  const _BookingDetailsView();
 
   @override
   Widget build(BuildContext context) {
-    final details = controller.details;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -71,16 +60,26 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              if (details == null)
-                const Text(
-                  'Booking not found.',
-                  style: TextStyle(fontSize: 13, color: AppColors.subtitle),
-                )
-              else ...[
-                _guestCard(),
-                const SizedBox(height: 16),
-                _tripCard(),
-              ],
+              BlocBuilder<BookingDetailsCubit, BookingDetailsState>(
+                builder: (context, state) {
+                  final details = state.details;
+                  if (details == null) {
+                    return const Text(
+                      'Booking not found.',
+                      style:
+                          TextStyle(fontSize: 13, color: AppColors.subtitle),
+                    );
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _guestCard(details),
+                      const SizedBox(height: 16),
+                      _tripCard(details),
+                    ],
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -88,8 +87,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     );
   }
 
-  Widget _guestCard() {
-    final details = controller.details!;
+  Widget _guestCard(BookingDetails details) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -130,8 +128,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     );
   }
 
-  Widget _tripCard() {
-    final details = controller.details!;
+  Widget _tripCard(BookingDetails details) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),

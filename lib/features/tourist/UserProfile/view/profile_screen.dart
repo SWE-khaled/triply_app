@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/tourist/UserProfile/widget/edit_profile_sheet.dart';
 import 'package:triply/features/tourist/community/view/community_view.dart';
 import 'package:triply/features/tourist/home/view/home_screen.dart';
@@ -10,7 +10,8 @@ import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../common/AuthTourist/providers/auth_provider.dart';
 import '../../../common/AuthTourist/data/auth_repository.dart';
 import '../../../tour_guide/role_selection/view/role_selection_screen.dart';
-import '../controller/profile_controller.dart';
+import '../cubit/profile_cubit.dart';
+import '../cubit/profile_state.dart';
 import '../widget/account_option_tile.dart';
 import '../widget/profile_header.dart';
 
@@ -19,8 +20,8 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProfileController(),
+    return BlocProvider(
+      create: (_) => ProfileCubit(),
       child: const _ProfileBody(),
     );
   }
@@ -31,7 +32,7 @@ class _ProfileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<ProfileController>();
+    final controller = context.read<ProfileCubit>();
     final firebaseUser = context.watch<AuthProvider>().user;
     final name = (firebaseUser?.displayName?.trim().isNotEmpty ?? false)
         ? firebaseUser!.displayName!.trim()
@@ -44,6 +45,8 @@ class _ProfileBody extends StatelessWidget {
         ? Future<String?>.value()
         : AuthRepository().getUserPhone(firebaseUser.uid);
 
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, _) {
     return Scaffold(
       extendBody: true,
       backgroundColor: const Color.fromARGB(255, 252, 248, 241),
@@ -131,13 +134,13 @@ class _ProfileBody extends StatelessWidget {
                   AccountOptionTile(
                     icon: Icons.notifications_outlined,
                     title: 'Notifications',
-                    switchValue: controller.notificationsEnabled,
+                    switchValue: controller.state.notificationsEnabled,
                     onSwitchChanged: controller.toggleNotifications,
                   ),
                   AccountOptionTile(
                     icon: Icons.language_outlined,
                     title: 'Language',
-                    trailingText: controller.selectedLanguage,
+                    trailingText: controller.state.selectedLanguage,
                     onTap: () => _showLanguageSheet(context, controller),
                   ),
                   AccountOptionTile(
@@ -277,6 +280,8 @@ class _ProfileBody extends StatelessWidget {
         },
       ),
     );
+      },
+    );
   }
 
   Widget _stat(String value, String label, {bool last = false}) {
@@ -308,7 +313,7 @@ class _ProfileBody extends StatelessWidget {
     );
   }
 
-  void _showLanguageSheet(BuildContext context, ProfileController controller) {
+  void _showLanguageSheet(BuildContext context, ProfileCubit controller) {
     showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -331,7 +336,7 @@ class _ProfileBody extends StatelessWidget {
               ),
             ),
             RadioGroup<String>(
-              groupValue: controller.selectedLanguage,
+              groupValue: controller.state.selectedLanguage,
               onChanged: (value) {
                 if (value == null) return;
                 controller.setLanguage(value);

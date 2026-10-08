@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
-import '../controller/map_controller.dart';
+import '../cubit/map_state.dart';
 
 /// Filter chips row extracted from `map_view.dart:157-190`.
 class MapFilterChips extends StatelessWidget {

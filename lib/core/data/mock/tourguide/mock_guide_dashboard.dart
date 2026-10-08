@@ -15,7 +15,7 @@ const List<Map<String, dynamic>> mockBookingRequestsRaw = [
   {
     'id': 'b1',
     'guest_name': 'Sophie Martin',
-    'tour_title': 'Private guide booking',
+    'tour_title': 'Private guide booking', 
     'detail_label': '1 traveler · Today',
     'avatar_url': 'https://i.pravatar.cc/100?img=47',
     'is_private': true,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/tourist/place_details/view/place_details_view.dart';
-import '../controller/search_controller.dart' as c;
+import '../cubit/search_cubit.dart';
+import '../cubit/search_state.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../widget/destination_row.dart';
@@ -14,31 +16,31 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late final c.SearchController controller;
+  late final SearchCubit controller;
   late final TextEditingController textController;
 
   @override
   void initState() {
     super.initState();
-    controller = c.SearchController();
+    // Owned here (like the old controller) so the body below keeps working
+    // unchanged; provided below for BlocBuilder rebuilds.
+    controller = SearchCubit();
     textController = TextEditingController();
-    controller.addListener(_refresh);
-  }
-
-  void _refresh() {
-    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    controller.removeListener(_refresh);
-    controller.dispose();
+    controller.close();
     textController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: controller,
+      child: BlocBuilder<SearchCubit, SearchState>(
+        builder: (context, _) {
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -93,6 +95,9 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ],
         ),
+      ),
+    );
+        },
       ),
     );
   }
