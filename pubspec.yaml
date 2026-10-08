@@ -43,15 +43,42 @@ dependencies:
   flutter_svg: ^2.3.0
   lucide_icons_flutter: ^3.0.0
   iconsax_flutter: ^1.0.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
+flutter_launcher_icons:
+  android: "ic_launcher"
+
+  image_path: "assets/images/logo.jpg"
+
+  adaptive_icon_background: "#F7F0DF"
+  adaptive_icon_foreground: "assets/images/logo.jpg"
+
+  ios: true
+
+  web:
+    generate: true
+    image_path: "assets/images/logo.jpg"
+    background_color: "#F7F0DF"
+    theme_color: "#F7F0DF"
+
+  windows:
+    generate: true
+    image_path: "assets/images/logo.jpg"
+    icon_size: 48
+
+  macos:
+    generate: true
+    image_path: "assets/images/logo.jpg"
 flutter:
   uses-material-design: true
 
   assets:
-    - .env
+    #- .env
     - assets/images/svg/
+    - assets/images/
