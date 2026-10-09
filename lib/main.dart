@@ -18,6 +18,7 @@ import 'features/tourist/search/view/search_screen.dart';
 import 'features/tourist/UserProfile/view/profile_screen.dart';
 import 'features/tourist/UserProfile/view/privacy_security_screen.dart';
 import 'features/tourist/UserProfile/view/emergency_screen.dart';
+import 'features/splash/presentation/views/splash_view.dart';
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,22 +39,25 @@ class MyApp extends StatelessWidget {
         title: 'Triply',
         debugShowCheckedModeBanner: false,
         theme: buildAppTheme(),
-        home: Consumer<AuthProvider>(
-          builder: (context, authProvider, _) {
-            switch (authProvider.status) {
-              case AuthStatus.initial:
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              // On auth state change we stay at RoleSelection so the user
-              // can be redirected to the correct flow (tourist vs guide).
-              // Each auth flow handles its own post-login navigation.
-              default:
-               return const RoleSelectionScreen();
-            }
-          },
-        ),
+        initialRoute: AppRoutes.splash,
         routes: {
+          AppRoutes.splash: (context) => TriplySplashScreen(
+            nextPageBuilder: (ctx) => Consumer<AuthProvider>(
+              builder: (context, authProvider, _) {
+                switch (authProvider.status) {
+                  case AuthStatus.initial:
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  // On auth state change we stay at RoleSelection so the user
+                  // can be redirected to the correct flow (tourist vs guide).
+                  // Each auth flow handles its own post-login navigation.
+                  default:
+                   return const RoleSelectionScreen();
+                }
+              },
+            ),
+          ),
           AppRoutes.home: (context) => const HomeScreen(),
           AppRoutes.search: (context) => const SearchScreen(),
           AppRoutes.notifications: (context) => const NotificationsScreen(),

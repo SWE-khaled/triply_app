@@ -29,6 +29,7 @@ class AppRoutes {
   AppRoutes._();
 
   // ---- Named routes ----
+  static const String splash = '/splash';
   static const String home = '/home';
   // static const String map = '/map';
   // static const String community = '/community';
