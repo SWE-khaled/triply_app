@@ -43,6 +43,7 @@ dependencies:
   flutter_svg: ^2.3.0
   lucide_icons_flutter: ^3.0.0
   iconsax_flutter: ^1.0.0
+  pdf: ^3.13.1
 
 dev_dependencies:
   flutter_test:
