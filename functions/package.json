@@ -1,0 +1,23 @@
+{
+  "name": "triply-functions",
+  "description": "Triply trusted backend operations (Firebase Cloud Functions).",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "lint": "node --check index.js && node --check lib/guards.js",
+    "test": "node --test test/guards.test.js",
+    "test:rules": "node --test test/rules.test.js",
+    "test:callables": "node --test test/callables.test.js",
+    "deploy:dry": "node -e \"require('./index.js'); console.log('functions load OK')\""
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^6.1.1"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0"
+  }
+}

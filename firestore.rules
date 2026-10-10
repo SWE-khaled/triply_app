@@ -1,0 +1,306 @@
+rules_version = '2';
+
+// Triply Firestore Security Rules — reviewed, NOT YET DEPLOYED.
+// Project: triply-f9b82. Do not deploy until the target project is verified
+// and deployment is explicitly approved. Never use `allow read, write: if true`.
+//
+// Trust model:
+// - Firebase Auth owns identity; UID is the stable user key.
+// - `admins/{uid}` presence docs + `admin:true` custom claims own privilege.
+//   The legacy `triplykl` email-substring gate is NOT recognized here.
+// - Clients never write: admin roles, approval/verification decisions,
+//   booking totals, payment success, rating aggregates, capacity counters.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ── users/{uid} ──────────────────────────────────────────────
+    match /users/{uid} {
+      allow get: if isOwner(uid) || isAdmin();
+      // Admin user tables use queries; restrict list to admins to avoid
+      // harvesting PII (phone/email) by any signed-in user.
+      allow list: if isAdmin();
+      // Create: owner only, role must be tourist|guide (never admin),
+      // isActive must stay true.
+      allow create: if isOwner(uid)
+        && request.resource.data.role in ['tourist', 'guide']
+        && (!('isActive' in request.resource.data) || request.resource.data.isActive == true);
+      // Update: owner may edit profile fields but never role/isActive;
+      // admins may edit anything except promoting via this path is still
+      // governed by Functions (role changes require provisionAdmin).
+      allow update: if isAdmin() || (
+        isOwner(uid)
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.isActive == resource.data.isActive
+      );
+      allow delete: if isAdmin();
+    }
+
+    // ── guideProfiles/{uid} ──────────────────────────────────────
+    match /guideProfiles/{uid} {
+      // Public directory (tourist browsing works logged-out, as today).
+      allow read: if true;
+      // `.get()` defaults let first-time creates omit server-owned fields
+      // (absent == default); any explicit escalation still mismatches and
+      // is denied. Applies equally to updates via merge (merged values).
+      allow create, update: if isOwner(uid)
+        && request.resource.data.userId == uid
+        // Server-owned fields must not change via client:
+        && request.resource.data.get('isVerified', false) == (resource == null ? false : resource.data.get('isVerified', false))
+        && request.resource.data.get('canPublishTrips', false) == (resource == null ? false : resource.data.get('canPublishTrips', false))
+        && request.resource.data.get('ratingAvg', 0) == (resource == null ? 0 : resource.data.get('ratingAvg', 0))
+        && request.resource.data.get('ratingCount', 0) == (resource == null ? 0 : resource.data.get('ratingCount', 0));
+      allow delete: if isAdmin();
+    }
+
+    // ── guideVerifications/{id} ──────────────────────────────────
+    match /guideVerifications/{vid} {
+      allow get: if isSignedIn() && (resource.data.guideId == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      // Owner creates own pending submission only, with an exact key
+      // allowlist (stable id == guideId enforced client-side; Function
+      // also accepts auto-ids).
+      allow create: if isSignedIn()
+        && request.resource.data.guideId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly(['guideId', 'idDocumentUrl', 'licenseDocumentUrl', 'status', 'submittedAt', 'rejectionReason']);
+      // Owner may RE-SUBMIT after a rejection (rejected -> pending only,
+      // same key allowlist; reviewer fields stay Function-owned). Rejected
+      // docs carry reviewer metadata written by decideVerification, which
+      // this allowlist excludes — resubmission therefore drops stale
+      // reviewer fields while keeping the owner's documents.
+      allow update: if isSignedIn()
+        && resource.data.guideId == request.auth.uid
+        && resource.data.status == 'rejected'
+        && request.resource.data.guideId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly(['guideId', 'idDocumentUrl', 'licenseDocumentUrl', 'status', 'submittedAt', 'rejectionReason']);
+      // Decisions happen in Functions (Admin SDK bypasses rules).
+      allow delete: if false;
+    }
+
+    // ── places/{placeId} ─────────────────────────────────────────
+    match /places/{placeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── trips/{tripId} ───────────────────────────────────────────
+    match /trips/{tripId} {
+      // Tourists see approved trips; owners see own; admins see all.
+      allow get: if resource.data.approvalStatus == 'approved'
+        || (isSignedIn() && resource.data.guideId == request.auth.uid)
+        || isAdmin();
+      // List queries are authorized PER DOCUMENT (rules are not filters:
+      // every candidate doc must satisfy this expression). Tourist feed and
+      // place queries constrain approvalStatus==approved; guide "my trips"
+      // queries constrain guideId==self; admins are unconstrained. Unfiltered
+      // or cross-status queries by non-owners are denied for every
+      // non-matching document, so pending/rejected trips never leak.
+      allow list: if resource.data.approvalStatus == 'approved'
+        || (isSignedIn() && resource.data.guideId == request.auth.uid)
+        || isAdmin();
+      allow create: if isSignedIn()
+        && request.resource.data.guideId == request.auth.uid
+        // Only registered guides may publish: role comes from the
+        // server-side users doc (never from client input). Publish-gating
+        // for UNVERIFIED guides stays an approval-workflow decision —
+        // every create lands `pending` (see onTripCreated) — it is NOT
+        // enforced here so verification-pending guides can still submit.
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'guide'
+        && !(request.resource.data.keys().hasAny(['bookedSeats', 'approvalStatus', 'rejectionReason']))
+        // Basic payload validity (deeper validation lives in the app form).
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.priceEgp is number
+        && request.resource.data.priceEgp >= 0
+        && request.resource.data.capacity is int
+        && request.resource.data.capacity >= 1;
+      // Owner edits details; status/counters are Function-owned.
+      allow update: if isAdmin() || (
+        isSignedIn()
+        && resource.data.guideId == request.auth.uid
+        && request.resource.data.guideId == resource.data.guideId
+        && request.resource.data.bookedSeats == resource.data.bookedSeats
+        && (!('approvalStatus' in request.resource.data) || request.resource.data.approvalStatus == resource.data.approvalStatus)
+      );
+      allow delete: if isAdmin() || (
+        isSignedIn() && resource.data.guideId == request.auth.uid
+      );
+    }
+
+    // ── bookings/{bookingId} ─────────────────────────────────────
+    match /bookings/{bookingId} {
+      allow get: if isSignedIn() && (
+        resource.data.touristId == request.auth.uid
+        || resource.data.guideId == request.auth.uid
+        || isAdmin()
+      );
+      // Per-document participant check: callers must constrain queries to
+      // their own touristId/guideId (or be admin). Unfiltered and cross-user
+      // queries are denied for every non-matching document, so no booking
+      // (or its PII) leaks across users.
+      allow list: if isSignedIn() && (
+        resource.data.touristId == request.auth.uid
+        || resource.data.guideId == request.auth.uid
+        || isAdmin()
+      );
+      // Direct client creates are disabled: bookings are created by the
+      // `createBooking` callable Function (Admin SDK). This prevents
+      // capacity races and client-computed totals.
+      allow create: if false;
+      // Owner tourist may cancel own UNPAID active booking; everything else
+      // is Function/admin-owned. Paid cancellations must go through the
+      // `cancelBooking` callable (refund handling + capacity consistency);
+      // the client path is closed for them below via the paymentStatus gate.
+      allow update: if isAdmin() || (
+        isSignedIn()
+        && resource.data.touristId == request.auth.uid
+        && resource.data.status in ['pending', 'confirmed']
+        && resource.data.get('paymentStatus', 'pending') in ['pending', 'failed']
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.get('paymentStatus', 'pending') == resource.data.get('paymentStatus', 'pending')
+        && request.resource.data.touristId == resource.data.touristId
+        && request.resource.data.guideId == resource.data.guideId
+        && request.resource.data.get('tripId', '') == resource.data.get('tripId', '')
+        && request.resource.data.get('placeId', '') == resource.data.get('placeId', '')
+        && request.resource.data.bookingType == resource.data.bookingType
+        && request.resource.data.seats == resource.data.seats
+        && request.resource.data.unitPrice == resource.data.unitPrice
+        && request.resource.data.serviceFee == resource.data.serviceFee
+        && request.resource.data.totalAmount == resource.data.totalAmount
+        && request.resource.data.currency == resource.data.currency
+      );
+      allow delete: if false;
+    }
+
+    // ── bookingKeys/{key} ────────────────────────────────────────
+    match /bookingKeys/{key} {
+      // Function-owned idempotency ledger (Admin SDK bypasses rules).
+      // Never client-readable (keys correlate callers to bookings) and never
+      // client-writable (ownership is assigned inside the booking transaction).
+      allow read, write: if false;
+    }
+
+    // ── payments/{paymentId} ─────────────────────────────────────
+    match /payments/{paymentId} {
+      allow get: if isSignedIn() && (
+        resource.data.touristId == request.auth.uid || isAdmin()
+      );
+      // Owner-scoped lists: callers constrain bookingId/touristId to their
+      // own records (or are admin). Cross-user payment reads are denied.
+      allow list: if isSignedIn() && (
+        resource.data.touristId == request.auth.uid || isAdmin()
+      );
+      // Client creates the `pending` reconciliation record only.
+      allow create: if isSignedIn()
+        && request.resource.data.touristId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.provider == 'paymob';
+      // Only Functions move payments to succeeded/failed/refunded.
+      allow update, delete: if false;
+    }
+
+    // ── posts/{postId} ───────────────────────────────────────────
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.authorId == request.auth.uid;
+      // Owner edits text/location only; counters are Function-owned.
+      allow update: if isSignedIn()
+        && resource.data.authorId == request.auth.uid
+        && request.resource.data.authorId == resource.data.authorId
+        && request.resource.data.likesCount == resource.data.likesCount;
+      allow delete: if isSignedIn() && (
+        resource.data.authorId == request.auth.uid || isAdmin()
+      );
+
+      match /likes/{uid} {
+        allow read: if true;
+        allow write: if isOwner(uid);
+      }
+    }
+
+    // ── stories/{storyId} ────────────────────────────────────────
+    match /stories/{storyId} {
+      allow read: if true;
+      // `expiresAt` must be a Timestamp: readers and the scheduled cleanup
+      // compare against Timestamp.now(), and cross-type comparisons never
+      // match (stale string expiries would stay visible + uncollectable).
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.expiresAt is timestamp;
+      allow delete: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow update: if false;
+    }
+
+    // ── notifications/{notificationId} ───────────────────────────
+    match /notifications/{notificationId} {
+      // Recipient-only single reads (+ admins for support/moderation).
+      allow get: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      // Per-document recipient check: callers constrain userId==self (or are
+      // admin). Unfiltered and cross-user listing is denied document-wise.
+      allow list: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      // Created only by Functions (Admin SDK bypasses rules).
+      allow create, delete: if false;
+      // Recipient may flip isRead and nothing else: every other field pinned.
+      allow update: if isSignedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.title == resource.data.title
+        && request.resource.data.message == resource.data.message
+        && request.resource.data.type == resource.data.type
+        && request.resource.data.get('relatedEntityId', '') == resource.data.get('relatedEntityId', '')
+        && request.resource.data.get('relatedCollection', '') == resource.data.get('relatedCollection', '')
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    // ── reviews/{reviewId} ───────────────────────────────────────
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create, update: if isSignedIn()
+        && request.resource.data.touristId == request.auth.uid
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow delete: if isSignedIn() && (
+        resource.data.touristId == request.auth.uid || isAdmin()
+      );
+    }
+
+    // ── appSettings/{settingId} ──────────────────────────────────
+    match /appSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ── admins/{uid} ─────────────────────────────────────────────
+    match /admins/{uid} {
+      // Readable by the owner (for the isAdmin() check) and admins.
+      allow get: if isOwner(uid) || isAdmin();
+      allow list: if isAdmin();
+      // Provisioned via Console/Functions only — never from a client.
+      allow create, update, delete: if false;
+    }
+  }
+}
