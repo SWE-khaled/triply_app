@@ -19,8 +19,13 @@ service cloud.firestore {
     }
 
     function isAdmin() {
+      // `.get()` with a default: most ID tokens carry NO `admin` claim, and
+      // dot-access on a missing claim ERRORS (denying even legitimate owner
+      // operations evaluated after isAdmin, e.g. users profile edits).
+      // Default-false preserves the exact intended allow-set: true only when
+      // the claim is explicitly present and true.
       return isSignedIn() && (
-        request.auth.token.admin == true ||
+        request.auth.token.get('admin', false) == true ||
         exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
     }
@@ -43,10 +48,15 @@ service cloud.firestore {
       // Update: owner may edit profile fields but never role/isActive;
       // admins may edit anything except promoting via this path is still
       // governed by Functions (role changes require provisionAdmin).
+      // `.get(..., true)` defaults: real guide docs predate the `isActive`
+      // field, and dot-access on a missing field ERRORS the whole rule
+      // (blocking legitimate edits). Absent==absent passes; any actual
+      // change still mismatches and is denied. Default `true` matches the
+      // schema default written at signup.
       allow update: if isAdmin() || (
         isOwner(uid)
         && request.resource.data.role == resource.data.role
-        && request.resource.data.isActive == resource.data.isActive
+        && request.resource.data.get('isActive', true) == resource.data.get('isActive', true)
       );
       allow delete: if isAdmin();
     }

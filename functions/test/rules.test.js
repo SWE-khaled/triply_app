@@ -41,9 +41,9 @@ async function seed() {
   await testEnv.withSecurityRulesDisabled(async (admin) => {
     const db = admin.firestore();
     await db.collection('admins').doc('admin1').set({provisionedBy: 'test'});
-    await db.collection('users').doc('touristA').set({role: 'tourist', fullName: 'A'});
-    await db.collection('users').doc('touristB').set({role: 'tourist', fullName: 'B'});
-    await db.collection('users').doc('guide1').set({role: 'guide', fullName: 'G'});
+    await db.collection('users').doc('touristA').set({role: 'tourist', fullName: 'A', isActive: true});
+    await db.collection('users').doc('touristB').set({role: 'tourist', fullName: 'B', isActive: true});
+    await db.collection('users').doc('guide1').set({role: 'guide', fullName: 'G', isActive: true});
     await db.collection('trips').doc('t1').set({
       guideId: 'guide1', approvalStatus: 'approved', title: 'Nile Day',
       capacity: 10, bookedSeats: 2, priceEgp: 6000, currency: 'EGP',
