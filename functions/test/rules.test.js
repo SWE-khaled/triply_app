@@ -18,7 +18,13 @@ const {
   assertSucceeds,
   assertFails,
 } = require('@firebase/rules-unit-testing');
-const {Timestamp} = require('firebase-admin/firestore');
+// NOTE: every Firestore instance in this file (seed + test bodies) comes
+// from the CLIENT SDK via the test context (see
+// withSecurityRulesDisabled/createContext in @firebase/rules-unit-testing:
+// `this.getApp().firestore()`). Never pass firebase-admin value classes
+// (Timestamp/FieldValue/GeoPoint) here — the client serializer rejects them
+// as foreign objects. Use plain `new Date()`; the client converts it to a
+// Timestamp on write.
 
 const PROJECT_ID = process.env.FIRESTORE_TEST_PROJECT || 'demo-triply';
 const HOST = '127.0.0.1';
@@ -64,7 +70,7 @@ async function seed() {
     });
     await db.collection('notifications').doc('nA').set({
       userId: 'touristA', title: 'Hi', message: 'hello', type: 'general',
-      isRead: false, createdAt: Timestamp.now(),
+      isRead: false, createdAt: new Date(),
     });
     await db.collection('payments').doc('pA').set({
       touristId: 'touristA', bookingId: 'bA', provider: 'paymob',
@@ -313,14 +319,14 @@ describe('payments + users + profiles + bookingKeys', () => {
     await assertSucceeds(
       g.collection('guideVerifications').doc('rej1').set({
         guideId: 'guide1', idDocumentUrl: 'http://id2', licenseDocumentUrl: 'http://lic2',
-        status: 'pending', submittedAt: Timestamp.now(), rejectionReason: '',
+        status: 'pending', submittedAt: new Date(), rejectionReason: '',
       }),
     );
     // Approved doc cannot be touched by the owner.
     await assertFails(
       g.collection('guideVerifications').doc('appr1').set({
         guideId: 'guide1', idDocumentUrl: 'http://id2', licenseDocumentUrl: 'http://lic2',
-        status: 'pending', submittedAt: Timestamp.now(), rejectionReason: '',
+        status: 'pending', submittedAt: new Date(), rejectionReason: '',
       }),
     );
     // Reviewer fields can never be smuggled client-side.
@@ -336,8 +342,10 @@ describe('payments + users + profiles + bookingKeys', () => {
 
   it('stories: expiresAt must be a Timestamp (string expiries rejected)', async () => {
     const mine = ctx('touristA').firestore();
+    // `new Date()` is serialized to a Timestamp by the client SDK, so the
+    // `is timestamp` rule still sees a Timestamp here.
     await assertSucceeds(
-      mine.collection('stories').doc('s1').set({userId: 'touristA', mediaUrl: 'm', expiresAt: Timestamp.now()}),
+      mine.collection('stories').doc('s1').set({userId: 'touristA', mediaUrl: 'm', expiresAt: new Date()}),
     );
     await assertFails(
       mine.collection('stories').doc('s2').set({userId: 'touristA', mediaUrl: 'm', expiresAt: '2026-11-02T10:00:00.000Z'}),
