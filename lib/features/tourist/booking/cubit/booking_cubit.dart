@@ -1,6 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/data/mock/tourist/mock_guides.dart';
 import 'package:triply/core/data/mock/tourist/mock_places.dart';
+import 'package:triply/data/firestore/booking_pricing.dart';
+import 'package:triply/data/firestore/models/booking_doc.dart';
+import 'package:triply/data/firestore/repositories/bookings_repository.dart';
 import 'package:triply/features/tourist/booking/model/booking.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 import 'package:triply/features/tourist/booking/services/price_calculator.dart';
@@ -40,8 +43,7 @@ class BookingCubit extends Cubit<BookingState> {
     'Giza Plateau Gate',
   ];
 
-  List<Place> get places =>
-      mockPlaces.map((e) => Place.fromJson(e)).toList();
+  List<Place> get places => mockPlaces.map((e) => Place.fromJson(e)).toList();
 
   Place? get selectedPlace => state.selectedPlace;
 
@@ -68,7 +70,10 @@ class BookingCubit extends Cubit<BookingState> {
       PriceCalculator.durationHoursFor(state.durationLabel);
 
   double get subtotal => PriceCalculator.subtotal(
-      guide.pricePerHour, durationHours, state.travelers);
+    guide.pricePerHour,
+    durationHours,
+    state.travelers,
+  );
   double get serviceFee => PriceCalculator.serviceFee(subtotal);
   double get total =>
       PriceCalculator.total(guide.pricePerHour, durationHours, state.travelers);
@@ -153,5 +158,84 @@ class BookingCubit extends Cubit<BookingState> {
     );
     emit(state.copyWith(stepIndex: 3));
     return booking;
+  }
+
+  /// Client-side traveler pre-check (UX only). The Function enforces
+  /// 1–10 travelers and 1–24 duration hours and is authoritative.
+  String? validateTravelers() =>
+      BookingPricing.validatePrivate(travelers: state.travelers);
+
+  /// Deterministic idempotency key for one logical private request.
+  /// Identical inputs (including a retry after a network failure) produce
+  /// the identical key, so the server dedupes to the original booking.
+  static String buildIdempotencyKey({
+    required String uid,
+    required String guideId,
+    required DateTime appointmentAt,
+    required String timeSlot,
+    required int travelers,
+    required int durationHours,
+    required String meetingPoint,
+    required String specialRequests,
+    required String? placeId,
+  }) {
+    final a = appointmentAt.toUtc();
+    final appt =
+        '${a.year.toString().padLeft(4, '0')}'
+        '${a.month.toString().padLeft(2, '0')}'
+        '${a.day.toString().padLeft(2, '0')}';
+    final req = BookingPricing.shortHash(
+      '$timeSlot|$meetingPoint|${specialRequests.trim()}|${placeId ?? ''}',
+    );
+    return 'pvt-$uid-$guideId-$appt-$travelers-${durationHours}h-$req';
+  }
+
+  /// Creates the private booking through `createBooking` and returns the
+  /// authoritative server [BookingDoc] (guide price + server fee).
+  /// Returns null when a submission is already in flight (duplicate-tap
+  /// guard). Throws with a user-facing message on validation/backend
+  /// failure (e.g. unknown guide) — never records a local booking.
+  /// NOTE: the guide id must exist in `guideProfiles/` (real guide data,
+  /// wired in the guide phase); otherwise the server answers `not-found`.
+  Future<BookingDoc?> submitBooking({
+    required BookingsRepository repository,
+    required String? uid,
+  }) async {
+    if (state.isSubmitting) return null;
+    if (uid == null || uid.isEmpty) {
+      throw Exception('Please sign in to book.');
+    }
+    final err = validateTravelers();
+    if (err != null) throw Exception(err);
+    final date = state.date;
+    if (date == null) throw Exception('Select a date for your tour.');
+    if (durationHours < 1) throw Exception('Select a valid duration.');
+    final key = buildIdempotencyKey(
+      uid: uid,
+      guideId: guideId,
+      appointmentAt: date,
+      timeSlot: state.timeSlot ?? '',
+      travelers: state.travelers,
+      durationHours: durationHours,
+      meetingPoint: state.meetingPoint,
+      specialRequests: _notes,
+      placeId: state.selectedPlace?.id,
+    );
+    emit(state.copyWith(isSubmitting: true));
+    try {
+      return await repository.createPrivate(
+        guideId: guideId,
+        placeId: state.selectedPlace?.id,
+        appointmentAt: date,
+        timeSlot: state.timeSlot ?? '',
+        travelers: state.travelers,
+        durationHours: durationHours,
+        meetingPoint: state.meetingPoint,
+        specialRequests: _notes,
+        idempotencyKey: key,
+      );
+    } finally {
+      if (!isClosed) emit(state.copyWith(isSubmitting: false));
+    }
   }
 }

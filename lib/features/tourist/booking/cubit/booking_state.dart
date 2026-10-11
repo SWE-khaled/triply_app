@@ -9,6 +9,11 @@ class BookingState {
   final String meetingPoint;
   final Place? selectedPlace;
 
+  /// True while a `createBooking` submission is in flight. The Confirm
+  /// button is disabled then, so duplicate taps cannot create a second
+  /// booking (the in-flight request owns the idempotency key).
+  final bool isSubmitting;
+
   const BookingState({
     this.stepIndex = 0,
     this.date,
@@ -17,6 +22,7 @@ class BookingState {
     this.travelers = 2,
     this.meetingPoint = 'Hotel Lobby',
     this.selectedPlace,
+    this.isSubmitting = false,
   });
 
   BookingState copyWith({
@@ -27,6 +33,7 @@ class BookingState {
     int? travelers,
     String? meetingPoint,
     Place? selectedPlace,
+    bool? isSubmitting,
   }) {
     return BookingState(
       stepIndex: stepIndex ?? this.stepIndex,
@@ -36,6 +43,7 @@ class BookingState {
       travelers: travelers ?? this.travelers,
       meetingPoint: meetingPoint ?? this.meetingPoint,
       selectedPlace: selectedPlace ?? this.selectedPlace,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
     );
   }
 }

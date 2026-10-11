@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import '../../../../core/data/my_bookings_public.dart';
 import '../data/auth_repository.dart';
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
@@ -84,6 +85,13 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _authRepository.signOut();
+    // Session booking entries belong to the signed-in tourist; drop them so
+    // the next login never sees the previous user's trips. The static store
+    // has other same-session consumers (trip details, profile counter) that
+    // repopulate on use.
+    for (final id in MyBookingsPublic.bookedIds.toList()) {
+      MyBookingsPublic.cancelBooking(id);
+    }
   }
 
   Future<void> refreshUser() async {

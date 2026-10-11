@@ -1,4 +1,3 @@
-
 class CheckoutBookingSummary {
   final String guideId;
   final String guideName;
@@ -29,7 +28,6 @@ class CheckoutBookingSummary {
     required this.serviceFee,
     required this.total,
   });
-
 
   factory CheckoutBookingSummary.figmaExample() {
     return const CheckoutBookingSummary(
@@ -89,7 +87,6 @@ class CheckoutBookingSummary {
       '$travelers${travelers == 1 ? 'person' : 'people'}';
 }
 
-
 class PaymobBillingData {
   final String firstName;
   final String lastName;
@@ -119,7 +116,6 @@ class PaymobBillingData {
     this.state = 'Cairo',
   });
 
-
   Map<String, dynamic> toJson() {
     return {
       'apartment': _or(apartment, '801'),
@@ -137,7 +133,6 @@ class PaymobBillingData {
       'state': _or(state, 'Cairo'),
     };
   }
-
 
   static String _or(String value, String fallback) {
     final v = value.trim();

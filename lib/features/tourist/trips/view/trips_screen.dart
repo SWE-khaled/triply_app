@@ -20,6 +20,7 @@ class TripsScreen extends StatefulWidget {
 
 class _TripsScreenState extends State<TripsScreen> {
   int bottomIndex = 1; // Trips
+  bool _remoteRequested = false;
 
   static const List<String> tabLabels = ['Upcoming', 'Completed'];
 
@@ -27,6 +28,37 @@ class _TripsScreenState extends State<TripsScreen> {
     TripStatus.upcoming,
     TripStatus.completed,
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Remote reads stay OFF until backend deploy + emulator proof
+    // ([TripsCubit.useRemote]); mocks render meanwhile with no extra UI.
+    if (TripsCubit.useRemote) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _refreshRemote());
+    }
+  }
+
+  /// Best-effort remote refresh. Guarded so rebuilds never duplicate it;
+  /// only explicit navigation/tab taps trigger a request. On failure the
+  /// mock list stays with an explicit offline notice (never presented as
+  /// live data).
+  Future<void> _refreshRemote() async {
+    if (!mounted || _remoteRequested) return;
+    _remoteRequested = true;
+    try {
+      final ok = await context.read<TripsCubit>().loadRemote();
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Couldn't refresh trips — showing sample trips."),
+          ),
+        );
+      }
+    } finally {
+      _remoteRequested = false;
+    }
+  }
 
   void _openDetails(Trip trip) {
     Navigator.of(context).push(AppRoutes.tripDetails(trip));
@@ -73,9 +105,12 @@ class _TripsScreenState extends State<TripsScreen> {
                         final selected = tabValues[i] == state.selectedTab;
                         return Expanded(
                           child: GestureDetector(
-                            onTap: () => context.read<TripsCubit>().selectTab(
-                              tabValues[i],
-                            ),
+                            onTap: () {
+                              context.read<TripsCubit>().selectTab(
+                                tabValues[i],
+                              );
+                              if (TripsCubit.useRemote) _refreshRemote();
+                            },
                             behavior: HitTestBehavior.opaque,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),

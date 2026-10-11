@@ -390,3 +390,29 @@ Keep the Flutter app exactly as-is; add Repository/RemoteDataSource seams per fe
 
 `EXISTS` = in code and working. `PARTIALLY IMPLEMENTED` = works with known gaps. `MOCK / LOCAL ONLY` = static/session data, cleared on restart unless Firebase/Firestore. `NOT IMPLEMENTED` = absent. `NEEDS VERIFICATION` = unconfirmed (needs device/CI/backend check). `RECOMMENDED` = proposal, not a requirement. `ASSUMPTION` = inferred without code proof. MVCW = Model-View-Controller-Widgets (legacy); MVVMW = Model-View-ViewModel(Cubit)-Widgets (current); DTO = backend transfer object; RBAC = role-based access control.
 
+## Appendix C. Firebase Implementation Addendum (2026-10-09, branch `Back-end`)
+
+> The §17–§19 NestJS/PostgreSQL recommendation is SUPERSEDED by the confirmed
+> Firebase architecture decision (Auth + Firestore + Functions + Rules). The
+> PostgreSQL schema (§18) and REST API spec (§19) remain useful domain references
+> but were NOT implemented. What WAS implemented (locally, undeployed):
+> `lib/core/firebase/` (paths/converters/result), `lib/data/firestore/models/`
+> (12 canonical docs), `lib/data/firestore/datasources/` (14, incl. admins),
+> `lib/data/firestore/repositories/` (7) + `booking_pricing.dart` +
+> `mappers/firestore_mappers.dart`, additive auth/cubit bridges (signup role,
+> guide dual-writes, `loadRemote`/`refreshRemote`/`submitTripToFirestore`,
+> `AdminAccessService`), `firestore.rules` + `firestore.indexes.json`
+> (23 composites), `functions/index.js` (10 Functions: createBooking,
+> onTripCreated, onBookingStatusChanged, decideTripStatus, decideVerification,
+> verifyPaymobTransaction, onPostLikeWritten, onReviewWritten,
+> cleanupExpiredStories, provisionAdmin), `tool/export_seed_json.dart` +
+> `tool/seed_firestore.js` (158 places / 3 trips exported; dry-run verified),
+> `test/{firestore_converters,booking_pricing,firestore_models}_test.dart`
+> (32/32 pass). Roles are no longer pure silos at the DATA layer (shared
+> `trips`/`bookings`/`guideVerifications` docs + Function-owned transitions),
+> though cubits still render mocks until `loadRemote` bridges are called by
+> Views. Secrets still hardcoded (`paymob_service.dart`, `cloudinary_service.dart`)
+> — rotate before release. Full detail: `docs/FIREBASE_IMPLEMENTATION_REPORT.md`,
+> `docs/FIRESTORE_SCHEMA.md`, `docs/ADMIN_PROVISIONING.md`,
+> `docs/DEPLOYMENT_CHECKLIST.md`. NOT deployed; emulator + Console steps outstanding.
+

@@ -68,7 +68,8 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
     if (confirmed != true || !context.mounted) return;
-    context.read<AdminAuthCubit>().logout();
+    // Signs out of Firebase too (AdminAuthCubit), then leaves the console.
+    await context.read<AdminAuthCubit>().logout();
     if (!context.mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
@@ -118,18 +119,18 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: AppColors.background,
       drawer: Drawer(
         width: 240,
-          child: AdminSidebar(
-            selectedIndex: _selectedIndex,
-            adminName: adminName,
-            onItemSelected: (i) {
-              setState(() => _selectedIndex = i);
-              Navigator.of(context).pop(); // close drawer
-            },
-            onLogout: () {
-              Navigator.of(context).pop();
-              _confirmLogout(context);
-            },
-          ),
+        child: AdminSidebar(
+          selectedIndex: _selectedIndex,
+          adminName: adminName,
+          onItemSelected: (i) {
+            setState(() => _selectedIndex = i);
+            Navigator.of(context).pop(); // close drawer
+          },
+          onLogout: () {
+            Navigator.of(context).pop();
+            _confirmLogout(context);
+          },
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,7 +249,6 @@ class _PageHeader extends StatelessWidget {
               ],
             ),
           ),
-
         ],
       ),
     );

@@ -52,3 +52,14 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Firebase Functions + Emulator (local only, never commit credentials)
+functions/node_modules/
+.firebase/
+firestore-debug.log
+firebase-debug.log
+ui-debug.log
+*-debug.log
+tool/seed_data/*.log
+service-account*.json
+*-service-account.json

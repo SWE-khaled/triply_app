@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
-import '../../../../data/mock/d_mock_guides.dart';
+import '../../../../data/firestore/repositories/admin_repository.dart';
 import '../../d_home/view/d_home_view.dart';
 
-/// Overview / Dashboard page.
+/// Overview / Dashboard page (server-backed).
+///
+/// Stat cards show live server aggregates (counts + commission earnings);
+/// the guide applications card drives the same admin-only verification
+/// decisions as the Guides screen.
 class OverviewView extends StatefulWidget {
   const OverviewView({super.key});
 
@@ -13,32 +17,151 @@ class OverviewView extends StatefulWidget {
 }
 
 class _OverviewViewState extends State<OverviewView> {
-  late List<MockGuide> _guides;
+  final AdminRepository _repo = AdminRepository();
+  AdminOverview? _overview;
+  List<AdminGuideRow> _guides = [];
+  bool _loading = true;
+  String? _error;
+  final Set<String> _busy = {};
 
   @override
   void initState() {
     super.initState();
-    _guides = List.from(mockGuides);
+    _load();
   }
 
-  void _updateGuideStatus(MockGuide guide, String status) {
+  /// Reloads stats + queue. Returns false (with [error] set) when the
+  /// display may be stale — mutating callers surface a notice instead of
+  /// a misleading success.
+  Future<bool> _load() async {
+    if (!mounted) return false;
     setState(() {
-      final i = _guides.indexOf(guide);
-      if (i != -1) {
-        _guides[i] = MockGuide(
-          name: guide.name, email: guide.email, document: guide.document, city: guide.city, status: status,
-          phone: guide.phone, submitted: guide.submitted, docFileName: guide.docFileName, uploadedTrips: guide.uploadedTrips,
-        );
-      }
+      _loading = true;
+      _error = null;
     });
+    try {
+      final overview = await _repo.overviewCounts();
+      final guides = await _repo.pendingVerifications(limit: 10);
+      if (!mounted) return false;
+      setState(() {
+        _overview = overview;
+        _guides = guides;
+        _loading = false;
+      });
+      return true;
+    } catch (e) {
+      if (!mounted) return false;
+      setState(() {
+        _loading = false;
+        _error = _message(e);
+      });
+      return false;
+    }
+  }
+
+  static String _message(Object e) {
+    const prefix = 'Exception: ';
+    final text = e.toString();
+    final msg = text.startsWith(prefix) ? text.substring(prefix.length) : text;
+    return msg.isEmpty ? 'Operation failed. Please try again.' : msg;
+  }
+
+  void _snack(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Thousands separator for stat values (no new dependencies).
+  static String _fmt(int value) {
+    final digits = value.toString();
+    final buffer = StringBuffer();
+    var count = 0;
+    for (var i = digits.length - 1; i >= 0; i--) {
+      buffer.write(digits[i]);
+      count++;
+      if (count % 3 == 0 && i != 0) buffer.write(',');
+    }
+    return buffer.toString().split('').reversed.join();
+  }
+
+  Future<void> _decide(AdminGuideRow row, bool approved) async {
+    if (_busy.contains(row.guideId)) return;
+    setState(() => _busy.add(row.guideId));
+    try {
+      await _repo.decideVerification(guideId: row.guideId, approved: approved);
+      final fresh = await _load();
+      _snack(
+        fresh
+            ? (approved ? 'Guide approved.' : 'Verification rejected.')
+            : 'Saved, but the list could not refresh.',
+      );
+    } catch (e) {
+      _snack(_message(e));
+    } finally {
+      if (mounted) setState(() => _busy.remove(row.guideId));
+    }
+  }
+
+  Future<void> _toggleActive(AdminGuideRow row) async {
+    if (_busy.contains(row.guideId)) return;
+    setState(() => _busy.add(row.guideId));
+    try {
+      await _repo.setUserActive(row.guideId, !row.userActive);
+      final fresh = await _load();
+      if (!fresh) {
+        _snack('Saved, but the list could not refresh.');
+      } else {
+        _snack(row.userActive ? 'Guide suspended.' : 'Guide reactivated.');
+      }
+    } catch (e) {
+      _snack(_message(e));
+    } finally {
+      if (mounted) setState(() => _busy.remove(row.guideId));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final pendingGuidesCount = _guides.where((g) => g.status == 'pending').length;
-    // Trip applications hardcoded to 3 for now, since this view only edits guides
-    final pendingTripsCount = 3;
-    final totalPending = pendingGuidesCount + pendingTripsCount;
+    final overview = _overview;
+    final pendingGuidesCount = overview?.pendingGuides ?? 0;
+    final pendingTripsCount = overview?.pendingTrips ?? 0;
+    final totalPending = overview?.totalPending ?? 0;
+
+    if (_loading && overview == null) {
+      return const SingleChildScrollView(
+        child: AdminCard(
+          padding: EdgeInsets.all(24),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 64),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        ),
+      );
+    }
+    if (_error != null && overview == null) {
+      return SingleChildScrollView(
+        child: AdminCard(
+          padding: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 48),
+            child: Center(
+              child: Column(
+                children: [
+                  Text(_error!, textAlign: TextAlign.center),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: _load,
+                    child: const Text('Try again'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return SingleChildScrollView(
       child: AdminCard(
@@ -56,49 +179,54 @@ class _OverviewViewState extends State<OverviewView> {
                   children: [
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 1,
-                        value: '12,480',
+                        value: _fmt(overview?.usersTotal ?? 0),
                         label: 'Total Users',
-                        badge: '+4.2%',
+                        badge: '',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 2,
-                        value: '326',
+                        value: _fmt(overview?.guidesTotal ?? 0),
                         label: 'Tour Guides',
-                        badge: '+1.8%',
+                        badge: '',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 3,
-                        value: '1,204',
+                        value: _fmt(overview?.tripsTotal ?? 0),
                         label: 'Total Trips',
-                        badge: '+3.1%',
+                        badge: '',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 4,
-                        value: '8,930',
+                        value: _fmt(overview?.bookingsTotal ?? 0),
                         label: 'Total Bookings',
-                        badge: '+6.5%',
+                        badge: '',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 5,
-                        value: 'EGP 2,838',
+                        value:
+                            'EGP ${(overview?.earnings ?? 0).toStringAsFixed(0)}',
                         label: 'Our Earnings',
                         badge: 'from commissions',
                         badgeDanger: false,
@@ -130,11 +258,16 @@ class _OverviewViewState extends State<OverviewView> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _PendingActionsCard(guidesCount: pendingGuidesCount, tripsCount: pendingTripsCount),
+                      _PendingActionsCard(
+                        guidesCount: pendingGuidesCount,
+                        tripsCount: pendingTripsCount,
+                      ),
                       const SizedBox(height: 16),
                       _GuideApplicationsCard(
                         guides: _guides,
-                        onUpdateStatus: _updateGuideStatus,
+                        busy: _busy,
+                        onApprove: _decide,
+                        onToggleActive: _toggleActive,
                       ),
                     ],
                   );
@@ -144,13 +277,21 @@ class _OverviewViewState extends State<OverviewView> {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(width: leftW, child: _PendingActionsCard(guidesCount: pendingGuidesCount, tripsCount: pendingTripsCount)),
+                    SizedBox(
+                      width: leftW,
+                      child: _PendingActionsCard(
+                        guidesCount: pendingGuidesCount,
+                        tripsCount: pendingTripsCount,
+                      ),
+                    ),
                     const SizedBox(width: 16),
                     SizedBox(
                       width: rightW,
                       child: _GuideApplicationsCard(
                         guides: _guides,
-                        onUpdateStatus: _updateGuideStatus,
+                        busy: _busy,
+                        onApprove: _decide,
+                        onToggleActive: _toggleActive,
                       ),
                     ),
                   ],
@@ -221,23 +362,27 @@ class _StatCard extends StatelessWidget {
                 style: badgeDanger
                     ? AppTextStyles.statPercentDanger
                     : (badgeIsText
-                        ? AppTextStyles.sectionSubtitle.copyWith(
-                            color: AppColors.positiveGreen,
-                          )
-                        : AppTextStyles.statPercent),
+                          ? AppTextStyles.sectionSubtitle.copyWith(
+                              color: AppColors.positiveGreen,
+                            )
+                          : AppTextStyles.statPercent),
               ),
             ],
           ),
           const SizedBox(height: 14),
-          Text(value,
-              style: AppTextStyles.statValue,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1),
+          Text(
+            value,
+            style: AppTextStyles.statValue,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
           const SizedBox(height: 4),
-          Text(label,
-              style: AppTextStyles.statLabel,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1),
+          Text(
+            label,
+            style: AppTextStyles.statLabel,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
         ],
       ),
     );
@@ -248,8 +393,11 @@ class _StatCard extends StatelessWidget {
 class _PendingActionsCard extends StatelessWidget {
   final int guidesCount;
   final int tripsCount;
-  
-  const _PendingActionsCard({required this.guidesCount, required this.tripsCount});
+
+  const _PendingActionsCard({
+    required this.guidesCount,
+    required this.tripsCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -334,10 +482,17 @@ class _PendingActionItem extends StatelessWidget {
 
 // ── Guide Applications Card (mini table) ─────────────────────
 class _GuideApplicationsCard extends StatelessWidget {
-  final List<MockGuide> guides;
-  final void Function(MockGuide, String) onUpdateStatus;
+  final List<AdminGuideRow> guides;
+  final Set<String> busy;
+  final Future<void> Function(AdminGuideRow, bool) onApprove;
+  final Future<void> Function(AdminGuideRow) onToggleActive;
 
-  const _GuideApplicationsCard({required this.guides, required this.onUpdateStatus});
+  const _GuideApplicationsCard({
+    required this.guides,
+    required this.busy,
+    required this.onApprove,
+    required this.onToggleActive,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -360,27 +515,49 @@ class _GuideApplicationsCard extends StatelessWidget {
                 children: [
                   Text('Guide Applications', style: AppTextStyles.sectionTitle),
                   const SizedBox(height: 2),
-                  Text('Review documents, guide activity and uploaded content', style: AppTextStyles.sectionSubtitle),
+                  Text(
+                    'Review documents, guide activity and uploaded content',
+                    style: AppTextStyles.sectionSubtitle,
+                  ),
                 ],
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(color: AppColors.statusPendingBg, borderRadius: BorderRadius.circular(20)),
-                child: Text('${pendingGuides.length} pending', style: AppTextStyles.tableCellMuted.copyWith(color: AppColors.statusPendingText, fontWeight: FontWeight.w600)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.statusPendingBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${pendingGuides.length} pending',
+                  style: AppTextStyles.tableCellMuted.copyWith(
+                    color: AppColors.statusPendingText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           _MiniGuideTableHeader(),
           const Divider(color: AppColors.divider, height: 1),
-          ...guides.map((g) => _MiniGuideRow(
-            guide: g,
-            onApprove: () => onUpdateStatus(g, 'approved'),
-            onReject: () => onUpdateStatus(g, 'suspended'),
-            onSuspend: () => onUpdateStatus(g, 'suspended'),
-            onActivate: () => onUpdateStatus(g, 'approved'),
-          )),
+          ...guides.map(
+            (g) => _MiniGuideRow(
+              row: g,
+              busy: busy.contains(g.guideId),
+              onApprove: () => onApprove(g, true),
+              onReject: () => onApprove(g, false),
+              onToggleActive: () => onToggleActive(g),
+            ),
+          ),
+          if (guides.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: Text('No pending applications.')),
+            ),
         ],
       ),
     );
@@ -425,18 +602,18 @@ class _MiniGuideTableHeader extends StatelessWidget {
 }
 
 class _MiniGuideRow extends StatelessWidget {
-  final MockGuide guide;
+  final AdminGuideRow row;
+  final bool busy;
   final VoidCallback onApprove;
   final VoidCallback onReject;
-  final VoidCallback onSuspend;
-  final VoidCallback onActivate;
-  
+  final VoidCallback onToggleActive;
+
   const _MiniGuideRow({
-    required this.guide,
+    required this.row,
+    required this.busy,
     required this.onApprove,
     required this.onReject,
-    required this.onSuspend,
-    required this.onActivate,
+    required this.onToggleActive,
   });
 
   @override
@@ -453,14 +630,18 @@ class _MiniGuideRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(guide.name,
-                        style: AppTextStyles.tableCell,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
-                    Text(guide.email,
-                        style: AppTextStyles.tableCellMuted,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
+                    Text(
+                      row.displayName,
+                      style: AppTextStyles.tableCell,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      row.email,
+                      style: AppTextStyles.tableCellMuted,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ],
                 ),
               ),
@@ -469,10 +650,12 @@ class _MiniGuideRow extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(guide.document,
-                          style: AppTextStyles.tableCellMuted,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1),
+                      child: Text(
+                        _docLabel(row),
+                        style: AppTextStyles.tableCellMuted,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Text('View file', style: AppTextStyles.linkText),
@@ -481,24 +664,33 @@ class _MiniGuideRow extends StatelessWidget {
               ),
               Expanded(
                 flex: 2,
-                child: Text(guide.city,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  row.city.isNotEmpty ? row.city : '—',
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 2,
-                child: _buildStatusChip(guide.status),
+                child: _buildStatusChip(
+                  row.userActive ? row.status : 'suspended',
+                ),
               ),
-              Expanded(
-                flex: 3,
-                child: _buildActions(guide, context),
-              ),
+              Expanded(flex: 3, child: _buildActions(row, context)),
             ],
           ),
         ),
       ],
     );
+  }
+
+  static String _docLabel(AdminGuideRow row) {
+    final hasId = row.verification.idDocumentUrl.isNotEmpty;
+    final hasLicense = row.verification.licenseDocumentUrl.isNotEmpty;
+    if (hasId && hasLicense) return '2 files';
+    if (hasId || hasLicense) return '1 file';
+    return 'No files';
   }
 
   Widget _buildStatusChip(String status) {
@@ -535,8 +727,20 @@ class _MiniGuideRow extends StatelessWidget {
     );
   }
 
-  Widget _buildActions(MockGuide guide, BuildContext context) {
-    if (guide.status == 'pending') {
+  Widget _buildActions(AdminGuideRow row, BuildContext context) {
+    if (busy) {
+      return const Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ],
+      );
+    }
+    if (row.status == 'pending') {
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -551,13 +755,14 @@ class _MiniGuideRow extends StatelessWidget {
           ),
         ],
       );
-    } else if (guide.status == 'suspended') {
+    }
+    if (row.userActive) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           InkWell(
-            onTap: onActivate,
-            child: const _SmallBtn(label: 'Activate', danger: false),
+            onTap: onToggleActive,
+            child: const _SmallBtn(label: 'Suspend', danger: true),
           ),
         ],
       );
@@ -566,8 +771,8 @@ class _MiniGuideRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         InkWell(
-          onTap: onSuspend,
-          child: const _SmallBtn(label: 'Suspend', danger: true),
+          onTap: onToggleActive,
+          child: const _SmallBtn(label: 'Activate', danger: false),
         ),
       ],
     );

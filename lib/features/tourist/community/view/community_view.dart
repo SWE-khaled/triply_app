@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
@@ -26,49 +27,88 @@ class CommunityScreen extends StatefulWidget {
 
 class _CommunityScreenState extends State<CommunityScreen> {
   final ImagePicker _picker = ImagePicker();
+  late final CommunityCubit _cubit;
+  bool _loadRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Owned here so the Firebase uid is bound once; provided below for
+    // BlocBuilder rebuilds. Server feed is primary
+    // ([CommunityCubit.useRemote]); mocks render meanwhile with an explicit
+    // notice when the refresh fails.
+    _cubit = CommunityCubit(uid: FirebaseAuth.instance.currentUser?.uid);
+    if (CommunityCubit.useRemote) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _refreshFeed());
+    }
+  }
+
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
+
+  /// Best-effort server refresh, guarded so rebuilds never duplicate it.
+  /// On failure the mock baseline stays with an explicit notice (never
+  /// presented as live data).
+  Future<void> _refreshFeed() async {
+    if (!mounted || _loadRequested) return;
+    _loadRequested = true;
+    // Captured before the async gap (avoids BuildContext across awaits).
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final ok = await _cubit.refreshRemote();
+      if (!ok && mounted) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text("Couldn't refresh community — showing samples."),
+          ),
+        );
+      }
+    } finally {
+      _loadRequested = false;
+    }
+  }
 
   Future<void> _openComposer(BuildContext context) async {
+    // Captured before the async gap (avoids BuildContext across awaits).
+    final cubit = context.read<CommunityCubit>();
+    final messenger = ScaffoldMessenger.of(context);
     final result = await Navigator.of(context).push<ComposerResult>(
       MaterialPageRoute(builder: (_) => const NewPostScreen()),
     );
     if (result == null) return;
     if (!mounted) return;
 
-    final cubit = context.read<CommunityCubit>();
     if (result.isStory) {
       if (result.image != null) {
         cubit.addMyStory(result.image!.path);
       }
-    } else {
-      cubit.addPost(
-        imagePaths: result.images.map((e) => e.path).toList(),
-        text: result.text,
-        location: result.location,
-      );
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Posted!',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Posted!',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
         ),
-      ),
-    );
-  }
-
-  /// Quick "+" action on the story bubble itself: opens the gallery directly
-  /// and publishes a story right away, without going through the composer.
-  Future<void> _pickMyStoryImage(BuildContext context) async {
-    try {
-      final XFile? picked = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
       );
-      if (picked == null) return;
+      return;
+    }
+    // Text/location posts persist on the backend; photo posts are refused
+    // (no upload backend in this phase) instead of faking success.
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      await cubit.createPost(
+        text: result.text,
+        imagePaths: result.images.map((e) => e.path).toList(),
+        location: result.location,
+        authorName: user?.displayName ?? 'Traveler',
+        authorAvatarUrl: user?.photoURL ?? '',
+      );
       if (!mounted) return;
-      context.read<CommunityCubit>().addMyStory(picked.path);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(
           content: Text(
             'Posted!',
@@ -78,7 +118,45 @@ class _CommunityScreenState extends State<CommunityScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(SnackBar(content: Text(_postError(e))));
+    }
+  }
+
+  /// Repository errors already carry user-facing messages; anything else
+  /// becomes a generic failure. Never logs media paths or user data.
+  String _postError(Object e) {
+    final text = e.toString();
+    const prefix = 'Exception: ';
+    final msg = text.startsWith(prefix) ? text.substring(prefix.length) : text;
+    return msg.isEmpty ? 'Could not post. Please try again.' : msg;
+  }
+
+  /// Quick "+" action on the story bubble itself: opens the gallery directly
+  /// and publishes a story right away, without going through the composer.
+  Future<void> _pickMyStoryImage(BuildContext context) async {
+    // Captured before the async gap (avoids BuildContext across awaits).
+    final cubit = context.read<CommunityCubit>();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final XFile? picked = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+      if (!mounted) return;
+      cubit.addMyStory(picked.path);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Posted!',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
         SnackBar(content: Text("Can't open the gallery: $e")),
       );
     }
@@ -95,23 +173,21 @@ class _CommunityScreenState extends State<CommunityScreen> {
             fullscreenDialog: true,
             builder: (_) => BlocProvider.value(
               value: cubit,
-              child: StoryViewerScreen(
-                stories: userStories,
-              ),
+              child: StoryViewerScreen(stories: userStories),
             ),
           ),
         )
         .then((_) {
-      // Refresh rings after possible deletions inside the viewer.
-      // (Cubit emits rebuild this screen automatically; kept for parity.)
-      if (mounted) setState(() {});
-    });
+          // Refresh rings after possible deletions inside the viewer.
+          // (Cubit emits rebuild this screen automatically; kept for parity.)
+          if (mounted) setState(() {});
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => CommunityCubit(),
+    return BlocProvider.value(
+      value: _cubit,
       child: BlocBuilder<CommunityCubit, CommunityState>(
         builder: (context, state) {
           final cubit = context.read<CommunityCubit>();
@@ -122,7 +198,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
             extendBody: true, // content extends under the glass nav
             backgroundColor: Colors.white,
             body: SafeArea(
-              bottom: false, // <-- let the content reach the bottom of the screen
+              bottom:
+                  false, // <-- let the content reach the bottom of the screen
               child: Column(
                 children: [
                   Padding(
@@ -133,7 +210,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         const Text(
                           'Community',
                           style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.w700),
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         CircleIconButton(
                           icon: Icons.add,
@@ -148,7 +227,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   const SizedBox(height: 6),
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.only(bottom: 100), // <-- space for nav
+                      padding: const EdgeInsets.only(
+                        bottom: 100,
+                      ), // <-- space for nav
                       children: [
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -160,9 +241,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                 MyStoryBubble(
                                   hasStory: hasMyStory,
                                   onAddTap: () => _pickMyStoryImage(context),
-                                  onViewTap: () =>
-                                      _openStoryViewerForUser(
-                                          context, currentUserId),
+                                  onViewTap: () => _openStoryViewerForUser(
+                                    context,
+                                    cubit.uid,
+                                  ),
                                 ),
                                 for (var i = 0; i < rings.length; i++) ...[
                                   const SizedBox(width: 14),
@@ -174,7 +256,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                       AppColors.accentOrange,
                                     ][i % 3],
                                     onTap: () => _openStoryViewerForUser(
-                                        context, rings[i].userId),
+                                      context,
+                                      rings[i].userId,
+                                    ),
                                   ),
                                 ],
                               ],
@@ -188,15 +272,32 @@ class _CommunityScreenState extends State<CommunityScreen> {
                             child: PostCard(
                               post: post,
                               onLike: () {
-                                cubit.toggleLike(post);
+                                cubit.toggleLikePersistent(post).then((ok) {
+                                  if (!ok && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Couldn't update like. Please try again.",
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                });
                               },
-                              onDelete: () {
-                                final deleted = cubit.deletePost(post);
-                                if (!deleted && context.mounted) {
+                              onDelete: () async {
+                                try {
+                                  await cubit.deletePostRemote(post);
+                                } catch (e) {
+                                  if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       backgroundColor: AppColors.primaryTeal,
-                                      content: Text("You can't delete others post!",style: TextStyle(color: Colors.white),),
+                                      content: Text(
+                                        _postError(e),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   );
                                 }

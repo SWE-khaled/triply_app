@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/data/mock/tourist/mock_places.dart';
+import 'package:triply/core/firebase/firestore_result.dart';
+import 'package:triply/data/firestore/repositories/places_repository.dart';
 import '../../map/model/place.dart';
 import '../model/search_filter.dart';
 import '../../../../core/data/mock/tourist/mock_search.dart';
@@ -7,12 +9,18 @@ import 'search_state.dart';
 
 /// Searches the existing Map places list (single source of truth).
 /// Popular searches / destinations reference Map places by id.
+///
+/// Firestore bridge: [searchRemote] queries `places/nameLower` first and
+/// falls back to the local substring filter on any failure/empty result.
+/// No state shape changes — Views keep reading [results].
 class SearchCubit extends Cubit<SearchState> {
+  final PlacesRepository _repository;
   final List<Place> allPlaces =
       mockPlaces.map(Place.fromJson).toList();
 
-  SearchCubit()
-      : super(SearchState(recentSearches: List.of(mockRecentSearches)));
+  SearchCubit([PlacesRepository? repository])
+      : _repository = repository ?? PlacesRepository(),
+        super(SearchState(recentSearches: List.of(mockRecentSearches)));
 
   static const _popularSearchIds = [
     'giza_pyramids',
@@ -100,5 +108,16 @@ class SearchCubit extends Cubit<SearchState> {
 
   void clearRecents() {
     emit(state.copyWith(recentSearches: []));
+  }
+
+  /// Remote-first search helper for future View opt-in. Returns Firestore
+  /// matches when available, otherwise the current local [results].
+  Future<List<Place>> searchRemote(String value) async {
+    submit(value);
+    final result = await _repository.search(value);
+    if (result is FirestoreOk<List<Place>> && result.data.isNotEmpty) {
+      return result.data;
+    }
+    return results;
   }
 }

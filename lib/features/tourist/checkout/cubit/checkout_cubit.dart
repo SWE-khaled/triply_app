@@ -15,8 +15,8 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   final PaymobService _service;
 
   CheckoutCubit({required this.summary, PaymobService? service})
-      : _service = service ?? PaymobService(),
-        super(const CheckoutState());
+    : _service = service ?? PaymobService(),
+      super(const CheckoutState());
 
   // ----- Card form state (kept in memory for masked display only) -----
   String cardNumber = '';
@@ -38,6 +38,11 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   bool get isPaying => state.isPaying;
   String? get payError => state.payError;
   String? get paymentToken => state.paymentToken;
+
+  /// Paymob order id from the last successful token fetch (plain field,
+  /// like the card form: no rebuilds). Callers persist it on the pending
+  /// payment record so server verification can look the order up.
+  int? lastOrderId;
 
   // ================= Validation (pure, testable) =================
 
@@ -136,8 +141,9 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   /// Masked card for the summary screen, e.g. "Visa •••• 3456".
   String get maskedCard {
     final digits = cardNumber.replaceAll(RegExp(r'\D'), '');
-    final last4 =
-        digits.length >= 4 ? digits.substring(digits.length - 4) : '••••';
+    final last4 = digits.length >= 4
+        ? digits.substring(digits.length - 4)
+        : '••••';
     return '$_brand •••• $last4';
   }
 
@@ -160,16 +166,19 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
   /// Runs the Paymob 3-step workflow. Returns the payment token, or null
   /// when it failed (see [payError]). Raw card data is never transmitted.
+  /// On success [lastOrderId] holds the Paymob order id for the pending
+  /// reconciliation record.
   Future<String?> startPayment() async {
     if (state.isPaying) return null;
     emit(state.copyWith(isPaying: true, payError: null));
     try {
-      final token = await _service.createPaymentToken(
+      final result = await _service.createPaymentToken(
         summary: summary,
         billing: _billing,
       );
-      emit(state.copyWith(paymentToken: token));
-      return token;
+      lastOrderId = result.orderId;
+      emit(state.copyWith(paymentToken: result.paymentToken));
+      return result.paymentToken;
     } on PaymobException catch (e) {
       emit(state.copyWith(payError: e.message));
       return null;

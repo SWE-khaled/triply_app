@@ -10,7 +10,8 @@ import 'admin_create_account_view.dart';
 
 /// Admin Login — same visual design as the Tourist Login
 /// (AuthHeader / AuthTextField / AuthButton).
-/// Frontend-only rule: the identifier must contain 'triplykl'.
+/// Server-backed rule: Firebase sign-in + provisioned admin check
+/// ([AdminAccessService]); non-admins are signed back out.
 class AdminLoginView extends StatefulWidget {
   const AdminLoginView({super.key});
 
@@ -49,9 +50,9 @@ class _AdminLoginViewState extends State<AdminLoginView> {
         (_) => false,
       );
     } else if (cubit.state.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(cubit.state.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(cubit.state.errorMessage!)));
     }
   }
 
@@ -101,13 +102,13 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                           const SizedBox(height: 8),
                           AuthTextField(
                             controller: _emailController,
-                            hintText: 'khaledtriplykl@gmail.com',
+                            hintText: 'admin@triply.app',
                             icon: Icons.mail_outline,
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) =>
                                 (value == null || !value.contains('@'))
-                                    ? 'Enter a valid email'
-                                    : null,
+                                ? 'Enter a valid email'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           const Text(
@@ -122,14 +123,13 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                             isPassword: true,
                             validator: (value) =>
                                 (value == null || value.length < 6)
-                                    ? 'Minimum 6 characters'
-                                    : null,
+                                ? 'Minimum 6 characters'
+                                : null,
                           ),
                           const SizedBox(height: 24),
                           AuthButton(
                             label: 'Log In',
-                            isLoading:
-                                state.status == AdminAuthStatus.loading,
+                            isLoading: state.status == AdminAuthStatus.loading,
                             onPressed: () => _handleLogin(cubit),
                           ),
                           const SizedBox(height: 24),

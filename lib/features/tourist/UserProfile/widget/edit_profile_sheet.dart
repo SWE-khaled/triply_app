@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../data/firestore/datasources/users_datasource.dart';
 import '../../../common/AuthTourist/providers/auth_provider.dart';
 
 class EditProfileSheet extends StatefulWidget {
@@ -104,6 +105,15 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
       await user.updateDisplayName(newName);
       if (newPhotoUrl != null) await user.updatePhotoURL(newPhotoUrl);
+      // Best-effort `users/` sync so the profile doc never goes stale
+      // behind Auth (phone/role/isActive untouched — rules-owned).
+      try {
+        await UsersDatasource().updateFields(user.uid, {
+          'fullName': newName,
+          // ignore: use_null_aware_elements
+          if (newPhotoUrl != null) 'avatarUrl': newPhotoUrl,
+        });
+      } catch (_) {}
       await auth.refreshUser();
 
       if (mounted) Navigator.pop(context, true);

@@ -1,0 +1,4111 @@
+[
+  {
+    "id": "giza_pyramids",
+    "name": "Giza Pyramids & Sphinx",
+    "city": "Giza",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Al Haram, Giza Governorate, Egypt",
+    "latitude": 29.9792,
+    "longitude": 31.1342,
+    "rating": 4.9,
+    "reviewsCount": 12847,
+    "shortDescription": "The last surviving wonder of the ancient world...",
+    "about": "The Great Pyramid of Khufu, Khafre, and Menkaure alongside the Great Sphinx represent the pinnacle of ancient Egyptian architectural mastery.",
+    "highlights": [
+      "Great Pyramid of Khufu",
+      "The Great Sphinx",
+      "Solar Boat Museum",
+      "Sound & Light Show"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=1200&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=1200&auto=format&fit=crop"
+    ],
+    "nameLower": "giza pyramids & sphinx",
+    "cityLower": "giza"
+  },
+  {
+    "id": "luxor_temple",
+    "name": "Luxor Temple",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "East Bank, Luxor, Egypt",
+    "latitude": 25.6995,
+    "longitude": 32.6391,
+    "rating": 4.9,
+    "reviewsCount": 8214,
+    "shortDescription": "Ancient Egypt monument with monumental columns and statues...",
+    "about": "Large Ancient Egyptian temple complex located on the east bank of the Nile River in the city today known as Luxor.",
+    "highlights": [
+      "Avenue of Sphinxes",
+      "Hypostyle Hall",
+      "Night Illumination"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "luxor temple",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "karnak_temple",
+    "name": "Karnak Temple Complex",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Karnak, Luxor, Egypt",
+    "latitude": 25.7188,
+    "longitude": 32.6573,
+    "rating": 4.9,
+    "reviewsCount": 9150,
+    "shortDescription": "Vast open-air museum and the largest religious complex ever built...",
+    "about": "A vast complex of sanctuaries, kiosks, pylons, and obelisks dedicated to the Theban triad and the glory of the Pharaohs.",
+    "highlights": [
+      "Great Hypostyle Hall",
+      "Obelisk of Hatshepsut",
+      "Sacred Lake"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "karnak temple complex",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "valley_of_the_kings",
+    "name": "Valley of the Kings",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "West Bank, Luxor, Egypt",
+    "latitude": 25.7402,
+    "longitude": 32.6014,
+    "rating": 4.8,
+    "reviewsCount": 7640,
+    "shortDescription": "Ancient burial ground of New Kingdom Pharaohs...",
+    "about": "A valley where, for a period of nearly 500 years, rock-cut tombs were excavated for the pharaohs and powerful nobles including Tutankhamun.",
+    "highlights": [
+      "Tomb of Tutankhamun",
+      "Tomb of Seti I",
+      "Vibrant Wall Paintings"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "valley of the kings",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "grand_egyptian_museum",
+    "name": "Grand Egyptian Museum (GEM)",
+    "city": "Giza",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "museum",
+    "address": "Pyramids Complex Road, Giza, Egypt",
+    "latitude": 29.995,
+    "longitude": 31.1186,
+    "rating": 4.9,
+    "reviewsCount": 9450,
+    "shortDescription": "The largest archaeological museum complex in the world...",
+    "about": "Houses tens of thousands of ancient artifacts, including the complete King Tutankhamun collection in a state-of-the-art facility.",
+    "highlights": [
+      "Hanging Obelisk",
+      "Statue of Ramses II",
+      "Tutankhamun Galleries"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "grand egyptian museum (gem)",
+    "cityLower": "giza"
+  },
+  {
+    "id": "egyptian_museum_tahrir",
+    "name": "The Egyptian Museum in Tahrir",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "museum",
+    "address": "Tahrir Square, Downtown Cairo, Egypt",
+    "latitude": 30.0478,
+    "longitude": 31.2336,
+    "rating": 4.7,
+    "reviewsCount": 10500,
+    "shortDescription": "The historic home of Egyptian antiquities in central Cairo...",
+    "about": "Opened in 1902, this iconic pink palace stores over 120,000 items of Pharaonic antiquity.",
+    "highlights": [
+      "Royal Mummy Collection",
+      "Ancient Sarcophagi",
+      "Papyrus Scrolls"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "the egyptian museum in tahrir",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "abu_simbel",
+    "name": "Abu Simbel Temples",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Abu Simbel, Aswan Governorate, Egypt",
+    "latitude": 22.3372,
+    "longitude": 31.6258,
+    "rating": 4.9,
+    "reviewsCount": 6430,
+    "shortDescription": "Colossal rock temples of Ramses II on the shores of Lake Nasser...",
+    "about": "Two massive rock-cut temples carved into the mountainside during the reign of Pharaoh Ramesses II in the 13th century BC.",
+    "highlights": [
+      "Great Temple of Ramses II",
+      "Temple of Nefertari",
+      "Sun Alignment Phenomenon"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "abu simbel temples",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "philae_temple",
+    "name": "Philae Temple Complex",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Agilkia Island, Aswan, Egypt",
+    "latitude": 24.0256,
+    "longitude": 32.8843,
+    "rating": 4.8,
+    "reviewsCount": 5120,
+    "shortDescription": "Island temple dedicated to the goddess Isis...",
+    "about": "Rescued from the rising waters of the Nile by UNESCO, this island temple complex is revered for its Ptolemaic architecture.",
+    "highlights": [
+      "Temple of Isis",
+      "Kiosk of Trajan",
+      "Boat Ride Access"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "philae temple complex",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "citadel_saladin",
+    "name": "Citadel of Saladin",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Al Abageyah, El-Khalifa, Cairo, Egypt",
+    "latitude": 30.0299,
+    "longitude": 31.2611,
+    "rating": 4.8,
+    "reviewsCount": 7890,
+    "shortDescription": "Medieval Islamic fortification with sweeping Cairo views...",
+    "about": "Built by Saladin in the 12th century, this hilltop fortress houses majestic mosques, museums, and panoramic city lookouts.",
+    "highlights": [
+      "Mosque of Muhammad Ali",
+      "Gawhara Palace",
+      "Cairo Skyline View"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "citadel of saladin",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "citadel_qaitbay",
+    "name": "Citadel of Qaitbay",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Pharos Island, Alexandria, Egypt",
+    "latitude": 31.214,
+    "longitude": 29.8856,
+    "rating": 4.6,
+    "reviewsCount": 4560,
+    "shortDescription": "15th-century seafront fortress on Pharos Island...",
+    "about": "Constructed on the exact site of the ancient Lighthouse of Alexandria using its salvaged stones to protect the Mediterranean coast.",
+    "highlights": [
+      "Mediterranean Sea Views",
+      "Ancient Stone Towers",
+      "Seafront Promenade"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "citadel of qaitbay",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "catacombs_kom_el_shoqafa",
+    "name": "Catacombs of Kom El Shoqafa",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Karmouz, Alexandria, Egypt",
+    "latitude": 31.1786,
+    "longitude": 29.8931,
+    "rating": 4.5,
+    "reviewsCount": 3200,
+    "shortDescription": "Subterranean necropolis blending Roman, Greek, and Pharaonic art...",
+    "about": "One of the Seven Wonders of the Middle Ages, consisting of three tiers of tombs and chambers cut into solid rock.",
+    "highlights": [
+      "Rotunda Shaft",
+      "Triclinium Banquet Hall",
+      "Hybrid Sculptures"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "catacombs of kom el shoqafa",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "nile_felucca",
+    "name": "Nile Felucca Ride",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Nile River Corniche, Aswan, Egypt",
+    "latitude": 24.0889,
+    "longitude": 32.8998,
+    "rating": 4.8,
+    "reviewsCount": 2310,
+    "shortDescription": "Sunset felucca sail on the Nile with Nubian views...",
+    "about": "Experience peaceful sailing on a traditional wooden felucca boat around Elephantine Island and Botanical Gardens.",
+    "highlights": [
+      "Sunset Sail",
+      "Nubian Village View",
+      "Tea on Board"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "nile felucca ride",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "luxor_hot_air_balloon",
+    "name": "Luxor Sunrise Hot Air Balloon",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "West Bank Takeoff Field, Luxor, Egypt",
+    "latitude": 25.7285,
+    "longitude": 32.615,
+    "rating": 4.9,
+    "reviewsCount": 5800,
+    "shortDescription": "Fly over open-air temples and the Nile River at dawn...",
+    "about": "Soar above Luxor’s West Bank monuments, lush green farmland, and the Nile River as the sun rises over the ancient city.",
+    "highlights": [
+      "Sunrise Aerial Views",
+      "Valley of Kings Overhead",
+      "Flight Certificate"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "luxor sunrise hot air balloon",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "hurghada_diving",
+    "name": "Hurghada Red Sea Reef Diving",
+    "city": "Hurghada",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Red Sea Coast, Hurghada, Egypt",
+    "latitude": 27.2579,
+    "longitude": 33.8116,
+    "rating": 4.7,
+    "reviewsCount": 1893,
+    "shortDescription": "World-class scuba diving along vibrant coral reefs...",
+    "about": "Guided diving tours into the clear waters of the Red Sea, home to sea turtles, dolphins, and diverse marine life.",
+    "highlights": [
+      "Giftun Island Drop-off",
+      "Coral Reef Exploration",
+      "Beginner Intro Dives"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "hurghada red sea reef diving",
+    "cityLower": "hurghada"
+  },
+  {
+    "id": "blue_hole_dahab",
+    "name": "Dahab Blue Hole Diving & Snorkeling",
+    "city": "Dahab",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Blue Hole Road, Dahab, South Sinai, Egypt",
+    "latitude": 28.5722,
+    "longitude": 34.5367,
+    "rating": 4.8,
+    "reviewsCount": 3410,
+    "shortDescription": "World-famous submarine sinkhole for diving and freediving...",
+    "about": "A 100-meter-deep marine sinkhole renowned globally for its wall diving, freediving community, and clear reef waters.",
+    "highlights": [
+      "The Saddle Coral Reef",
+      "Freediving Spot",
+      "Bedouin Seaside Cafes"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "dahab blue hole diving & snorkeling",
+    "cityLower": "dahab"
+  },
+  {
+    "id": "quad_bike_giza",
+    "name": "Giza Desert Quad Biking Safari",
+    "city": "Giza",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Desert Dunes, Pyramids Area, Giza, Egypt",
+    "latitude": 29.965,
+    "longitude": 31.12,
+    "rating": 4.6,
+    "reviewsCount": 2980,
+    "shortDescription": "Thrill-seeking ATV quad bike tour across desert dunes...",
+    "about": "Ride through the golden sand dunes surrounding the Pyramids of Giza for an adrenaline-pumping panoramic adventure.",
+    "highlights": [
+      "ATV Dunes Ride",
+      "Panoramic Pyramid Views",
+      "Sunset Photo Stops"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "giza desert quad biking safari",
+    "cityLower": "giza"
+  },
+  {
+    "id": "mount_sinai_trek",
+    "name": "Mount Sinai Sunrise Trek",
+    "city": "Saint Catherine",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "St. Catherine Reserve, South Sinai, Egypt",
+    "latitude": 28.5394,
+    "longitude": 33.9753,
+    "rating": 4.8,
+    "reviewsCount": 2100,
+    "shortDescription": "Night mountain hike culminating in a spiritual sunrise...",
+    "about": "Trek up the sacred biblical peak of Mount Sinai at night to catch breathtaking mountain vistas at dawn.",
+    "highlights": [
+      "Camel Path Trail",
+      "Steps of Repentance",
+      "Summit Sunrise View"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "mount sinai sunrise trek",
+    "cityLower": "saint catherine"
+  },
+  {
+    "id": "khan_el_khalili",
+    "name": "Khan el-Khalili Bazaar Tour",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "bazaar",
+    "address": "El-Gamaleya, Islamic Cairo, Egypt",
+    "latitude": 30.0478,
+    "longitude": 31.2622,
+    "rating": 4.7,
+    "reviewsCount": 11200,
+    "shortDescription": "Explore historic medieval shopping alleys and artisan stalls...",
+    "about": "A bustling historic bazaar in Islamic Cairo packed with brassware, leather goods, antiques, and vibrant spice shops.",
+    "highlights": [
+      "El Fishawy Heritage Cafe",
+      "Handcrafted Lanterns",
+      "Spice Markets"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "khan el-khalili bazaar tour",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "siwa_oasis",
+    "name": "Siwa Oasis & Salt Lakes",
+    "city": "Siwa",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Western Desert, Siwa, Egypt",
+    "latitude": 29.2032,
+    "longitude": 25.5195,
+    "rating": 4.9,
+    "reviewsCount": 1204,
+    "shortDescription": "Remote desert oasis with high-salinity blue lakes...",
+    "about": "A magical oasis in the Western Desert famous for floating salt lakes, natural hot springs, date palm groves, and olive trees.",
+    "highlights": [
+      "Floating Salt Pools",
+      "Cleopatra Spring",
+      "Shali Fortress Ruins"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "siwa oasis & salt lakes",
+    "cityLower": "siwa"
+  },
+  {
+    "id": "white_desert",
+    "name": "White Desert National Park",
+    "city": "Farafra",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Farafra Oasis, New Valley, Egypt",
+    "latitude": 27.3828,
+    "longitude": 28.1882,
+    "rating": 4.9,
+    "reviewsCount": 980,
+    "shortDescription": "Surreal chalk rock formations forming a snow-like desert...",
+    "about": "Famous for its wind-sculpted mushroom-shaped chalk rock formations that glow white under the moonlight.",
+    "highlights": [
+      "Mushroom Formations",
+      "Stargazing Camping",
+      "Crystal Mountain"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "white desert national park",
+    "cityLower": "farafra"
+  },
+  {
+    "id": "ras_mohammed",
+    "name": "Ras Mohammed National Park",
+    "city": "Sharm El Sheikh",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Sinai Peninsula, Sharm El Sheikh, Egypt",
+    "latitude": 27.7391,
+    "longitude": 34.2422,
+    "rating": 4.8,
+    "reviewsCount": 3120,
+    "shortDescription": "Protected marine sanctuary at the tip of Sinai Peninsula...",
+    "about": "Egypt’s first national park features mangrove forests, earthquake fissures, and world-renowned underwater drop-off reefs.",
+    "highlights": [
+      "Magic Lake",
+      "Yolanda Reef",
+      "Mangrove Forest Channel"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "ras mohammed national park",
+    "cityLower": "sharm el sheikh"
+  },
+  {
+    "id": "wadi_al_hitan",
+    "name": "Wadi Al-Hitan (Valley of Whales)",
+    "city": "Fayoum",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Fayoum Governorate, Egypt",
+    "latitude": 29.2708,
+    "longitude": 30.0438,
+    "rating": 4.8,
+    "reviewsCount": 890,
+    "shortDescription": "UNESCO World Heritage site with prehistoric whale fossils...",
+    "about": "A desert valley containing invaluable fossil remains of the earliest, now extinct, suborder of whales in a dramatic desert landscape.",
+    "highlights": [
+      "Fossilized Whale Skeletons",
+      "Climate Change Museum",
+      "Sand Dunes"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wadi al-hitan (valley of whales)",
+    "cityLower": "fayoum"
+  },
+  {
+    "id": "wadi_el_rayan",
+    "name": "Wadi El Rayan Waterfalls & Lakes",
+    "city": "Fayoum",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Wadi El Rayan Protectorate, Fayoum, Egypt",
+    "latitude": 29.1481,
+    "longitude": 30.4348,
+    "rating": 4.6,
+    "reviewsCount": 2450,
+    "shortDescription": "Desert oasis featuring Egypt’s only natural waterfalls...",
+    "about": "A protected natural valley containing two connected desert lakes and cascading waterfalls surrounded by sand dunes.",
+    "highlights": [
+      "Desert Waterfalls",
+      "Sandboarding Mudawara Mountain",
+      "Rowing Boats"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wadi el rayan waterfalls & lakes",
+    "cityLower": "fayoum"
+  },
+  {
+    "id": "giftun_island",
+    "name": "Giftun Island (Mahmya Beach)",
+    "city": "Hurghada",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Red Sea Marine Park, Hurghada, Egypt",
+    "latitude": 27.23,
+    "longitude": 33.95,
+    "rating": 4.7,
+    "reviewsCount": 4100,
+    "shortDescription": "Tropical-like sandy island surrounded by turquoise waters...",
+    "about": "A pristine national park island in the Red Sea offering white sandy beaches, crystal-clear sea, and shallow reefs.",
+    "highlights": [
+      "White Sand Beaches",
+      "Turquoise Waters",
+      "Seaside Lounging"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "giftun island (mahmya beach)",
+    "cityLower": "hurghada"
+  },
+  {
+    "id": "koshary_abou_tarek",
+    "name": "Abou Tarek Koshary",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Champollion Rd, Downtown Cairo, Egypt",
+    "latitude": 30.0444,
+    "longitude": 31.2357,
+    "rating": 4.6,
+    "reviewsCount": 5420,
+    "shortDescription": "The undisputed world-famous king of Koshary in Cairo...",
+    "about": "An iconic multi-story restaurant dedicated entirely to serving Egypt’s traditional national dish of rice, lentils, pasta, and spicy tomato sauce.",
+    "highlights": [
+      "Signature Egyptian Koshary",
+      "Crispy Onions Topping",
+      "Downtown Vibe"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "abou tarek koshary",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "sobhy_kaber",
+    "name": "Sobhy Kaber Restaurant",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Shubra, Cairo Governorate, Egypt",
+    "latitude": 30.0881,
+    "longitude": 31.2464,
+    "rating": 4.7,
+    "reviewsCount": 8900,
+    "shortDescription": "Legendary spot for authentic Egyptian grilled meats and stews...",
+    "about": "Famous across Egypt for its charcoal grills, Kabab, Kofta, and traditional clay pots (Tagen) served with fresh hot baladi bread.",
+    "highlights": [
+      "Molokhia Pouring Show",
+      "Charcoal Grilled Kofta",
+      "Clay Pot Tagines"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "sobhy kaber restaurant",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "naguib_mahfouz_cafe",
+    "name": "Naguib Mahfouz Cafe",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Khan el-Khalili Alley, Cairo, Egypt",
+    "latitude": 30.0475,
+    "longitude": 31.2618,
+    "rating": 4.5,
+    "reviewsCount": 1850,
+    "shortDescription": "Atmospheric dining inside the heart of Khan el-Khalili...",
+    "about": "Managed by Oberoi, this historic cafe offers authentic Middle Eastern cuisine, fresh mezze, and mint tea in a air-conditioned oriental setting.",
+    "highlights": [
+      "Live Oriental Oud Music",
+      "Traditional Mezzes",
+      "Egyptian Mint Tea"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "naguib mahfouz cafe",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "zoba_cairo",
+    "name": "Zooba (Zamalek)",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "26th of July St, Zamalek, Cairo, Egypt",
+    "latitude": 30.0609,
+    "longitude": 31.2197,
+    "rating": 4.6,
+    "reviewsCount": 3100,
+    "shortDescription": "Modern gourmet twist on classic Egyptian street food...",
+    "about": "A trendy restaurant upgrading traditional Egyptian street staples like Taameya (Falafel), Ful Medames, and Hawawshi using gourmet ingredients.",
+    "highlights": [
+      "Gourmet Taameya Sandwiches",
+      "Hawawshi",
+      "Hibiscus Ice Tea"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "zooba (zamalek)",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "fish_market_alex",
+    "name": "Fish Market Alexandria",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Corniche Road, Al Anfoushi, Alexandria, Egypt",
+    "latitude": 31.2105,
+    "longitude": 29.889,
+    "rating": 4.6,
+    "reviewsCount": 4200,
+    "shortDescription": "Fresh seafood dining with panoramic Mediterranean views...",
+    "about": "Choose your fresh catch straight from the ice display and have it grilled or fried while enjoying panoramic views of Alexandria harbour.",
+    "highlights": [
+      "Fresh Catch Selection",
+      "Seafood Soup",
+      "Harbour Waterfront Views"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "fish market alexandria",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "fresca_al_farrous",
+    "name": "Mohamed Ahmed Falafel",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Shakour St, Mahat El Raml, Alexandria, Egypt",
+    "latitude": 31.1994,
+    "longitude": 29.8992,
+    "rating": 4.7,
+    "reviewsCount": 3890,
+    "shortDescription": "Historic Alexandrian breakfast spot famous for Ful & Taameya...",
+    "about": "Operating since 1957, this legendary eatery was once visited by Queen Sofia of Spain and remains a staple for authentic Alexandrian breakfast.",
+    "highlights": [
+      "Alexandrian Ful with Olive Oil",
+      "Stuffed Taameya",
+      "Fried Eggplant"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "mohamed ahmed falafel",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "soliman_nubian_restaurant",
+    "name": "Soliman Nubian Restaurant",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Sohail Island, Aswan, Egypt",
+    "latitude": 24.062,
+    "longitude": 32.875,
+    "rating": 4.8,
+    "reviewsCount": 1420,
+    "shortDescription": "Authentic Nubian home-cooked meals on an island in the Nile...",
+    "about": "Dine inside a colorful traditional Nubian house on Sohail Island, tasting authentic dishes like Tagine chicken, Nubian bread, and fresh salads.",
+    "highlights": [
+      "Traditional Nubian Tajines",
+      "Riverfront Terrace",
+      "Authentic Decor"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "soliman nubian restaurant",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "bibliotheca_alexandrina",
+    "name": "Bibliotheca Alexandrina",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "museum",
+    "address": "El Shatby, Alexandria, Egypt",
+    "latitude": 31.2089,
+    "longitude": 29.9092,
+    "rating": 4.7,
+    "reviewsCount": 6720,
+    "shortDescription": "Modern tribute to the ancient Library of Alexandria...",
+    "about": "A vast cultural complex reviving the legacy of the ancient Great Library, housing millions of books, manuscripts, and a planetarium.",
+    "highlights": [
+      "Main Reading Hall",
+      "Antiquities Museum",
+      "Planetarium Science Center"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "bibliotheca alexandrina",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "edfu_temple",
+    "name": "Temple of Edfu",
+    "city": "Edfu",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Edfu, Aswan Governorate, Egypt",
+    "latitude": 24.9781,
+    "longitude": 32.873,
+    "rating": 4.8,
+    "reviewsCount": 4310,
+    "shortDescription": "Best-preserved temple in Egypt dedicated to Horus...",
+    "about": "Built during the Ptolemaic period, this temple offers some of the most complete and well-preserved reliefs of ancient Egyptian religious life.",
+    "highlights": [
+      "Statue of Horus Falcon",
+      "Ptolemaic Reliefs",
+      "Great Pylon"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "temple of edfu",
+    "cityLower": "edfu"
+  },
+  {
+    "id": "kom_ombo_temple",
+    "name": "Temple of Kom Ombo",
+    "city": "Kom Ombo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Kom Ombo, Aswan Governorate, Egypt",
+    "latitude": 24.4523,
+    "longitude": 32.9282,
+    "rating": 4.7,
+    "reviewsCount": 3980,
+    "shortDescription": "Unique double temple dedicated to two gods...",
+    "about": "A rare symmetrical temple dedicated equally to the crocodile god Sobek and the falcon god Horus, overlooking the Nile.",
+    "highlights": [
+      "Crocodile Museum",
+      "Nilometer",
+      "Riverside Views"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "temple of kom ombo",
+    "cityLower": "kom ombo"
+  },
+  {
+    "id": "colossi_of_memnon",
+    "name": "Colossi of Memnon",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "West Bank, Luxor, Egypt",
+    "latitude": 25.7202,
+    "longitude": 32.6103,
+    "rating": 4.5,
+    "reviewsCount": 3120,
+    "shortDescription": "Two massive stone statues guarding a lost mortuary temple...",
+    "about": "These twin colossal statues of Pharaoh Amenhotep III once guarded the entrance to his now-vanished mortuary temple complex.",
+    "highlights": [
+      "Twin Stone Giants",
+      "Ancient Mortuary Site",
+      "Photo Stop"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "colossi of memnon",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "hatshepsut_temple",
+    "name": "Temple of Hatshepsut",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Deir el-Bahari, West Bank, Luxor, Egypt",
+    "latitude": 25.7381,
+    "longitude": 32.6067,
+    "rating": 4.8,
+    "reviewsCount": 5230,
+    "shortDescription": "Iconic terraced mortuary temple carved into limestone cliffs...",
+    "about": "Built for Egypt's most famous female pharaoh, this striking temple rises in three colonnaded terraces against the desert cliffs.",
+    "highlights": [
+      "Terraced Colonnades",
+      "Punt Expedition Reliefs",
+      "Cliffside Setting"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "temple of hatshepsut",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "siwa_sand_safari",
+    "name": "Siwa Great Sand Sea Safari",
+    "city": "Siwa",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Great Sand Sea, Siwa, Egypt",
+    "latitude": 29.19,
+    "longitude": 25.54,
+    "rating": 4.8,
+    "reviewsCount": 1540,
+    "shortDescription": "4x4 dune bashing across one of the world's largest sand seas...",
+    "about": "Race across towering golden dunes by 4x4 jeep, ending with sandboarding and a Bedouin-style dinner under the stars.",
+    "highlights": [
+      "4x4 Dune Bashing",
+      "Sandboarding",
+      "Bedouin Desert Camp"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "siwa great sand sea safari",
+    "cityLower": "siwa"
+  },
+  {
+    "id": "naama_bay_snorkeling",
+    "name": "Naama Bay Snorkeling Trip",
+    "city": "Sharm El Sheikh",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Naama Bay, Sharm El Sheikh, Egypt",
+    "latitude": 27.9158,
+    "longitude": 34.33,
+    "rating": 4.7,
+    "reviewsCount": 2870,
+    "shortDescription": "Boat snorkeling trip over coral reefs in the Red Sea...",
+    "about": "A relaxed boat excursion to shallow reef sites near Naama Bay, ideal for spotting colorful fish and coral without a diving license.",
+    "highlights": [
+      "Coral Reef Snorkeling",
+      "Glass-bottom Boat Option",
+      "Beginner Friendly"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "naama bay snorkeling trip",
+    "cityLower": "sharm el sheikh"
+  },
+  {
+    "id": "el_gouna_kitesurfing",
+    "name": "El Gouna Kitesurfing Lessons",
+    "city": "El Gouna",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Mangroovy Beach, El Gouna, Egypt",
+    "latitude": 27.395,
+    "longitude": 33.68,
+    "rating": 4.7,
+    "reviewsCount": 980,
+    "shortDescription": "Flat-water lagoon ideal for learning to kitesurf...",
+    "about": "El Gouna's calm, shallow lagoons and consistent winds make it one of Egypt's top spots for beginner and intermediate kitesurfers.",
+    "highlights": [
+      "Flat-water Lagoon",
+      "Certified Instructors",
+      "Equipment Rental"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "el gouna kitesurfing lessons",
+    "cityLower": "el gouna"
+  },
+  {
+    "id": "cairo_tower",
+    "name": "Cairo Tower",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "landmark",
+    "address": "Zamalek, Cairo, Egypt",
+    "latitude": 30.0459,
+    "longitude": 31.2243,
+    "rating": 4.5,
+    "reviewsCount": 8930,
+    "shortDescription": "360-degree observation deck overlooking the Nile and Cairo...",
+    "about": "A latticework tower rising above Gezira Island, offering a rotating restaurant and panoramic views across the sprawling city and river.",
+    "highlights": [
+      "360° Observation Deck",
+      "Nile Views",
+      "Rotating Restaurant"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "cairo tower",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "nubian_village_tour",
+    "name": "Nubian Village Tour",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Gharb Soheil, Aswan, Egypt",
+    "latitude": 24.09,
+    "longitude": 32.88,
+    "rating": 4.7,
+    "reviewsCount": 2140,
+    "shortDescription": "Colorful lakeside village tour with Nubian culture and crocodiles...",
+    "about": "Visit brightly painted Nubian houses, sample local henna and cuisine, and meet friendly domesticated crocodiles kept as tradition.",
+    "highlights": [
+      "Colorful Nubian Houses",
+      "Local Handicrafts",
+      "Camel Ride Option"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "nubian village tour",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "lake_qarun",
+    "name": "Lake Qarun",
+    "city": "Fayoum",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Qarun Protected Area, Fayoum, Egypt",
+    "latitude": 29.4553,
+    "longitude": 30.62,
+    "rating": 4.4,
+    "reviewsCount": 1680,
+    "shortDescription": "One of the world's oldest lakes, rich in birdlife...",
+    "about": "A saline lake remnant of an ancient inland sea, popular for birdwatching, windsurfing, and lakeside picnics near Fayoum.",
+    "highlights": [
+      "Migratory Bird Watching",
+      "Lakeside Picnics",
+      "Windsurfing"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "lake qarun",
+    "cityLower": "fayoum"
+  },
+  {
+    "id": "saint_catherine_protectorate",
+    "name": "Saint Catherine Protectorate",
+    "city": "Saint Catherine",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "South Sinai Governorate, Egypt",
+    "latitude": 28.556,
+    "longitude": 33.95,
+    "rating": 4.8,
+    "reviewsCount": 1950,
+    "shortDescription": "High-altitude desert reserve around Egypt's tallest mountains...",
+    "about": "Home to Mount Sinai and Mount Catherine, this UNESCO-listed protectorate offers rugged granite peaks, rare desert flora, and Bedouin trails.",
+    "highlights": [
+      "Mount Catherine Peak",
+      "Bedouin Guided Hikes",
+      "Rare Desert Flora"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "saint catherine protectorate",
+    "cityLower": "saint catherine"
+  },
+  {
+    "id": "zaranik_protected_area",
+    "name": "Zaranik Protected Area",
+    "city": "North Sinai",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Bardawil Lagoon, North Sinai, Egypt",
+    "latitude": 31.1,
+    "longitude": 33.47,
+    "rating": 4.3,
+    "reviewsCount": 420,
+    "shortDescription": "Coastal wetland sanctuary for migratory birds...",
+    "about": "A key stopover on the Africa-Eurasia flyway, this protected lagoon and sand dune area hosts hundreds of thousands of migrating birds each year.",
+    "highlights": [
+      "Bardawil Lagoon",
+      "Flamingo Sightings",
+      "Coastal Sand Dunes"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "zaranik protected area",
+    "cityLower": "north sinai"
+  },
+  {
+    "id": "nabq_protected_area",
+    "name": "Nabq Protected Area",
+    "city": "Sharm El Sheikh",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Nabq Bay, Sharm El Sheikh, Egypt",
+    "latitude": 28.03,
+    "longitude": 34.43,
+    "rating": 4.5,
+    "reviewsCount": 1120,
+    "shortDescription": "Coastal reserve with mangroves and desert-meets-sea scenery...",
+    "about": "One of the few places where mangrove forests grow along the Red Sea coast, alongside coral reefs and desert acacia trees.",
+    "highlights": [
+      "Mangrove Forest Walk",
+      "Shore Snorkeling",
+      "Desert-Sea Landscape"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "nabq protected area",
+    "cityLower": "sharm el sheikh"
+  },
+  {
+    "id": "lake_nasser",
+    "name": "Lake Nasser",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Aswan Governorate, Egypt",
+    "latitude": 23.97,
+    "longitude": 32.88,
+    "rating": 4.6,
+    "reviewsCount": 1340,
+    "shortDescription": "Vast man-made lake formed by the Aswan High Dam...",
+    "about": "One of the largest artificial lakes in the world, offering serene cruises, fishing trips, and access to relocated Nubian temples.",
+    "highlights": [
+      "Multi-day Lake Cruises",
+      "Nile Perch Fishing",
+      "Relocated Temple Views"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "lake nasser",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "felfela_restaurant",
+    "name": "Felfela Restaurant",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Hoda Shaarawy St, Downtown Cairo, Egypt",
+    "latitude": 30.0478,
+    "longitude": 31.24,
+    "rating": 4.5,
+    "reviewsCount": 6210,
+    "shortDescription": "Iconic downtown spot serving classic Egyptian comfort food...",
+    "about": "Operating since 1959, this rustic-themed restaurant is a Cairo institution for traditional dishes like ful, taameya, and grilled meats.",
+    "highlights": [
+      "Traditional Egyptian Menu",
+      "Rustic Decor",
+      "Downtown Landmark"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "felfela restaurant",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "sequoia_zamalek",
+    "name": "Sequoia",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Abou El Feda St, Zamalek, Cairo, Egypt",
+    "latitude": 30.07,
+    "longitude": 31.22,
+    "rating": 4.6,
+    "reviewsCount": 4780,
+    "shortDescription": "Nile-front lounge restaurant with Mediterranean and Asian dishes...",
+    "about": "A relaxed open-air venue on the tip of Zamalek island, popular for sunset views over the Nile alongside a wide-ranging fusion menu.",
+    "highlights": [
+      "Nile-front Terrace",
+      "Sunset Views",
+      "Fusion Menu"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "sequoia",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "kebdet_el_prince",
+    "name": "Kebdet El Prince",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Mahatet El Raml, Alexandria, Egypt",
+    "latitude": 31.1975,
+    "longitude": 29.899,
+    "rating": 4.6,
+    "reviewsCount": 2870,
+    "shortDescription": "Beloved late-night spot for Alexandrian liver sandwiches...",
+    "about": "A long-running street-food favorite specializing in spicy fried liver (kebda) sandwiches, a signature Alexandrian late-night snack.",
+    "highlights": [
+      "Spicy Liver Sandwiches",
+      "Late-night Crowd",
+      "Street Food Classic"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "kebdet el prince",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "andrea_el_mariouteya",
+    "name": "Andrea El Mariouteya",
+    "city": "Giza",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "El Mariouteya Canal, Giza, Egypt",
+    "latitude": 29.985,
+    "longitude": 31.155,
+    "rating": 4.7,
+    "reviewsCount": 5340,
+    "shortDescription": "Famous garden restaurant known for charcoal-grilled chicken...",
+    "about": "A sprawling open-air garden restaurant near the Pyramids, celebrated across Egypt for its simple but perfect grilled chicken and salads.",
+    "highlights": [
+      "Charcoal Grilled Chicken",
+      "Garden Seating",
+      "Fresh Baladi Bread"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "andrea el mariouteya",
+    "cityLower": "giza"
+  },
+  {
+    "id": "el_fishawy_cafe",
+    "name": "El Fishawy Cafe",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Khan el-Khalili, Cairo, Egypt",
+    "latitude": 30.0478,
+    "longitude": 31.2622,
+    "rating": 4.6,
+    "reviewsCount": 9870,
+    "shortDescription": "Egypt's oldest continuously open coffeehouse since 1773...",
+    "about": "Tucked in the alleys of Khan el-Khalili, this historic mirrored cafe has served mint tea, shisha, and hibiscus drinks to locals and writers for over two centuries.",
+    "highlights": [
+      "Historic Mirrored Interior",
+      "Shisha & Mint Tea",
+      "Bazaar Alley Setting"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "el fishawy cafe",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "dendera_temple",
+    "name": "Dendera Temple Complex",
+    "city": "Qena",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Dendera, Qena Governorate, Egypt",
+    "latitude": 26.1417,
+    "longitude": 32.6703,
+    "rating": 4.8,
+    "reviewsCount": 3560,
+    "shortDescription": "Well-preserved temple dedicated to the goddess Hathor...",
+    "about": "One of the best-preserved temple complexes in Egypt, famous for its intact roof, astronomical ceiling, and the Dendera Zodiac.",
+    "highlights": [
+      "Hathor Temple Hall",
+      "Dendera Zodiac Ceiling",
+      "Underground Crypts"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "dendera temple complex",
+    "cityLower": "qena"
+  },
+  {
+    "id": "saqqara_step_pyramid",
+    "name": "Saqqara Step Pyramid of Djoser",
+    "city": "Saqqara",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Saqqara, Giza Governorate, Egypt",
+    "latitude": 29.8713,
+    "longitude": 31.2165,
+    "rating": 4.8,
+    "reviewsCount": 4980,
+    "shortDescription": "The world's oldest large-scale stone monument...",
+    "about": "Designed by the architect Imhotep for Pharaoh Djoser, this six-tiered pyramid marks the birth of Egyptian monumental stone architecture.",
+    "highlights": [
+      "Step Pyramid Structure",
+      "Imhotep Museum",
+      "Ancient Necropolis"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "saqqara step pyramid of djoser",
+    "cityLower": "saqqara"
+  },
+  {
+    "id": "medinet_habu",
+    "name": "Medinet Habu (Ramses III Temple)",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "West Bank, Luxor, Egypt",
+    "latitude": 25.7202,
+    "longitude": 32.6011,
+    "rating": 4.7,
+    "reviewsCount": 2340,
+    "shortDescription": "Massive mortuary temple with vividly preserved reliefs...",
+    "about": "One of the best-preserved temples on Luxor's West Bank, recording the military victories and reign of Ramesses III in vivid detail.",
+    "highlights": [
+      "Painted Wall Reliefs",
+      "Fortified Gateway",
+      "Sea Peoples Battle Scenes"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1601921004897-b7d582772c6a?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1601921004897-b7d582772c6a?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "medinet habu (ramses iii temple)",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "esna_temple",
+    "name": "Temple of Esna",
+    "city": "Esna",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Esna, Luxor Governorate, Egypt",
+    "latitude": 25.2934,
+    "longitude": 32.5531,
+    "rating": 4.6,
+    "reviewsCount": 1180,
+    "shortDescription": "Recently restored temple with vibrant original colors...",
+    "about": "Following a major restoration project, Esna's hypostyle hall now reveals its original vivid ceiling colors, hidden for centuries under soot.",
+    "highlights": [
+      "Restored Ceiling Colors",
+      "Hypostyle Hall",
+      "Zodiac Reliefs"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "temple of esna",
+    "cityLower": "esna"
+  },
+  {
+    "id": "mosque_of_ibn_tulun",
+    "name": "Mosque of Ibn Tulun",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Al-Saliba St, Cairo, Egypt",
+    "latitude": 30.0289,
+    "longitude": 31.2494,
+    "rating": 4.7,
+    "reviewsCount": 2870,
+    "shortDescription": "One of the oldest and largest mosques in Cairo...",
+    "about": "Built in 879 AD, this is one of the few surviving examples of Abbasid architecture, known for its spiraling minaret and vast courtyard.",
+    "highlights": [
+      "Spiral Minaret Climb",
+      "Vast Open Courtyard",
+      "Abbasid Architecture"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "mosque of ibn tulun",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "bahariya_desert_safari",
+    "name": "Bahariya Oasis Desert Safari",
+    "city": "Bahariya",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Bahariya Oasis, Giza Governorate, Egypt",
+    "latitude": 28.35,
+    "longitude": 28.8667,
+    "rating": 4.7,
+    "reviewsCount": 1230,
+    "shortDescription": "Multi-day 4x4 safari through black desert and hot springs...",
+    "about": "A gateway oasis for exploring the dramatic Black Desert, volcanic hills, and natural hot springs before heading to the White Desert.",
+    "highlights": [
+      "Black Desert Hills",
+      "Natural Hot Springs",
+      "Desert Camping"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "bahariya oasis desert safari",
+    "cityLower": "bahariya"
+  },
+  {
+    "id": "nile_dinner_cruise_cairo",
+    "name": "Cairo Nile Dinner Cruise",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Nile Corniche, Cairo, Egypt",
+    "latitude": 30.043,
+    "longitude": 31.228,
+    "rating": 4.5,
+    "reviewsCount": 6740,
+    "shortDescription": "Evening dinner cruise with live music and Tanoura show...",
+    "about": "Sail the Nile aboard a floating restaurant with a buffet dinner, belly dance, and traditional Tanoura folk dance performance.",
+    "highlights": [
+      "Nile Buffet Dinner",
+      "Tanoura Dance Show",
+      "City Skyline at Night"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "cairo nile dinner cruise",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "camel_ride_giza",
+    "name": "Camel Ride at the Pyramids",
+    "city": "Giza",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Nazlet El-Semman, Giza, Egypt",
+    "latitude": 29.9765,
+    "longitude": 31.131,
+    "rating": 4.4,
+    "reviewsCount": 5120,
+    "shortDescription": "Classic camel ride around the pyramid plateau...",
+    "about": "A traditional way to explore the Giza plateau, with camel guides taking visitors to panoramic viewpoints overlooking all three pyramids.",
+    "highlights": [
+      "Panorama Viewpoint",
+      "Traditional Camel Guides",
+      "Photo Opportunities"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "camel ride at the pyramids",
+    "cityLower": "giza"
+  },
+  {
+    "id": "marsa_alam_snorkeling",
+    "name": "Marsa Alam Dolphin House Snorkeling",
+    "city": "Marsa Alam",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Sha'ab Samadai, Marsa Alam, Egypt",
+    "latitude": 24.85,
+    "longitude": 34.95,
+    "rating": 4.8,
+    "reviewsCount": 1870,
+    "shortDescription": "Swim with wild spinner dolphins in their natural reef habitat...",
+    "about": "A boat trip to the horseshoe-shaped reef known as \"Dolphin House,\" home to a resident pod of spinner dolphins in crystal-clear water.",
+    "highlights": [
+      "Wild Dolphin Encounters",
+      "Coral Reef Snorkeling",
+      "Turquoise Lagoon"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "marsa alam dolphin house snorkeling",
+    "cityLower": "marsa alam"
+  },
+  {
+    "id": "ras_sedr_kite_camp",
+    "name": "Ras Sedr Kitesurfing & Camping",
+    "city": "Ras Sedr",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Gulf of Suez Coast, Ras Sedr, Egypt",
+    "latitude": 29.59,
+    "longitude": 32.71,
+    "rating": 4.5,
+    "reviewsCount": 640,
+    "shortDescription": "Windy Gulf of Suez coastline popular for kite camps...",
+    "about": "A quieter alternative to El Gouna, offering strong steady winds, beach camping, and a laid-back kitesurfing community close to Cairo.",
+    "highlights": [
+      "Steady Coastal Winds",
+      "Beach Camping",
+      "Weekend Kite Trips"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "ras sedr kitesurfing & camping",
+    "cityLower": "ras sedr"
+  },
+  {
+    "id": "wadi_degla_protectorate",
+    "name": "Wadi Degla Protectorate",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Maadi, Cairo Governorate, Egypt",
+    "latitude": 29.9333,
+    "longitude": 31.3333,
+    "rating": 4.5,
+    "reviewsCount": 2980,
+    "shortDescription": "Desert canyon reserve minutes from downtown Cairo...",
+    "about": "A dramatic limestone canyon carved by an ancient riverbed, popular for hiking, trail running, and cycling just outside Cairo.",
+    "highlights": [
+      "Canyon Hiking Trails",
+      "Trail Running Routes",
+      "Fossil-rich Rock Layers"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wadi degla protectorate",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "gebel_elba_reserve",
+    "name": "Gebel Elba National Park",
+    "city": "Halayeb",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Red Sea Governorate, Egypt",
+    "latitude": 22.2,
+    "longitude": 36.4,
+    "rating": 4.6,
+    "reviewsCount": 210,
+    "shortDescription": "Egypt's southernmost biodiversity hotspot with mist-covered peaks...",
+    "about": "A remote mountain range where sea fog sustains a unique cloud forest ecosystem found nowhere else in Egypt, rich in rare wildlife.",
+    "highlights": [
+      "Mist Oasis Ecosystem",
+      "Rare Acacia Forests",
+      "Remote Wildlife Viewing"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "gebel elba national park",
+    "cityLower": "halayeb"
+  },
+  {
+    "id": "ain_sokhna_beaches",
+    "name": "Ain Sokhna Beaches",
+    "city": "Ain Sokhna",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Gulf of Suez, Ain Sokhna, Egypt",
+    "latitude": 29.6,
+    "longitude": 32.35,
+    "rating": 4.4,
+    "reviewsCount": 3450,
+    "shortDescription": "Popular calm-water beach getaway close to Cairo...",
+    "about": "A convenient coastal escape on the Gulf of Suez known for calm turquoise waters, mountain backdrops, and easy weekend access from Cairo.",
+    "highlights": [
+      "Calm Turquoise Waters",
+      "Mountain Backdrop",
+      "Weekend Resorts"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "ain sokhna beaches",
+    "cityLower": "ain sokhna"
+  },
+  {
+    "id": "tunis_village_fayoum",
+    "name": "Tunis Village & Magic Lake",
+    "city": "Fayoum",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Tunis Village, Fayoum, Egypt",
+    "latitude": 29.5167,
+    "longitude": 30.6667,
+    "rating": 4.7,
+    "reviewsCount": 1560,
+    "shortDescription": "Artistic pottery village overlooking a color-shifting lake...",
+    "about": "A tranquil village of hand-built pottery studios and mud-brick guesthouses overlooking Lake Qarun, famous for its shifting evening colors.",
+    "highlights": [
+      "Pottery Workshops",
+      "Lakeside Sunset Views",
+      "Rural Guesthouses"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "tunis village & magic lake",
+    "cityLower": "fayoum"
+  },
+  {
+    "id": "zafarana_mountains",
+    "name": "Zafarana Coastal Mountains",
+    "city": "Zafarana",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Red Sea Coast Road, Zafarana, Egypt",
+    "latitude": 29.1167,
+    "longitude": 32.65,
+    "rating": 4.3,
+    "reviewsCount": 380,
+    "shortDescription": "Dramatic desert mountains meeting the Red Sea coastline...",
+    "about": "A scenic stretch where rugged mountain ranges drop directly into the Red Sea, popular for wind farms, coastal camping, and road-trip stops.",
+    "highlights": [
+      "Coastal Mountain Views",
+      "Wind Farm Landscape",
+      "Roadside Camping Spots"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "zafarana coastal mountains",
+    "cityLower": "zafarana"
+  },
+  {
+    "id": "abou_el_sid",
+    "name": "Abou El Sid",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "26th of July St, Zamalek, Cairo, Egypt",
+    "latitude": 30.0616,
+    "longitude": 31.2205,
+    "rating": 4.6,
+    "reviewsCount": 5670,
+    "shortDescription": "Upscale traditional Egyptian dining in old Cairo decor...",
+    "about": "A refined restaurant chain reviving classic Egyptian home-cooking such as molokhia, mahshi, and hamam mahshi in an ornate 1920s-style setting.",
+    "highlights": [
+      "Molokhia with Rabbit",
+      "Stuffed Pigeon (Hamam)",
+      "Vintage Cairo Decor"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "abou el sid",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "farahat_seafood_alex",
+    "name": "Farahat Seafood Restaurant",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Bahari, Alexandria, Egypt",
+    "latitude": 31.2,
+    "longitude": 29.885,
+    "rating": 4.6,
+    "reviewsCount": 3010,
+    "shortDescription": "Local favorite for fresh Mediterranean seafood platters...",
+    "about": "A no-frills neighborhood spot near the fishing harbor known for its daily-fresh catch, grilled shrimp, and calamari at honest prices.",
+    "highlights": [
+      "Daily Fresh Catch",
+      "Grilled Shrimp Platter",
+      "Harbor-side Location"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "farahat seafood restaurant",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "gad_restaurant_cairo",
+    "name": "Gad Restaurant",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Multiple Branches, Cairo, Egypt",
+    "latitude": 30.05,
+    "longitude": 31.24,
+    "rating": 4.3,
+    "reviewsCount": 12400,
+    "shortDescription": "Egypt's largest chain for fast, affordable street food...",
+    "about": "A nationwide chain serving quick and affordable Egyptian staples like taameya, shawarma, and koshary to millions daily.",
+    "highlights": [
+      "Fast Casual Menu",
+      "Affordable Shawarma",
+      "Nationwide Branches"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "gad restaurant",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "el_dahan_grill",
+    "name": "El Dahan Grill",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Hussein Square, Islamic Cairo, Egypt",
+    "latitude": 30.0475,
+    "longitude": 31.2625,
+    "rating": 4.5,
+    "reviewsCount": 4120,
+    "shortDescription": "Historic grill house near Al-Hussein Mosque...",
+    "about": "Serving skewered kofta and kebab grilled over charcoal since 1936, right in the heart of the bustling Hussein Square.",
+    "highlights": [
+      "Charcoal Grilled Kofta",
+      "Historic Location",
+      "Bustling Square View"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "el dahan grill",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "aswan_1902_restaurant",
+    "name": "1902 Restaurant, Old Cataract",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Old Cataract Hotel, Aswan, Egypt",
+    "latitude": 24.087,
+    "longitude": 32.887,
+    "rating": 4.8,
+    "reviewsCount": 1230,
+    "shortDescription": "Grand domed dining room overlooking the Nile in a historic hotel...",
+    "about": "A Moorish-style domed dining hall inside the legendary Old Cataract Hotel, offering fine dining with sweeping views of the Nile and Elephantine Island.",
+    "highlights": [
+      "Moorish Dome Architecture",
+      "Nile & Island Views",
+      "Fine Dining Experience"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "1902 restaurant, old cataract",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "sultan_hassan_mosque",
+    "name": "Sultan Hassan Mosque-Madrassa",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Al Qalaa St, Cairo, Egypt",
+    "latitude": 30.0326,
+    "longitude": 31.257,
+    "rating": 4.8,
+    "reviewsCount": 3210,
+    "shortDescription": "Monumental 14th-century Mamluk mosque and madrassa...",
+    "about": "One of the largest mosques in the world by ground area, celebrated for its towering entrance portal and massive central courtyard.",
+    "highlights": [
+      "Mamluk Architecture",
+      "Towering Minarets",
+      "Grand Courtyard"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "sultan hassan mosque-madrassa",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "al_azhar_mosque",
+    "name": "Al-Azhar Mosque",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Al-Azhar St, Islamic Cairo, Egypt",
+    "latitude": 30.0459,
+    "longitude": 31.2625,
+    "rating": 4.8,
+    "reviewsCount": 5430,
+    "shortDescription": "One of the oldest universities and mosques in the Islamic world...",
+    "about": "Founded in 970 AD, Al-Azhar remains a leading center of Islamic learning, with a stunning blend of Fatimid, Mamluk, and Ottoman architecture.",
+    "highlights": [
+      "Fatimid Architecture",
+      "Historic Islamic University",
+      "Ornate Courtyard"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "al-azhar mosque",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "amr_ibn_al_as_mosque",
+    "name": "Mosque of Amr ibn al-As",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Old Cairo, Egypt",
+    "latitude": 30.0056,
+    "longitude": 31.2306,
+    "rating": 4.6,
+    "reviewsCount": 1870,
+    "shortDescription": "The first mosque ever built in Africa...",
+    "about": "Founded in 642 AD by the Muslim general Amr ibn al-As, this mosque marks the founding site of Fustat, Egypt's first Islamic capital.",
+    "highlights": [
+      "Oldest Mosque in Africa",
+      "Historic Fustat Site",
+      "Open Courtyard"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "mosque of amr ibn al-as",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "hanging_church_cairo",
+    "name": "The Hanging Church (El Muallaqa)",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Coptic Cairo, Old Cairo, Egypt",
+    "latitude": 30.0055,
+    "longitude": 31.2301,
+    "rating": 4.7,
+    "reviewsCount": 3980,
+    "shortDescription": "Ancient Coptic church suspended over a Roman gatehouse...",
+    "about": "Built atop the towers of the Roman Babylon Fortress, this is one of Egypt's oldest and most important Coptic Christian churches.",
+    "highlights": [
+      "Roman Fortress Foundation",
+      "Ancient Icons",
+      "Coptic Woodwork"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "the hanging church (el muallaqa)",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "ben_ezra_synagogue",
+    "name": "Ben Ezra Synagogue",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Coptic Cairo, Old Cairo, Egypt",
+    "latitude": 30.0052,
+    "longitude": 31.2299,
+    "rating": 4.6,
+    "reviewsCount": 1450,
+    "shortDescription": "Egypt's oldest synagogue, source of the famed Cairo Geniza...",
+    "about": "Dating back over a thousand years, this synagogue is famous for its hidden Geniza chamber that preserved centuries of Jewish manuscripts.",
+    "highlights": [
+      "Historic Geniza Chamber",
+      "Ancient Torah Scrolls",
+      "Coptic Cairo Location"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "ben ezra synagogue",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "bent_pyramid_dahshur",
+    "name": "Bent Pyramid of Dahshur",
+    "city": "Dahshur",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Dahshur, Giza Governorate, Egypt",
+    "latitude": 29.7908,
+    "longitude": 31.2092,
+    "rating": 4.6,
+    "reviewsCount": 980,
+    "shortDescription": "Unique pyramid with a distinctive change in slope angle...",
+    "about": "Built for Pharaoh Sneferu, this experimental pyramid shows engineers correcting their angle mid-construction, offering insight into pyramid evolution.",
+    "highlights": [
+      "Unique Slope Angle",
+      "Original Limestone Casing",
+      "Quiet Desert Site"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "bent pyramid of dahshur",
+    "cityLower": "dahshur"
+  },
+  {
+    "id": "red_pyramid_dahshur",
+    "name": "Red Pyramid of Dahshur",
+    "city": "Dahshur",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Dahshur, Giza Governorate, Egypt",
+    "latitude": 29.8092,
+    "longitude": 31.2058,
+    "rating": 4.7,
+    "reviewsCount": 1230,
+    "shortDescription": "Egypt's first successful true smooth-sided pyramid...",
+    "about": "Named for the reddish limestone used in its core, this pyramid represents the successful culmination of Sneferu's pyramid-building experiments.",
+    "highlights": [
+      "First True Pyramid",
+      "Interior Chamber Access",
+      "Reddish Limestone"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "red pyramid of dahshur",
+    "cityLower": "dahshur"
+  },
+  {
+    "id": "seti_temple_abydos",
+    "name": "Temple of Seti I, Abydos",
+    "city": "Abydos",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Abydos, Sohag Governorate, Egypt",
+    "latitude": 26.185,
+    "longitude": 31.9192,
+    "rating": 4.8,
+    "reviewsCount": 1560,
+    "shortDescription": "Exquisitely carved temple with the famous king list...",
+    "about": "Renowned for some of the finest relief carvings in Egypt and the Abydos King List recording the names of Egypt's pharaohs.",
+    "highlights": [
+      "Abydos King List",
+      "Fine Relief Carvings",
+      "Osireion Ruins"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "temple of seti i, abydos",
+    "cityLower": "abydos"
+  },
+  {
+    "id": "unfinished_obelisk_aswan",
+    "name": "Unfinished Obelisk",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Northern Quarries, Aswan, Egypt",
+    "latitude": 24.0867,
+    "longitude": 32.8817,
+    "rating": 4.6,
+    "reviewsCount": 2340,
+    "shortDescription": "Ancient granite obelisk abandoned mid-carving in the quarry...",
+    "about": "Still attached to bedrock, this would have been the largest obelisk ever raised, offering rare insight into ancient quarrying techniques.",
+    "highlights": [
+      "Ancient Quarry Site",
+      "Would-be Largest Obelisk",
+      "Carving Tool Marks"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568907459137-04c4dfa27e9a?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "unfinished obelisk",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "aswan_high_dam",
+    "name": "Aswan High Dam",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "landmark",
+    "address": "Aswan Governorate, Egypt",
+    "latitude": 23.97,
+    "longitude": 32.8775,
+    "rating": 4.5,
+    "reviewsCount": 4120,
+    "shortDescription": "Iconic 20th-century engineering feat controlling the Nile...",
+    "about": "Completed in 1970, this massive dam controls Nile flooding, generates hydroelectric power, and created Lake Nasser.",
+    "highlights": [
+      "Engineering Viewpoint",
+      "Lake Nasser Overlook",
+      "Egyptian-Soviet Friendship Monument"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "aswan high dam",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "elephantine_island_aswan",
+    "name": "Elephantine Island",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Nile River, Aswan, Egypt",
+    "latitude": 24.0875,
+    "longitude": 32.8867,
+    "rating": 4.7,
+    "reviewsCount": 1980,
+    "shortDescription": "Ancient island with ruins, a Nilometer, and Nubian villages...",
+    "about": "Once the frontier town of ancient Egypt, this Nile island holds ruins of the Temple of Khnum, an ancient Nilometer, and colorful Nubian houses.",
+    "highlights": [
+      "Ancient Nilometer",
+      "Temple of Khnum Ruins",
+      "Nubian Village Walks"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "elephantine island",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "tombs_of_nobles_aswan",
+    "name": "Tombs of the Nobles, Aswan",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "West Bank, Aswan, Egypt",
+    "latitude": 24.095,
+    "longitude": 32.88,
+    "rating": 4.5,
+    "reviewsCount": 780,
+    "shortDescription": "Rock-cut tombs of ancient Aswan governors and priests...",
+    "about": "Carved into the cliffs across from the city, these tombs belonged to the noblemen who governed Egypt's southern frontier in antiquity.",
+    "highlights": [
+      "Rock-cut Tomb Chapels",
+      "Nile Panorama",
+      "Ancient Governor Burials"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "tombs of the nobles, aswan",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "deir_el_medina",
+    "name": "Deir el-Medina",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "West Bank, Luxor, Egypt",
+    "latitude": 25.7281,
+    "longitude": 32.6014,
+    "rating": 4.7,
+    "reviewsCount": 1340,
+    "shortDescription": "Well-preserved village of the ancient tomb-builders...",
+    "about": "Home to the artisans who built the royal tombs in the Valley of the Kings, with colorfully decorated tombs of their own.",
+    "highlights": [
+      "Workers' Village Ruins",
+      "Painted Artisan Tombs",
+      "Ptolemaic Hathor Temple"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "deir el-medina",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "ramesseum_luxor",
+    "name": "The Ramesseum",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "West Bank, Luxor, Egypt",
+    "latitude": 25.7283,
+    "longitude": 32.6111,
+    "rating": 4.6,
+    "reviewsCount": 2010,
+    "shortDescription": "Mortuary temple of Ramesses II with a toppled colossus...",
+    "about": "Home to the fallen colossal statue that inspired Shelley's poem \"Ozymandias,\" this temple showcases Ramesses II's grand architectural ambitions.",
+    "highlights": [
+      "Fallen Colossus of Ramesses II",
+      "Hypostyle Hall Ruins",
+      "Battle of Kadesh Reliefs"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "the ramesseum",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "tombs_of_nobles_luxor",
+    "name": "Tombs of the Nobles, Luxor",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Sheikh Abd el-Qurna, West Bank, Luxor, Egypt",
+    "latitude": 25.7305,
+    "longitude": 32.6083,
+    "rating": 4.6,
+    "reviewsCount": 970,
+    "shortDescription": "Vivid, colorful tombs of ancient officials and scribes...",
+    "about": "Less crowded than the royal valleys, these tombs feature lively scenes of daily life, feasting, and work in ancient Thebes.",
+    "highlights": [
+      "Daily-Life Tomb Paintings",
+      "Tomb of Nakht",
+      "Tomb of Menna"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "tombs of the nobles, luxor",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "luxor_museum",
+    "name": "Luxor Museum",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "museum",
+    "address": "Corniche El Nil, Luxor, Egypt",
+    "latitude": 25.6997,
+    "longitude": 32.6389,
+    "rating": 4.8,
+    "reviewsCount": 3120,
+    "shortDescription": "Compact museum with beautifully displayed masterpieces...",
+    "about": "A smaller but exquisitely curated museum showcasing statues, artifacts, and royal mummies with excellent lighting and context.",
+    "highlights": [
+      "Statue of Tuthmosis III",
+      "Royal Mummy Hall",
+      "Karnak Cachette Finds"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "luxor museum",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "mummification_museum_luxor",
+    "name": "Mummification Museum",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "museum",
+    "address": "Corniche El Nil, Luxor, Egypt",
+    "latitude": 25.7005,
+    "longitude": 32.6394,
+    "rating": 4.5,
+    "reviewsCount": 1450,
+    "shortDescription": "Museum dedicated to the ancient art of mummification...",
+    "about": "Explains the tools, rituals, and science behind ancient Egyptian embalming practices through mummies of humans and sacred animals.",
+    "highlights": [
+      "Embalming Tools Display",
+      "Animal Mummies",
+      "Ritual Process Explained"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "mummification museum",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "coptic_museum_cairo",
+    "name": "Coptic Museum",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "museum",
+    "address": "Coptic Cairo, Old Cairo, Egypt",
+    "latitude": 30.005,
+    "longitude": 31.2303,
+    "rating": 4.6,
+    "reviewsCount": 1670,
+    "shortDescription": "World's largest collection of Coptic Christian artifacts...",
+    "about": "Housed within the walls of the Roman fortress, this museum traces Egypt's Christian heritage through textiles, icons, and manuscripts.",
+    "highlights": [
+      "Ancient Coptic Icons",
+      "Nag Hammadi Manuscripts",
+      "Roman Fortress Setting"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "coptic museum",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "manial_palace_museum",
+    "name": "Manial Palace Museum",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "museum",
+    "address": "Rhoda Island, Manial, Cairo, Egypt",
+    "latitude": 30.0233,
+    "longitude": 31.2264,
+    "rating": 4.6,
+    "reviewsCount": 1980,
+    "shortDescription": "Ornate royal palace blending Islamic architectural styles...",
+    "about": "Built by Prince Mohammed Ali Tewfik, this palace complex combines Ottoman, Moorish, Persian, and Rococo styles set within lush gardens.",
+    "highlights": [
+      "Throne Hall",
+      "Botanical Gardens",
+      "Eclectic Royal Architecture"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "manial palace museum",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "baron_empain_palace",
+    "name": "Baron Empain Palace",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "landmark",
+    "address": "Heliopolis, Cairo, Egypt",
+    "latitude": 30.0913,
+    "longitude": 31.3247,
+    "rating": 4.5,
+    "reviewsCount": 5230,
+    "shortDescription": "Flamboyant Hindu-style palace in the heart of Heliopolis...",
+    "about": "Built in 1911 by Belgian industrialist Baron Édouard Empain, this striking palace draws inspiration from Cambodian and Indian temple architecture.",
+    "highlights": [
+      "Hindu-Khmer Architecture",
+      "Rotating Design Legend",
+      "Heliopolis Landmark"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "baron empain palace",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "al_muizz_street",
+    "name": "Al-Muizz Street",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Islamic Cairo, Egypt",
+    "latitude": 30.05,
+    "longitude": 31.26,
+    "rating": 4.7,
+    "reviewsCount": 6780,
+    "shortDescription": "Open-air museum street lined with medieval monuments...",
+    "about": "One of the oldest streets in Cairo, flanked by mosques, madrassas, and mausoleums spanning the Fatimid, Mamluk, and Ottoman eras.",
+    "highlights": [
+      "Qalawun Complex",
+      "Historic Street Lanterns",
+      "Living Medieval Cairo"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "al-muizz street",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "bayt_al_suhaymi",
+    "name": "Bayt Al-Suhaymi",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Darb Al-Asfar, Islamic Cairo, Egypt",
+    "latitude": 30.0533,
+    "longitude": 31.2611,
+    "rating": 4.6,
+    "reviewsCount": 890,
+    "shortDescription": "Beautifully preserved Ottoman-era Cairo courtyard house...",
+    "about": "A rare surviving example of a wealthy Ottoman-period Cairene home, with wooden mashrabiya screens and a tranquil inner courtyard.",
+    "highlights": [
+      "Mashrabiya Wood Screens",
+      "Ottoman Courtyard",
+      "Traditional House Layout"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "bayt al-suhaymi",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "wadi_natrun_monasteries",
+    "name": "Wadi El Natrun Monasteries",
+    "city": "Wadi El Natrun",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Wadi El Natrun, Beheira Governorate, Egypt",
+    "latitude": 30.4167,
+    "longitude": 30.35,
+    "rating": 4.7,
+    "reviewsCount": 1230,
+    "shortDescription": "Cluster of ancient fortified Coptic monasteries...",
+    "about": "One of the earliest centers of Christian monasticism, this desert valley holds four active monasteries dating back to the 4th century.",
+    "highlights": [
+      "Ancient Monastic Walls",
+      "Coptic Frescoes",
+      "Desert Pilgrimage Site"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wadi el natrun monasteries",
+    "cityLower": "wadi el natrun"
+  },
+  {
+    "id": "monastery_saint_anthony",
+    "name": "Monastery of Saint Anthony",
+    "city": "Red Sea",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Eastern Desert, Red Sea Governorate, Egypt",
+    "latitude": 28.9333,
+    "longitude": 32.3667,
+    "rating": 4.7,
+    "reviewsCount": 760,
+    "shortDescription": "World's oldest Christian monastery, founded circa 356 AD...",
+    "about": "Nestled at the foot of the Red Sea mountains, this fortified monastery marks the birthplace of Christian monasticism.",
+    "highlights": [
+      "Oldest Monastery Claim",
+      "Ancient Church Frescoes",
+      "Mountain Desert Setting"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "monastery of saint anthony",
+    "cityLower": "red sea"
+  },
+  {
+    "id": "monastery_saint_catherine",
+    "name": "Monastery of Saint Catherine",
+    "city": "Saint Catherine",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Foot of Mount Sinai, South Sinai, Egypt",
+    "latitude": 28.5561,
+    "longitude": 33.9758,
+    "rating": 4.9,
+    "reviewsCount": 4670,
+    "shortDescription": "UNESCO-listed monastery at the base of the biblical mount...",
+    "about": "One of the oldest working Christian monasteries in the world, home to a priceless library of ancient manuscripts and icons.",
+    "highlights": [
+      "Burning Bush Site",
+      "Ancient Manuscript Library",
+      "Mount Sinai Base"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "monastery of saint catherine",
+    "cityLower": "saint catherine"
+  },
+  {
+    "id": "fortress_of_babylon",
+    "name": "Fortress of Babylon",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Coptic Cairo, Old Cairo, Egypt",
+    "latitude": 30.0058,
+    "longitude": 31.2298,
+    "rating": 4.6,
+    "reviewsCount": 1560,
+    "shortDescription": "Ancient Roman fortress underlying Coptic Cairo...",
+    "about": "Built by the Romans to guard the Nile, its massive walls and towers still form the foundation of Coptic Cairo's churches and museum.",
+    "highlights": [
+      "Roman Defensive Towers",
+      "Coptic Cairo Foundation",
+      "Ancient River Gate"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "fortress of babylon",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "nilometer_rhoda_island",
+    "name": "Nilometer of Rhoda Island",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Rhoda Island, Cairo, Egypt",
+    "latitude": 30.0189,
+    "longitude": 31.2247,
+    "rating": 4.5,
+    "reviewsCount": 620,
+    "shortDescription": "Ancient device used to measure the Nile's annual flood...",
+    "about": "Built in the 9th century, this graduated column measured Nile water levels, determining tax rates for the coming harvest season.",
+    "highlights": [
+      "9th-century Measuring Column",
+      "Nile-side Location",
+      "Islamic-era Engineering"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "nilometer of rhoda island",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "seti_temple_qurna",
+    "name": "Temple of Seti I at Qurna",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "West Bank, Luxor, Egypt",
+    "latitude": 25.7386,
+    "longitude": 32.605,
+    "rating": 4.5,
+    "reviewsCount": 540,
+    "shortDescription": "Lesser-visited mortuary temple with fine reliefs...",
+    "about": "A quieter mortuary temple on Luxor's West Bank dedicated to Seti I and completed by his son Ramesses II.",
+    "highlights": [
+      "Quiet Uncrowded Site",
+      "Fine Wall Reliefs",
+      "West Bank Location"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "temple of seti i at qurna",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "wikala_al_ghouri",
+    "name": "Wikala Al-Ghouri",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Al-Azhar St, Islamic Cairo, Egypt",
+    "latitude": 30.0475,
+    "longitude": 31.261,
+    "rating": 4.6,
+    "reviewsCount": 1120,
+    "shortDescription": "Restored Mamluk-era caravanserai and cultural venue...",
+    "about": "Once a merchant trading complex, this 16th-century caravanserai now hosts traditional Tanoura dance performances and cultural events.",
+    "highlights": [
+      "Tanoura Dance Shows",
+      "Mamluk Courtyard",
+      "Historic Trading Hub"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wikala al-ghouri",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "bab_zuweila",
+    "name": "Bab Zuweila",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "historical",
+    "type": "historical_landmark",
+    "address": "Al-Muizz St, Islamic Cairo, Egypt",
+    "latitude": 30.0431,
+    "longitude": 31.2603,
+    "rating": 4.6,
+    "reviewsCount": 1670,
+    "shortDescription": "One of the last surviving gates of Fatimid Cairo's walls...",
+    "about": "This monumental medieval gate offers a climbable minaret with sweeping panoramic views across the rooftops of Islamic Cairo.",
+    "highlights": [
+      "Climbable Minaret Towers",
+      "Fatimid City Gate",
+      "Rooftop Panorama"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "bab zuweila",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "karnak_sound_light_show",
+    "name": "Karnak Sound & Light Show",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Karnak Temple, Luxor, Egypt",
+    "latitude": 25.7188,
+    "longitude": 32.6573,
+    "rating": 4.6,
+    "reviewsCount": 3210,
+    "shortDescription": "Evening narrated walk through Karnak's illuminated ruins...",
+    "about": "A dramatic nighttime multimedia show that narrates ancient Egyptian history while walking through the illuminated temple pathways.",
+    "highlights": [
+      "Illuminated Temple Walk",
+      "Narrated History Show",
+      "Sacred Lake Finale"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "karnak sound & light show",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "giza_horseback_riding",
+    "name": "Giza Plateau Horseback Riding",
+    "city": "Giza",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Nazlet El-Semman, Giza, Egypt",
+    "latitude": 29.974,
+    "longitude": 31.129,
+    "rating": 4.6,
+    "reviewsCount": 2450,
+    "shortDescription": "Horseback tour around the desert edges of the pyramids...",
+    "about": "Ride through the desert stables of Nazlet El-Semman for classic panoramic views of the pyramids away from the crowds.",
+    "highlights": [
+      "Desert Panorama Ride",
+      "Local Stable Guides",
+      "Sunset Photo Ops"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "giza plateau horseback riding",
+    "cityLower": "giza"
+  },
+  {
+    "id": "cairo_felucca_sunset",
+    "name": "Cairo Nile Felucca Sunset Sail",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Nile Corniche, Giza/Cairo, Egypt",
+    "latitude": 30.027,
+    "longitude": 31.224,
+    "rating": 4.5,
+    "reviewsCount": 3980,
+    "shortDescription": "Traditional sailboat cruise on the Nile at sunset...",
+    "about": "A relaxed hour-long sail on a classic wooden felucca, watching Cairo's skyline glow as the sun sets over the river.",
+    "highlights": [
+      "Traditional Sailboat",
+      "Cairo Skyline Views",
+      "Sunset Timing"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "cairo nile felucca sunset sail",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "siwa_sandboarding",
+    "name": "Siwa Sandboarding Adventure",
+    "city": "Siwa",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Great Sand Sea, Siwa, Egypt",
+    "latitude": 29.195,
+    "longitude": 25.535,
+    "rating": 4.7,
+    "reviewsCount": 890,
+    "shortDescription": "Surf down towering golden dunes on a sandboard...",
+    "about": "A thrilling stop on any Siwa desert safari, sliding down steep dune faces on a waxed board before a Bedouin desert dinner.",
+    "highlights": [
+      "Steep Dune Runs",
+      "Included in Safari Trips",
+      "Sunset Dune Views"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "siwa sandboarding adventure",
+    "cityLower": "siwa"
+  },
+  {
+    "id": "wadi_el_rayan_kayaking",
+    "name": "Wadi El Rayan Kayaking",
+    "city": "Fayoum",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Wadi El Rayan Lakes, Fayoum, Egypt",
+    "latitude": 29.15,
+    "longitude": 30.43,
+    "rating": 4.5,
+    "reviewsCount": 640,
+    "shortDescription": "Paddle the calm connected lakes of Wadi El Rayan...",
+    "about": "A peaceful kayaking route across the desert lakes near Egypt's only natural waterfalls, framed by golden dunes.",
+    "highlights": [
+      "Desert Lake Paddling",
+      "Waterfall Nearby",
+      "Sunset Kayak Tours"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wadi el rayan kayaking",
+    "cityLower": "fayoum"
+  },
+  {
+    "id": "lake_nasser_fishing_trip",
+    "name": "Lake Nasser Fishing Expedition",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Lake Nasser, Aswan Governorate, Egypt",
+    "latitude": 23.5,
+    "longitude": 32.85,
+    "rating": 4.7,
+    "reviewsCount": 410,
+    "shortDescription": "Multi-day Nile perch fishing safari on Lake Nasser...",
+    "about": "Charter a houseboat for a remote fishing expedition targeting massive Nile perch in one of Africa's premier freshwater fisheries.",
+    "highlights": [
+      "Trophy Nile Perch",
+      "Houseboat Charters",
+      "Remote Lake Scenery"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "lake nasser fishing expedition",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "hurghada_parasailing",
+    "name": "Hurghada Parasailing",
+    "city": "Hurghada",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Red Sea Coast, Hurghada, Egypt",
+    "latitude": 27.26,
+    "longitude": 33.813,
+    "rating": 4.6,
+    "reviewsCount": 1980,
+    "shortDescription": "Soar above the turquoise Red Sea coastline by parachute...",
+    "about": "A quick adrenaline boost off Hurghada's beaches, towed behind a speedboat for aerial views of the coral reefs below.",
+    "highlights": [
+      "Aerial Reef Views",
+      "Quick Adrenaline Ride",
+      "Beachfront Launch"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "hurghada parasailing",
+    "cityLower": "hurghada"
+  },
+  {
+    "id": "el_gouna_windsurfing",
+    "name": "El Gouna Windsurfing",
+    "city": "El Gouna",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Mangroovy Beach, El Gouna, Egypt",
+    "latitude": 27.396,
+    "longitude": 33.679,
+    "rating": 4.6,
+    "reviewsCount": 720,
+    "shortDescription": "Reliable winds and flat lagoons for windsurfing all levels...",
+    "about": "El Gouna's protected lagoons and steady Red Sea winds make it a favorite training ground for windsurfers of every skill level.",
+    "highlights": [
+      "Flat-water Lagoon",
+      "Rental Equipment Available",
+      "Beginner Lessons"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "el gouna windsurfing",
+    "cityLower": "el gouna"
+  },
+  {
+    "id": "dahab_freediving_course",
+    "name": "Dahab Freediving Course",
+    "city": "Dahab",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Blue Hole, Dahab, South Sinai, Egypt",
+    "latitude": 28.573,
+    "longitude": 34.5375,
+    "rating": 4.8,
+    "reviewsCount": 1560,
+    "shortDescription": "Learn freediving techniques at a world-renowned training site...",
+    "about": "Dahab's calm, deep waters and relaxed community have made it one of the world's top destinations for freediving certification courses.",
+    "highlights": [
+      "AIDA Certification Courses",
+      "Calm Deep-water Site",
+      "Experienced Instructors"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "dahab freediving course",
+    "cityLower": "dahab"
+  },
+  {
+    "id": "white_desert_jeep_safari",
+    "name": "White Desert Jeep Safari",
+    "city": "Farafra",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "White Desert National Park, Farafra, Egypt",
+    "latitude": 27.37,
+    "longitude": 28.18,
+    "rating": 4.8,
+    "reviewsCount": 1340,
+    "shortDescription": "Overnight 4x4 safari camping among chalk rock formations...",
+    "about": "A guided jeep expedition through surreal white rock sculptures, ending with camping beneath the stars in the open desert.",
+    "highlights": [
+      "4x4 Desert Driving",
+      "Overnight Stargazing Camp",
+      "Chalk Formation Photography"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "white desert jeep safari",
+    "cityLower": "farafra"
+  },
+  {
+    "id": "cairo_papyrus_workshop",
+    "name": "Cairo Papyrus-Making Workshop",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Giza/Cairo, Egypt",
+    "latitude": 30.01,
+    "longitude": 31.21,
+    "rating": 4.3,
+    "reviewsCount": 2140,
+    "shortDescription": "Hands-on demonstration of ancient papyrus paper-making...",
+    "about": "Watch artisans demonstrate the ancient technique of turning papyrus reeds into paper, and try painting your own hieroglyphic scroll.",
+    "highlights": [
+      "Live Papyrus Demonstration",
+      "Hieroglyphic Painting",
+      "Artisan Workshop Visit"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "cairo papyrus-making workshop",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "cairo_cooking_class",
+    "name": "Cairo Egyptian Cooking Class",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Downtown Cairo, Egypt",
+    "latitude": 30.045,
+    "longitude": 31.238,
+    "rating": 4.7,
+    "reviewsCount": 630,
+    "shortDescription": "Learn to cook classic Egyptian dishes with a local chef...",
+    "about": "A hands-on class covering staples like koshary, molokhia, and stuffed vine leaves, followed by a shared home-style meal.",
+    "highlights": [
+      "Hands-on Cooking",
+      "Local Home Kitchen",
+      "Shared Traditional Meal"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "cairo egyptian cooking class",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "luxor_aswan_nile_cruise",
+    "name": "Luxor to Aswan Nile Cruise",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Nile River, Luxor to Aswan, Egypt",
+    "latitude": 25.68,
+    "longitude": 32.64,
+    "rating": 4.8,
+    "reviewsCount": 5670,
+    "shortDescription": "Multi-day cruise between Luxor and Aswan's ancient sites...",
+    "about": "A classic 3-4 day Nile cruise stopping at Edfu, Kom Ombo, and other temples along the way, combining sightseeing with river relaxation.",
+    "highlights": [
+      "Multi-day River Cruise",
+      "Temple Stops En Route",
+      "Onboard Pool & Deck"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "luxor to aswan nile cruise",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "luxor_west_bank_cycling",
+    "name": "Luxor West Bank Cycling Tour",
+    "city": "Luxor",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "West Bank, Luxor, Egypt",
+    "latitude": 25.725,
+    "longitude": 32.605,
+    "rating": 4.6,
+    "reviewsCount": 540,
+    "shortDescription": "Pedal past sugarcane fields and ancient temple ruins...",
+    "about": "A scenic bike ride through farmland and small villages on the West Bank, linking temples and tombs at your own pace.",
+    "highlights": [
+      "Rural Farmland Views",
+      "Flexible Temple Stops",
+      "Local Village Encounters"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "luxor west bank cycling tour",
+    "cityLower": "luxor"
+  },
+  {
+    "id": "ras_mohammed_diving_trip",
+    "name": "Ras Mohammed Diving Trip",
+    "city": "Sharm El Sheikh",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Ras Mohammed National Park, Sharm El Sheikh, Egypt",
+    "latitude": 27.73,
+    "longitude": 34.25,
+    "rating": 4.8,
+    "reviewsCount": 2670,
+    "shortDescription": "Boat diving trip to Egypt's most famous reef drop-offs...",
+    "about": "A full-day dive boat excursion to the legendary Shark and Yolanda Reefs, known for dramatic drop-offs and abundant marine life.",
+    "highlights": [
+      "Shark & Yolanda Reef",
+      "Wall Diving",
+      "Rich Marine Biodiversity"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "ras mohammed diving trip",
+    "cityLower": "sharm el sheikh"
+  },
+  {
+    "id": "sahl_hasheesh_horseback",
+    "name": "Sahl Hasheesh Beach Horseback Ride",
+    "city": "Hurghada",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Sahl Hasheesh, Hurghada, Egypt",
+    "latitude": 27.08,
+    "longitude": 33.87,
+    "rating": 4.5,
+    "reviewsCount": 480,
+    "shortDescription": "Sunset beach ride along the Red Sea shoreline...",
+    "about": "Ride along the quiet shoreline of Sahl Hasheesh as the sun sets over the Red Sea, a relaxed alternative to desert riding.",
+    "highlights": [
+      "Beachfront Horse Trail",
+      "Sunset Timing",
+      "Calm Coastal Scenery"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "sahl hasheesh beach horseback ride",
+    "cityLower": "hurghada"
+  },
+  {
+    "id": "alexandria_walking_tour",
+    "name": "Alexandria Old Town Walking Tour",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Downtown Alexandria, Egypt",
+    "latitude": 31.2,
+    "longitude": 29.91,
+    "rating": 4.6,
+    "reviewsCount": 1230,
+    "shortDescription": "Guided walk through Alexandria's Mediterranean-flavored streets...",
+    "about": "A relaxed walking tour covering the tram-lined streets, historic cafes, and seafront corniche of Egypt's Mediterranean capital.",
+    "highlights": [
+      "Historic Tram Streets",
+      "Corniche Seafront Walk",
+      "Local Cafe Stops"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "alexandria old town walking tour",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "abu_simbel_sound_light_show",
+    "name": "Abu Simbel Sound & Light Show",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Abu Simbel, Aswan Governorate, Egypt",
+    "latitude": 22.3372,
+    "longitude": 31.6258,
+    "rating": 4.7,
+    "reviewsCount": 890,
+    "shortDescription": "Evening light and narration show at the great temples...",
+    "about": "A nighttime multimedia performance projected across the facades of the Abu Simbel temples, retelling the story of Ramesses II.",
+    "highlights": [
+      "Illuminated Temple Facades",
+      "Historical Narration",
+      "Lakeside Evening Setting"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "abu simbel sound & light show",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "fayoum_desert_camping",
+    "name": "Fayoum Desert Camping Trip",
+    "city": "Fayoum",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Wadi El Rayan Desert, Fayoum, Egypt",
+    "latitude": 29.16,
+    "longitude": 30.42,
+    "rating": 4.6,
+    "reviewsCount": 560,
+    "shortDescription": "Overnight desert camping close to Cairo...",
+    "about": "A convenient weekend escape combining dune driving, stargazing, and a Bedouin-style campfire dinner just hours from the capital.",
+    "highlights": [
+      "Overnight Desert Camp",
+      "Stargazing Sessions",
+      "Campfire Dinner"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "fayoum desert camping trip",
+    "cityLower": "fayoum"
+  },
+  {
+    "id": "sharm_glass_bottom_boat",
+    "name": "Sharm El Sheikh Glass-Bottom Boat Tour",
+    "city": "Sharm El Sheikh",
+    "country": "Egypt",
+    "category": "activities",
+    "type": "activity",
+    "address": "Naama Bay, Sharm El Sheikh, Egypt",
+    "latitude": 27.913,
+    "longitude": 34.328,
+    "rating": 4.4,
+    "reviewsCount": 1780,
+    "shortDescription": "View coral reefs and fish without getting wet...",
+    "about": "A family-friendly boat tour with a transparent hull, ideal for viewing the reef's colorful marine life without snorkeling.",
+    "highlights": [
+      "Family-friendly Format",
+      "Coral Reef Viewing",
+      "No Swimming Required"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "sharm el sheikh glass-bottom boat tour",
+    "cityLower": "sharm el sheikh"
+  },
+  {
+    "id": "blue_lagoon_nuweiba",
+    "name": "Blue Lagoon, Nuweiba",
+    "city": "Nuweiba",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Nuweiba Coast, South Sinai, Egypt",
+    "latitude": 29.03,
+    "longitude": 34.66,
+    "rating": 4.6,
+    "reviewsCount": 780,
+    "shortDescription": "Calm shallow lagoon with striking turquoise waters...",
+    "about": "A relaxed beach lagoon popular with backpackers, known for its shallow warm waters, camel rides, and laid-back beach camps.",
+    "highlights": [
+      "Shallow Turquoise Waters",
+      "Beach Camp Huts",
+      "Camel Rides"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "blue lagoon, nuweiba",
+    "cityLower": "nuweiba"
+  },
+  {
+    "id": "ras_abu_galum_reserve",
+    "name": "Ras Abu Galum Protected Area",
+    "city": "Dahab",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "North of Dahab, South Sinai, Egypt",
+    "latitude": 28.68,
+    "longitude": 34.63,
+    "rating": 4.6,
+    "reviewsCount": 340,
+    "shortDescription": "Remote coastal reserve reachable only by boat or camel...",
+    "about": "A protected stretch of coral reef and mountain coastline accessible only by camel trek or boat, home to Bedouin fishing communities.",
+    "highlights": [
+      "Remote Coral Reefs",
+      "Camel Trek Access",
+      "Bedouin Fishing Camps"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "ras abu galum protected area",
+    "cityLower": "dahab"
+  },
+  {
+    "id": "wadi_gimal_national_park",
+    "name": "Wadi Gimal National Park",
+    "city": "Marsa Alam",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Marsa Alam, Red Sea Governorate, Egypt",
+    "latitude": 24.68,
+    "longitude": 35.15,
+    "rating": 4.7,
+    "reviewsCount": 520,
+    "shortDescription": "Pristine marine park with mangroves and seagrass meadows...",
+    "about": "One of Egypt's largest protected areas, combining desert mountains, mangrove lagoons, and seagrass beds frequented by sea turtles and dugongs.",
+    "highlights": [
+      "Seagrass Turtle Habitat",
+      "Mangrove Lagoons",
+      "Untouched Beaches"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wadi gimal national park",
+    "cityLower": "marsa alam"
+  },
+  {
+    "id": "colored_canyon_nuweiba",
+    "name": "Colored Canyon",
+    "city": "Nuweiba",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Near Nuweiba, South Sinai, Egypt",
+    "latitude": 29.09,
+    "longitude": 34.57,
+    "rating": 4.7,
+    "reviewsCount": 1120,
+    "shortDescription": "Narrow desert canyon streaked with vivid mineral colors...",
+    "about": "A dramatic slot canyon in the Sinai desert, its rock walls swirled with reds, purples, and yellows from mineral deposits over millennia.",
+    "highlights": [
+      "Rainbow Rock Walls",
+      "Narrow Canyon Hike",
+      "Bedouin Guided Trekking"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "colored canyon",
+    "cityLower": "nuweiba"
+  },
+  {
+    "id": "hurghada_mangrove_reserve",
+    "name": "Hurghada Mangrove Nature Reserve",
+    "city": "Hurghada",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "North of Hurghada, Red Sea Governorate, Egypt",
+    "latitude": 27.35,
+    "longitude": 33.78,
+    "rating": 4.4,
+    "reviewsCount": 380,
+    "shortDescription": "Rare Red Sea mangrove forest supporting coastal wildlife...",
+    "about": "A protected mangrove stand along the desert coastline, providing a nesting habitat for herons and a nursery for juvenile fish.",
+    "highlights": [
+      "Mangrove Boardwalk",
+      "Bird Nesting Grounds",
+      "Coastal Desert Contrast"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "hurghada mangrove nature reserve",
+    "cityLower": "hurghada"
+  },
+  {
+    "id": "petrified_forest_cairo",
+    "name": "Petrified Forest Protected Area",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Cairo-Suez Road, Cairo Governorate, Egypt",
+    "latitude": 29.97,
+    "longitude": 31.52,
+    "rating": 4.2,
+    "reviewsCount": 260,
+    "shortDescription": "Scattered fossilized tree trunks millions of years old...",
+    "about": "A little-visited desert reserve just outside Cairo where ancient tree trunks have turned to stone over 35 million years.",
+    "highlights": [
+      "Fossilized Tree Trunks",
+      "Easy Cairo Day Trip",
+      "Desert Geology"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "petrified forest protected area",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "fatnas_island_siwa",
+    "name": "Fatnas Island, Siwa",
+    "city": "Siwa",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Siwa Lake, Siwa Oasis, Egypt",
+    "latitude": 29.2,
+    "longitude": 25.48,
+    "rating": 4.7,
+    "reviewsCount": 640,
+    "shortDescription": "Small palm-fringed island famed for sunset views...",
+    "about": "A tranquil spring-fed pool surrounded by date palms on Siwa's salt lake, best visited at sunset for its golden reflections.",
+    "highlights": [
+      "Natural Spring Pool",
+      "Palm Grove Setting",
+      "Famous Sunset Views"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "fatnas island, siwa",
+    "cityLower": "siwa"
+  },
+  {
+    "id": "dahab_lagoon",
+    "name": "Dahab Lagoon",
+    "city": "Dahab",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Dahab, South Sinai, Egypt",
+    "latitude": 28.49,
+    "longitude": 34.49,
+    "rating": 4.6,
+    "reviewsCount": 950,
+    "shortDescription": "Shallow, wind-sheltered bay popular for kite lessons...",
+    "about": "A calm, waist-deep lagoon protected by a reef, making it ideal for beginner kitesurfing lessons and relaxed swimming.",
+    "highlights": [
+      "Shallow Kite Lagoon",
+      "Beginner-friendly Waters",
+      "Beachside Cafes"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "dahab lagoon",
+    "cityLower": "dahab"
+  },
+  {
+    "id": "kitcheners_island_aswan",
+    "name": "Kitchener's Island Botanical Garden",
+    "city": "Aswan",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Nile River, Aswan, Egypt",
+    "latitude": 24.09,
+    "longitude": 32.883,
+    "rating": 4.7,
+    "reviewsCount": 1980,
+    "shortDescription": "Lush botanical island garden in the middle of the Nile...",
+    "about": "A green oasis of exotic plants collected from around the world, planted by Lord Kitchener in the early 1900s, reachable only by boat.",
+    "highlights": [
+      "Exotic Plant Collection",
+      "Nile Island Setting",
+      "Boat-only Access"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "kitchener's island botanical garden",
+    "cityLower": "aswan"
+  },
+  {
+    "id": "marsa_shagra_reef",
+    "name": "Marsa Shagra House Reef",
+    "city": "Marsa Alam",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Marsa Shagra, Marsa Alam, Egypt",
+    "latitude": 25.2,
+    "longitude": 34.83,
+    "rating": 4.8,
+    "reviewsCount": 870,
+    "shortDescription": "Shore-accessible reef teeming with marine biodiversity...",
+    "about": "One of the Red Sea's best house reefs, directly accessible from the beach, popular for snorkeling right off the shore.",
+    "highlights": [
+      "Shore-entry Snorkeling",
+      "Dense Coral Coverage",
+      "Frequent Turtle Sightings"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "marsa shagra house reef",
+    "cityLower": "marsa alam"
+  },
+  {
+    "id": "sataya_dolphin_reef",
+    "name": "Sataya Dolphin Reef",
+    "city": "Marsa Alam",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Fury Shoal, Marsa Alam, Egypt",
+    "latitude": 24.2,
+    "longitude": 35.1,
+    "rating": 4.8,
+    "reviewsCount": 730,
+    "shortDescription": "Horseshoe-shaped reef sheltering resident spinner dolphins...",
+    "about": "Part of the Fury Shoal system, this crescent reef offers calm lagoon waters where wild spinner dolphins regularly rest and play.",
+    "highlights": [
+      "Resident Dolphin Pod",
+      "Sheltered Lagoon Reef",
+      "Rich Coral Gardens"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "sataya dolphin reef",
+    "cityLower": "marsa alam"
+  },
+  {
+    "id": "el_quseir_nature_reserve",
+    "name": "El Quseir Coastal Nature Area",
+    "city": "El Quseir",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "El Quseir, Red Sea Governorate, Egypt",
+    "latitude": 26.1,
+    "longitude": 34.28,
+    "rating": 4.5,
+    "reviewsCount": 410,
+    "shortDescription": "Quiet fishing town coastline with untouched reefs...",
+    "about": "A laid-back Red Sea town with a historic harbor, offering quiet beaches and shallow reefs far from the resort crowds.",
+    "highlights": [
+      "Uncrowded Reef Access",
+      "Historic Fishing Port",
+      "Calm Coastal Walks"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "el quseir coastal nature area",
+    "cityLower": "el quseir"
+  },
+  {
+    "id": "ain_el_serw_farafra",
+    "name": "Ain El Serw Hot Spring",
+    "city": "Farafra",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Farafra Oasis, New Valley, Egypt",
+    "latitude": 27.07,
+    "longitude": 27.97,
+    "rating": 4.5,
+    "reviewsCount": 320,
+    "shortDescription": "Warm natural spring pool in the Farafra oasis...",
+    "about": "A soothing warm-water spring surrounded by palm trees, a popular stop for desert travelers heading to or from the White Desert.",
+    "highlights": [
+      "Warm Spring Pool",
+      "Palm Grove Setting",
+      "Desert Traveler Stop"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "ain el serw hot spring",
+    "cityLower": "farafra"
+  },
+  {
+    "id": "black_desert_bahariya",
+    "name": "Black Desert, Bahariya",
+    "city": "Bahariya",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Bahariya Oasis, Giza Governorate, Egypt",
+    "latitude": 28.22,
+    "longitude": 28.88,
+    "rating": 4.6,
+    "reviewsCount": 780,
+    "shortDescription": "Volcanic hills dusted black with basalt fragments...",
+    "about": "A striking desert landscape of dark volcanic hills capped with basalt rubble, contrasting sharply with the surrounding golden sands.",
+    "highlights": [
+      "Volcanic Hill Formations",
+      "Basalt-capped Peaks",
+      "Scenic Viewpoint Climb"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "black desert, bahariya",
+    "cityLower": "bahariya"
+  },
+  {
+    "id": "bir_wahed_siwa",
+    "name": "Bir Wahed Hot & Cold Springs",
+    "city": "Siwa",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Great Sand Sea, Siwa, Egypt",
+    "latitude": 29.05,
+    "longitude": 25.33,
+    "rating": 4.7,
+    "reviewsCount": 560,
+    "shortDescription": "Remote desert spring with both hot and cold pools...",
+    "about": "Deep in the Great Sand Sea, this natural spring offers a hot sulfur pool and a cooler pool side by side, a highlight of Siwa safaris.",
+    "highlights": [
+      "Hot Sulfur Spring",
+      "Cool Pool Alternative",
+      "Deep Desert Location"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "bir wahed hot & cold springs",
+    "cityLower": "siwa"
+  },
+  {
+    "id": "lake_burullus",
+    "name": "Lake Burullus",
+    "city": "Kafr El Sheikh",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Nile Delta, Kafr El Sheikh Governorate, Egypt",
+    "latitude": 31.47,
+    "longitude": 30.98,
+    "rating": 4.3,
+    "reviewsCount": 210,
+    "shortDescription": "Nile Delta lagoon rich in migratory birdlife...",
+    "about": "One of Egypt's largest coastal lakes, a Ramsar wetland site supporting fisheries and vast numbers of wintering waterbirds.",
+    "highlights": [
+      "Ramsar Wetland Site",
+      "Birdwatching Boat Trips",
+      "Delta Fishing Villages"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "lake burullus",
+    "cityLower": "kafr el sheikh"
+  },
+  {
+    "id": "lake_manzala",
+    "name": "Lake Manzala",
+    "city": "Port Said",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature_reserve",
+    "address": "Nile Delta, Port Said Governorate, Egypt",
+    "latitude": 31.2,
+    "longitude": 32.1,
+    "rating": 4.2,
+    "reviewsCount": 180,
+    "shortDescription": "Egypt's largest brackish lagoon along the Delta coast...",
+    "about": "A vast shallow lagoon near Port Said, historically one of Egypt's richest fisheries and an important stop for migratory birds.",
+    "highlights": [
+      "Delta Fishing Culture",
+      "Migratory Bird Habitat",
+      "Vast Open Lagoon"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "lake manzala",
+    "cityLower": "port said"
+  },
+  {
+    "id": "wadi_feiran_sinai",
+    "name": "Wadi Feiran",
+    "city": "South Sinai",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Wadi Feiran, South Sinai, Egypt",
+    "latitude": 28.7,
+    "longitude": 33.63,
+    "rating": 4.6,
+    "reviewsCount": 290,
+    "shortDescription": "Lush palm-filled valley oasis in the Sinai mountains...",
+    "about": "Known as the \"Pearl of Sinai,\" this fertile valley is Sinai's largest oasis, historically significant and rich with date palm groves.",
+    "highlights": [
+      "Sinai's Largest Oasis",
+      "Date Palm Groves",
+      "Mountain Valley Setting"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "wadi feiran",
+    "cityLower": "south sinai"
+  },
+  {
+    "id": "abu_minqar_oasis",
+    "name": "Abu Minqar Oasis",
+    "city": "Dakhla",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Western Desert, New Valley Governorate, Egypt",
+    "latitude": 25.88,
+    "longitude": 28.13,
+    "rating": 4.3,
+    "reviewsCount": 140,
+    "shortDescription": "Tiny remote desert oasis on the edge of the Great Sand Sea...",
+    "about": "One of Egypt's smallest and most isolated oases, offering a genuine glimpse of remote Western Desert farming life.",
+    "highlights": [
+      "Remote Desert Village",
+      "Traditional Farming",
+      "Off-the-beaten-path Access"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "abu minqar oasis",
+    "cityLower": "dakhla"
+  },
+  {
+    "id": "dakhla_oasis_springs",
+    "name": "Dakhla Oasis Hot Springs",
+    "city": "Dakhla",
+    "country": "Egypt",
+    "category": "nature",
+    "type": "nature",
+    "address": "Dakhla Oasis, New Valley Governorate, Egypt",
+    "latitude": 25.49,
+    "longitude": 29.16,
+    "rating": 4.6,
+    "reviewsCount": 480,
+    "shortDescription": "Warm mineral springs scattered across a green desert oasis...",
+    "about": "Dakhla's natural hot springs, framed by palm groves and mud-brick villages, offer a relaxing soak deep in the Western Desert.",
+    "highlights": [
+      "Mineral Hot Springs",
+      "Mud-brick Village Views",
+      "Palm Grove Surroundings"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "dakhla oasis hot springs",
+    "cityLower": "dakhla"
+  },
+  {
+    "id": "koshary_el_tahrir",
+    "name": "Koshary El Tahrir",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Tahrir Square, Downtown Cairo, Egypt",
+    "latitude": 30.0445,
+    "longitude": 31.2358,
+    "rating": 4.4,
+    "reviewsCount": 3670,
+    "shortDescription": "Bustling koshary chain near Cairo's central square...",
+    "about": "A popular, no-frills koshary spot serving generous portions of Egypt's beloved rice, pasta, and lentil dish at affordable prices.",
+    "highlights": [
+      "Classic Koshary Bowl",
+      "Central Downtown Location",
+      "Quick Casual Service"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "koshary el tahrir",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "el_shabrawy",
+    "name": "El Shabrawy",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Multiple Branches, Cairo, Egypt",
+    "latitude": 30.05,
+    "longitude": 31.245,
+    "rating": 4.3,
+    "reviewsCount": 8920,
+    "shortDescription": "Nationwide chain famous for taameya and fuul sandwiches...",
+    "about": "A well-known Egyptian fast-food chain serving classic street-food staples like taameya, fuul, and shawarma across the country.",
+    "highlights": [
+      "Taameya Sandwiches",
+      "Fuul Medames",
+      "Affordable Fast Food"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "el shabrawy",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "momen_restaurant",
+    "name": "Mo'men Restaurant",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Multiple Branches, Cairo, Egypt",
+    "latitude": 30.06,
+    "longitude": 31.25,
+    "rating": 4.2,
+    "reviewsCount": 6540,
+    "shortDescription": "Long-running Egyptian fast-food chain since the 1980s...",
+    "about": "One of Egypt's oldest fast-food chains, known for fried chicken, burgers, and combo meals at family-friendly prices.",
+    "highlights": [
+      "Fried Chicken Combos",
+      "Family-friendly Menu",
+      "Nationwide Branches"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "mo'men restaurant",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "fasahet_somaya",
+    "name": "Fasahet Somaya",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Downtown Cairo, Egypt",
+    "latitude": 30.048,
+    "longitude": 31.241,
+    "rating": 4.7,
+    "reviewsCount": 2340,
+    "shortDescription": "Beloved home-style Egyptian kitchen run by a local matriarch...",
+    "about": "A tiny, no-menu eatery serving whatever traditional home-cooked dishes were prepared that day, treasured for its authenticity.",
+    "highlights": [
+      "Daily Rotating Menu",
+      "Authentic Home Cooking",
+      "Local Cairo Institution"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "fasahet somaya",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "om_hashim_falafel",
+    "name": "Om Hashim Falafel",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Dokki, Giza, Egypt",
+    "latitude": 30.038,
+    "longitude": 31.212,
+    "rating": 4.6,
+    "reviewsCount": 1980,
+    "shortDescription": "Legendary Dokki spot famous for crispy taameya...",
+    "about": "A neighborhood institution renowned for perfectly crispy taameya (Egyptian falafel) served fresh throughout the day.",
+    "highlights": [
+      "Crispy Taameya",
+      "Local Neighborhood Favorite",
+      "Fresh Daily Frying"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "om hashim falafel",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "groppi_cafe",
+    "name": "Groppi",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Talaat Harb Square, Downtown Cairo, Egypt",
+    "latitude": 30.0459,
+    "longitude": 31.2447,
+    "rating": 4.4,
+    "reviewsCount": 3120,
+    "shortDescription": "Historic patisserie and cafe operating since 1909...",
+    "about": "Once dubbed the \"Groppi of the Nile,\" this iconic Belle Époque cafe has served pastries, chocolates, and coffee to Cairo's elite for over a century.",
+    "highlights": [
+      "Historic 1909 Cafe",
+      "Art Deco Interior",
+      "Classic Pastries"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "groppi",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "simonds_cafe",
+    "name": "Simonds Café",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "26th of July St, Zamalek, Cairo, Egypt",
+    "latitude": 30.062,
+    "longitude": 31.221,
+    "rating": 4.5,
+    "reviewsCount": 1670,
+    "shortDescription": "Zamalek's oldest coffeehouse, open since 1897...",
+    "about": "A historic Zamalek institution serving strong Egyptian coffee and simple pastries in an old-world, unpretentious setting.",
+    "highlights": [
+      "Historic 1897 Coffeehouse",
+      "Strong Egyptian Coffee",
+      "Zamalek Local Favorite"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "simonds café",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "la_rosa_alexandria",
+    "name": "La Rosa Restaurant",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Ibrahimeya, Alexandria, Egypt",
+    "latitude": 31.22,
+    "longitude": 29.94,
+    "rating": 4.6,
+    "reviewsCount": 2870,
+    "shortDescription": "One of Alexandria's favorite seafood destinations...",
+    "about": "A long-standing Alexandrian seafood restaurant known for fresh grilled fish, shrimp tagine, and generous Mediterranean-style mezze.",
+    "highlights": [
+      "Fresh Grilled Seafood",
+      "Shrimp Tagine",
+      "Mediterranean Mezze"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "la rosa restaurant",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "aly_abdo_alexandria",
+    "name": "Aly Abdo Fish Market",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Al Anfoushi, Alexandria, Egypt",
+    "latitude": 31.2115,
+    "longitude": 29.8845,
+    "rating": 4.5,
+    "reviewsCount": 1780,
+    "shortDescription": "Pick-your-own-fish seafood market restaurant...",
+    "about": "A classic Alexandrian fish-market restaurant where diners choose their fresh catch from the ice counter to be grilled or fried to order.",
+    "highlights": [
+      "Choose-your-fish Counter",
+      "Harbor-side Setting",
+      "Fried Calamari"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "aly abdo fish market",
+    "cityLower": "alexandria"
+  },
+  {
+    "id": "sabaya_sharm",
+    "name": "Sabaya Restaurant",
+    "city": "Sharm El Sheikh",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Four Seasons Resort, Sharm El Sheikh, Egypt",
+    "latitude": 27.86,
+    "longitude": 34.39,
+    "rating": 4.7,
+    "reviewsCount": 980,
+    "shortDescription": "Upscale Lebanese and Middle Eastern dining by the Red Sea...",
+    "about": "A refined resort restaurant offering an extensive mezze spread and grilled specialties with views over the Red Sea.",
+    "highlights": [
+      "Extensive Mezze Spread",
+      "Red Sea Views",
+      "Live Bread Baking"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "sabaya restaurant",
+    "cityLower": "sharm el sheikh"
+  },
+  {
+    "id": "kazaz_restaurant",
+    "name": "Kazaz Restaurant",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Downtown Cairo, Egypt",
+    "latitude": 30.05,
+    "longitude": 31.242,
+    "rating": 4.4,
+    "reviewsCount": 2450,
+    "shortDescription": "Old-school Cairo eatery known for grilled meats and juices...",
+    "about": "A long-running Downtown Cairo spot pairing classic grilled meat platters with fresh-squeezed juice combinations.",
+    "highlights": [
+      "Grilled Meat Platters",
+      "Fresh Juice Bar",
+      "Downtown Cairo Classic"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "kazaz restaurant",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "left_bank_zamalek",
+    "name": "Left Bank",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "26th of July St, Zamalek, Cairo, Egypt",
+    "latitude": 30.061,
+    "longitude": 31.2198,
+    "rating": 4.5,
+    "reviewsCount": 2670,
+    "shortDescription": "Nile-front restaurant and lounge with a global menu...",
+    "about": "A stylish Zamalek riverside venue combining an international menu with sweeping Nile views, popular for evening dining and cocktails.",
+    "highlights": [
+      "Nile-front Terrace",
+      "International Menu",
+      "Evening Lounge Vibe"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "left bank",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "el_malky_grill",
+    "name": "El Malky Grill",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Nasr City, Cairo, Egypt",
+    "latitude": 30.07,
+    "longitude": 31.34,
+    "rating": 4.5,
+    "reviewsCount": 3230,
+    "shortDescription": "Popular grill house for kebab, kofta, and mixed grills...",
+    "about": "A go-to destination in Nasr City for generous charcoal-grilled meat platters served with traditional Egyptian sides.",
+    "highlights": [
+      "Mixed Grill Platters",
+      "Charcoal Cooking",
+      "Family Dining Hall"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "el malky grill",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "taboula_zamalek",
+    "name": "Taboula",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Sherif St, Downtown/Zamalek, Cairo, Egypt",
+    "latitude": 30.05,
+    "longitude": 31.235,
+    "rating": 4.6,
+    "reviewsCount": 3540,
+    "shortDescription": "Long-standing favorite for Lebanese-style mezze in Cairo...",
+    "about": "A beloved Cairo institution for Levantine mezze, grilled meats, and fresh tabbouleh, popular for group dining.",
+    "highlights": [
+      "Lebanese Mezze Spread",
+      "Fresh Tabbouleh",
+      "Group-friendly Seating"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "taboula",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "cilantro_cafe",
+    "name": "Cilantro Café",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Multiple Branches, Cairo, Egypt",
+    "latitude": 30.055,
+    "longitude": 31.23,
+    "rating": 4.3,
+    "reviewsCount": 4870,
+    "shortDescription": "Egypt's popular homegrown coffeehouse chain...",
+    "about": "A widely loved Egyptian café chain serving coffee, sandwiches, and desserts in a relaxed, modern setting across the country.",
+    "highlights": [
+      "Homegrown Coffee Chain",
+      "Casual Work-friendly Seating",
+      "Sandwich & Dessert Menu"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "cilantro café",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "koshary_hend",
+    "name": "Koshary Hend",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Multiple Branches, Cairo, Egypt",
+    "latitude": 30.04,
+    "longitude": 31.22,
+    "rating": 4.5,
+    "reviewsCount": 5670,
+    "shortDescription": "Modern koshary chain with a spicier signature sauce...",
+    "about": "A popular contemporary koshary chain known for its distinctively spicy tomato sauce and consistent quality across branches.",
+    "highlights": [
+      "Signature Spicy Sauce",
+      "Consistent Quality",
+      "Modern Fast-casual Setting"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "koshary hend",
+    "cityLower": "cairo"
+  },
+  {
+    "id": "crave_restaurant",
+    "name": "Crave",
+    "city": "Cairo",
+    "country": "Egypt",
+    "category": "food",
+    "type": "restaurant",
+    "address": "Sheikh Zayed City, Giza, Egypt",
+    "latitude": 30.03,
+    "longitude": 30.97,
+    "rating": 4.5,
+    "reviewsCount": 1670,
+    "shortDescription": "Modern casual dining spot popular in West Cairo suburbs...",
+    "about": "A trendy West Cairo restaurant serving a contemporary mix of burgers, pasta, and Egyptian-fusion plates in a relaxed setting.",
+    "highlights": [
+      "Modern Fusion Menu",
+      "West Cairo Suburb Location",
+      "Casual Trendy Vibe"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop",
+    "imageUrls": [
+      "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop"
+    ],
+    "nameLower": "crave",
+    "cityLower": "cairo"
+  }
+]

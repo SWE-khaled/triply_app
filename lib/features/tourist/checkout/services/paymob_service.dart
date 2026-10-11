@@ -8,50 +8,42 @@ import 'package:http/http.dart' as http;
 import '../model/booking_model.dart';
 
 /// Dedicated network helper for the Paymob sandbox 3-step workflow.
-/// Secrets are read from `.env` first; sandbox fallback constants below
-/// guarantee the flow still works when `.env` is missing or was never
-/// initialized in `main.dart` (which stays untouched).
-/// NOTE: fallbacks live in source on purpose so sandbox testing never
-/// throws a null/missing-key error. Rotate them before any release.
+///
+/// Secrets come ONLY from `.env` (`PAYMOB_API_KEY`, `PAYMOB_INTEGRATION_ID`,
+/// `PAYMOB_IFRAME_ID`, loaded in `main.dart`). There are no in-source
+/// fallbacks: without configuration every workflow fails closed with a
+/// clear message instead of silently using embedded credentials.
+/// Nothing here is ever logged (responses may carry tokens).
 class PaymobService {
   static const String _base = 'https://accept.paymob.com';
 
-  // ----- Sandbox fallbacks (used only when .env has no value) -----
-  static const String _fallbackApiKey =
-      'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRJek5qRTVNeXdpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS4xQWpDQUc5SUR3U0h0a3dRNGx1anBoUi1xSWtIeTBZVGRkNk9oNmhjbW5GUEp6bFVTRGNzUHJfZWtTRW8tR0xVa2txeHJZT2V5WWRIN0VaTm5UdWVCUQ==';
-  static const String _fallbackIntegrationId = '5955185';
-  static const String _fallbackIframeId = '1083051';
+  final http.Client _client;
+
+  PaymobService({http.Client? client}) : _client = client ?? http.Client();
 
   bool _envLoaded = false;
 
-  /// Best-effort `.env` load. Never throws: on failure the getters below
-  /// fall back to the sandbox constants, so `main.dart` stays untouched.
+  /// Best-effort `.env` load. Never throws; missing keys surface later as
+  /// a configuration error from the getters below. Skips when values are
+  /// already present (`main.dart` loads at startup): `dotenv.load` clears
+  /// first, so reloading here would wipe runtime-provided values.
   Future<void> _ensureEnv() async {
     if (_envLoaded) return;
     _envLoaded = true;
+    if (dotenv.isInitialized) return;
     try {
       await dotenv.load(fileName: '.env');
-    } catch (_) {
-
-    }
+    } catch (_) {}
   }
 
-  /// `.env` value wins; sandbox fallback otherwise (never null/empty).
-  String get _apiKey {
-    final v = dotenv.env['PAYMOB_API_KEY'] ?? '';
-    return v.isNotEmpty ? v : _fallbackApiKey;
-  }
+  /// `.env` value or empty when unconfigured (callers fail closed).
+  String get _apiKey => dotenv.env['PAYMOB_API_KEY'] ?? '';
 
   int get _integrationId {
-    final raw = dotenv.env['PAYMOB_INTEGRATION_ID'] ?? '';
-    final parsed = int.tryParse(raw.isNotEmpty ? raw : _fallbackIntegrationId);
-    return parsed ?? int.parse(_fallbackIntegrationId);
+    return int.tryParse(dotenv.env['PAYMOB_INTEGRATION_ID'] ?? '') ?? 0;
   }
 
-  String get iframeId {
-    final v = dotenv.env['PAYMOB_IFRAME_ID'] ?? '';
-    return v.isNotEmpty ? v : _fallbackIframeId;
-  }
+  String get iframeId => dotenv.env['PAYMOB_IFRAME_ID'] ?? '';
 
   void _assertConfigured() {
     if (_apiKey.isEmpty || _integrationId == 0 || iframeId.isEmpty) {
@@ -68,12 +60,12 @@ class PaymobService {
   /// can show actionable messages instead of a generic fallback.
   Future<http.Response> _post(Uri url, Map<String, dynamic> body) async {
     try {
-      return await http
+      return await _client
           .post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      )
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
           .timeout(_timeout);
     } on SocketException {
       throw const PaymobException(
@@ -109,12 +101,8 @@ class PaymobService {
       'api_key': _apiKey,
     });
 
-    print('--- Paymob Auth Step ---');
-    print('Status Code: ${res.statusCode}');
-    print('Response Body: ${res.body}');
-
     if (res.statusCode != 200 && res.statusCode != 201) {
-      throw PaymobException('Auth failed (HTTP ${res.statusCode}):${res.body}');
+      throw PaymobException('Auth failed (HTTP ${res.statusCode}).');
     }
     final token = _decode(res, 'Auth')['token'] as String?;
     if (token == null || token.isEmpty) {
@@ -137,12 +125,8 @@ class PaymobService {
       'items': [],
     });
 
-    print('--- Paymob Register Order Step ---');
-    print('Status Code: ${res.statusCode}');
-    print('Response Body: ${res.body}');
-
     if (res.statusCode != 200 && res.statusCode != 201) {
-      throw PaymobException('Order failed (HTTP ${res.statusCode}):${res.body}');
+      throw PaymobException('Order failed (HTTP ${res.statusCode}).');
     }
     final id = _decode(res, 'Order')['id'];
     if (id == null) throw const PaymobException('Order failed: no id.');
@@ -166,12 +150,8 @@ class PaymobService {
       'integration_id': _integrationId,
     });
 
-    print('--- Paymob Payment Key Step ---');
-    print('Status Code: ${res.statusCode}');
-    print('Response Body: ${res.body}');
-
     if (res.statusCode != 200 && res.statusCode != 201) {
-      throw PaymobException('Payment key failed (HTTP ${res.statusCode}):${res.body}');
+      throw PaymobException('Payment key failed (HTTP ${res.statusCode}).');
     }
     final token = _decode(res, 'Payment key')['token'] as String?;
     if (token == null || token.isEmpty) {
@@ -180,35 +160,28 @@ class PaymobService {
     return token;
   }
 
-  /// Full workflow: auth -> order -> payment key. Returns the payment token
-  /// for the iframe URL.
-  Future<String> createPaymentToken({
+  /// Full workflow: auth -> order -> payment key. Returns the iframe
+  /// payment token together with the Paymob order id, so callers can
+  /// persist a pending reconciliation record carrying the order reference
+  /// the server verification looks up. Never logs request/response bodies
+  /// (they may carry tokens).
+  Future<({String paymentToken, int orderId})> createPaymentToken({
     required CheckoutBookingSummary summary,
     required PaymobBillingData billing,
   }) async {
-    try {
-      print('================ START PAYMOB PAYMENT ================');
-      final authToken = await requestAuthToken();
-      final amountCents = (summary.total * 100).round();
-      final orderId = await registerOrder(
-        authToken: authToken,
-        amountCents: amountCents,
-      );
-      final paymentToken = await requestPaymentKey(
-        authToken: authToken,
-        orderId: orderId,
-        amountCents: amountCents,
-        billing: billing,
-      );
-      print('================ PAYMOB PAYMENT SUCCESS ================');
-      return paymentToken;
-    } catch (e, stackTrace) {
-      print('================ PAYMOB ERROR CATCH ================');
-      print('Exception: $e');
-      print('StackTrace:\n$stackTrace');
-      print('====================================================');
-      rethrow;
-    }
+    final authToken = await requestAuthToken();
+    final amountCents = (summary.total * 100).round();
+    final orderId = await registerOrder(
+      authToken: authToken,
+      amountCents: amountCents,
+    );
+    final paymentToken = await requestPaymentKey(
+      authToken: authToken,
+      orderId: orderId,
+      amountCents: amountCents,
+      billing: billing,
+    );
+    return (paymentToken: paymentToken, orderId: orderId);
   }
 
   /// Iframe URL opened by [PaymobWebviewScreen].

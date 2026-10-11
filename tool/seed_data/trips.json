@@ -1,0 +1,77 @@
+[
+  {
+    "id": "t1",
+    "guideId": "",
+    "guideName": "Omar El-Rashidy",
+    "placeId": "",
+    "title": "Pyramids at Dawn & Sphinx",
+    "description": "",
+    "location": "Egypt",
+    "dateLabel": "Oct 15, 2026 · 6:00 AM",
+    "priceEgp": 6000.0,
+    "currency": "EGP",
+    "capacity": 12,
+    "meetingPoint": "",
+    "included": [],
+    "highlights": [],
+    "itinerary": [],
+    "notes": [],
+    "languages": [],
+    "coverImageUrl": "https://picsum.photos/seed/pyramids/300/400",
+    "imageUrls": [
+      "https://picsum.photos/seed/pyramids/300/400"
+    ],
+    "category": "historical",
+    "titleLower": "pyramids at dawn & sphinx"
+  },
+  {
+    "id": "t2",
+    "guideId": "",
+    "guideName": "Nour Abdallah",
+    "placeId": "",
+    "title": "Nile Felucca & Nubian Village",
+    "description": "",
+    "location": "Egypt",
+    "dateLabel": "Oct 22, 2026 · 3:00 PM",
+    "priceEgp": 4750.0,
+    "currency": "EGP",
+    "capacity": 12,
+    "meetingPoint": "",
+    "included": [],
+    "highlights": [],
+    "itinerary": [],
+    "notes": [],
+    "languages": [],
+    "coverImageUrl": "https://picsum.photos/seed/nile/300/400",
+    "imageUrls": [
+      "https://picsum.photos/seed/nile/300/400"
+    ],
+    "category": "activities",
+    "titleLower": "nile felucca & nubian village"
+  },
+  {
+    "id": "t3",
+    "guideId": "",
+    "guideName": "Nour Abdallah",
+    "placeId": "",
+    "title": "Valley of the Kings Private Tour",
+    "description": "",
+    "location": "Egypt",
+    "dateLabel": "Nov 5, 2026 · 8:00 AM",
+    "priceEgp": 7500.0,
+    "currency": "EGP",
+    "capacity": 10,
+    "meetingPoint": "",
+    "included": [],
+    "highlights": [],
+    "itinerary": [],
+    "notes": [],
+    "languages": [],
+    "coverImageUrl": "https://picsum.photos/seed/valley/300/400",
+    "imageUrls": [
+      "https://picsum.photos/seed/valley/300/400"
+    ],
+    "category": "historical",
+    "titleLower": "valley of the kings private tour"
+  }
+]

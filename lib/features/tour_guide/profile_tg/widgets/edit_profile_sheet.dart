@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../data/firestore/datasources/guide_profiles_datasource.dart';
 import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../../common/AuthTourist/providers/auth_provider.dart';
 
@@ -129,6 +130,19 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         location: _locationController.text.trim(),
         phone: _phoneController.text.trim(),
       );
+      // Best-effort public-directory sync so the tourist-facing guide
+      // profile never goes stale behind `users/`. Owner-editable fields
+      // only — verification flags/ratings are server-owned (see datasource).
+      try {
+        await GuideProfilesDatasource().updatePublicFields(
+          user.uid,
+          displayName: newName,
+          contactPhone: _phoneController.text.trim(),
+          about: _aboutController.text.trim(),
+          location: _locationController.text.trim(),
+          coverUrl: newPhotoUrl,
+        );
+      } catch (_) {}
       await auth.refreshUser();
 
       if (mounted) Navigator.pop(context, true);
@@ -148,8 +162,8 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     if (_pickedImage != null) {
       avatar = FileImage(_pickedImage!);
     } else if (widget.displayAvatar.isNotEmpty) {
-  avatar = NetworkImage(widget.displayAvatar);
-}
+      avatar = NetworkImage(widget.displayAvatar);
+    }
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -167,87 +181,87 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-          GestureDetector(
-            onTap: _loading ? null : _pickImage,
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: avatar,
-                  child: avatar == null
-                      ? Text(
-                          widget.name.isNotEmpty
-                              ? widget.name[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(fontSize: 36),
-                        )
-                      : null,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Theme.of(context).primaryColor,
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 16,
-                      color: Colors.white,
+            GestureDetector(
+              onTap: _loading ? null : _pickImage,
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: avatar,
+                    child: avatar == null
+                        ? Text(
+                            widget.name.isNotEmpty
+                                ? widget.name[0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(fontSize: 36),
+                          )
+                        : null,
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Theme.of(context).primaryColor,
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 16,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _aboutController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'About',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _aboutController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'About',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _locationController,
-            decoration: const InputDecoration(
-              labelText: 'Location',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _locationController,
+              decoration: const InputDecoration(
+                labelText: 'Location',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(
-              labelText: 'Phone number',
-              border: OutlineInputBorder(),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: 'Phone number',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: _loading ? null : _save,
-              child: _loading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Save'),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _loading ? null : _save,
+                child: _loading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save'),
+              ),
             ),
-          ),
           ],
         ),
       ),

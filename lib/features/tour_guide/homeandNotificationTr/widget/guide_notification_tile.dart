@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../../../../core/theme/app_colors.dart';
-import '../model/guide_notification.dart';
+import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/features/tour_guide/homeandNotificationTr/model/guide_notification.dart';
 
 /// Cream tint from Figma (icon circles). Local const only — the global
 /// theme in `core/theme/` is left untouched.
@@ -61,6 +60,16 @@ class GuideNotificationTile extends StatelessWidget {
                 ],
               ),
             ),
+            if (!item.isRead)
+              Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.only(top: 6, left: 8),
+                decoration: const BoxDecoration(
+                  color: AppColors.accentOrange,
+                  shape: BoxShape.circle,
+                ),
+              ),
           ],
         ),
       ),

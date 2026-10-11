@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:triply/data/firestore/models/trip_doc.dart';
+import 'package:triply/data/firestore/repositories/guide_trips_repository.dart';
 import '../../../../core/data/guide_trip_details_source.dart';
 import '../../../../core/data/guide_trips_store.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
@@ -15,6 +17,7 @@ import 'create_trip_state.dart';
 /// they are disposed in [close]. No validation UI here — [submit]
 /// returns a message and the View shows it.
 class CreateTripCubit extends Cubit<CreateTripState> {
+  final GuideTripsRepository _repository;
   int _nextId = 1;
 
   final nameCtrl = TextEditingController();
@@ -32,7 +35,9 @@ class CreateTripCubit extends Cubit<CreateTripState> {
   final languagesCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
 
-  CreateTripCubit() : super(CreateTripState.initial());
+  CreateTripCubit([GuideTripsRepository? repository])
+      : _repository = repository ?? GuideTripsRepository(),
+        super(CreateTripState.initial());
 
   @override
   Future<void> close() {
@@ -360,5 +365,73 @@ class CreateTripCubit extends Cubit<CreateTripState> {
       ),
     );
     return (trip: trip, error: null);
+  }
+
+  /// Firestore-backed submit. Runs the existing session [submitTrip] first
+  /// (so the UI flow is unchanged), then persists the same trip to
+  /// `trips/` as `pending`. Returns the session trip + optional remote
+  /// error (session success is never rolled back on remote failure).
+  Future<({GuideTrip? trip, String? error, String? remoteError})>
+      submitTripToFirestore({
+    required String guideId,
+    String guideName = '',
+  }) async {
+    final local = submitTrip();
+    if (local.trip == null) {
+      return (trip: null, error: local.error, remoteError: null);
+    }
+    final trip = local.trip!;
+    try {
+      await _repository.createTrip(
+        TripDoc(
+          id: '',
+          guideId: guideId,
+          guideName: guideName,
+          title: trip.title,
+          description: aboutCtrl.text.trim(),
+          location: trip.location,
+          dateLabel: dateCtrl.text.trim().isEmpty
+              ? trip.scheduleLabel
+              : dateCtrl.text.trim(),
+          startTime: timeCtrl.text.trim(),
+          duration: durationCtrl.text.trim(),
+          priceEgp: trip.priceEgp,
+          capacity: int.tryParse(maxTravelersCtrl.text.trim()) ?? 12,
+          meetingPoint: meetingCtrl.text.trim(),
+          included: includedCtrl.text.trim().isEmpty
+              ? const []
+              : [includedCtrl.text.trim()],
+          highlights: state.highlights
+              .map((h) => h.text.trim())
+              .where((t) => t.isNotEmpty)
+              .toList(),
+          itinerary: state.itinerary
+              .where(
+                (s) => s.time.trim().isNotEmpty || s.activity.trim().isNotEmpty,
+              )
+              .map(
+                (s) => {'time': s.time.trim(), 'title': s.activity.trim()},
+              )
+              .toList(),
+          notes: notesCtrl.text.trim().isEmpty
+              ? const []
+              : notesCtrl.text
+                  .split('\n')
+                  .map((n) => n.trim())
+                  .where((n) => n.isNotEmpty)
+                  .toList(),
+          languages: languagesCtrl.text.trim().isEmpty
+              ? const []
+              : [languagesCtrl.text.trim()],
+          coverImageUrl: trip.imageUrl,
+          category: labelCtrl.text.trim().isEmpty
+              ? 'historical'
+              : labelCtrl.text.trim(),
+        ),
+      );
+      return (trip: trip, error: null, remoteError: null);
+    } catch (e) {
+      return (trip: trip, error: null, remoteError: e.toString());
+    }
   }
 }

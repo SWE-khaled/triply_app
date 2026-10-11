@@ -1,4 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/core/firebase/firestore_result.dart';
+import 'package:triply/data/firestore/repositories/places_repository.dart';
+import 'package:triply/data/firestore/repositories/trips_repository.dart';
 import '../../../../core/data/mock/tourist/mock_guides.dart' as guides_src;
 import '../../../../core/data/mock/tourist/mock_guides1.dart';
 import '../../../../core/data/mock/tourist/mock_places.dart';
@@ -14,9 +18,26 @@ import 'place_detail_state.dart';
 
 class PlaceDetailCubit extends Cubit<PlaceDetailState> {
   final String placeId;
+  final PlacesRepository _places;
+  final TripsRepository _trips;
 
-  PlaceDetailCubit({required this.placeId})
-      : super(_load(placeId));
+  /// Kill-switch: gates every remote call in the View. Stays `false` until
+  /// the backend is deployed AND the emulator suite passes.
+  static const bool useRemote = false;
+
+  /// Trips-tab kill-switch (Phase 1): approved `trips/` for this place are
+  /// primary; the mock tab list is the explicit offline baseline. Scoped to
+  /// the Trips tab only — the header/guides/stories paths stay on mocks
+  /// behind [useRemote].
+  static const bool useRemoteTrips = true;
+
+  PlaceDetailCubit({
+    required this.placeId,
+    PlacesRepository? places,
+    TripsRepository? trips,
+  }) : _places = places ?? PlacesRepository(),
+       _trips = trips ?? TripsRepository(),
+       super(_load(placeId));
 
   static PlaceDetailState _load(String placeId) {
     final placeJson = mockPlaces.firstWhere(
@@ -83,5 +104,46 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState> {
   void toggleFavorite() {
     place.isFavorite = !place.isFavorite;
     emit(state.copyWith());
+  }
+
+  /// Best-effort remote trips-tab refresh via the existing
+  /// `trips where placeId + approvalStatus == approved` query. Replaces the
+  /// tab list on success (real ids flow to Trip Details); keeps the mock
+  /// list on empty/failure and returns false — callers must surface this,
+  /// never present the mock tab as live data.
+  Future<bool> loadRemoteTrips() async {
+    try {
+      final result = await _trips.tripsByPlace(placeId);
+      if (result is FirestoreOk<List<Trip>>) {
+        emit(state.copyWith(trips: result.data));
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Triply: PlaceDetailCubit.loadRemoteTrips failed: $e');
+      return false;
+    }
+    debugPrint('Triply: PlaceDetailCubit.loadRemoteTrips kept mock trips.');
+    return false;
+  }
+
+  /// Best-effort remote header refresh. Only the header [place] is replaced;
+  /// guides/trips/stories tabs stay on mocks. Returns true on success, false
+  /// (mock kept) on missing doc, permission, or network failure — callers
+  /// must surface this, never present the mock header as live data.
+  Future<bool> loadRemotePlace() async {
+    try {
+      final result = await _places.byId(placeId);
+      if (result is FirestoreOk<Place>) {
+        final remote = result.data;
+        remote.isFavorite = state.place.isFavorite;
+        emit(state.copyWith(place: remote));
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Triply: PlaceDetailCubit.loadRemotePlace failed: $e');
+      return false;
+    }
+    debugPrint('Triply: PlaceDetailCubit.loadRemotePlace kept mock place.');
+    return false;
   }
 }

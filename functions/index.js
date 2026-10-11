@@ -23,11 +23,14 @@ const {onCall, HttpsError} = require('firebase-functions/v2/https');
 const {onDocumentCreated, onDocumentUpdated, onDocumentWritten} = require('firebase-functions/v2/firestore');
 const {onSchedule} = require('firebase-functions/v2/scheduler');
 const admin = require('firebase-admin');
+// Static Firestore value classes MUST come from 'firebase-admin/firestore':
+// `admin.firestore` is a function object, so `admin.firestore.FieldValue`
+// evaluates to `undefined` and crashes every write at runtime.
+const {FieldValue, Timestamp} = require('firebase-admin/firestore');
 const guards = require('./lib/guards');
 
 admin.initializeApp();
 const db = admin.firestore();
-const FieldValue = admin.firestore.FieldValue;
 
 // ── Shared helpers ──────────────────────────────────────────────
 
@@ -147,6 +150,17 @@ exports.createBooking = onCall(async (request) => {
     if (!Number.isInteger(seats) || seats < 1) throw new HttpsError('invalid-argument', 'Select at least 1 seat.');
     const parsed = guards.parseDateOrNull(d.tripDate);
     if (parsed.invalid) throw new HttpsError('invalid-argument', 'Invalid tripDate.');
+    // Request fingerprint: same key + same material request → dedupe to the
+    // original booking; same key + DIFFERENT request → reject (never silently
+    // return an unrelated booking). Dates normalized to ISO so equivalent
+    // instants in different formats still match.
+    const fp = guards.bookingFingerprint({
+      t: 'public',
+      trip: tripId,
+      date: parsed.date ? parsed.date.toISOString() : '',
+      seats,
+      req: String(d.specialRequests || ''),
+    });
 
     const feeRate = await operationalFeeRate('serviceFeeRate', 0.05);
     const bookingRef = db.collection('bookings').doc();
@@ -162,9 +176,14 @@ exports.createBooking = onCall(async (request) => {
             keyTouristId: keySnap.data().touristId,
             callerUid: touristId,
             bookingId: keySnap.data().bookingId,
+            expectedFp: keySnap.data().fp,
+            actualFp: fp,
           });
           if (c.action === 'deny') {
             throw new HttpsError('permission-denied', 'Duplicate booking reference.');
+          }
+          if (c.action === 'mismatch') {
+            throw new HttpsError('failed-precondition', 'Idempotency key was already used for a different booking request.');
           }
           throw new HttpsError('already-exists', c.bookingId);
         }
@@ -188,7 +207,7 @@ exports.createBooking = onCall(async (request) => {
           tripId,
           guideId: String(trip.guideId || ''),
           placeId: trip.placeId || null,
-          tripDate: parsed.date ? admin.firestore.Timestamp.fromDate(parsed.date) : null,
+          tripDate: parsed.date ? Timestamp.fromDate(parsed.date) : null,
           seats,
           unitPrice: round2(Number(trip.priceEgp) || 0),
           serviceFee: price.fee,
@@ -209,6 +228,7 @@ exports.createBooking = onCall(async (request) => {
         tx.set(keyRef, {
           bookingId: bookingRef.id,
           touristId,
+          fp,
           createdAt: FieldValue.serverTimestamp(),
         });
       });
@@ -245,6 +265,17 @@ exports.createBooking = onCall(async (request) => {
   }
   const parsedAppt = guards.parseDateOrNull(d.appointmentAt);
   if (parsedAppt.invalid) throw new HttpsError('invalid-argument', 'Invalid appointmentAt.');
+  const fp = guards.bookingFingerprint({
+    t: 'private',
+    guide: guideId,
+    place: d.placeId || '',
+    appt: parsedAppt.date ? parsedAppt.date.toISOString() : '',
+    slot: String(d.timeSlot || ''),
+    trav: travelers,
+    hrs: durationHours,
+    meet: String(d.meetingPoint || ''),
+    req: String(d.specialRequests || ''),
+  });
   const profileSnap = await db.collection('guideProfiles').doc(guideId).get();
   if (!profileSnap.exists) {
     throw new HttpsError('not-found', 'Guide not found.');
@@ -262,9 +293,14 @@ exports.createBooking = onCall(async (request) => {
           keyTouristId: keySnap.data().touristId,
           callerUid: touristId,
           bookingId: keySnap.data().bookingId,
+          expectedFp: keySnap.data().fp,
+          actualFp: fp,
         });
         if (c.action === 'deny') {
           throw new HttpsError('permission-denied', 'Duplicate booking reference.');
+        }
+        if (c.action === 'mismatch') {
+          throw new HttpsError('failed-precondition', 'Idempotency key was already used for a different booking request.');
         }
         throw new HttpsError('already-exists', c.bookingId);
       }
@@ -273,7 +309,7 @@ exports.createBooking = onCall(async (request) => {
         bookingType: 'private',
         guideId,
         placeId: d.placeId || null,
-        appointmentAt: parsedAppt.date ? admin.firestore.Timestamp.fromDate(parsedAppt.date) : null,
+        appointmentAt: parsedAppt.date ? Timestamp.fromDate(parsedAppt.date) : null,
         timeSlot: String(d.timeSlot || ''),
         seats: travelers,
         durationHours,
@@ -292,6 +328,7 @@ exports.createBooking = onCall(async (request) => {
       tx.set(keyRef, {
         bookingId: bookingRef.id,
         touristId,
+        fp,
         createdAt: FieldValue.serverTimestamp(),
       });
     });
@@ -320,14 +357,24 @@ exports.onTripCreated = onDocumentCreated('trips/{tripId}', async (event) => {
   if (!snap) return;
   const data = snap.data() || {};
   const patch = {};
-  if (data.approvalStatus !== 'pending') patch.approvalStatus = 'pending';
+  // Default ONLY when absent: an explicitly assigned status (e.g. an
+  // admin-seeded or migrated `approved` trip) must survive creation.
+  // Clients cannot smuggle a status anyway (rules forbid the
+  // approvalStatus/bookedSeats/rejectionReason keys on create), so every
+  // client-created trip still lands `pending` as before.
+  const needsReview = data.approvalStatus == null;
+  if (needsReview) patch.approvalStatus = 'pending';
   if (typeof data.title === 'string' && !data.titleLower) patch.titleLower = data.title.toLowerCase();
   if (data.bookedSeats == null) patch.bookedSeats = 0;
   patch.updatedAt = FieldValue.serverTimestamp();
   if (Object.keys(patch).length > 1) {
     await snap.ref.set(patch, {merge: true});
   }
-  if (data.guideId) {
+  // Notify only when THIS invocation actually pended the trip: keeps the
+  // trigger idempotent under at-least-once redelivery (a retry recomputes an
+  // empty patch and stays silent) and avoids telling a guide that an
+  // already-approved trip "is pending admin approval".
+  if (needsReview && data.guideId) {
     await notify({
       userId: data.guideId,
       title: 'Trip submitted for review',
@@ -571,15 +618,21 @@ exports.verifyPaymobTransaction = onCall(async (request) => {
     throw new HttpsError('failed-precondition', 'Booking no longer exists.');
   }
   const booking = bookingSnap.data();
+  // The booking must belong to the caller too: otherwise anyone could point
+  // their own payment doc at someone else's same-priced booking and flip
+  // its state. Admins keep the cross-user path (explicit bypass below).
+  if (booking.touristId !== uid && !(await isAdminUid(uid))) {
+    throw new HttpsError('permission-denied', 'Not your booking.');
+  }
   // Only a pending+unpaid booking may transition to confirmed. This closes
   // the cancel-then-verify resurrection (capacity was already released).
+  // NOTE: no dedupe branch here — a booking-level `succeeded` never proves a
+  // NEW payment was captured; replay of an already-succeeded payment is
+  // handled by the payment-level early return above.
   const gate = guards.canConfirmAfterVerify({
     bookingStatus: booking.status,
     paymentStatus: booking.paymentStatus,
   });
-  if (gate.deduped) {
-    return {paymentId: String(paymentId), status: 'succeeded', _deduped: true};
-  }
   if (!gate.ok) {
     throw new HttpsError(
       'failed-precondition',
@@ -687,7 +740,7 @@ exports.onReviewWritten = onDocumentWritten('reviews/{reviewId}', async (event) 
 // ── cleanupExpiredStories (scheduled, daily) ─────────────────────
 
 exports.cleanupExpiredStories = onSchedule({schedule: 'every 24 hours', timeZone: 'Africa/Cairo'}, async () => {
-  const now = admin.firestore.Timestamp.now();
+  const now = Timestamp.now();
   const snap = await db.collection('stories').where('expiresAt', '<', now).limit(400).get();
   if (snap.empty) return;
   const batch = db.batch();

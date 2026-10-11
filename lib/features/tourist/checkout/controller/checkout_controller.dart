@@ -14,8 +14,10 @@ class CheckoutController extends ChangeNotifier {
   final CheckoutCubit _cubit;
   late final StreamSubscription<CheckoutState> _subscription;
 
-  CheckoutController({required CheckoutBookingSummary summary, PaymobService? service})
-      : _cubit = CheckoutCubit(summary: summary, service: service) {
+  CheckoutController({
+    required CheckoutBookingSummary summary,
+    PaymobService? service,
+  }) : _cubit = CheckoutCubit(summary: summary, service: service) {
     _subscription = _cubit.stream.listen((_) => notifyListeners());
   }
 
@@ -42,6 +44,9 @@ class CheckoutController extends ChangeNotifier {
   String? get payError => _cubit.payError;
   String? get paymentToken => _cubit.paymentToken;
 
+  /// Paymob order id from the last successful token fetch (see cubit).
+  int? get lastOrderId => _cubit.lastOrderId;
+
   // ================= Validation (pure, testable) =================
 
   /// See [CheckoutCubit.sandboxMode].
@@ -53,8 +58,7 @@ class CheckoutController extends ChangeNotifier {
   static String? validateExpiry(String input) =>
       CheckoutCubit.validateExpiry(input);
 
-  static String? validateCvv(String input) =>
-      CheckoutCubit.validateCvv(input);
+  static String? validateCvv(String input) => CheckoutCubit.validateCvv(input);
 
   static String? validateCardholder(String input) =>
       CheckoutCubit.validateCardholder(input);

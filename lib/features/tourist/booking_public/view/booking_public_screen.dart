@@ -1,11 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/data/trip_details_source.dart';
+import '../../../../data/firestore/models/booking_doc.dart';
+import '../../../../data/firestore/repositories/bookings_repository.dart';
 import '../../checkout/controller/checkout_controller.dart';
 import '../../checkout/model/booking_model.dart';
 import '../../checkout/view/paymob_webview_screen.dart';
@@ -55,28 +59,19 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
     super.dispose();
   }
 
-  /// Confirm & Pay: runs checkout + Paymob first; the trip is only
-  /// recorded (added to My Trips) after a successful payment.
+  /// Confirm & Pay: creates the authoritative server booking FIRST
+  /// (`createBooking`: atomic capacity check + server pricing), records a
+  /// `pending` payment reconciliation entry, then runs the existing
+  /// checkout flow with the SERVER totals. The trip is only recorded
+  /// locally after server-side verification reports `succeeded` — a
+  /// WebView redirect alone never confirms anything, and a backend
+  /// failure records nothing and shows an error instead.
   Future<void> _confirm(BuildContext context) async {
     final cubit = context.read<BookingPublicCubit>();
+    if (cubit.state.isSubmitting) return;
     final trip = widget.trip;
-    final seats = cubit.state.seats;
-    final summary = CheckoutBookingSummary(
-      guideId: '',
-      guideName: trip.guideName,
-      guideSpecialty: '',
-      guideAvatarUrl: '',
-      dateLabel: trip.dateLabel,
-      timeSlot: '',
-      durationLabel: details.duration,
-      travelers: seats,
-      meetingPoint: details.meetingPoint,
-      pricePerHour: details.priceEgp,
-      currency: 'EGP',
-      serviceFee: cubit.fee(details.priceEgp),
-      total: cubit.total(details.priceEgp),
-    );
-    final checkout = CheckoutController(summary: summary);
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final repository = BookingsRepository();
     // Captured before the async gap (avoids BuildContext across awaits).
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -87,39 +82,145 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
         child: CircularProgressIndicator(color: AppColors.primary),
       ),
     );
-    final token = await checkout.startPayment();
+    BookingDoc? booking;
+    try {
+      booking = await cubit.submitBooking(
+        repository: repository,
+        uid: uid,
+        trip: trip,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      navigator.pop(); // Dismiss the loading dialog.
+      messenger.showSnackBar(SnackBar(content: Text(_bookingError(e))));
+      return;
+    }
     if (!mounted) return;
     navigator.pop(); // Dismiss the loading dialog.
+    if (booking == null) return; // Duplicate tap while submitting.
+    final doc = booking;
+    final summary = CheckoutBookingSummary(
+      guideId: doc.guideId,
+      guideName: trip.guideName,
+      guideSpecialty: '',
+      guideAvatarUrl: '',
+      dateLabel: trip.dateLabel,
+      timeSlot: '',
+      durationLabel: details.duration,
+      travelers: doc.seats,
+      meetingPoint: doc.meetingPoint.isNotEmpty
+          ? doc.meetingPoint
+          : details.meetingPoint,
+      pricePerHour: doc.unitPrice,
+      currency: doc.currency,
+      serviceFee: doc.serviceFee,
+      total: doc.totalAmount,
+    );
+    final checkout = CheckoutController(summary: summary);
+    final token = await checkout.startPayment();
+    if (!mounted) return;
     if (token == null) {
-      final message =
-          checkout.payError ?? 'Payment failed. Please try again.';
+      final message = checkout.payError ?? 'Payment failed. Please try again.';
       checkout.dispose();
       messenger.showSnackBar(SnackBar(content: Text(message)));
       return;
     }
-    checkout.dispose(); // WebView only needs the token strings below.
+    final orderId = checkout.lastOrderId;
+    checkout.dispose(); // WebView only needs the strings below.
+    // Pending reconciliation record (server amounts + Paymob order id)
+    // BEFORE the iframe, so verification has something to reconcile.
+    // Fails closed: without it there is nothing to verify against.
+    String paymentId;
+    try {
+      paymentId = await repository.createPendingPayment(
+        bookingId: doc.id,
+        touristId: uid!,
+        amount: doc.totalAmount,
+        providerReference: orderId != null ? orderId.toString() : '',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Could not start secure checkout. Please try again.'),
+        ),
+      );
+      return;
+    }
+    if (!mounted) return;
     navigator.push(
       MaterialPageRoute(
         builder: (_) => PaymobWebviewScreen(
           paymentToken: token,
           guideName: trip.guideName,
-          onSuccess: () {
-            final booking = cubit.confirm(
-              tripId: trip.id,
-              unitPrice: details.priceEgp,
-            );
-            navigator.pushReplacement(
-              AppRoutes.bookingConfirmed(
-                trip: trip,
-                details: details,
-                seats: booking.seats,
-                total: booking.total,
-              ),
+          onSuccess: () async {
+            await _verifyAndConfirm(
+              navigator,
+              messenger,
+              repository: repository,
+              trip: trip,
+              doc: doc,
+              paymentId: paymentId,
             );
           },
         ),
       ),
     );
+  }
+
+  /// Verifies the payment server-side and only then records + confirms.
+  /// Anything but `succeeded` leaves the booking unpaid: the user lands on
+  /// My Trips (where the pending booking is visible) with an honest
+  /// message — never a false confirmation.
+  Future<void> _verifyAndConfirm(
+    NavigatorState navigator,
+    ScaffoldMessengerState messenger, {
+    required BookingsRepository repository,
+    required Trip trip,
+    required BookingDoc doc,
+    required String paymentId,
+  }) async {
+    messenger.showSnackBar(const SnackBar(content: Text('Verifying payment…')));
+    try {
+      final verdict = await repository.verifyPayment(paymentId);
+      if (!mounted) return;
+      if (verdict.status == 'succeeded') {
+        // Verified paid: values are server-authoritative.
+        MyBookingsPublic.record(trip.id, doc.seats, totalPaid: doc.totalAmount);
+        navigator.pushReplacement(
+          AppRoutes.bookingConfirmed(
+            trip: trip,
+            details: details,
+            seats: doc.seats,
+            total: doc.totalAmount,
+          ),
+        );
+        return;
+      }
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Payment received and is awaiting confirmation. '
+            'You can check My Trips for updates.',
+          ),
+        ),
+      );
+      AppRoutes.goToMyTrips(navigator.context);
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(_bookingError(e))));
+      AppRoutes.goToMyTrips(navigator.context);
+    }
+  }
+
+  /// Repository errors already carry user-facing messages behind an
+  /// `Exception:` prefix; anything else becomes a generic failure.
+  /// Never logs tokens, payment data, or user identifiers.
+  String _bookingError(Object e) {
+    final text = e.toString();
+    const prefix = 'Exception: ';
+    final msg = text.startsWith(prefix) ? text.substring(prefix.length) : text;
+    return msg.isEmpty ? 'Booking failed. Please try again.' : msg;
   }
 
   @override
@@ -251,7 +352,9 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
               return SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => _confirm(context),
+                  onPressed: state.isSubmitting
+                      ? null
+                      : () => _confirm(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.tabSelectedBg,
                     foregroundColor: Colors.white,

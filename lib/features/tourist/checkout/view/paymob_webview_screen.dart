@@ -4,15 +4,15 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../services/paymob_service.dart';
 
-
 class PaymobWebviewScreen extends StatefulWidget {
   final String paymentToken;
   final String guideName;
 
-  /// Called after a successful payment when the user taps Done, so the
-  /// caller can record the booking (e.g. add the trip to My Trips).
+  /// Called after the provider redirect reports success AND the user taps
+  /// Done. The redirect alone proves nothing — callers MUST verify through
+  /// `verifyPaymobTransaction` before treating anything as paid.
   /// When null, the previous behavior is kept (pop back to the summary).
-  final VoidCallback? onSuccess;
+  final Future<void> Function()? onSuccess;
 
   const PaymobWebviewScreen({
     super.key,
@@ -20,6 +20,14 @@ class PaymobWebviewScreen extends StatefulWidget {
     this.guideName = '',
     this.onSuccess,
   });
+
+  /// Pure redirect parsing: true only for an explicit `success=true`
+  /// provider parameter. UNTRUSTED by itself — never proof of payment.
+  static bool indicatesSuccess(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return false;
+    return uri.queryParameters['success']?.toLowerCase() == 'true';
+  }
 
   @override
   State<PaymobWebviewScreen> createState() => _PaymobWebviewScreenState();
@@ -64,18 +72,16 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
     if (_handled) return;
     final uri = Uri.tryParse(url);
     if (uri == null) return;
-    final params = uri.queryParameters;
     // Paymob appends success=true/false (+ txn response codes) on redirect.
-    if (!params.containsKey('success')) return;
+    if (!uri.queryParameters.containsKey('success')) return;
     _handled = true;
-    final ok = params['success']?.toLowerCase() == 'true';
+    final ok = PaymobWebviewScreen.indicatesSuccess(url);
     if (ok) {
       _showResult(
         success: true,
-        title: 'Booking Confirmed!',
-        message: widget.guideName.isEmpty
-            ? 'Your private tour is confirmed. A confirmation email has been sent to your inbox.'
-            : 'Your private tour with ${widget.guideName} is confirmed. A confirmation email has been sent to your inbox.',
+        title: 'Payment submitted!',
+        message:
+            'Your payment was submitted. Your booking will be confirmed once the payment is verified.',
       );
     } else {
       _showResult(
@@ -97,8 +103,7 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -114,23 +119,25 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
               child: Icon(
                 success ? Icons.check_circle : Icons.error_outline,
                 size: 36,
-                color: success
-                    ? AppColors.primary
-                    : const Color(0xFFC62828),
+                color: success ? AppColors.primary : const Color(0xFFC62828),
               ),
             ),
             const SizedBox(height: 12),
-            Text(title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.title)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: AppColors.title,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 13, color: AppColors.subtitle)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            ),
           ],
         ),
         actions: [
@@ -143,20 +150,19 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
                   _handled = false;
                   _loading = true;
                 });
-                final url = PaymobService()
-                    .iframeUrl(widget.paymentToken);
+                final url = PaymobService().iframeUrl(widget.paymentToken);
                 _web.loadRequest(Uri.parse(url));
               },
               child: const Text('Retry'),
             ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).pop(); // dialog
               Navigator.of(context).pop(); // webview
               if (success) {
-                if (widget.onSuccess != null) {
-                  widget.onSuccess!();
-                } else {
+                // Awaited: callers verify server-side before confirming.
+                await widget.onSuccess?.call();
+                if (widget.onSuccess == null && context.mounted) {
                   // Back to the summary screen; the host app can pop
                   // further to the booking confirmation as needed.
                   Navigator.of(context).pop();
@@ -167,7 +173,8 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
             child: Text(success ? 'Done' : 'Back'),
           ),
@@ -187,11 +194,14 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
           icon: const Icon(Icons.chevron_left, color: AppColors.title),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Secure Payment',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppColors.title)),
+        title: const Text(
+          'Secure Payment',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.title,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Stack(
@@ -199,8 +209,7 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
           WebViewWidget(controller: _web),
           if (_loading)
             const Center(
-              child: CircularProgressIndicator(
-                  color: AppColors.primary),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
         ],
       ),

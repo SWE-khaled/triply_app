@@ -35,10 +35,17 @@ describe('canConfirmAfterVerify (no resurrection, replay-safe)', () => {
       {ok: true},
     );
   });
-  it('dedupes already-succeeded without side effects', () => {
+  it('rejects already-paid bookings for NEW payments (no false dedupe)', () => {
+    // A booking-level `succeeded` never proves a new payment was captured:
+    // legitimate replay is keyed off the PAYMENT doc status (handled in
+    // verifyPaymobTransaction), never off the booking. Both must reject.
     assert.deepEqual(
       g.canConfirmAfterVerify({bookingStatus: 'confirmed', paymentStatus: 'succeeded'}),
-      {ok: true, deduped: true},
+      {ok: false, reason: 'invalid-transition'},
+    );
+    assert.deepEqual(
+      g.canConfirmAfterVerify({bookingStatus: 'cancelled', paymentStatus: 'succeeded'}),
+      {ok: false, reason: 'invalid-transition'},
     );
   });
   it('blocks cancelled/completed/confirmed-unpaid transitions', () => {
@@ -139,6 +146,34 @@ describe('classifyKeyConflict (no cross-user disclosure)', () => {
     const r = g.classifyKeyConflict({keyExists: true, keyTouristId: 'u1', callerUid: 'u2', bookingId: 'b9'});
     assert.equal(r.action, 'deny');
     assert.ok(!('bookingId' in r));
+  });
+  it('rejects same-owner key reuse with a different request', () => {
+    assert.deepEqual(
+      g.classifyKeyConflict({keyExists: true, keyTouristId: 'u1', callerUid: 'u1', bookingId: 'b9', expectedFp: 'aaa', actualFp: 'bbb'}),
+      {action: 'mismatch'},
+    );
+    assert.deepEqual(
+      g.classifyKeyConflict({keyExists: true, keyTouristId: 'u1', callerUid: 'u1', bookingId: 'b9', expectedFp: 'aaa', actualFp: 'aaa'}),
+      {action: 'dedupe', bookingId: 'b9'},
+    );
+    // Legacy keys without a fingerprint keep deduplicating (compatible).
+    assert.deepEqual(
+      g.classifyKeyConflict({keyExists: true, keyTouristId: 'u1', callerUid: 'u1', bookingId: 'b9'}),
+      {action: 'dedupe', bookingId: 'b9'},
+    );
+  });
+});
+
+describe('bookingFingerprint (stable request identity)', () => {
+  const a = {t: 'public', trip: 't1', seats: 2, req: ''};
+  it('is deterministic and order-independent', () => {
+    assert.equal(g.bookingFingerprint(a), g.bookingFingerprint({req: '', seats: 2, trip: 't1', t: 'public'}));
+    assert.match(g.bookingFingerprint(a), /^[0-9a-f]{64}$/);
+  });
+  it('changes on any material difference', () => {
+    assert.notEqual(g.bookingFingerprint(a), g.bookingFingerprint({...a, seats: 3}));
+    assert.notEqual(g.bookingFingerprint(a), g.bookingFingerprint({...a, trip: 't2'}));
+    assert.notEqual(g.bookingFingerprint(a), g.bookingFingerprint({...a, req: 'x'}));
   });
 });
 

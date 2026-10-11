@@ -7,6 +7,8 @@
  * Paymob amount/currency verification, and replay protection.
  */
 
+const {createHash} = require('node:crypto');
+
 const CANCELLABLE_STATUSES = ['pending', 'confirmed'];
 const UNPAID_STATUSES = ['pending', 'failed'];
 
@@ -21,9 +23,14 @@ function canClientCancel({status, paymentStatus}) {
   return {ok: true};
 }
 
-/** Paymob verify gate: only a pending booking with a pending payment moves. */
+/**
+ * Paymob verify gate: ONLY a pending booking with a pending payment may move
+ * to confirmed. There is deliberately NO dedupe branch here: a booking-level
+ * `succeeded` never proves that a NEW, unverified payment doc was captured.
+ * Legitimate replay of an already-succeeded PAYMENT is handled separately by
+ * the payment-level early return in verifyPaymobTransaction.
+ */
 function canConfirmAfterVerify({bookingStatus, paymentStatus}) {
-  if (paymentStatus === 'succeeded') return {ok: true, deduped: true};
   if (bookingStatus !== 'pending' || paymentStatus !== 'pending') {
     return {ok: false, reason: 'invalid-transition'};
   }
@@ -77,11 +84,34 @@ function parseDateOrNull(v) {
 /**
  * Single-transaction idempotency decision. `keyTouristId` is the owner stored
  * on the existing key doc; `callerUid` is the current caller.
+ *
+ * `expectedFp` is the request fingerprint stored on the key doc (absent for
+ * keys written before fingerprinting existed — treated as a match so old
+ * retries keep working); `actualFp` is the current request's fingerprint.
+ * Same owner + same request → dedupe; same owner + DIFFERENT request →
+ * mismatch (rejected: the key is bound to the original booking, never
+ * silently re-resolved to an unrelated one).
  */
-function classifyKeyConflict({keyExists, keyTouristId, callerUid, bookingId}) {
+function classifyKeyConflict({keyExists, keyTouristId, callerUid, bookingId, expectedFp, actualFp}) {
   if (!keyExists) return {action: 'proceed'};
   if (keyTouristId !== callerUid) return {action: 'deny'};
+  if (expectedFp && actualFp && expectedFp !== actualFp) return {action: 'mismatch'};
   return {action: 'dedupe', bookingId};
+}
+
+/**
+ * Stable fingerprint of a booking request's material fields. Key-sorted JSON
+ * hashed with SHA-256: deterministic across retries, sensitive to any
+ * material change, and independent of field order or idempotency key.
+ * Pure (node:crypto only) so unit tests exercise the deployed logic.
+ */
+function bookingFingerprint(input) {
+  const norm = {};
+  for (const k of Object.keys(input || {}).sort()) {
+    const v = input[k];
+    norm[k] = v === undefined ? null : v;
+  }
+  return createHash('sha256').update(JSON.stringify(norm)).digest('hex');
 }
 
 /** Commercial terms whose edit re-pends an approved trip (P1 decided rule). */
@@ -129,6 +159,7 @@ module.exports = {
   validIdempotencyKey,
   parseDateOrNull,
   classifyKeyConflict,
+  bookingFingerprint,
   REPEND_FIELDS,
   shouldRependTrip,
   mergeLegacyVerification,

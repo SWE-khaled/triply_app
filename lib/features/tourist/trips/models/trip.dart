@@ -12,6 +12,12 @@ class Trip {
   final String category;
   final int capacity;
 
+  /// Server booking backing this card, if it renders a booking (My Trips).
+  /// Null for feed/search/place cards. Never invented: set only from a real
+  /// `bookings/{id}` record so cancellation targets the exact booking even
+  /// when one trip was booked twice.
+  final String? bookingId;
+
   const Trip({
     required this.id,
     required this.title,
@@ -23,6 +29,7 @@ class Trip {
     required this.status,
     required this.category,
     required this.capacity,
+    this.bookingId,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -40,6 +47,7 @@ class Trip {
       ),
       category: (json['category'] ?? 'historical') as String,
       capacity: (json['capacity'] ?? 12) as int,
+      bookingId: json['bookingId'] as String?,
     );
   }
 
@@ -55,6 +63,7 @@ class Trip {
       'status': status.name,
       'category': category,
       'capacity': capacity,
+      if (bookingId != null) 'bookingId': bookingId,
     };
   }
 }

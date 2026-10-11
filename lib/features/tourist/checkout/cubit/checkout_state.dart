@@ -32,10 +32,10 @@ class CheckoutState {
       cardNumberError: cardNumberError == _keep
           ? this.cardNumberError
           : cardNumberError as String?,
-      expiryError:
-          expiryError == _keep ? this.expiryError : expiryError as String?,
-      cvvError:
-          cvvError == _keep ? this.cvvError : cvvError as String?,
+      expiryError: expiryError == _keep
+          ? this.expiryError
+          : expiryError as String?,
+      cvvError: cvvError == _keep ? this.cvvError : cvvError as String?,
       cardholderError: cardholderError == _keep
           ? this.cardholderError
           : cardholderError as String?,

@@ -9,13 +9,14 @@ import '../cubit/admin_auth_state.dart';
 
 /// Admin Create Account — same visual design as the Tourist
 /// Create Account (AuthHeader / AuthTextField / AuthButton).
-/// Frontend-only rule: the identifier must contain 'triplykl'.
+/// Server-backed rule: provisions through the admin-only `provisionAdmin`
+/// callable, then signs in as the new account — the caller must already be
+/// a signed-in admin (first admin comes from the console procedure).
 class AdminCreateAccountView extends StatefulWidget {
   const AdminCreateAccountView({super.key});
 
   @override
-  State<AdminCreateAccountView> createState() =>
-      _AdminCreateAccountViewState();
+  State<AdminCreateAccountView> createState() => _AdminCreateAccountViewState();
 }
 
 class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
@@ -54,9 +55,9 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
         (_) => false,
       );
     } else if (cubit.state.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(cubit.state.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(cubit.state.errorMessage!)));
     }
   }
 
@@ -110,8 +111,8 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
                             icon: Icons.person_outline,
                             validator: (value) =>
                                 (value == null || value.trim().isEmpty)
-                                    ? 'Enter your full name'
-                                    : null,
+                                ? 'Enter your full name'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           const Text(
@@ -126,8 +127,8 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) =>
                                 (value == null || !value.contains('@'))
-                                    ? 'Enter a valid email'
-                                    : null,
+                                ? 'Enter a valid email'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           const Text(
@@ -142,8 +143,8 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
                             isPassword: true,
                             validator: (value) =>
                                 (value == null || value.length < 6)
-                                    ? 'Minimum 6 characters'
-                                    : null,
+                                ? 'Minimum 6 characters'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           const Text(
@@ -158,14 +159,13 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
                             isPassword: true,
                             validator: (value) =>
                                 value != _passwordController.text
-                                    ? 'Passwords do not match'
-                                    : null,
+                                ? 'Passwords do not match'
+                                : null,
                           ),
                           const SizedBox(height: 28),
                           AuthButton(
                             label: 'Create Account',
-                            isLoading:
-                                state.status == AdminAuthStatus.loading,
+                            isLoading: state.status == AdminAuthStatus.loading,
                             onPressed: () => _handleCreateAccount(cubit),
                           ),
                           const SizedBox(height: 24),

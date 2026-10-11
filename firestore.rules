@@ -230,12 +230,21 @@ service cloud.firestore {
     match /posts/{postId} {
       allow read: if true;
       allow create: if isSignedIn()
-        && request.resource.data.authorId == request.auth.uid;
+        && request.resource.data.authorId == request.auth.uid
+        // Counters are Function-owned: a fresh post starts at zero.
+        // Absent fields read as the default, so honest clients that omit
+        // them (see PostDoc.toCreateMap) are unaffected.
+        && request.resource.data.get('likesCount', 0) == 0
+        && request.resource.data.get('commentsCount', 0) == 0;
       // Owner edits text/location only; counters are Function-owned.
+      // `.get(..., 0)` tolerates older/counter-less docs (the app omits
+      // counters on create): absent reads as 0 on both sides instead of
+      // erroring, while any smuggled non-zero value still mismatches.
       allow update: if isSignedIn()
         && resource.data.authorId == request.auth.uid
         && request.resource.data.authorId == resource.data.authorId
-        && request.resource.data.likesCount == resource.data.likesCount;
+        && request.resource.data.get('likesCount', 0) == resource.data.get('likesCount', 0)
+        && request.resource.data.get('commentsCount', 0) == resource.data.get('commentsCount', 0);
       allow delete: if isSignedIn() && (
         resource.data.authorId == request.auth.uid || isAdmin()
       );

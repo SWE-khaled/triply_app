@@ -10,9 +10,13 @@ class TripDetailsSource {
   List<TripDetails> get all =>
       mockTripDetailsJson.map((e) => TripDetails.fromJson(e)).toList();
 
-  /// Returns details for [tripId]. Trips without mock data fall back
-  /// to the first entry but keep the trip's own card fields
-  /// (title/image/price/guide) so they never show another trip's content.
+  /// Returns details for [tripId], or an honest empty shell built ONLY from
+  /// the trip's own card fields when no mock entry matches.
+  ///
+  /// Never copies another trip's about/highlights/itinerary/notes: showing
+  /// the first mock trip's content for an unknown id presents wrong data as
+  /// real. Empty sections render as empty (never as another trip), and the
+  /// remote refresh replaces the shell with Firestore details on success.
   TripDetails getByTripId(
     String tripId, {
     String? title,
@@ -23,30 +27,29 @@ class TripDetailsSource {
     for (final d in all) {
       if (d.tripId == tripId) return d;
     }
-    final base = all.first;
     return TripDetails(
-      id: 'fallback',
+      id: 'fallback-$tripId',
       tripId: tripId,
-      tag: base.tag,
-      title: title ?? base.title,
-      rating: base.rating,
-      reviewsCount: base.reviewsCount,
-      location: base.location,
-      duration: base.duration,
-      groupType: base.groupType,
-      languages: base.languages,
-      about: base.about,
-      highlights: base.highlights,
-      itinerary: base.itinerary,
-      notes: base.notes,
-      meetingPoint: base.meetingPoint,
-      priceEgp: priceEgp ?? base.priceEgp,
-      guideName: guideName ?? base.guideName,
-      guideAvatarUrl: base.guideAvatarUrl,
-      guideRating: base.guideRating,
-      guideReviews: base.guideReviews,
-      topRatedGuide: base.topRatedGuide,
-      imageUrl: imageUrl ?? base.imageUrl,
+      tag: '',
+      title: title ?? 'Trip',
+      rating: 0,
+      reviewsCount: 0,
+      location: '',
+      duration: '',
+      groupType: '',
+      languages: '',
+      about: '',
+      highlights: const [],
+      itinerary: const [],
+      notes: const [],
+      meetingPoint: '',
+      priceEgp: priceEgp ?? 0,
+      guideName: guideName ?? '',
+      guideAvatarUrl: '',
+      guideRating: 0,
+      guideReviews: 0,
+      topRatedGuide: false,
+      imageUrl: imageUrl ?? '',
     );
   }
 }

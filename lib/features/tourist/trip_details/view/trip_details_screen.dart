@@ -18,7 +18,7 @@ import '../widgets/details_tab_content.dart';
 import '../widgets/details_tabs.dart';
 import '../widgets/guide_card.dart';
 
-class TripDetailsScreen extends StatelessWidget {
+class TripDetailsScreen extends StatefulWidget {
   final Trip trip;
 
   /// True when opened from My Trips (already booked): hides Book Now.
@@ -36,6 +36,46 @@ class TripDetailsScreen extends StatelessWidget {
     'Itinerary',
     'Notes',
   ];
+
+  @override
+  State<TripDetailsScreen> createState() => _TripDetailsScreenState();
+}
+
+class _TripDetailsScreenState extends State<TripDetailsScreen> {
+  bool _remoteRequested = false;
+
+  Trip get trip => widget.trip;
+  bool get isBooked => widget.isBooked;
+
+  @override
+  void initState() {
+    super.initState();
+    // Remote reads stay OFF until backend deploy + emulator proof
+    // ([TripDetailsCubit.useRemote]); mock details render meanwhile.
+    if (TripDetailsCubit.useRemote) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _refreshDetails());
+    }
+  }
+
+  /// Best-effort remote refresh, guarded so rebuilds never duplicate it.
+  /// On failure the mock details stay with an explicit notice (never
+  /// presented as live data).
+  Future<void> _refreshDetails() async {
+    if (!mounted || _remoteRequested) return;
+    _remoteRequested = true;
+    try {
+      final ok = await context.read<TripDetailsCubit>().loadRemote(trip.id);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Couldn't refresh details — showing saved details."),
+          ),
+        );
+      }
+    } finally {
+      _remoteRequested = false;
+    }
+  }
 
   /// Booking summary shown when opened from My Trips (already booked).
   /// The Book button stays hidden via [isBooked] — no re-booking.
@@ -164,7 +204,7 @@ class TripDetailsScreen extends StatelessWidget {
                         DetailsInfo(details: details),
                         const SizedBox(height: 18),
                         DetailsTabs(
-                          tabs: tabs,
+                          tabs: TripDetailsScreen.tabs,
                           selectedIndex: state.selectedTab,
                           onSelected: (i) =>
                               context.read<TripDetailsCubit>().selectTab(i),
