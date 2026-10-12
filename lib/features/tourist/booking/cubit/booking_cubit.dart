@@ -15,11 +15,19 @@ import 'booking_state.dart';
 class BookingCubit extends Cubit<BookingState> {
   final String guideId;
 
+  /// True only when the selected guide was mapped from a real Firestore
+  /// `guideProfiles/{uid}` document (passed through from the profile
+  /// screen). Mock/offline baseline guides default to false: the server
+  /// `createBooking` callable has no such profile and answers `not-found`
+  /// ("Guide not found.").
+  final bool isRemoteGuide;
+
   /// Notes scratch text. Kept outside the emitted state on purpose:
   /// typing must not rebuild the whole flow.
   String _notes = '';
 
-  BookingCubit({required this.guideId}) : super(const BookingState());
+  BookingCubit({required this.guideId, this.isRemoteGuide = false})
+    : super(const BookingState());
 
   static const List<String> timeSlots = [
     '7:00 AM',
@@ -197,6 +205,9 @@ class BookingCubit extends Cubit<BookingState> {
   /// failure (e.g. unknown guide) — never records a local booking.
   /// NOTE: the guide id must exist in `guideProfiles/` (real guide data,
   /// wired in the guide phase); otherwise the server answers `not-found`.
+  /// Mock/offline baseline guides ([isRemoteGuide] false) are refused here
+  /// with an honest message before any backend call — the private flow
+  /// keeps its own guide lookup and is never forced into a trip lookup.
   Future<BookingDoc?> submitBooking({
     required BookingsRepository repository,
     required String? uid,
@@ -204,6 +215,11 @@ class BookingCubit extends Cubit<BookingState> {
     if (state.isSubmitting) return null;
     if (uid == null || uid.isEmpty) {
       throw Exception('Please sign in to book.');
+    }
+    if (!isRemoteGuide) {
+      throw Exception(
+        'This guide is not available for booking right now. Please choose another guide.',
+      );
     }
     final err = validateTravelers();
     if (err != null) throw Exception(err);

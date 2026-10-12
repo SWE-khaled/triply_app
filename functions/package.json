@@ -11,6 +11,7 @@
     "test": "node --test test/guards.test.js",
     "test:rules": "node --test test/rules.test.js",
     "test:callables": "node --test test/callables.test.js",
+    "test:provision": "node --test test/provision_admin.test.js",
     "deploy:dry": "node -e \"require('./index.js'); console.log('functions load OK')\""
   },
   "dependencies": {

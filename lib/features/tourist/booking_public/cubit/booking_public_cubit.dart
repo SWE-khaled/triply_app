@@ -91,6 +91,17 @@ class BookingPublicCubit extends Cubit<BookingPublicState> {
     if (uid == null || uid.isEmpty) {
       throw Exception('Please sign in to book.');
     }
+    // Provenance gate (fail fast, no backend call): only trips mapped from
+    // a real Firestore `trips/{id}` document (`isRemote`) can be booked.
+    // Mock/offline baseline cards carry ids the server has never seen, so
+    // `createBooking` would answer `not-found` ("Trip not found."). Refuse
+    // honestly here instead of after a futile server round-trip. Identity
+    // itself still flows unchanged when remote (see `trip.id` below).
+    if (!trip.isRemote) {
+      throw Exception(
+        'This trip is not available for booking. Please choose a published trip.',
+      );
+    }
     final err = validateSeats(trip.capacity - trip.peopleCount);
     if (err != null) throw Exception(err);
     final tripDate = parseTripDate(trip.dateLabel);

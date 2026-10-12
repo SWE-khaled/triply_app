@@ -140,11 +140,42 @@ void main() {
         '/api/ecommerce/orders',
         '/api/acceptance/payment_keys',
       ]);
-      // 12600 EGP -> 1,260,000 minor units on BOTH money calls.
-      expect(client.bodies[1]['amount_cents'], '1260000');
+      // 12600 EGP -> 1,260,000 minor units on BOTH money calls (int).
+      expect(client.bodies[1]['amount_cents'], 1260000);
       expect(client.bodies[2]['amount_cents'], 1260000);
       expect(client.bodies[2]['order_id'], 777);
       expect(client.bodies[2]['currency'], 'EGP');
+    });
+
+    test('booking currency travels on both money calls (no hardcode)',
+        () async {
+      // The server rejects currency-mismatched orders, so the booking
+      // currency (not a hardcoded guess) must reach Paymob on both calls.
+      const usd = CheckoutBookingSummary(
+        guideId: 'g1',
+        guideName: 'Omar',
+        guideSpecialty: '',
+        guideAvatarUrl: '',
+        dateLabel: '2026-11-02',
+        timeSlot: '',
+        durationLabel: '4 hours',
+        travelers: 2,
+        meetingPoint: 'Gate',
+        pricePerHour: 6000,
+        currency: 'USD',
+        serviceFee: 600,
+        total: 12600,
+      );
+      final client = _FakeClient([
+        _json({'token': 'auth-t'}),
+        _json({'id': 777}),
+        _json({'token': 'pay-t'}),
+      ]);
+      final service = PaymobService(client: client);
+      await service.createPaymentToken(summary: usd, billing: _billing());
+      expect(client.bodies[1]['currency'], 'USD');
+      expect(client.bodies[2]['currency'], 'USD');
+      expect(client.bodies[1]['amount_cents'], 1260000);
     });
 
     test('auth failure never leaks the response body', () async {

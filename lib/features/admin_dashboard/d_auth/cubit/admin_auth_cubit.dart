@@ -35,6 +35,17 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
   static const String accessDeniedMessage =
       'You are not allowed to access the Admin Dashboard.';
 
+  /// UI eligibility only (never authorization). Returns true when [email]
+  /// looks like an admin identifier (valid `@` + contains `triplykl`,
+  /// case-insensitive). Real privilege always comes from the server
+  /// (`admins/{uid}` doc OR `admin:true` claim via `provisionAdmin` /
+  /// bootstrap + `AdminAccessService.isAuthorized`); this helper grants
+  /// nothing by itself.
+  static bool isEligibleAdminEmail(String email) {
+    final clean = email.trim().toLowerCase();
+    return clean.contains('@') && clean.contains('triplykl');
+  }
+
   /// Silent restore: a persisted Firebase session that is still authorized
   /// becomes an admin session without another login. Anything else stays
   /// logged out (never a misleading session).
@@ -91,8 +102,23 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
         return e.message ?? 'No user found with that email.';
       case 'unauthenticated':
         return 'Please sign in as an admin first.';
+      case 'internal':
+        // Functions v2 scrubs uncaught errors to INTERNAL. Never surface raw
+        // "INTERNAL" — fail closed with an actionable message. First admin
+        // still requires the console bootstrap (docs/ADMIN_PROVISIONING.md).
+        if (e.message == null ||
+            e.message!.isEmpty ||
+            e.message!.toUpperCase() == 'INTERNAL') {
+          return 'Could not create the admin account. Please try again.';
+        }
+        return e.message!;
       default:
-        return e.message ?? 'Could not create the admin account.';
+        if (e.message == null ||
+            e.message!.isEmpty ||
+            e.message!.toUpperCase() == 'INTERNAL') {
+          return 'Could not create the admin account. Please try again.';
+        }
+        return e.message!;
     }
   }
 
@@ -181,6 +207,17 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
       );
       return false;
     }
+    // Eligibility only (never authorization): the "triplykl" substring gates
+    // the UI, while real privilege comes from provisionAdmin + isAuthorized.
+    if (!isEligibleAdminEmail(cleanEmail)) {
+      emit(
+        state.copyWith(
+          status: AdminAuthStatus.error,
+          errorMessage: 'Use an admin email containing "triplykl".',
+        ),
+      );
+      return false;
+    }
     if (password.length < 6) {
       emit(
         state.copyWith(
@@ -194,7 +231,16 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
       final callable = FirebaseFunctions.instance.httpsCallable(
         'provisionAdmin',
       );
-      await callable.call({'email': cleanEmail});
+      // Server creates the Auth user when the caller is already an admin
+      // (see functions/index.js provisionAdmin). Password is transmitted
+      // only over the encrypted callable to the trusted backend for
+      // Admin-SDK user creation and is never logged. First admin still
+      // requires the console bootstrap — this call stays admin-only.
+      await callable.call({
+        'email': cleanEmail,
+        'password': password,
+        'displayName': cleanName,
+      });
       final credential = await _auth.signInWithEmailAndPassword(
         email: cleanEmail,
         password: password,
@@ -205,6 +251,11 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
           await user.updateDisplayName(cleanName);
         } catch (_) {}
       }
+      // Force-refresh so a freshly granted `admin:true` claim is visible
+      // before the authorization gate (cached tokens lack the new claim).
+      try {
+        await user?.getIdToken(true);
+      } catch (_) {}
       final uid = user?.uid ?? '';
       if (uid.isEmpty || !await _access.isAuthorized(uid)) {
         try {

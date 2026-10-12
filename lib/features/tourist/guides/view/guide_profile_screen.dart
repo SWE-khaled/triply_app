@@ -396,7 +396,12 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) =>
-                          BookingScreen(guideId: _controller.guide.id),
+                          BookingScreen(
+                            guideId: _controller.guide.id,
+                            // Provenance flows with the id: mock guides are
+                            // refused honestly at submit; remote guides pass.
+                            isRemoteGuide: _controller.guide.isRemote,
+                          ),
                     ),
                   );
                 },

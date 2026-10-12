@@ -122,13 +122,21 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
                           const SizedBox(height: 8),
                           AuthTextField(
                             controller: _emailController,
-                            hintText: 'khaled@gmail.com',
+                            hintText: 'khaledtriplykl@gmail.com',
                             icon: Icons.mail_outline,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (value) =>
-                                (value == null || !value.contains('@'))
-                                ? 'Enter a valid email'
-                                : null,
+                            validator: (value) {
+                              if (value == null || !value.contains('@')) {
+                                return 'Enter a valid email';
+                              }
+                              // Eligibility only (never authorization): see
+                              // AdminAuthCubit.isEligibleAdminEmail. Real
+                              // privilege is server-side (admins doc/claim).
+                              if (!AdminAuthCubit.isEligibleAdminEmail(value)) {
+                                return 'Use an admin email containing "triplykl"';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 20),
                           const Text(

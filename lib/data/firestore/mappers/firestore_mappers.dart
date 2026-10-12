@@ -49,6 +49,8 @@ class FirestoreMappers {
           : trips_ui.TripStatus.upcoming,
       category: d.category,
       capacity: d.capacity,
+      // Firestore-backed card: safe to book (server holds this exact id).
+      isRemote: true,
     );
   }
 
@@ -171,6 +173,8 @@ class FirestoreMappers {
       pricePerHour: p.pricePerHour,
       currency: p.currency,
       isVerified: p.isVerified,
+      // Firestore-backed guide: safe to book (server holds this exact id).
+      isRemote: true,
     );
   }
 

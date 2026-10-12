@@ -15,6 +15,7 @@ import 'package:triply/data/firestore/models/review_doc.dart';
 import 'package:triply/data/firestore/models/story_doc.dart';
 import 'package:triply/data/firestore/models/trip_doc.dart';
 import 'package:triply/features/tour_guide/my_trips_tg/model/guide_trip.dart';
+import 'package:triply/features/tourist/guides/model/guide.dart' as guides_ui;
 import 'package:triply/features/tourist/trips/models/trip.dart';
 
 void main() {
@@ -80,6 +81,49 @@ void main() {
           ),
         ).status,
         GuideTripStatus.pending,
+      );
+    });
+    test('booking provenance: Firestore cards remote, mock JSON not', () {
+      // Remote-mapped cards carry the exact server id and may be booked;
+      // mock/offline JSON has no provenance flag and defaults to false, so
+      // booking cubits refuse it early instead of hitting `not-found`.
+      expect(
+        FirestoreMappers.tripDocToTouristTrip(
+          const TripDoc(id: 't9', guideId: 'g', title: 'T'),
+        ).isRemote,
+        isTrue,
+      );
+      expect(
+        FirestoreMappers.guideProfileToGuide(
+          const GuideProfileDoc(userId: 'g9'),
+          displayName: 'G',
+        ).isRemote,
+        isTrue,
+      );
+      expect(
+        Trip.fromJson({
+          'id': 't1',
+          'title': 'T',
+          'dateLabel': 'x',
+          'guideName': 'G',
+          'peopleCount': 0,
+          'priceEgp': 1,
+          'imageUrl': '',
+          'status': 'upcoming',
+        }).isRemote,
+        isFalse,
+      );
+      expect(
+        guides_ui.Guide.fromJson({
+          'id': 'g1',
+          'name': 'G',
+          'specialty': 'S',
+          'languages': <String>[],
+          'rating': 5,
+          'review_count': 1,
+          'price_per_hour': 1,
+        }).isRemote,
+        isFalse,
       );
     });
     test('SECURITY: client create payload excludes server-owned fields', () {

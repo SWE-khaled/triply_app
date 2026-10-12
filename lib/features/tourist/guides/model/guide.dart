@@ -15,6 +15,13 @@ class Guide {
   final String currency; // e.g. "\$" — locked display rule for list
   final bool isVerified;
 
+  /// True only when mapped from a real Firestore `guideProfiles/{uid}`
+  /// document (see `FirestoreMappers.guideProfileToGuide`). Mock/offline
+  /// baseline guides stay false: the server `createBooking` callable has no
+  /// such profile and answers `not-found`, so booking must refuse them
+  /// early with an honest message instead of a late server error.
+  final bool isRemote;
+
   const Guide({
     required this.id,
     required this.name,
@@ -29,6 +36,7 @@ class Guide {
     required this.pricePerHour,
     required this.currency,
     this.isVerified = true,
+    this.isRemote = false,
   });
 
   factory Guide.fromJson(Map<String, dynamic> json) {
@@ -48,6 +56,7 @@ class Guide {
       pricePerHour: (json['price_per_hour'] as num? ?? 0).toDouble(),
       currency: json['currency'] as String? ?? '\$',
       isVerified: json['is_verified'] as bool? ?? true,
+      isRemote: json['isRemote'] as bool? ?? false,
     );
   }
 
@@ -66,6 +75,7 @@ class Guide {
       'price_per_hour': pricePerHour,
       'currency': currency,
       'is_verified': isVerified,
+      'isRemote': isRemote,
     };
   }
 }

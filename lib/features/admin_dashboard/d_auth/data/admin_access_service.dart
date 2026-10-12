@@ -28,11 +28,17 @@ class AdminAccessService {
   }
 
   /// Reads the custom claim without a network round-trip when the token
-  /// is fresh. Returns false on any failure (fail-closed).
+  /// is fresh, falling back to one forced refresh so a just-provisioned
+  /// `admin:true` claim is observed. Returns false on any failure (fail-closed).
   Future<bool> hasAdminClaim() async {
     try {
-      final token = await FirebaseAuth.instance.currentUser?.getIdTokenResult();
-      return (token?.claims?['admin'] as bool?) ?? false;
+      final user = FirebaseAuth.instance.currentUser;
+      final cached = await user?.getIdTokenResult();
+      if ((cached?.claims?['admin'] as bool?) == true) return true;
+      // Newly provisioned admins hold a cached token without the claim —
+      // one refresh picks it up without forcing refresh on every check.
+      final fresh = await user?.getIdTokenResult(true);
+      return (fresh?.claims?['admin'] as bool?) ?? false;
     } catch (_) {
       return false;
     }

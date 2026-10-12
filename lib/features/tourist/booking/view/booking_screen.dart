@@ -18,7 +18,16 @@ import '../../../../core/data/my_bookings_public.dart';
 class BookingScreen extends StatefulWidget {
   final String guideId;
 
-  const BookingScreen({super.key, required this.guideId});
+  /// True when the selected guide came from a real Firestore
+  /// `guideProfiles/{uid}` document. Mock/offline baseline guides stay
+  /// false and are refused honestly at submit time (see [BookingCubit]).
+  final bool isRemoteGuide;
+
+  const BookingScreen({
+    super.key,
+    required this.guideId,
+    this.isRemoteGuide = false,
+  });
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -33,7 +42,10 @@ class _BookingScreenState extends State<BookingScreen> {
     super.initState();
     // Owned here (like the old controller) so every helper keeps working
     // unchanged; provided below for BlocBuilder rebuilds.
-    _controller = BookingCubit(guideId: widget.guideId);
+    _controller = BookingCubit(
+      guideId: widget.guideId,
+      isRemoteGuide: widget.isRemoteGuide,
+    );
     _notesController = TextEditingController();
   }
 
@@ -908,13 +920,10 @@ class _BookingScreenState extends State<BookingScreen> {
           amount: doc.totalAmount,
           providerReference: orderId != null ? orderId.toString() : '',
         );
-      } catch (_) {
+      } catch (e) {
         if (!mounted) return;
-        messenger.showSnackBar(
-          const SnackBar(
-            content: Text('Could not start secure checkout. Please try again.'),
-          ),
-        );
+        // Fail closed with the actual cause (never a false success).
+        messenger.showSnackBar(SnackBar(content: Text(_bookingError(e))));
         return;
       }
       if (!mounted) return;

@@ -752,17 +752,68 @@ exports.cleanupExpiredStories = onSchedule({schedule: 'every 24 hours', timeZone
 
 exports.provisionAdmin = onCall(async (request) => {
   const caller = await requireAdmin(request);
-  const {uid, email} = request.data || {};
+  const {uid, email, password, displayName} = request.data || {};
   let targetUid = uid ? String(uid) : '';
+  let cleanEmail = '';
   if (!targetUid && email) {
+    cleanEmail = String(email).trim();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      throw new HttpsError('invalid-argument', 'Valid email is required.');
+    }
+    // Eligibility (never authorization): provisioned admin identifiers must
+    // contain "triplykl" (case-insensitive). Authorization stays
+    // caller-based via requireAdmin above — the substring alone never grants
+    // anything, and ineligible targets are rejected even for admin callers.
+    if (!cleanEmail.toLowerCase().includes('triplykl')) {
+      throw new HttpsError('invalid-argument', 'Admin email must contain "triplykl".');
+    }
     try {
-      const user = await admin.auth().getUserByEmail(String(email));
+      const user = await admin.auth().getUserByEmail(cleanEmail);
       targetUid = user.uid;
     } catch (_) {
-      throw new HttpsError('not-found', 'No user with that email.');
+      // Authorized creation path: an existing admin may provision a brand-new
+      // admin in one step. The password is used only for Admin-SDK creation
+      // and is never logged. Without a sufficient password the legacy
+      // not-found error is preserved. Still admin-only: requireAdmin ran
+      // first, so logged-out callers never reach here; the first admin still
+      // requires the console bootstrap (docs/ADMIN_PROVISIONING.md).
+      const pw = password ? String(password) : '';
+      if (!pw || pw.length < 6) {
+        throw new HttpsError('not-found', 'No user with that email.');
+      }
+      try {
+        const created = await admin.auth().createUser({
+          email: cleanEmail,
+          password: pw,
+          displayName: displayName ? String(displayName).slice(0, 100) : undefined,
+        });
+        targetUid = created.uid;
+      } catch (e) {
+        if (e && e.code === 'auth/email-already-exists') {
+          const existing = await admin.auth().getUserByEmail(cleanEmail);
+          targetUid = existing.uid;
+        } else if (e instanceof HttpsError) {
+          throw e;
+        } else {
+          throw new HttpsError('invalid-argument', 'Could not create admin user.');
+        }
+      }
     }
   }
   if (!targetUid) throw new HttpsError('invalid-argument', 'uid or email is required.');
+  // Uid-addressed targets: resolve the account email and enforce the same
+  // eligibility rule so the policy cannot be bypassed via uid.
+  if (!cleanEmail) {
+    try {
+      const u = await admin.auth().getUser(targetUid);
+      cleanEmail = u.email || '';
+    } catch (_) {
+      throw new HttpsError('not-found', 'No user with that id.');
+    }
+    if (!cleanEmail.toLowerCase().includes('triplykl')) {
+      throw new HttpsError('invalid-argument', 'Admin email must contain "triplykl".');
+    }
+  }
   await admin.auth().setCustomUserClaims(targetUid, {admin: true});
   await db.collection('admins').doc(targetUid).set({
     provisionedBy: caller,

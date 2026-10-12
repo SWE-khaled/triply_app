@@ -85,6 +85,8 @@ const _trip = Trip(
   status: TripStatus.upcoming,
   category: 'historical',
   capacity: 12,
+  // Remote-backed card (as mapped from `trips/t1`): bookable.
+  isRemote: true,
 );
 
 BookingDoc _serverPublicDoc() => const BookingDoc(
@@ -174,6 +176,7 @@ void main() {
         status: TripStatus.upcoming,
         category: 'historical',
         capacity: 10,
+        isRemote: true,
       );
       final repo = _FakeBookingsRepository()..publicResult = _serverPublicDoc();
       final cubit = BookingPublicCubit();
@@ -218,6 +221,66 @@ void main() {
         throwsA(predicate((e) => e.toString().contains('Please sign in'))),
       );
       expect(repo.createPublicCalls, 0);
+      await cubit.close();
+    });
+
+    test('mock (non-remote) trip is refused before any backend call',
+        () async {
+      // Regression for "Trip not found.": mock/offline baseline cards carry
+      // ids the server has never seen (`trips/t1` absent), so the cubit
+      // refuses honestly instead of surfacing a late server `not-found`.
+      const mockTrip = Trip(
+        id: 't1',
+        title: 'Nile Day',
+        dateLabel: 'Oct 15, 2026 · 6:00 AM',
+        guideName: 'Omar',
+        peopleCount: 6,
+        priceEgp: 6000,
+        imageUrl: '',
+        status: TripStatus.upcoming,
+        category: 'historical',
+        capacity: 12,
+      );
+      expect(mockTrip.isRemote, isFalse);
+      final repo = _FakeBookingsRepository()
+        ..publicResult = _serverPublicDoc();
+      final cubit = BookingPublicCubit()..changeSeats(2);
+      await expectLater(
+        cubit.submitBooking(repository: repo, uid: 'u1', trip: mockTrip),
+        throwsA(
+          predicate((e) => e.toString().contains('not available for booking')),
+        ),
+      );
+      expect(repo.createPublicCalls, 0);
+      expect(cubit.state.isSubmitting, isFalse);
+      await cubit.close();
+    });
+
+    test('checkout forwards the exact selected trip id', () async {
+      const remote = Trip(
+        id: 'trip-demo-public',
+        title: 'Demo',
+        dateLabel: '2026-11-02T10:00:00.000Z',
+        guideName: 'G',
+        peopleCount: 0,
+        priceEgp: 1000,
+        imageUrl: '',
+        status: TripStatus.upcoming,
+        category: 'historical',
+        capacity: 10,
+        isRemote: true,
+      );
+      final repo = _FakeBookingsRepository()
+        ..publicResult = _serverPublicDoc();
+      final cubit = BookingPublicCubit();
+      await cubit.submitBooking(repository: repo, uid: 'u1', trip: remote);
+      expect(repo.lastPublic!['tripId'], 'trip-demo-public');
+      expect(
+        (repo.lastPublic!['idempotencyKey'] as String).contains(
+          'trip-demo-public',
+        ),
+        isTrue,
+      );
       await cubit.close();
     });
 
@@ -281,7 +344,8 @@ void main() {
 
   group('private submit', () {
     BookingCubit readyCubit() {
-      final cubit = BookingCubit(guideId: 'guide1');
+      // Remote-backed guide (as mapped from `guideProfiles/guide1`).
+      final cubit = BookingCubit(guideId: 'guide1', isRemoteGuide: true);
       cubit.setDate(DateTime.utc(2026, 11, 2, 10));
       cubit.setTimeSlot('9:00 AM');
       cubit.setDuration('4 hours');
@@ -312,12 +376,48 @@ void main() {
     test('missing date fails before any backend call', () async {
       final repo = _FakeBookingsRepository()
         ..privateResult = _serverPrivateDoc();
-      final cubit = BookingCubit(guideId: 'guide1');
+      final cubit = BookingCubit(guideId: 'guide1', isRemoteGuide: true);
       await expectLater(
         cubit.submitBooking(repository: repo, uid: 'u1'),
         throwsA(predicate((e) => e.toString().contains('Select a date'))),
       );
       expect(repo.createPrivateCalls, 0);
+      await cubit.close();
+    });
+
+    test('mock (non-remote) guide is refused before any backend call',
+        () async {
+      // Private keeps its own guide lookup (never a trip lookup): a
+      // mock/offline guide id has no `guideProfiles/` document, so the
+      // cubit refuses honestly instead of surfacing "Guide not found."
+      final repo = _FakeBookingsRepository()
+        ..privateResult = _serverPrivateDoc();
+      final cubit = BookingCubit(guideId: 'g1');
+      expect(cubit.isRemoteGuide, isFalse);
+      cubit.setDate(DateTime.utc(2026, 11, 2, 10));
+      cubit.setTimeSlot('9:00 AM');
+      cubit.setDuration('4 hours');
+      await expectLater(
+        cubit.submitBooking(repository: repo, uid: 'u1'),
+        throwsA(
+          predicate((e) => e.toString().contains('not available for booking')),
+        ),
+      );
+      expect(repo.createPrivateCalls, 0);
+      expect(cubit.state.isSubmitting, isFalse);
+      await cubit.close();
+    });
+
+    test('checkout forwards the exact selected guide id', () async {
+      final repo = _FakeBookingsRepository()
+        ..privateResult = _serverPrivateDoc();
+      final cubit = readyCubit();
+      await cubit.submitBooking(repository: repo, uid: 'u1');
+      expect(repo.lastPrivate!['guideId'], 'guide1');
+      expect(
+        (repo.lastPrivate!['idempotencyKey'] as String).contains('guide1'),
+        isTrue,
+      );
       await cubit.close();
     });
 

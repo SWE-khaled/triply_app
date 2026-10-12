@@ -6,7 +6,37 @@
 > `AdminAccessService` (`lib/features/admin_dashboard/d_auth/data/admin_access_service.dart`)
 > checks both. Do NOT deploy rules/Functions before completing step 1.
 
-## Step 1 — First admin (one-time bootstrap, Firebase Console)
+## Step 1 — First admin
+
+### A. Local Emulator first-admin bootstrap (current testing workflow)
+
+Local testing uses a `demo-*` project only — never production Firebase:
+
+1. Start the emulators with the local config (`.firebase-emulator.local.json`):
+   Firestore `127.0.0.1:8092`, Auth `127.0.0.1:9099`, Functions
+   `127.0.0.1:5001`, UI `127.0.0.1:4000`.
+2. Before running any script, verify the target is local: the project ID
+   starts with `demo-`, and the Firestore/Auth hosts are `127.0.0.1` or
+   `localhost`. `tool/bootstrap_first_admin.js` enforces both and refuses
+   `triply-f9b82` and production-looking endpoints.
+3. Run (password via local env only, never committed or logged):
+   ```powershell
+   $env:FIRESTORE_EMULATOR_HOST='127.0.0.1:8092'
+   $env:FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099'
+   $env:DEMO_ADMIN_PASSWORD='<local-only, min 6 chars>'
+   node tool/bootstrap_first_admin.js --project demo-localtest `
+     --email admin-triplykl@demo.local --name "Demo Admin"
+   ```
+4. The script creates the Auth user (if missing), sets the `admin:true`
+   claim, and writes `admins/{uid}` + `users/{uid}.role=admin`. It is
+   repeatable and merges instead of duplicating.
+
+### B. Production first-admin provisioning (documentation only)
+
+This section is **NOT part of the current local testing workflow**. Never
+execute it against production now, and never modify production Firebase.
+The first production admin must still come from a controlled trusted
+procedure (kept here so the requirement is not lost):
 
 1. In the Firebase Console, open project **`triply-f9b82`** (verify the project
    ID in the project settings — do NOT assume the local checkout is linked).
@@ -20,13 +50,23 @@
 
 ## Step 2 — Further admins (no console needed afterwards)
 
-Any existing admin calls the `provisionAdmin` callable with `{uid}` or
-`{email}` of the new admin (from a signed-in admin session). It sets the
+Only an **already-authorized, signed-in admin** can call the `provisionAdmin`
+callable with `{uid}` or `{email}` of the new admin. It sets the
 custom claim + `admins/{uid}` + `users/{uid}.role=admin`.
+
+`triplykl` is an **eligibility** requirement, not authorization: the target
+email must contain `triplykl` (case-insensitive, enforced server-side in
+`provisionAdmin`), but the substring alone never grants anything. A newly
+created account must still sign in successfully and pass server-side
+authorization (`AdminAccessService.isAuthorized`) before reaching the
+dashboard; anything else is signed back out.
 
 ```dart
 // Example (admin session only):
-// FirebaseFunctions.instance.httpsCallable('provisionAdmin').call({'email': 'new-admin@…'});
+// FirebaseFunctions.instance.httpsCallable('provisionAdmin').call({'email': 'new-admin-triplykl@…'});
+// The target email must contain "triplykl" (enforced server-side); the
+// substring alone never authorizes — only an already-signed-in admin caller
+// can provision.
 ```
 
 ## Step 3 — Verify (before announcing)

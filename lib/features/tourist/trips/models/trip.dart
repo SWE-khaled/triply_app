@@ -18,6 +18,13 @@ class Trip {
   /// when one trip was booked twice.
   final String? bookingId;
 
+  /// True only when this card was mapped from a real Firestore `trips/{id}`
+  /// document (see `FirestoreMappers.tripDocToTouristTrip`). Mock/offline
+  /// baseline cards stay false: the server `createBooking` callable has no
+  /// such document and answers `not-found`, so booking screens must refuse
+  /// them early with an honest message instead of a late server error.
+  final bool isRemote;
+
   const Trip({
     required this.id,
     required this.title,
@@ -30,6 +37,7 @@ class Trip {
     required this.category,
     required this.capacity,
     this.bookingId,
+    this.isRemote = false,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) {
@@ -48,6 +56,7 @@ class Trip {
       category: (json['category'] ?? 'historical') as String,
       capacity: (json['capacity'] ?? 12) as int,
       bookingId: json['bookingId'] as String?,
+      isRemote: json['isRemote'] as bool? ?? false,
     );
   }
 
@@ -64,6 +73,7 @@ class Trip {
       'category': category,
       'capacity': capacity,
       if (bookingId != null) 'bookingId': bookingId,
+      'isRemote': isRemote,
     };
   }
 }

@@ -140,11 +140,10 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Could not start secure checkout. Please try again.'),
-        ),
-      );
+      // Fail closed with the actual cause (never a false success, never a
+      // swallowed backend message). _bookingError maps scrubbed INTERNAL to
+      // a friendly retry message via the repository.
+      messenger.showSnackBar(SnackBar(content: Text(_bookingError(e))));
       return;
     }
     if (!mounted) return;

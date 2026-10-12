@@ -261,10 +261,31 @@ class BookingsRepository {
         return 'This booking was already submitted.';
       case 'failed-precondition':
         return e.message ?? 'Booking is no longer available.';
+      case 'not-found':
+        return e.message ?? 'Requested trip or guide was not found.';
+      case 'permission-denied':
+        return e.message ?? 'You are not allowed to perform this action.';
       case 'unavailable':
         return 'Booking service unavailable. Please try again.';
+      case 'internal':
+        // Functions v2 scrubs uncaught errors to code=internal/message=INTERNAL.
+        // Never surface raw "INTERNAL" — fail closed with an actionable message.
+        if (e.message == null ||
+            e.message!.isEmpty ||
+            e.message!.toUpperCase() == 'INTERNAL') {
+          return 'Booking service unavailable. Please try again.';
+        }
+        return e.message!;
       default:
-        return e.message ?? 'Booking failed. Please try again.';
+        // Same guard for any future scrubbed code carrying "INTERNAL".
+        if (e.message == null ||
+            e.message!.isEmpty ||
+            e.message!.toUpperCase() == 'INTERNAL') {
+          return action == null
+              ? 'Booking failed. Please try again.'
+              : 'Could not $action. Please try again.';
+        }
+        return e.message!;
     }
   }
 }

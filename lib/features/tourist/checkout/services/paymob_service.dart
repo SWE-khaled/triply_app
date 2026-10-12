@@ -112,16 +112,19 @@ class PaymobService {
   }
 
   /// Step 2: POST /api/ecommerce/orders -> order id.
-  /// [amountCents] is the EGP minor-unit total.
+  /// [amountCents] is the minor-unit total in [currency] (default EGP).
+  /// Currency must match the server booking or verification rejects the
+  /// order as `currency-mismatch` — never hardcode a guess here.
   Future<int> registerOrder({
     required String authToken,
     required int amountCents,
+    String currency = 'EGP',
   }) async {
     final res = await _post(Uri.parse('$_base/api/ecommerce/orders'), {
       'auth_token': authToken,
       'delivery_needed': 'false',
-      'amount_cents': amountCents.toString(),
-      'currency': 'EGP',
+      'amount_cents': amountCents,
+      'currency': currency,
       'items': [],
     });
 
@@ -134,11 +137,14 @@ class PaymobService {
   }
 
   /// Step 3: POST /api/acceptance/payment_keys -> payment token.
+  /// [currency] must equal the order currency and the server booking
+  /// currency (see [registerOrder]).
   Future<String> requestPaymentKey({
     required String authToken,
     required int orderId,
     required int amountCents,
     required PaymobBillingData billing,
+    String currency = 'EGP',
   }) async {
     final res = await _post(Uri.parse('$_base/api/acceptance/payment_keys'), {
       'auth_token': authToken,
@@ -146,7 +152,7 @@ class PaymobService {
       'expiration': 3600,
       'order_id': orderId,
       'billing_data': billing.toJson(),
-      'currency': 'EGP',
+      'currency': currency,
       'integration_id': _integrationId,
     });
 
@@ -171,15 +177,22 @@ class PaymobService {
   }) async {
     final authToken = await requestAuthToken();
     final amountCents = (summary.total * 100).round();
+    // Server verification compares provider currency to the booking
+    // currency, so the booking currency (not a hardcoded guess) travels
+    // with both money calls. Normalized: empty becomes EGP.
+    final upper = summary.currency.trim().toUpperCase();
+    final currency = upper.isEmpty ? 'EGP' : upper;
     final orderId = await registerOrder(
       authToken: authToken,
       amountCents: amountCents,
+      currency: currency,
     );
     final paymentToken = await requestPaymentKey(
       authToken: authToken,
       orderId: orderId,
       amountCents: amountCents,
       billing: billing,
+      currency: currency,
     );
     return (paymentToken: paymentToken, orderId: orderId);
   }
