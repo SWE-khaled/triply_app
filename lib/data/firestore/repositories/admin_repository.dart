@@ -323,26 +323,24 @@ class AdminRepository {
     }
   }
 
-  /// Approve/reject/cancel a trip via the `decideTripStatus` callable.
-  /// Returns the decided status. Capacity/booking protections stay
-  /// server-side; cancelling a trip does NOT refund bookings (those keep
-  /// their own lifecycle) — callers must not claim refunds from this.
+  /// Approve/reject/cancel a trip via direct Firestore decision write
+  /// (Spark-compatible: the rules authorize admins and pin all other
+  /// fields — no callable). Returns the decided status.
+  /// Capacity/booking protections stay server-side; cancelling a trip does
+  /// NOT refund bookings (those keep their own lifecycle) — callers must
+  /// not claim refunds from this.
   Future<String> decideTripStatus({
     required String tripId,
     required String decision,
     String rejectionReason = '',
   }) async {
     try {
-      final callable = _functions.httpsCallable('decideTripStatus');
-      final res = await callable.call({
-        'tripId': tripId,
-        'decision': decision,
-        'rejectionReason': rejectionReason,
-      });
-      final data = Map<String, dynamic>.from(res.data as Map);
-      return (data['approvalStatus'] ?? '').toString();
-    } on FirebaseFunctionsException catch (e) {
-      throw Exception(_functionMessage(e));
+      await _trips.setDecision(
+        id: tripId,
+        approvalStatus: decision,
+        rejectionReason: decision == 'rejected' ? rejectionReason : '',
+      );
+      return decision;
     } catch (e) {
       throw Exception(_friendlyError(e));
     }

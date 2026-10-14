@@ -133,13 +133,27 @@ class TripsDatasource {
     return snap.docs.map(TripDoc.fromFirestore).toList();
   }
 
-  /// Guide creates a trip. Writes the client-safe payload only; the
-  /// `onTripCreate` Function stamps `approvalStatus=pending` + denormalized
-  /// search fields. Returns the new doc id.
+  /// Guide creates a trip. Writes the client-safe payload only, stamped
+  /// `pending` for admin review (rules enforce the exact value).
+  /// Returns the new doc id.
   Future<String> create(TripDoc doc) async {
     final ref = _col.doc();
     await ref.set(doc.toCreateMap());
     return ref.id;
+  }
+
+  /// Admin decision write (Spark-compatible: no callable). Writes ONLY the
+  /// decision fields; the rules authorize admins and pin every other field.
+  Future<void> setDecision({
+    required String id,
+    required String approvalStatus,
+    String rejectionReason = '',
+  }) async {
+    await _col.doc(id).set({
+      'approvalStatus': approvalStatus,
+      'rejectionReason': rejectionReason,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   /// Guide edits own trip (title/details only). Status-affecting fields are

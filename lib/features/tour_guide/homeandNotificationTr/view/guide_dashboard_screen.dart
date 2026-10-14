@@ -109,6 +109,48 @@ class _GuideDashboardView extends StatelessWidget {
                             color: AppColors.subtitle,
                           ),
                         ),
+                        if (state.isLoading) ...[
+                          const SizedBox(height: 12),
+                          const LinearProgressIndicator(),
+                        ],
+                        if (state.countsError != null) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: _cream,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: AppColors.cardBorder,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.info_outline,
+                                  size: 20,
+                                  color: AppColors.title,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    state.countsError!,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.subtitle,
+                                    ),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => context
+                                      .read<DashboardCubit>()
+                                      .loadRemote(),
+                                  child: const Text('Retry'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 16),
                         Row(
                           children: [

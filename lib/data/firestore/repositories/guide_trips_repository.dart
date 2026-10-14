@@ -1,4 +1,3 @@
-import 'package:triply/core/data/mock/tourguide/mock_guide_trips.dart';
 import 'package:triply/core/firebase/firestore_result.dart';
 import 'package:triply/data/firestore/datasources/firestore_query_helper.dart';
 import 'package:triply/data/firestore/datasources/trips_datasource.dart';
@@ -31,14 +30,10 @@ class GuideTripsRepository {
       if (items.isEmpty) return const FirestoreEmpty();
       return FirestoreOk(items);
     } catch (e) {
-      try {
-        final items =
-            mockGuideTripsJson.map(GuideTrip.fromJson).toList();
-        if (items.isEmpty) return const FirestoreEmpty();
-        return FirestoreOk(items);
-      } catch (_) {
-        return FirestoreFailure(FirestoreQueryHelper.friendlyError(e), e);
-      }
+      // Honest failure: the cubit's session/mock baseline stays in place
+      // and the caller reports it — never present mocks as a successful
+      // remote fetch (masks real Firebase errors on this screen).
+      return FirestoreFailure(FirestoreQueryHelper.friendlyError(e), e);
     }
   }
 

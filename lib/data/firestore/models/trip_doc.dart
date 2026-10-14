@@ -150,13 +150,17 @@ class TripDoc {
   }
 
   /// Client create payload — excludes server-owned `bookedSeats`,
-  /// `approvalStatus`, timestamps (rules enforce this too).
+  /// `rejectionReason` and timestamps (rules enforce this too).
+  /// `approvalStatus` is stamped exactly 'pending': the rules deny any
+  /// other value at creation, so guides can never self-approve
+  /// (Spark-compatible flow, no Functions deploy required).
   Map<String, dynamic> toCreateMap() {
     return {
       'guideId': guideId,
       'guideName': guideName,
       'placeId': placeId,
       'title': title,
+      'approvalStatus': 'pending',
       'description': description,
       'location': location,
       'dateLabel': dateLabel,

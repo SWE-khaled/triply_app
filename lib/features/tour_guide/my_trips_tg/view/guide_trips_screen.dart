@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,10 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/data/guide_trip_details_source.dart';
+import '../../../../data/firestore/datasources/firestore_query_helper.dart';
+import '../../../../data/firestore/datasources/trips_datasource.dart';
+import '../../../../data/firestore/mappers/firestore_mappers.dart';
+import '../../trip_details_tg/model/guide_trip_details.dart';
 import '../cubit/guide_trips_cubit.dart';
 import '../cubit/guide_trips_state.dart';
 import '../model/guide_trip.dart';
@@ -54,6 +59,48 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
     GuideTripStatus.cancelled,
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    // Initial load: spinner first (never mock/session rows), then the
+    // guide's Firebase trips. Session/mock list stays only when signed
+    // out or when remote fails (with an explicit notice).
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadInitial());
+  }
+
+  /// First load for this screen. Shows a failure notice only when a
+  /// signed-in guide's remote fetch fails.
+  Future<void> _loadInitial() async {
+    if (!mounted) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final ok = await context.read<GuideTripsCubit>().loadInitial(uid);
+    if (!ok && mounted && uid != null && uid.isNotEmpty) {
+      showAppSnackBar(
+        context,
+        'Could not load trips. Please try again.',
+        icon: Icons.info_outline,
+      );
+    }
+  }
+
+  /// Loads the signed-in guide's trips through the existing
+  /// repository/datasource bridge. A failure keeps the current
+  /// session/mock list with an explicit notice — never presented
+  /// as a successful remote fetch.
+  Future<void> _refreshRemote() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || uid.isEmpty) return;
+    if (!mounted) return;
+    final ok = await context.read<GuideTripsCubit>().loadRemote(uid);
+    if (!ok && mounted) {
+      showAppSnackBar(
+        context,
+        'Could not refresh trips. Showing saved trips.',
+        icon: Icons.info_outline,
+      );
+    }
+  }
+
   void _openDetails(BuildContext context, GuideTrip trip) {
     // Reload on return: an edit may have changed this trip.
     Navigator.of(context).push(AppRoutes.guideTripDetails(trip)).then((_) {
@@ -64,21 +111,70 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
   }
 
   void _openCreate(BuildContext context) {
-    // After a successful submit, land on Pending where the new trip is.
-    Navigator.of(context).push(AppRoutes.createTrip()).then((created) {
+    // After a successful submit, land on Pending where the new trip is,
+    // then refresh from Firebase so the saved document (not just the
+    // session copy) backs the list.
+    Navigator.of(context).push(AppRoutes.createTrip()).then((created) async {
       if (created == true && context.mounted) {
         context.read<GuideTripsCubit>().selectStatus(GuideTripStatus.pending);
+        await _refreshRemote();
       }
     });
   }
 
-  void _openManage(BuildContext context, GuideTrip trip) {
-    final details = const GuideTripDetailsSource().getByTripId(
+  void _openManage(BuildContext context, GuideTrip trip) async {
+    // Exact session/mock match first (sync): offline and mock flows keep
+    // working with no network and no design change.
+    final local = const GuideTripDetailsSource().getByTripId(
       trip.id,
       title: trip.title,
       imageUrl: trip.imageUrl,
       priceEgp: trip.priceEgp,
     );
+    if (local.id != 'fallback') {
+      _pushManage(context, trip, local);
+      return;
+    }
+    // Real Firestore document: loading dialog first, never mock filler.
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) =>
+          const Center(child: CircularProgressIndicator()),
+    );
+    try {
+      final doc = await TripsDatasource().getById(trip.id);
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // Dismiss the loader.
+      if (doc == null) {
+        _manageError(
+          context,
+          trip,
+          'Trip not found. It may have been deleted.',
+        );
+        return;
+      }
+      _pushManage(
+        context,
+        trip,
+        FirestoreMappers.tripDocToGuideTripDetails(doc),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // Dismiss the loader.
+      _manageError(
+        context,
+        trip,
+        FirestoreQueryHelper.friendlyError(e),
+      );
+    }
+  }
+
+  void _pushManage(
+    BuildContext context,
+    GuideTrip trip,
+    GuideTripDetails details,
+  ) {
     Navigator.of(
       context,
     ).push(AppRoutes.manageTrip(trip: trip, details: details)).then((_) {
@@ -86,6 +182,23 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
         context.read<GuideTripsCubit>().refresh();
       }
     });
+  }
+
+  /// Error with a Retry action that re-runs the manage flow.
+  void _manageError(BuildContext context, GuideTrip trip, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: () {
+              if (context.mounted) _openManage(context, trip);
+            },
+          ),
+        ),
+      );
   }
 
   void _todo(String what) {
@@ -230,6 +343,11 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
             Expanded(
               child: BlocBuilder<GuideTripsCubit, GuideTripsState>(
                 builder: (context, state) {
+                  if (state.isLoading) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
                   final trips = state.trips;
                   if (trips.isEmpty) {
                     return Center(

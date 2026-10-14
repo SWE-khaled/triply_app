@@ -37,14 +37,6 @@
       "collectionGroup": "trips",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "placeId", "order": "ASCENDING" },
-        { "fieldPath": "approvalStatus", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "trips",
-      "queryScope": "COLLECTION",
-      "fields": [
         { "fieldPath": "approvalStatus", "order": "ASCENDING" },
         { "fieldPath": "category", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
@@ -73,19 +65,6 @@
         { "fieldPath": "tripId", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
-    },
-    {
-      "collectionGroup": "bookings",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "tripId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "bookings",
-      "queryScope": "COLLECTION",
-      "fields": [{ "fieldPath": "idempotencyKey", "order": "ASCENDING" }]
     },
     {
       "collectionGroup": "payments",

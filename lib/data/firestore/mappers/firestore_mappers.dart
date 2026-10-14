@@ -18,6 +18,8 @@ import 'package:triply/features/tourist/trip_details/model/trip_details.dart';
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_ui;
 import 'package:triply/features/tour_guide/my_trips_tg/model/guide_trip.dart'
     as guide_ui;
+import 'package:triply/features/tour_guide/trip_details_tg/model/guide_trip_details.dart'
+    as guide_details_ui;
 
 /// Pure mappers: canonical Firestore docs → existing UI models.
 ///
@@ -71,6 +73,47 @@ class FirestoreMappers {
       },
       duration: d.duration.isEmpty ? null : d.duration,
       rejectionReason: d.rejectionReason.isEmpty ? null : d.rejectionReason,
+    );
+  }
+
+  /// `trips/` doc → guide-side trip details screen. Binds every field to
+  /// the selected Firestore document (no mock fallback content).
+  static guide_details_ui.GuideTripDetails tripDocToGuideTripDetails(
+    TripDoc d,
+  ) {
+    return guide_details_ui.GuideTripDetails(
+      id: 'details-${d.id}',
+      tripId: d.id,
+      tag: d.category,
+      title: d.title,
+      // Aggregates written by `onReviewWritten`; 0/0 until the first review.
+      // Guide card stays zeroed: guide rating/avatar live in `guideProfiles`
+      // (separate collection) and are enriched in a later phase.
+      rating: d.rating < 0 ? 0 : d.rating,
+      reviewsCount: d.reviewsCount < 0 ? 0 : d.reviewsCount,
+      location: d.location,
+      duration: d.duration,
+      groupType: d.capacity > 1 ? 'Group' : 'Private',
+      languages: d.languages.isEmpty ? 'English' : d.languages.join(', '),
+      about: d.description,
+      highlights: d.highlights,
+      itinerary: d.itinerary
+          .map(
+            (e) => guide_details_ui.GuideItineraryStop(
+              time: (e['time'] ?? '').toString(),
+              title: (e['title'] ?? e['activity'] ?? '').toString(),
+            ),
+          )
+          .toList(),
+      notes: d.notes,
+      included: d.included.join(', '),
+      meetingPoint: d.meetingPoint,
+      priceEgp: d.priceEgp,
+      guideName: d.guideName,
+      guideAvatarUrl: '',
+      guideRating: 0,
+      guideReviews: 0,
+      imageUrl: d.coverImageUrl,
     );
   }
 

@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:triply/data/firestore/datasources/firestore_query_helper.dart';
+import 'package:triply/data/firestore/datasources/trips_datasource.dart';
 import 'package:triply/data/firestore/models/trip_doc.dart';
 import 'package:triply/data/firestore/repositories/guide_trips_repository.dart';
 import '../../../../core/data/guide_trip_details_source.dart';
@@ -308,6 +310,74 @@ class CreateTripCubit extends Cubit<CreateTripState> {
       ),
     );
     return null;
+  }
+
+  /// Persists an edit to the SAME Firestore document when one exists.
+  /// Returns null when the trip is session/mock-only (no remote doc —
+  /// existing session behavior applies) or when the remote update
+  /// succeeded; otherwise returns a user-facing error message.
+  /// Identity/status/counter keys are never sent (rules + datasource
+  /// strip them); a locally re-picked cover (device path) is omitted so
+  /// a valid remote URL is never overwritten with a file path.
+  Future<String?> saveEditRemote({required GuideTrip existingTrip}) async {
+    try {
+      final doc = await TripsDatasource().getById(existingTrip.id);
+      if (doc == null) return null;
+      final price =
+          double.tryParse(priceCtrl.text.trim()) ?? existingTrip.priceEgp;
+      final capacity = int.tryParse(maxTravelersCtrl.text.trim());
+      final cover = state.coverImagePath ?? existingTrip.imageUrl;
+      final fields = <String, dynamic>{
+        'title': nameCtrl.text.trim(),
+        'description': aboutCtrl.text.trim(),
+        'location': locationCtrl.text.trim().isEmpty
+            ? doc.location
+            : locationCtrl.text.trim(),
+        'dateLabel': dateCtrl.text.trim().isEmpty
+            ? doc.dateLabel
+            : dateCtrl.text.trim(),
+        'startTime': timeCtrl.text.trim(),
+        'duration': durationCtrl.text.trim(),
+        'priceEgp': price,
+        'meetingPoint': meetingCtrl.text.trim().isEmpty
+            ? doc.meetingPoint
+            : meetingCtrl.text.trim(),
+        'included': includedCtrl.text.trim().isEmpty
+            ? doc.included
+            : [includedCtrl.text.trim()],
+        'highlights': state.highlights
+            .map((h) => h.text.trim())
+            .where((t) => t.isNotEmpty)
+            .toList(),
+        'itinerary': state.itinerary
+            .where(
+              (s) => s.time.trim().isNotEmpty || s.activity.trim().isNotEmpty,
+            )
+            .map(
+              (s) => {'time': s.time.trim(), 'title': s.activity.trim()},
+            )
+            .toList(),
+        'notes': notesCtrl.text.trim().isEmpty
+            ? doc.notes
+            : notesCtrl.text
+                  .split('\n')
+                  .map((n) => n.trim())
+                  .where((n) => n.isNotEmpty)
+                  .toList(),
+        'languages': languagesCtrl.text.trim().isEmpty
+            ? doc.languages
+            : [languagesCtrl.text.trim()],
+        'category': labelCtrl.text.trim().isEmpty
+            ? doc.category
+            : labelCtrl.text.trim(),
+      };
+      if (capacity != null && capacity >= 1) fields['capacity'] = capacity;
+      if (cover.startsWith('http')) fields['coverImageUrl'] = cover;
+      await _repository.updateTrip(existingTrip.id, fields);
+      return null;
+    } catch (e) {
+      return FirestoreQueryHelper.friendlyError(e);
+    }
   }
 
   /// Validates, stores as pending, returns the created trip.

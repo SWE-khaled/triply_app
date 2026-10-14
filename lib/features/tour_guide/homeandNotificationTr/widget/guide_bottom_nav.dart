@@ -1,12 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:triply/core/theme/app_colors.dart';
 
-/// Cream tint from Figma (active tab circle). Local const only — the global
-/// theme in `core/theme/` is left untouched.
-const Color _cream = Color(0xFFFAF5EA);
-
 /// 3-tab bottom bar from the guide Figma (Home / My Trips / Profile).
-/// Local to tour_guide: the shared `AppBottomNav` carries tourist tabs.
+/// Visuals mirror the tourist floating glass pill ([AppBottomNav]:
+/// detached capsule, blur, translucent background, border, shadow and
+/// the same oval active highlight). Tabs, icons, indices and tap
+/// behavior are unchanged.
 ///
 /// Keeps its own selected index, so the active color changes on tap even if
 /// the parent doesn't rebuild. If the parent changes [currentIndex], the nav
@@ -24,10 +26,12 @@ class GuideBottomNav extends StatefulWidget {
 class _GuideBottomNavState extends State<GuideBottomNav> {
   late int _selected;
 
-  static const _items = [
-    (Icons.home_outlined, 'Home'),
-    (Icons.work_outline, 'My Trips'),
-    (Icons.person_outline, 'Profile'),
+  /// Same IconData as the Tourist navbar ([AppBottomNav]): Home → house,
+  /// My Trips → route (Tourist Trips/Explore icon), Profile → user.
+  static const _icons = [
+    LucideIcons.house,
+    LucideIcons.route,
+    LucideIcons.user,
   ];
 
   @override
@@ -51,50 +55,79 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.cardBorder)),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(_items.length, (i) {
-              final selected = i == _selected;
-              final color =
-                  selected ? AppColors.title : AppColors.bottomNavUnselected;
-              return GestureDetector(
-                onTap: () => _handleTap(i),
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 44,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: selected ? _cream : Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(_items[i].$1, size: 22, color: color),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _items[i].$2,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: color,
-                        fontWeight:
-                            selected ? FontWeight.w700 : FontWeight.w400,
-                      ),
-                    ),
-                  ],
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
                 ),
-              );
-            }),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE9EDF0).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(_icons.length, (i) {
+                    final selected = i == _selected;
+                    final color = selected
+                        ? AppColors.bottomNavSelected
+                        : const Color.fromARGB(255, 171, 182, 187);
+                    return GestureDetector(
+                      onTap: () => _handleTap(i),
+                      behavior: HitTestBehavior.opaque,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        curve: Curves.easeOut,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? AppColors.bottomNavSelected.withValues(
+                                  alpha: 0.16,
+                                )
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: AnimatedScale(
+                          scale: selected ? 1.1 : 1.0,
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOut,
+                          child: Icon(
+                            _icons[i],
+                            size: 25,
+                            color: color,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ),
           ),
         ),
       ),

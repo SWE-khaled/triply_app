@@ -47,6 +47,45 @@ class GuideTripDetailsScreen extends StatelessWidget {
           body: BlocBuilder<GuideTripDetailsCubit, GuideTripDetailsState>(
             builder: (context, state) {
               final details = state.details;
+              if (state.error != null) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          state.error!,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: AppColors.subtitle,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => context
+                              .read<GuideTripDetailsCubit>()
+                              .loadTrip(trip),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.tabSelectedBg,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
               if (details == null) {
                 return const Center(child: CircularProgressIndicator());
               }

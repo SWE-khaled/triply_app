@@ -26,6 +26,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int _selectedIndex = 0;
+  int _overviewNonce = 0;
 
   static const List<String> _titles = [
     'Overview',
@@ -48,6 +49,21 @@ class _HomeViewState extends State<HomeView> {
     TripApplicationsView(),
     AppSettingsView(),
   ];
+
+  /// Selects a tab. Returning to the Overview dashboard rebuilds it with
+  /// a fresh key so its state (and live counts) reload; other tabs keep
+  /// their existing state.
+  void _selectPage(int i) {
+    if (i == 0) _overviewNonce++;
+    setState(() => _selectedIndex = i);
+  }
+
+  Widget _body() {
+    if (_selectedIndex == 0) {
+      return OverviewView(key: ValueKey('overview-$_overviewNonce'));
+    }
+    return _bodies[_selectedIndex];
+  }
 
   Future<void> _confirmLogout(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -92,7 +108,7 @@ class _HomeViewState extends State<HomeView> {
           children: [
             AdminSidebar(
               selectedIndex: _selectedIndex,
-              onItemSelected: (i) => setState(() => _selectedIndex = i),
+              onItemSelected: _selectPage,
               adminName: adminName,
               onLogout: () => _confirmLogout(context),
             ),
@@ -105,7 +121,7 @@ class _HomeViewState extends State<HomeView> {
                     subtitle: meta.subtitle,
                     isDesktop: true,
                   ),
-                  Expanded(child: _bodies[_selectedIndex]),
+                  Expanded(child: _body()),
                 ],
               ),
             ),
@@ -123,7 +139,7 @@ class _HomeViewState extends State<HomeView> {
           selectedIndex: _selectedIndex,
           adminName: adminName,
           onItemSelected: (i) {
-            setState(() => _selectedIndex = i);
+            _selectPage(i);
             Navigator.of(context).pop(); // close drawer
           },
           onLogout: () {
@@ -140,7 +156,7 @@ class _HomeViewState extends State<HomeView> {
             subtitle: meta.subtitle,
             isDesktop: false,
           ),
-          Expanded(child: _bodies[_selectedIndex]),
+          Expanded(child: _body()),
         ],
       ),
     );

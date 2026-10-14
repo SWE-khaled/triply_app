@@ -126,7 +126,7 @@ void main() {
         isFalse,
       );
     });
-    test('SECURITY: client create payload excludes server-owned fields', () {
+    test('SECURITY: client create payload stamps pending, excludes the rest', () {
       const doc = TripDoc(
         id: 'x',
         guideId: 'g',
@@ -136,8 +136,10 @@ void main() {
         rejectionReason: 'x',
       );
       final payload = doc.toCreateMap();
+      // Spark-compatible pending flow: exactly 'pending' (rules deny any
+      // other value, so guides can never self-approve at creation).
+      expect(payload['approvalStatus'], 'pending');
       expect(payload.containsKey('bookedSeats'), isFalse);
-      expect(payload.containsKey('approvalStatus'), isFalse);
       expect(payload.containsKey('rejectionReason'), isFalse);
       expect(payload['guideId'], 'g');
     });

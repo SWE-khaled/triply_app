@@ -29,9 +29,17 @@ class GuideTripsCubit extends Cubit<GuideTripsState> {
     ...mockGuideTripsJson.map((e) => GuideTrip.fromJson(e)),
   ]);
 
-  /// Re-reads the store (call after returning from Create Trip).
+  /// Last successful remote fetch (all statuses). Tab filters read this
+  /// first so switching tabs never drops back to session/mock data.
+  /// Null until the first success.
+  List<GuideTrip>? _remoteTrips;
+
+  List<GuideTrip> _visible(GuideTripStatus status) =>
+      (_remoteTrips ?? _all()).where((t) => t.status == status).toList();
+
+  /// Re-reads the current source (call after returning from Create Trip).
   void refresh() {
-    emit(state.copyWith(trips: _filter(state.selectedStatus)));
+    emit(state.copyWith(trips: _visible(state.selectedStatus)));
   }
 
   static List<GuideTrip> _filter(GuideTripStatus status) =>
@@ -53,7 +61,7 @@ class GuideTripsCubit extends Cubit<GuideTripsState> {
   }
 
   void selectStatus(GuideTripStatus status) {
-    emit(state.copyWith(selectedStatus: status, trips: _filter(status)));
+    emit(state.copyWith(selectedStatus: status, trips: _visible(status)));
   }
 
   /// Best-effort remote refresh for [guideId]. Returns true when remote
@@ -63,10 +71,13 @@ class GuideTripsCubit extends Cubit<GuideTripsState> {
     try {
       final result = await _repository.myTrips(guideId);
       if (result is FirestoreOk<List<GuideTrip>> && result.data.isNotEmpty) {
-        final trips = result.data
-            .where((t) => t.status == state.selectedStatus)
-            .toList();
-        emit(state.copyWith(trips: trips));
+        _remoteTrips = result.data;
+        emit(
+          state.copyWith(
+            trips: _visible(state.selectedStatus),
+            isLoading: false,
+          ),
+        );
         return true;
       }
     } catch (e) {
@@ -75,5 +86,38 @@ class GuideTripsCubit extends Cubit<GuideTripsState> {
     }
     debugPrint('Triply: GuideTripsCubit.loadRemote kept session data.');
     return false;
+  }
+
+  /// Initial load: shows a spinner (never mock/session rows) while the
+  /// Firebase list loads. Signed-out guides fall back to the local list.
+  /// Returns true when remote trips replaced the list.
+  Future<bool> loadInitial(String? guideId) async {
+    emit(
+      GuideTripsState(
+        selectedStatus: state.selectedStatus,
+        trips: const [],
+        isLoading: true,
+      ),
+    );
+    if (guideId == null || guideId.isEmpty) {
+      emit(
+        GuideTripsState(
+          selectedStatus: state.selectedStatus,
+          trips: _filter(state.selectedStatus),
+        ),
+      );
+      return false;
+    }
+    final ok = await loadRemote(guideId);
+    if (!ok) {
+      // Initial load must not present mock/session rows as the list.
+      emit(
+        GuideTripsState(
+          selectedStatus: state.selectedStatus,
+          trips: const [],
+        ),
+      );
+    }
+    return ok;
   }
 }

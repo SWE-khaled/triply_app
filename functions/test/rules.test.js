@@ -158,7 +158,7 @@ describe('trips list authorization (P0-1)', () => {
     assert.equal(snap.size, 3);
   });
 
-  it('guide cannot smuggle approvalStatus/bookedSeats on create', async () => {
+  it('guide creates pending only; approved or missing status is denied', async () => {
     const db = ctx('guide1').firestore();
     await assertFails(
       db.collection('trips').doc('evil').set({guideId: 'guide1', title: 'x', priceEgp: 100, capacity: 5, approvalStatus: 'approved'}),
@@ -166,8 +166,11 @@ describe('trips list authorization (P0-1)', () => {
     await assertFails(
       db.collection('trips').doc('evil').set({guideId: 'guideX', title: 'x', priceEgp: 100, capacity: 5}),
     );
+    await assertFails(
+      db.collection('trips').doc('no-status').set({guideId: 'guide1', title: 'x', priceEgp: 100, capacity: 5}),
+    );
     await assertSucceeds(
-      db.collection('trips').doc('ok1').set({guideId: 'guide1', title: 'x', priceEgp: 100, capacity: 5}),
+      db.collection('trips').doc('ok1').set({guideId: 'guide1', title: 'x', priceEgp: 100, capacity: 5, approvalStatus: 'pending'}),
     );
   });
 

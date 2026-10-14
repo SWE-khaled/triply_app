@@ -80,7 +80,11 @@ service cloud.firestore {
 
     // ── guideVerifications/{id} ──────────────────────────────────
     match /guideVerifications/{vid} {
-      allow get: if isSignedIn() && (resource.data.guideId == request.auth.uid || isAdmin());
+      // Owner reads own doc; a missing doc must also be readable so a
+      // guide who never submitted gets an empty snapshot (null) instead
+      // of permission-denied. Existing docs still require ownership/admin,
+      // so no other guide's data leaks.
+      allow get: if isSignedIn() && (resource == null || resource.data.guideId == request.auth.uid || isAdmin());
       allow list: if isAdmin();
       // Owner creates own pending submission only, with an exact key
       // allowlist (stable id == guideId enforced client-side; Function
@@ -130,10 +134,15 @@ service cloud.firestore {
         // Only registered guides may publish: role comes from the
         // server-side users doc (never from client input). Publish-gating
         // for UNVERIFIED guides stays an approval-workflow decision —
-        // every create lands `pending` (see onTripCreated) — it is NOT
-        // enforced here so verification-pending guides can still submit.
+        // every create lands `pending` (enforced below; the onTripCreated
+        // Function backfills legacy/absent values when deployed) — it is
+        // NOT enforced here so verification-pending guides can still submit.
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'guide'
-        && !(request.resource.data.keys().hasAny(['bookedSeats', 'approvalStatus', 'rejectionReason']))
+        // Spark-compatible pending flow (no Functions deploy): the client
+        // stamps exactly 'pending'; a missing or different status is denied,
+        // so guides can never self-approve at creation.
+        && request.resource.data.approvalStatus == 'pending'
+        && !(request.resource.data.keys().hasAny(['bookedSeats', 'rejectionReason']))
         // Basic payload validity (deeper validation lives in the app form).
         && request.resource.data.title is string
         && request.resource.data.title.size() > 0
@@ -142,6 +151,14 @@ service cloud.firestore {
         && request.resource.data.capacity is int
         && request.resource.data.capacity >= 1;
       // Owner edits details; status/counters are Function-owned.
+      // Admin decisions (Spark-compatible: no callable required). Only the
+      // decision fields may change; ownership, counters and every other
+      // field are pinned, so this branch cannot be abused for anything but
+      // review — and guides cannot reach it without admin rights.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['approvalStatus', 'rejectionReason', 'updatedAt'])
+        && request.resource.data.approvalStatus in ['approved', 'rejected', 'cancelled']
+        && request.resource.data.rejectionReason is string;
       allow update: if isAdmin() || (
         isSignedIn()
         && resource.data.guideId == request.auth.uid

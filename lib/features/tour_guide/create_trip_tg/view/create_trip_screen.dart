@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -109,7 +110,7 @@ class _CreateTripView extends StatelessWidget {
     Navigator.of(context).push(AppRoutes.guideTripDetails(trip));
   }
 
-  void _submit(BuildContext context, bool isEditing) {
+  void _submit(BuildContext context, bool isEditing) async {
     final cubit = context.read<CreateTripCubit>();
     if (isEditing) {
       final trip = editingTrip;
@@ -126,13 +127,44 @@ class _CreateTripView extends StatelessWidget {
         _toast(context, error);
         return;
       }
+      // Persist to the SAME Firestore document when one exists
+      // (mock/session-only trips skip remote silently, as before).
+      final remoteError = await cubit.saveEditRemote(existingTrip: trip);
+      if (!context.mounted) return;
+      if (remoteError != null) {
+        _toast(
+          context,
+          'Saved on this device, but the server could not be reached. Please try again.',
+        );
+        return;
+      }
       showAppSnackBar(context, 'Changes saved', icon: Icons.check_circle);
       Navigator.of(context).pop(true);
       return;
     }
-    final result = cubit.submitTrip();
+    // Create mode: session submit + Firebase persistence through the
+    // existing submitTripToFirestore path (trips/ create; the
+    // onTripCreated Function stamps approvalStatus=pending for admin
+    // review). Success is reported only after the remote write succeeds.
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _toast(context, 'Please sign in to submit your trip');
+      return;
+    }
+    final result = await cubit.submitTripToFirestore(
+      guideId: user.uid,
+      guideName: user.displayName ?? '',
+    );
+    if (!context.mounted) return;
     if (result.error != null) {
       _toast(context, result.error!);
+      return;
+    }
+    if (result.remoteError != null) {
+      _toast(
+        context,
+        'Saved on this device, but the server could not be reached. Please try again.',
+      );
       return;
     }
     showAppSnackBar(
