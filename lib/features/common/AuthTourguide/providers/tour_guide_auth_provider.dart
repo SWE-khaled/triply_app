@@ -45,7 +45,8 @@ class TourGuideAuthProvider extends ChangeNotifier {
 
   // ──────────────── Login ────────────────
 
-  /// Returns the role string (`'guide'` or `'tourist'`) on success, or null on failure.
+  /// Returns `'guide'` on success, or null on failure (wrong-role accounts
+  /// are rejected inside the service and surface as errors, never as logins).
   Future<String?> signInGuide({
     required String email,
     required String password,

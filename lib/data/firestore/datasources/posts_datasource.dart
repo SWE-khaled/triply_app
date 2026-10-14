@@ -7,7 +7,9 @@ import 'firestore_query_helper.dart';
 ///
 /// Feed is reverse-chron; likes are ownership-safe subcollection docs
 /// (`likes/{uid}`); `likesCount` is a Function-maintained aggregate that
-/// clients never write directly.
+/// clients never write directly. Feeds display live subcollection counts
+/// (see [countLikes]) so totals stay correct even when that Function
+/// isn't deployed.
 class PostsDatasource {
   FirebaseFirestore? _dbInit;
   PostsDatasource([FirebaseFirestore? db]) : _dbInit = db;
@@ -67,6 +69,22 @@ class PostsDatasource {
     return doc.exists;
   }
 
+  /// Batch version of [isLiked] for a feed page: returns the subset of
+  /// [postIds] the user liked. Parallel gets; a failure yields an empty
+  /// set (feed renders unliked) rather than failing the whole feed.
+  /// Skipped by callers for signed-out previews.
+  Future<Set<String>> likedIds(List<String> postIds, String uid) async {
+    if (postIds.isEmpty || uid.isEmpty) return <String>{};
+    try {
+      final results = await Future.wait(
+        postIds.map((id) async => (id: id, liked: await isLiked(id, uid))),
+      );
+      return {for (final r in results) if (r.liked) r.id};
+    } catch (_) {
+      return <String>{};
+    }
+  }
+
   /// Persistent like/unlike. Count aggregation happens in Functions
   /// (`onPostLikeWrite`); the UI applies an optimistic +/-1 on top.
   Future<void> like(String postId, String uid) async {
@@ -77,5 +95,15 @@ class PostsDatasource {
 
   Future<void> unlike(String postId, String uid) async {
     await _likes(postId).doc(uid).delete();
+  }
+
+  /// Live like total for one post (size of the `likes` subcollection).
+  /// Used because the `likesCount` aggregate field is only refreshed by
+  /// the `onPostLikeWritten` Function when deployed — reading the true
+  /// count keeps every client correct with no Functions deploy required
+  /// (likes reads are public per rules).
+  Future<int> countLikes(String postId) async {
+    final snap = await _likes(postId).count().get();
+    return snap.count ?? 0;
   }
 }

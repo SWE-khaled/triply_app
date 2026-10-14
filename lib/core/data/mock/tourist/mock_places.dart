@@ -1,3 +1,4 @@
+
 const List<Map<String, dynamic>> mockPlaces = [
   // ==========================================
   // 1. HISTORICAL (الأماكن التاريخية والأثرية)
@@ -13,17 +14,31 @@ const List<Map<String, dynamic>> mockPlaces = [
     'longitude': 31.1342,
     'rating': 4.9,
     'reviews_count': 12847,
-    'short_description': 'The last surviving wonder of the ancient world...',
+    'short_description':
+    'The only surviving wonder of the ancient world, guarded by the Great Sphinx.',
     'about':
-        'The Great Pyramid of Khufu, Khafre, and Menkaure alongside the Great Sphinx represent the pinnacle of ancient Egyptian architectural mastery.',
+    'The Giza plateau holds the pyramids of Khufu, Khafre and Menkaure, built around 2600-2500 BC during the Fourth Dynasty. The Great Pyramid of Khufu is the only one of the Seven Wonders of the Ancient World still standing. The Great Sphinx, carved from the bedrock and usually attributed to the reign of Khafre, watches over the site.',
     'highlights': [
       'Great Pyramid of Khufu',
       'The Great Sphinx',
-      'Solar Boat Museum',
+      'Pyramids of Khafre and Menkaure',
       'Sound & Light Show',
     ],
+    'tour_guide': {
+      'suggested_duration': '3-4 hours',
+      'best_time':
+      'Arrive at opening time (early morning) or late afternoon to avoid the midday heat and the biggest crowds. October to April is the most comfortable season.',
+      'tips': [
+        'Entering the Great Pyramid itself needs a separate ticket and is cramped; skip it if you dislike tight spaces.',
+        'The Panorama viewpoint on the plateau gives the classic photo of all three pyramids together.',
+        'Agree on the price before any camel or horse ride, and only buy tickets from the official ticket offices.',
+        'Wear a hat, sunscreen and closed shoes; there is almost no shade.',
+        'The Grand Egyptian Museum is a short drive away and fits well into the same day.',
+      ],
+    },
+    // Commons: Great Sphinx of Giza (Featured picture)
     'image_url':
-        'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=1200&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Great_Sphinx_of_Giza_(%D8%A3%D8%A8%D9%88_%D8%A7%D9%84%D9%87%D9%88%D9%84).jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -32,22 +47,34 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Luxor',
     'category': 'Historical',
     'type': 'historical_landmark',
-    'address': 'East Bank, Luxor, Egypt',
+    'address': 'Corniche El Nil, East Bank, Luxor, Egypt',
     'latitude': 25.6995,
     'longitude': 32.6391,
     'rating': 4.9,
     'reviews_count': 8214,
     'short_description':
-        'Ancient Egypt monument with monumental columns and statues...',
+    'A New Kingdom temple in the heart of Luxor, beautifully lit at night.',
     'about':
-        'Large Ancient Egyptian temple complex located on the east bank of the Nile River in the city today known as Luxor.',
+    'Luxor Temple stands on the east bank of the Nile in the middle of the modern city. It was built mainly by Amenhotep III and expanded by Ramesses II around the 14th-13th centuries BC, and was dedicated to the Theban triad of Amun, Mut and Khonsu. It is joined to Karnak by the Avenue of Sphinxes.',
     'highlights': [
+      'Colonnade of Amenhotep III',
+      'Colossal statues of Ramesses II',
       'Avenue of Sphinxes',
-      'Hypostyle Hall',
       'Night Illumination',
     ],
+    'tour_guide': {
+      'suggested_duration': '1-1.5 hours',
+      'best_time':
+      'Visit around sunset so you see it in daylight and then lit up after dark.',
+      'tips': [
+        'It is open into the evening, which makes it easy to combine with a day at Karnak or the West Bank.',
+        'Look for the Mosque of Abu al-Haggag built on top of the temple, a rare example of a mosque inside an ancient temple.',
+        'You can walk or take a horse carriage along the Avenue of Sphinxes toward Karnak.',
+      ],
+    },
+    // Commons: Luxor Temple R15.jpg (Marc Ryckaert, CC BY-SA, Quality image)
     'image_url':
-        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Luxor_Temple_R15.jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -62,16 +89,29 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.9,
     'reviews_count': 9150,
     'short_description':
-        'Vast open-air museum and the largest religious complex ever built...',
+    'One of the largest ancient religious complexes in the world.',
     'about':
-        'A vast complex of sanctuaries, kiosks, pylons, and obelisks dedicated to the Theban triad and the glory of the Pharaohs.',
+    'Karnak is a vast complex of temples, chapels, pylons and obelisks built and expanded over roughly 2,000 years. Its heart is the Temple of Amun-Ra, where the Great Hypostyle Hall holds 134 giant columns, built under the 19th Dynasty (c. 1290-1224 BC).',
     'highlights': [
       'Great Hypostyle Hall',
       'Obelisk of Hatshepsut',
       'Sacred Lake',
+      'Avenue of Ram-Headed Sphinxes',
     ],
+    'tour_guide': {
+      'suggested_duration': '2.5-3 hours',
+      'best_time':
+      'Go as soon as it opens, before the tour buses arrive and before the heat builds.',
+      'tips': [
+        'Head straight for the Great Hypostyle Hall first, then explore the rest while crowds are still thin.',
+        'The site is large and mostly in the open sun; bring water and a hat.',
+        'A licensed guide helps a lot here, since the layout is confusing without explanation.',
+        'The evening Sound & Light show is a good option if you prefer to avoid daytime heat.',
+      ],
+    },
+    // Direct source: World History Encyclopedia (public domain)
     'image_url':
-        'https://images.unsplash.com/photo-1548013146-72479768bada?q=80&w=400&auto=format&fit=crop',
+    'https://www.worldhistory.org/uploads/images/12797.jpg',
     'is_favorite': false,
   },
   {
@@ -85,16 +125,30 @@ const List<Map<String, dynamic>> mockPlaces = [
     'longitude': 32.6014,
     'rating': 4.8,
     'reviews_count': 7640,
-    'short_description': 'Ancient burial ground of New Kingdom Pharaohs...',
+    'short_description':
+    'The royal burial ground of the New Kingdom pharaohs.',
     'about':
-        'A valley where, for a period of nearly 500 years, rock-cut tombs were excavated for the pharaohs and powerful nobles including Tutankhamun.',
+    'For nearly 500 years, from the 16th to the 11th century BC, rock-cut tombs were dug here for the pharaohs and powerful nobles of the New Kingdom. The valley holds around 63 known tombs and chambers, including the tomb of Tutankhamun (KV62), famously found by Howard Carter in 1922.',
     'highlights': [
-      'Tomb of Tutankhamun',
-      'Tomb of Seti I',
-      'Vibrant Wall Paintings',
+      'Tomb of Tutankhamun (KV62)',
+      'Tomb of Seti I (KV17)',
+      'Tomb of Ramesses VI',
+      'Painted burial chambers',
     ],
+    'tour_guide': {
+      'suggested_duration': '2-3 hours',
+      'best_time':
+      'Early morning, because the tombs get hot and stuffy as the day goes on.',
+      'tips': [
+        'The basic ticket covers three tombs; Tutankhamun, Seti I and a few others need an extra ticket.',
+        'Photography rules inside the tombs change from time to time, so check at the gate.',
+        'Some tombs are closed on rotation for conservation, so which ones you see may differ from guidebooks.',
+        'Combine it with Hatshepsut Temple and the Colossi of Memnon on the same West Bank day.',
+      ],
+    },
+    // Commons: Luxor Valley of the Kings A.jpg
     'image_url':
-        'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Luxor_Valley_of_the_Kings_A.jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -103,22 +157,35 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Giza',
     'category': 'Historical',
     'type': 'museum',
-    'address': 'Pyramids Complex Road, Giza, Egypt',
+    'address': 'Alexandria Desert Road (Pyramids Road), Giza, Egypt',
     'latitude': 29.9950,
     'longitude': 31.1186,
     'rating': 4.9,
     'reviews_count': 9450,
     'short_description':
-        'The largest archaeological museum complex in the world...',
+    'The world\'s largest museum dedicated to a single civilization.',
     'about':
-        'Houses tens of thousands of ancient artifacts, including the complete King Tutankhamun collection in a state-of-the-art facility.',
+    'Located about 2 km from the Giza pyramids, the GEM was built to hold more than 100,000 artifacts spanning roughly 3,000 years of Egyptian history. It displays the complete Tutankhamun collection together for the first time, and it was fully opened to the public in November 2025.',
     'highlights': [
-      'Hanging Obelisk',
-      'Statue of Ramses II',
+      'Hanging Obelisk of Ramesses II at the entrance',
+      'Colossal statue of Ramesses II in the Grand Hall',
+      'Grand Staircase',
       'Tutankhamun Galleries',
     ],
+    'tour_guide': {
+      'suggested_duration': '4-5 hours',
+      'best_time':
+      'Weekday mornings are usually quieter. Book tickets ahead on the official channels, because slots can sell out.',
+      'tips': [
+        'Start at the top of the Grand Staircase and work your way down.',
+        'Tutankhamun galleries are the busiest part; visit them early or late in your session.',
+        'The museum has views toward the pyramids, so plan a photo stop.',
+        'Opening hours and ticket prices change, so check the official site before you go.',
+      ],
+    },
+    // TODO-IMAGE: no verified photo yet (old Unsplash link kept as placeholder).
     'image_url':
-        'https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -127,22 +194,34 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Cairo',
     'category': 'Historical',
     'type': 'museum',
-    'address': 'Tahrir Square, Downtown Cairo, Egypt',
+    'address': 'Midan El Tahrir, Downtown Cairo, Egypt',
     'latitude': 30.0478,
     'longitude': 31.2336,
     'rating': 4.7,
     'reviews_count': 10500,
     'short_description':
-        'The historic home of Egyptian antiquities in central Cairo...',
+    'Cairo\'s historic museum of pharaonic antiquities, open since 1902.',
     'about':
-        'Opened in 1902, this iconic pink palace stores over 120,000 items of Pharaonic antiquity.',
+    'The neoclassical building, designed by the French architect Marcel Dourgnon, opened in 1902 and has long been the heart of Egyptology in Cairo. It holds well over 100,000 objects. Many of its most famous pieces, such as the Tutankhamun treasures, have moved to the Grand Egyptian Museum, and the royal mummies now rest in the National Museum of Egyptian Civilization.',
     'highlights': [
-      'Royal Mummy Collection',
-      'Ancient Sarcophagi',
-      'Papyrus Scrolls',
+      'Narmer Palette',
+      'Amarna Period collection',
+      'Yuya and Thuya funerary items',
+      'Statues of Old Kingdom royalty',
     ],
+    'tour_guide': {
+      'suggested_duration': '2-3 hours',
+      'best_time':
+      'Morning, then walk to nearby Downtown cafes and Tahrir Square.',
+      'tips': [
+        'Because collections have been moved to the GEM, check which galleries are currently open before you go.',
+        'Pair it with the National Museum of Egyptian Civilization in Fustat to see the royal mummies.',
+        'Wear comfortable shoes; the galleries are large and the building is not fully air-conditioned.',
+      ],
+    },
+    // TODO-IMAGE: no verified photo yet (old Unsplash link kept as placeholder).
     'image_url':
-        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -157,16 +236,28 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.9,
     'reviews_count': 6430,
     'short_description':
-        'Colossal rock temples of Ramses II on the shores of Lake Nasser...',
+    'Colossal rock temples of Ramesses II beside Lake Nasser.',
     'about':
-        'Two massive rock-cut temples carved into the mountainside during the reign of Pharaoh Ramesses II in the 13th century BC.',
+    'Two rock-cut temples carved into the cliff in the 13th century BC under Ramesses II, one for the king and one for his queen Nefertari. In the 1960s the complex was cut into blocks and rebuilt on higher ground to save it from the rising waters of Lake Nasser, in one of UNESCO\'s major rescue campaigns.',
     'highlights': [
-      'Great Temple of Ramses II',
-      'Temple of Nefertari',
-      'Sun Alignment Phenomenon',
+      'Great Temple of Ramesses II',
+      'Temple of Nefertari (Hathor)',
+      'Four colossal seated statues of Ramesses II',
+      'Sun alignment on the inner sanctuary',
     ],
+    'tour_guide': {
+      'suggested_duration': '1.5-2 hours on site, plus about 3 hours each way from Aswan by road',
+      'best_time':
+      'Early morning. The sun alignment inside the temple is celebrated around February 22 and October 22 each year, which draws big crowds.',
+      'tips': [
+        'Most visitors go on an early-morning convoy or tour from Aswan; confirm departure times and security arrangements before booking.',
+        'Photography inside the temples is restricted, so check the current rule at the entrance.',
+        'Bring water and sun protection; the area is very hot and dry.',
+      ],
+    },
+    // Commons: Abu Simbel 005.jpg (Ad Meskens, CC BY-SA 3.0)
     'image_url':
-        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Abu_Simbel_005.jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -180,12 +271,28 @@ const List<Map<String, dynamic>> mockPlaces = [
     'longitude': 32.8843,
     'rating': 4.8,
     'reviews_count': 5120,
-    'short_description': 'Island temple dedicated to the goddess Isis...',
+    'short_description': 'Island temple of the goddess Isis, reached by boat.',
     'about':
-        'Rescued from the rising waters of the Nile by UNESCO, this island temple complex is revered for its Ptolemaic architecture.',
-    'highlights': ['Temple of Isis', 'Kiosk of Trajan', 'Boat Ride Access'],
+    'The Temple of Isis at Philae was built mainly in the Late and Ptolemaic periods, with later Roman additions such as the Kiosk of Trajan. After the Aswan dams flooded the original island, UNESCO moved the whole complex to nearby Agilkia Island between 1972 and 1980.',
+    'highlights': [
+      'Temple of Isis',
+      'Kiosk of Trajan',
+      'Temple of Hathor',
+      'Boat ride to the island',
+    ],
+    'tour_guide': {
+      'suggested_duration': '1.5-2 hours',
+      'best_time':
+      'Morning or late afternoon for softer light on the stone and cooler temperatures.',
+      'tips': [
+        'You reach the island by a short motorboat ride from the landing point; agree on the fare with the boatmen first or book through your tour.',
+        'Look for the carved reliefs of musicians and animals in the Temple of Hathor.',
+        'It pairs well with the Aswan High Dam and the Unfinished Obelisk in one half-day trip.',
+      ],
+    },
+    // Commons: Philae 08.jpg (Olaf Tausch, CC BY 3.0, Quality image)
     'image_url':
-        'https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Philae_08.jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -194,22 +301,34 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Cairo',
     'category': 'Historical',
     'type': 'historical_landmark',
-    'address': 'Al Abageyah, El-Khalifa, Cairo, Egypt',
+    'address': 'Salah Salem St, Al Abageyah, El-Khalifa, Cairo, Egypt',
     'latitude': 30.0299,
     'longitude': 31.2611,
     'rating': 4.8,
     'reviews_count': 7890,
     'short_description':
-        'Medieval Islamic fortification with sweeping Cairo views...',
+    'Medieval Islamic fortress crowned by the Mosque of Muhammad Ali.',
     'about':
-        'Built by Saladin in the 12th century, this hilltop fortress houses majestic mosques, museums, and panoramic city lookouts.',
+    'Begun by Saladin in 1176 as a defense against the Crusaders, the Citadel was the seat of Egypt\'s rulers for about 700 years. Muhammad Ali Pasha added the Ottoman-style alabaster mosque that dominates Cairo\'s skyline, built between 1830 and 1848.',
     'highlights': [
       'Mosque of Muhammad Ali',
-      'Gawhara Palace',
-      'Cairo Skyline View',
+      'Mosque of an-Nasir Muhammad',
+      'National Military Museum',
+      'Panoramic view over Cairo',
     ],
+    'tour_guide': {
+      'suggested_duration': '2-3 hours',
+      'best_time':
+      'Morning, or late afternoon for the best light and city views.',
+      'tips': [
+        'Dress modestly for the mosque; shoes come off at the entrance.',
+        'Some smaller museums inside the Citadel are often closed, so focus on the mosques and the military museum.',
+        'The nearby Sultan Hassan and Al-Rifai mosques make a good extra stop.',
+      ],
+    },
+    // Commons: historic c.1875 photo (low resolution, TODO-IMAGE: replace with a modern photo)
     'image_url':
-        'https://images.unsplash.com/photo-1572252821143-02f063a62883?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Mosque_of_Muhammad_Ali,_Saladin_Citadel_of_Cairo_-_DPLA_-_760418287669f9dfbbfac271efe04a92.jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -218,21 +337,34 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Alexandria',
     'category': 'Historical',
     'type': 'historical_landmark',
-    'address': 'Pharos Island, Alexandria, Egypt',
+    'address': 'Eastern Harbour, Pharos Peninsula, Alexandria, Egypt',
     'latitude': 31.2140,
     'longitude': 29.8856,
     'rating': 4.6,
     'reviews_count': 4560,
-    'short_description': '15th-century seafront fortress on Pharos Island...',
+    'short_description':
+    'A 15th-century Mamluk sea fortress on the site of the ancient Pharos.',
     'about':
-        'Constructed on the exact site of the ancient Lighthouse of Alexandria using its salvaged stones to protect the Mediterranean coast.',
+    'Sultan Qaitbay ordered this fortress in 1477 after visiting the ruins of the Lighthouse of Alexandria, and it was built on the lighthouse\'s site. Some stones from the old lighthouse were probably reused. It was badly damaged during the British bombardment of 1882 and later restored.',
     'highlights': [
-      'Mediterranean Sea Views',
-      'Ancient Stone Towers',
-      'Seafront Promenade',
+      'Views over the Mediterranean and Eastern Harbour',
+      'Sultan Qaitbay\'s chamber',
+      'Mosque inside the fortress',
+      'Maritime museum',
     ],
+    'tour_guide': {
+      'suggested_duration': '1-1.5 hours',
+      'best_time':
+      'Late afternoon, then stay for sunset on the Corniche.',
+      'tips': [
+        'The upper levels have the best sea views, so climb to the top.',
+        'Seafood restaurants near the harbor make a good follow-up meal.',
+        'It is easy to pair with a Corniche walk and a visit to the Bibliotheca Alexandrina.',
+      ],
+    },
+    // Commons: QaitbeyCitadel2.jpg
     'image_url':
-        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/QaitbeyCitadel2.jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -247,21 +379,39 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.5,
     'reviews_count': 3200,
     'short_description':
-        'Subterranean necropolis blending Roman, Greek, and Pharaonic art...',
+    'Underground Roman-era tombs blending Greek, Roman and Egyptian art.',
     'about':
-        'One of the Seven Wonders of the Middle Ages, consisting of three tiers of tombs and chambers cut into solid rock.',
+    'Dug into the rock in the 2nd century AD, the catacombs were probably a family tomb before being expanded to hold hundreds of burials. They were rediscovered in 1900 when a donkey fell down a shaft. The deepest level is now flooded, and the site is counted among the Seven Wonders of the Middle Ages.',
     'highlights': [
-      'Rotunda Shaft',
-      'Triclinium Banquet Hall',
-      'Hybrid Sculptures',
+      'Spiral staircase and rotunda',
+      'Triclinium banquet hall',
+      'Main tomb with Anubis reliefs',
+      'Hall of Caracalla',
     ],
+    'tour_guide': {
+      'suggested_duration': '45-60 minutes',
+      'best_time':
+      'Early in the day, since the narrow passages feel crowded and stuffy when busy.',
+      'tips': [
+        'You can walk here from nearby Pompey\'s Pillar, so visit both together.',
+        'Watch your step on the staircase and low ceilings.',
+        'Look for the reliefs where Anubis wears Roman soldier dress, a clear sign of the mixed culture.',
+      ],
+    },
+    // Direct Commons file (113KOM_EL_SHOQAFA_CATACOMBS.jpg)
     'image_url':
-        'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?q=80&w=400&auto=format&fit=crop',
+    'https://upload.wikimedia.org/wikipedia/commons/8/85/113KOM_EL_SHOQAFA_CATACOMBS.jpg',
     'is_favorite': false,
   },
 
   // ==========================================
   // 2. ACTIVITIES (الأنشطة والأنشطة الترفيهية)
+  // ==========================================
+  // ==========================================
+  // 2. ACTIVITIES (الأنشطة)
+  // Paste these entries inside the same mockPlaces list.
+  // Entries marked TODO-IMAGE still need a verified photo of the right place.
+  // 'rating' and 'reviews_count' are still sample numbers, not real data.
   // ==========================================
   {
     'id': 'nile_felucca',
@@ -274,12 +424,32 @@ const List<Map<String, dynamic>> mockPlaces = [
     'longitude': 32.8998,
     'rating': 4.8,
     'reviews_count': 2310,
-    'short_description': 'Sunset felucca sail on the Nile with Nubian views...',
+    'short_description':
+    'A relaxed sail on a traditional wooden boat past Elephantine Island.',
     'about':
-        'Experience peaceful sailing on a traditional wooden felucca boat around Elephantine Island and Botanical Gardens.',
-    'highlights': ['Sunset Sail', 'Nubian Village View', 'Tea on Board'],
+    'Feluccas are traditional wooden sailing boats moved by the wind, and many of them are run by Nubian crews. In Aswan a ride usually circles Elephantine Island and Kitchener\'s Island, which is home to the Botanical Garden, with views of the Nubian village on Elephantine.',
+    'highlights': [
+      'Sunset sail',
+      'Kitchener\'s Island (Botanical Garden)',
+      'Nubian village on Elephantine Island',
+      'Tea on board',
+    ],
+    'tour_guide': {
+      'suggested_duration': '1-2 hours',
+      'best_time':
+      'Late afternoon so you are on the water for sunset. Mornings are also pleasant and less crowded.',
+      'tips': [
+        'Agree on the price, the route and the duration with the captain before boarding.',
+        'Because boats rely on the wind, a calm day means a slower trip; ask whether the boat has an engine as a backup.',
+        'Bring sun protection and a light layer for when the sun goes down.',
+        'You can stop at Kitchener\'s Island or Elephantine Island if you want to walk around.',
+      ],
+    },
+    // TODO-IMAGE: this is a felucca at sunset on the Nile at LUXOR, not Aswan
+    // (Commons: Felucca R08.jpg, Marc Ryckaert, CC BY-SA, Quality image).
+    // Swap for an Aswan photo when you find one.
     'image_url':
-        'https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Felucca_R08.jpg?width=1200',
     'is_favorite': false,
   },
   {
@@ -294,16 +464,30 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.9,
     'reviews_count': 5800,
     'short_description':
-        'Fly over open-air temples and the Nile River at dawn...',
+    'Drift over the West Bank temples, tombs and Nile farmland at dawn.',
     'about':
-        'Soar above Luxor’s West Bank monuments, lush green farmland, and the Nile River as the sun rises over the ancient city.',
+    'A sunrise balloon flight lifts off from the West Bank and floats a few hundred meters above the Nile, green farmland and the desert edge. The flight itself usually lasts about 45 minutes to an hour, and the view includes monuments such as the Valley of the Kings, Hatshepsut Temple and the Colossi of Memnon, with Karnak and Luxor Temple across the river.',
     'highlights': [
-      'Sunrise Aerial Views',
-      'Valley of Kings Overhead',
-      'Flight Certificate',
+      'Sunrise aerial views',
+      'Valley of the Kings and Hatshepsut Temple from above',
+      'Colossi of Memnon',
+      'Flight certificate',
     ],
+    'tour_guide': {
+      'suggested_duration': '3 hours in total, with about 45-60 minutes in the air',
+      'best_time':
+      'Before sunrise. Pickups are very early, often between 3:30 and 4:30 am, and the trip includes a short boat crossing to the West Bank.',
+      'tips': [
+        'Flights depend on the weather and can be cancelled at the last minute by the civil aviation authority, so keep a flexible day.',
+        'It is cold before the sun rises; bring a light jacket.',
+        'Operators are licensed by the Egyptian civil aviation authority, so check that your company is.',
+        'Some operators pause in the hottest summer months, so confirm availability if you travel then.',
+        'Plan the rest of your West Bank day (Valley of the Kings, Hatshepsut Temple) for after the flight.',
+      ],
+    },
+    // TODO-IMAGE: no verified photo yet (old Unsplash link kept as placeholder).
     'image_url':
-        'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -318,16 +502,30 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.7,
     'reviews_count': 1893,
     'short_description':
-        'World-class scuba diving along vibrant coral reefs...',
+    'Boat dives and snorkeling over Red Sea coral reefs near Hurghada.',
     'about':
-        'Guided diving tours into the clear waters of the Red Sea, home to sea turtles, dolphins, and diverse marine life.',
+    'Hurghada is one of the main diving bases on the Red Sea, with reefs close to the coast and around Giftun Island. Dive centers run guided dives and introductory dives for beginners, where you can see hard and soft corals, gorgonian fans, reef fish and sometimes sea turtles.',
     'highlights': [
-      'Giftun Island Drop-off',
-      'Coral Reef Exploration',
-      'Beginner Intro Dives',
+      'Giftun Island',
+      'Abu Ramada reef (soft coral and gorgonian fans)',
+      'Coral reef exploration',
+      'Introductory dives for beginners',
     ],
+    'tour_guide': {
+      'suggested_duration': 'Half day to full day, depending on the boat trip',
+      'best_time':
+      'Spring and autumn offer comfortable air and water temperatures; winter water is cooler, so a thicker wetsuit helps.',
+      'tips': [
+        'Choose a dive center accredited by a recognized diving association.',
+        'Certified divers should bring their card and logbook; beginners can book a supervised introductory dive.',
+        'Do not touch coral or take anything from the reef.',
+        'Currents can be strong at some sites, so follow your guide\'s briefing closely.',
+      ],
+    },
+    // TODO-IMAGE: old Unsplash link kept as placeholder; the same photo is also
+    // used for Dahab, so it cannot match both places.
     'image_url':
-        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -336,22 +534,36 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Dahab',
     'category': 'Activities',
     'type': 'activity',
-    'address': 'Blue Hole Road, Dahab, South Sinai, Egypt',
+    'address': 'Blue Hole, about 8-12 km north of Dahab, South Sinai, Egypt',
     'latitude': 28.5722,
     'longitude': 34.5367,
     'rating': 4.8,
     'reviews_count': 3410,
     'short_description':
-        'World-famous submarine sinkhole for diving and freediving...',
+    'A famous shore-access sinkhole, loved by divers and freedivers.',
     'about':
-        'A 100-meter-deep marine sinkhole renowned globally for its wall diving, freediving community, and clear reef waters.',
+    'The Blue Hole is a submarine sinkhole just off the coast north of Dahab, with a maximum depth of just over 100 m. A shallow opening to the sea called the Saddle lies at around 6-7 m, and a tunnel known as the Arch sits much deeper. It is popular for freediving because the depth is reachable from the shore and there is little current, but it is also known as a demanding site where divers must respect depth limits.',
     'highlights': [
-      'The Saddle Coral Reef',
-      'Freediving Spot',
-      'Bedouin Seaside Cafes',
+      'The Saddle (shallow entry)',
+      'The Bells entry point',
+      'Reef wall and coral life',
+      'Freediving and snorkeling',
     ],
+    'tour_guide': {
+      'suggested_duration': 'Half day',
+      'best_time':
+      'Morning, when the water is calm and there are fewer visitors. Winter water can be cold, so bring a good wetsuit.',
+      'tips': [
+        'Diving here is for certified divers (Open Water or higher); never go below your recreational depth limit, because the site has been the scene of fatal accidents.',
+        'Snorkelers can enjoy the reef edge and the Saddle without going deep.',
+        'Dive with a registered center and follow your guide\'s plan.',
+        'The nearby Canyon dive site is about 1.5 km away if you want a second dive.',
+        'Beach cafes on the shore are a good place to rest between dives.',
+      ],
+    },
+    // TODO-IMAGE: old Unsplash link kept as placeholder (same photo as Hurghada).
     'image_url':
-        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -360,22 +572,35 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Giza',
     'category': 'Activities',
     'type': 'activity',
-    'address': 'Desert Dunes, Pyramids Area, Giza, Egypt',
+    'address': 'Desert area near the Giza Pyramids, Giza, Egypt',
     'latitude': 29.9650,
     'longitude': 31.1200,
     'rating': 4.6,
     'reviews_count': 2980,
     'short_description':
-        'Thrill-seeking ATV quad bike tour across desert dunes...',
+    'A guided quad-bike ride through the desert beside the Giza plateau.',
     'about':
-        'Ride through the golden sand dunes surrounding the Pyramids of Giza for an adrenaline-pumping panoramic adventure.',
+    'Operators run guided ATV rides in the desert next to the pyramids, usually lasting one to two hours after a safety briefing. The rides stay in the permitted desert area around the plateau, because riding quad bikes or camels inside the archaeological complex itself is forbidden by the Egyptian authorities.',
     'highlights': [
-      'ATV Dunes Ride',
-      'Panoramic Pyramid Views',
-      'Sunset Photo Stops',
+      'Guided ATV desert ride',
+      'Panoramic views of the pyramids',
+      'Photo stops',
+      'Beginner-friendly briefing',
     ],
+    'tour_guide': {
+      'suggested_duration': '1-2 hours riding, plus transfers',
+      'best_time':
+      'Morning or late afternoon, when the desert is cooler and the light is better for photos.',
+      'tips': [
+        'Wear closed shoes and bring sunglasses, sun cream and a scarf for dust.',
+        'Helmets and a safety briefing should be provided; do not ride without them.',
+        'It is not recommended for pregnant travelers or people with back or heart problems.',
+        'Entry tickets to the pyramids are separate if you also want to visit the plateau.',
+      ],
+    },
+    // TODO-IMAGE: old Unsplash link kept as placeholder (same photo as Mount Sinai).
     'image_url':
-        'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -384,22 +609,37 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Saint Catherine',
     'category': 'Activities',
     'type': 'activity',
-    'address': 'St. Catherine Reserve, South Sinai, Egypt',
+    'address': 'Saint Catherine\'s Monastery area, South Sinai, Egypt',
     'latitude': 28.5394,
     'longitude': 33.9753,
     'rating': 4.8,
     'reviews_count': 2100,
     'short_description':
-        'Night mountain hike culminating in a spiritual sunrise...',
+    'A night climb of Jebel Musa to watch the sunrise from the summit.',
     'about':
-        'Trek up the sacred biblical peak of Mount Sinai at night to catch breathtaking mountain vistas at dawn.',
+    'Mount Sinai, also called Jebel Musa ("Mountain of Moses"), rises to about 2,285 m and is traditionally identified with the mountain where Moses received the Ten Commandments. The climb starts at Saint Catherine\'s Monastery, a sixth-century monastery at the foot of the mountain. There are two main routes: a longer camel path and the steeper "Steps of Repentance" (about 3,750 steps), and a small chapel and a mosque stand at the summit.',
     'highlights': [
-      'Camel Path Trail',
+      'Camel path trail',
       'Steps of Repentance',
-      'Summit Sunrise View',
+      'Summit chapel and mosque',
+      'Sunrise view over the mountains',
+      'Saint Catherine\'s Monastery',
     ],
+    'tour_guide': {
+      'suggested_duration': 'About 6-8 hours in total, including the climb, sunrise and descent',
+      'best_time':
+      'Start in the night so you reach the top before sunrise. Spring and autumn are the most comfortable seasons.',
+      'tips': [
+        'It gets very cold at the summit before dawn, even in warm months; bring a warm jacket, gloves and a flashlight.',
+        'The climb is usually done with a local Bedouin guide; confirm current arrangements and security rules before you go.',
+        'Wear sturdy shoes and carry water.',
+        'You can hire a camel for part of the route if you do not want to walk the whole way.',
+        'Visit Saint Catherine\'s Monastery separately; check its opening days first.',
+      ],
+    },
+    // TODO-IMAGE: old Unsplash link kept as placeholder (same photo as quad biking).
     'image_url':
-        'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -414,16 +654,29 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.7,
     'reviews_count': 11200,
     'short_description':
-        'Explore historic medieval shopping alleys and artisan stalls...',
+    'Cairo\'s historic bazaar, founded in the 14th century.',
     'about':
-        'A bustling historic bazaar in Islamic Cairo packed with brassware, leather goods, antiques, and vibrant spice shops.',
+    'Khan el-Khalili dates back to 1382, when it began as a caravanserai in Mamluk Cairo, and later took on a major role as a market. Today its lanes are packed with brassware, lanterns, jewelry, spices and souvenirs, sitting beside Al-Azhar and Al-Hussein in Islamic Cairo.',
     'highlights': [
-      'El Fishawy Heritage Cafe',
-      'Handcrafted Lanterns',
-      'Spice Markets',
+      'El Fishawy cafe',
+      'Hand-crafted lanterns and brassware',
+      'Spice and perfume shops',
+      'Nearby Al-Muizz Street and Al-Azhar',
     ],
+    'tour_guide': {
+      'suggested_duration': '2-3 hours',
+      'best_time':
+      'Afternoon into the evening, when it is lively and cooler. Many shops open late on Friday mornings.',
+      'tips': [
+        'Bargaining is normal; compare prices at a few shops first and stay polite.',
+        'Keep your phone and wallet secure in the crowds.',
+        'Dress modestly, particularly if you plan to visit nearby mosques.',
+        'Stop for tea or coffee at a classic cafe and walk on to Al-Muizz Street for historic buildings.',
+      ],
+    },
+    // TODO-IMAGE: no verified photo yet (old Unsplash link kept as placeholder).
     'image_url':
-        'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=400&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?q=80&w=1200&auto=format&fit=crop',
     'is_favorite': false,
   },
 
@@ -443,14 +696,16 @@ const List<Map<String, dynamic>> mockPlaces = [
     'reviews_count': 1204,
     'short_description': 'Remote desert oasis with high-salinity blue lakes...',
     'about':
-        'A magical oasis in the Western Desert famous for floating salt lakes, natural hot springs, date palm groves, and olive trees.',
+    'A remote oasis near the Libyan border, famous for its salt lakes, natural springs, date palm and olive groves, and its unique Amazigh (Siwi) culture.',
+    'tour_guide':
+    'Siwa is about 8–9 hours by road from Cairo and 5–6 hours from Marsa Matruh. Float in the salt lakes (the water is very salty, so avoid getting it in your eyes), visit Cleopatra Spring at sunset, climb Shali Fortress for a view of the old mud-brick town, and see the Temple of the Oracle at Aghurmi. Spring and autumn are the best seasons; summers are very hot. Dress modestly in the town.',
     'highlights': [
       'Floating Salt Pools',
       'Cleopatra Spring',
       'Shali Fortress Ruins',
     ],
     'image_url':
-        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Ruins_of_the_medieval_fortress_of_Shali,_Siwa_Oasis,_Matrouh_Governorate,_Egypt.jpg?width=400',
     'is_favorite': false,
   },
   {
@@ -465,16 +720,18 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.9,
     'reviews_count': 980,
     'short_description':
-        'Surreal chalk rock formations forming a snow-like desert...',
+    'Surreal chalk rock formations forming a snow-like desert...',
     'about':
-        'Famous for its wind-sculpted mushroom-shaped chalk rock formations that glow white under the moonlight.',
+    'A protected area north of Farafra, known for white chalk rock formations sculpted by wind erosion into mushroom and animal-like shapes.',
+    'tour_guide':
+    'Reached by 4x4 from Farafra or Bahariya, and usually visited as an overnight camping trip. Arrive before sunset for the best colors and stay for the stars. Winter nights get very cold, so bring warm clothes and a sleeping bag. Crystal Mountain and the Agabat valley are often combined with the trip. Go with a licensed guide and driver, and pay the park entrance fee.',
     'highlights': [
       'Mushroom Formations',
       'Stargazing Camping',
       'Crystal Mountain',
     ],
     'image_url':
-        'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/White_Desert,_Rock_formation,_Egypt.jpg?width=400',
     'is_favorite': false,
   },
   {
@@ -489,12 +746,14 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.8,
     'reviews_count': 3120,
     'short_description':
-        'Protected marine sanctuary at the tip of Sinai Peninsula...',
+    'Protected marine sanctuary at the tip of Sinai Peninsula...',
     'about':
-        'Egypt’s first national park features mangrove forests, earthquake fissures, and world-renowned underwater drop-off reefs.',
+    'Egypt’s first national park (declared in 1983), at the southern tip of Sinai. It features mangroves, coastal cliffs, fissures and some of the Red Sea’s best coral reefs.',
+    'tour_guide':
+    'About 20 km from Sharm El Sheikh. Visit in the morning to avoid crowds. Snorkeling and diving at Shark & Yolanda Reef are the main draw, and the mangrove channel is good for a short walk. There is an entrance fee and no shops inside the park, so bring water, food and reef-safe sunscreen, do not touch the corals, and carry your passport.',
     'highlights': ['Magic Lake', 'Yolanda Reef', 'Mangrove Forest Channel'],
     'image_url':
-        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Ras_Mohammed.jpg?width=400',
     'is_favorite': false,
   },
   {
@@ -503,22 +762,24 @@ const List<Map<String, dynamic>> mockPlaces = [
     'city': 'Fayoum',
     'category': 'Nature',
     'type': 'nature_reserve',
-    'address': 'Fayoum Governorate, Egypt',
+    'address': 'Wadi El Rayan Protectorate, Fayoum, Egypt',
     'latitude': 29.2708,
     'longitude': 30.0438,
     'rating': 4.8,
     'reviews_count': 890,
     'short_description':
-        'UNESCO World Heritage site with prehistoric whale fossils...',
+    'UNESCO World Heritage site with prehistoric whale fossils...',
     'about':
-        'A desert valley containing invaluable fossil remains of the earliest, now extinct, suborder of whales in a dramatic desert landscape.',
+    'A UNESCO World Heritage site (2005) holding fossils of early whales such as Basilosaurus and Dorudon, 30–40 million years old, showing the evolution of whales from land animals to sea creatures.',
+    'tour_guide':
+    'About 2 hours from Cairo via Fayoum, and usually combined with Wadi El Rayan in one day trip. A short marked trail passes the fossil skeletons, which are left in place in the sand. Visit the Climate Change Museum first for context. Take water and sun protection, as there is almost no shade.',
     'highlights': [
       'Fossilized Whale Skeletons',
       'Climate Change Museum',
       'Sand Dunes',
     ],
     'image_url':
-        'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Wadi_Al-Hitan_(Whale_Valley).jpg?width=400',
     'is_favorite': false,
   },
   {
@@ -533,16 +794,18 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.6,
     'reviews_count': 2450,
     'short_description':
-        'Desert oasis featuring Egypt’s only natural waterfalls...',
+    'Desert protectorate with Egypt’s only waterfalls...',
     'about':
-        'A protected natural valley containing two connected desert lakes and cascading waterfalls surrounded by sand dunes.',
+    'A protected area with two connected lakes fed by agricultural drainage water. Its waterfalls are not natural, but they are the only ones in Egypt, set among sand dunes.',
+    'tour_guide':
+    'About 2 hours from Cairo. Walk to the waterfall between the two lakes, try sandboarding on the dunes (Mudawara Mountain), and take a boat on the lake. Best visited in spring or autumn, and easy to combine with Wadi Al-Hitan and Lake Qarun in the same day.',
     'highlights': [
       'Desert Waterfalls',
       'Sandboarding Mudawara Mountain',
       'Rowing Boats',
     ],
     'image_url':
-        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Waterfalls_of_Wadi_El_Rayan,_Fayoum,_Egypt.jpg?width=400',
     'is_favorite': false,
   },
   {
@@ -557,18 +820,26 @@ const List<Map<String, dynamic>> mockPlaces = [
     'rating': 4.7,
     'reviews_count': 4100,
     'short_description':
-        'Tropical-like sandy island surrounded by turquoise waters...',
+    'Sandy islands with turquoise water and shallow reefs...',
     'about':
-        'A pristine national park island in the Red Sea offering white sandy beaches, crystal-clear sea, and shallow reefs.',
+    'The Giftun Islands (Giftun Soghayar and Kebir) are a protected marine area off Hurghada, known for white sandy beaches, clear water and shallow coral reefs good for snorkeling.',
+    'tour_guide':
+    'Reached by boat from Hurghada marina (about 45–60 minutes), usually on a full-day trip with snorkeling stops and lunch. Book in advance, as the park is limited by boat quotas. Do not touch or stand on the corals, and take your trash with you. Bring a hat, sunscreen and a towel.',
     'highlights': [
       'White Sand Beaches',
       'Turquoise Waters',
       'Seaside Lounging',
     ],
     'image_url':
-        'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=400&auto=format&fit=crop',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Beach_of_giftun_island.JPG?width=400',
     'is_favorite': false,
   },
+
+
+
+
+
+
 
   // ==========================================
   // 4. FOOD (المطاعم والمأكولات الشهيرة)
@@ -3031,53 +3302,6 @@ const List<Map<String, dynamic>> mockPlaces = [
     'is_favorite': false,
   },
   {
-    'id': 'petrified_forest_cairo',
-    'name': 'Petrified Forest Protected Area',
-    'city': 'Cairo',
-    'category': 'Nature',
-    'type': 'nature_reserve',
-    'address': 'Cairo-Suez Road, Cairo Governorate, Egypt',
-    'latitude': 29.9700,
-    'longitude': 31.5200,
-    'rating': 4.2,
-    'reviews_count': 260,
-    'short_description':
-        'Scattered fossilized tree trunks millions of years old...',
-    'about':
-        'A little-visited desert reserve just outside Cairo where ancient tree trunks have turned to stone over 35 million years.',
-    'highlights': [
-      'Fossilized Tree Trunks',
-      'Easy Cairo Day Trip',
-      'Desert Geology',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'fatnas_island_siwa',
-    'name': 'Fatnas Island, Siwa',
-    'city': 'Siwa',
-    'category': 'Nature',
-    'type': 'nature',
-    'address': 'Siwa Lake, Siwa Oasis, Egypt',
-    'latitude': 29.2000,
-    'longitude': 25.4800,
-    'rating': 4.7,
-    'reviews_count': 640,
-    'short_description': 'Small palm-fringed island famed for sunset views...',
-    'about':
-        'A tranquil spring-fed pool surrounded by date palms on Siwa\'s salt lake, best visited at sunset for its golden reflections.',
-    'highlights': [
-      'Natural Spring Pool',
-      'Palm Grove Setting',
-      'Famous Sunset Views',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
     'id': 'dahab_lagoon',
     'name': 'Dahab Lagoon',
     'city': 'Dahab',
@@ -3099,30 +3323,6 @@ const List<Map<String, dynamic>> mockPlaces = [
     ],
     'image_url':
         'https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'kitcheners_island_aswan',
-    'name': "Kitchener's Island Botanical Garden",
-    'city': 'Aswan',
-    'category': 'Nature',
-    'type': 'nature',
-    'address': 'Nile River, Aswan, Egypt',
-    'latitude': 24.0900,
-    'longitude': 32.8830,
-    'rating': 4.7,
-    'reviews_count': 1980,
-    'short_description':
-        'Lush botanical island garden in the middle of the Nile...',
-    'about':
-        'A green oasis of exotic plants collected from around the world, planted by Lord Kitchener in the early 1900s, reachable only by boat.',
-    'highlights': [
-      'Exotic Plant Collection',
-      'Nile Island Setting',
-      'Boat-only Access',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop',
     'is_favorite': false,
   },
   {
@@ -3312,54 +3512,7 @@ const List<Map<String, dynamic>> mockPlaces = [
         'https://images.unsplash.com/photo-1470770903676-69b98201ea1c?q=80&w=400&auto=format&fit=crop',
     'is_favorite': false,
   },
-  {
-    'id': 'wadi_feiran_sinai',
-    'name': 'Wadi Feiran',
-    'city': 'South Sinai',
-    'category': 'Nature',
-    'type': 'nature',
-    'address': 'Wadi Feiran, South Sinai, Egypt',
-    'latitude': 28.7000,
-    'longitude': 33.6300,
-    'rating': 4.6,
-    'reviews_count': 290,
-    'short_description':
-        'Lush palm-filled valley oasis in the Sinai mountains...',
-    'about':
-        'Known as the "Pearl of Sinai," this fertile valley is Sinai\'s largest oasis, historically significant and rich with date palm groves.',
-    'highlights': [
-      'Sinai\'s Largest Oasis',
-      'Date Palm Groves',
-      'Mountain Valley Setting',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1500534623283-312aade485b7?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'abu_minqar_oasis',
-    'name': 'Abu Minqar Oasis',
-    'city': 'Dakhla',
-    'category': 'Nature',
-    'type': 'nature',
-    'address': 'Western Desert, New Valley Governorate, Egypt',
-    'latitude': 25.8800,
-    'longitude': 28.1300,
-    'rating': 4.3,
-    'reviews_count': 140,
-    'short_description':
-        'Tiny remote desert oasis on the edge of the Great Sand Sea...',
-    'about':
-        'One of Egypt\'s smallest and most isolated oases, offering a genuine glimpse of remote Western Desert farming life.',
-    'highlights': [
-      'Remote Desert Village',
-      'Traditional Farming',
-      'Off-the-beaten-path Access',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
+
   {
     'id': 'dakhla_oasis_springs',
     'name': 'Dakhla Oasis Hot Springs',
@@ -3436,123 +3589,7 @@ const List<Map<String, dynamic>> mockPlaces = [
         'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop',
     'is_favorite': false,
   },
-  {
-    'id': 'momen_restaurant',
-    'name': "Mo'men Restaurant",
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Multiple Branches, Cairo, Egypt',
-    'latitude': 30.0600,
-    'longitude': 31.2500,
-    'rating': 4.2,
-    'reviews_count': 6540,
-    'short_description':
-        'Long-running Egyptian fast-food chain since the 1980s...',
-    'about':
-        'One of Egypt\'s oldest fast-food chains, known for fried chicken, burgers, and combo meals at family-friendly prices.',
-    'highlights': [
-      'Fried Chicken Combos',
-      'Family-friendly Menu',
-      'Nationwide Branches',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'fasahet_somaya',
-    'name': 'Fasahet Somaya',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Downtown Cairo, Egypt',
-    'latitude': 30.0480,
-    'longitude': 31.2410,
-    'rating': 4.7,
-    'reviews_count': 2340,
-    'short_description':
-        'Beloved home-style Egyptian kitchen run by a local matriarch...',
-    'about':
-        'A tiny, no-menu eatery serving whatever traditional home-cooked dishes were prepared that day, treasured for its authenticity.',
-    'highlights': [
-      'Daily Rotating Menu',
-      'Authentic Home Cooking',
-      'Local Cairo Institution',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'om_hashim_falafel',
-    'name': 'Om Hashim Falafel',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Dokki, Giza, Egypt',
-    'latitude': 30.0380,
-    'longitude': 31.2120,
-    'rating': 4.6,
-    'reviews_count': 1980,
-    'short_description': 'Legendary Dokki spot famous for crispy taameya...',
-    'about':
-        'A neighborhood institution renowned for perfectly crispy taameya (Egyptian falafel) served fresh throughout the day.',
-    'highlights': [
-      'Crispy Taameya',
-      'Local Neighborhood Favorite',
-      'Fresh Daily Frying',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'groppi_cafe',
-    'name': 'Groppi',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Talaat Harb Square, Downtown Cairo, Egypt',
-    'latitude': 30.0459,
-    'longitude': 31.2447,
-    'rating': 4.4,
-    'reviews_count': 3120,
-    'short_description': 'Historic patisserie and cafe operating since 1909...',
-    'about':
-        'Once dubbed the "Groppi of the Nile," this iconic Belle Époque cafe has served pastries, chocolates, and coffee to Cairo\'s elite for over a century.',
-    'highlights': [
-      'Historic 1909 Cafe',
-      'Art Deco Interior',
-      'Classic Pastries',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'simonds_cafe',
-    'name': "Simonds Café",
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': '26th of July St, Zamalek, Cairo, Egypt',
-    'latitude': 30.0620,
-    'longitude': 31.2210,
-    'rating': 4.5,
-    'reviews_count': 1670,
-    'short_description': "Zamalek's oldest coffeehouse, open since 1897...",
-    'about':
-        'A historic Zamalek institution serving strong Egyptian coffee and simple pastries in an old-world, unpretentious setting.',
-    'highlights': [
-      'Historic 1897 Coffeehouse',
-      'Strong Egyptian Coffee',
-      'Zamalek Local Favorite',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
+
   {
     'id': 'la_rosa_alexandria',
     'name': 'La Rosa Restaurant',
@@ -3599,78 +3636,8 @@ const List<Map<String, dynamic>> mockPlaces = [
         'https://images.unsplash.com/photo-1559847844-5315695dadae?q=80&w=400&auto=format&fit=crop',
     'is_favorite': false,
   },
-  {
-    'id': 'sabaya_sharm',
-    'name': 'Sabaya Restaurant',
-    'city': 'Sharm El Sheikh',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Four Seasons Resort, Sharm El Sheikh, Egypt',
-    'latitude': 27.8600,
-    'longitude': 34.3900,
-    'rating': 4.7,
-    'reviews_count': 980,
-    'short_description':
-        'Upscale Lebanese and Middle Eastern dining by the Red Sea...',
-    'about':
-        'A refined resort restaurant offering an extensive mezze spread and grilled specialties with views over the Red Sea.',
-    'highlights': [
-      'Extensive Mezze Spread',
-      'Red Sea Views',
-      'Live Bread Baking',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'kazaz_restaurant',
-    'name': 'Kazaz Restaurant',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Downtown Cairo, Egypt',
-    'latitude': 30.0500,
-    'longitude': 31.2420,
-    'rating': 4.4,
-    'reviews_count': 2450,
-    'short_description':
-        'Old-school Cairo eatery known for grilled meats and juices...',
-    'about':
-        'A long-running Downtown Cairo spot pairing classic grilled meat platters with fresh-squeezed juice combinations.',
-    'highlights': [
-      'Grilled Meat Platters',
-      'Fresh Juice Bar',
-      'Downtown Cairo Classic',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'left_bank_zamalek',
-    'name': 'Left Bank',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': '26th of July St, Zamalek, Cairo, Egypt',
-    'latitude': 30.0610,
-    'longitude': 31.2198,
-    'rating': 4.5,
-    'reviews_count': 2670,
-    'short_description':
-        'Nile-front restaurant and lounge with a global menu...',
-    'about':
-        'A stylish Zamalek riverside venue combining an international menu with sweeping Nile views, popular for evening dining and cocktails.',
-    'highlights': [
-      'Nile-front Terrace',
-      'International Menu',
-      'Evening Lounge Vibe',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
+
+
   {
     'id': 'el_malky_grill',
     'name': 'El Malky Grill',
@@ -3695,99 +3662,7 @@ const List<Map<String, dynamic>> mockPlaces = [
         'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=400&auto=format&fit=crop',
     'is_favorite': false,
   },
-  {
-    'id': 'taboula_zamalek',
-    'name': 'Taboula',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Sherif St, Downtown/Zamalek, Cairo, Egypt',
-    'latitude': 30.0500,
-    'longitude': 31.2350,
-    'rating': 4.6,
-    'reviews_count': 3540,
-    'short_description':
-        'Long-standing favorite for Lebanese-style mezze in Cairo...',
-    'about':
-        'A beloved Cairo institution for Levantine mezze, grilled meats, and fresh tabbouleh, popular for group dining.',
-    'highlights': [
-      'Lebanese Mezze Spread',
-      'Fresh Tabbouleh',
-      'Group-friendly Seating',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'cilantro_cafe',
-    'name': 'Cilantro Café',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Multiple Branches, Cairo, Egypt',
-    'latitude': 30.0550,
-    'longitude': 31.2300,
-    'rating': 4.3,
-    'reviews_count': 4870,
-    'short_description': "Egypt's popular homegrown coffeehouse chain...",
-    'about':
-        'A widely loved Egyptian café chain serving coffee, sandwiches, and desserts in a relaxed, modern setting across the country.',
-    'highlights': [
-      'Homegrown Coffee Chain',
-      'Casual Work-friendly Seating',
-      'Sandwich & Dessert Menu',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'koshary_hend',
-    'name': 'Koshary Hend',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Multiple Branches, Cairo, Egypt',
-    'latitude': 30.0400,
-    'longitude': 31.2200,
-    'rating': 4.5,
-    'reviews_count': 5670,
-    'short_description':
-        'Modern koshary chain with a spicier signature sauce...',
-    'about':
-        'A popular contemporary koshary chain known for its distinctively spicy tomato sauce and consistent quality across branches.',
-    'highlights': [
-      'Signature Spicy Sauce',
-      'Consistent Quality',
-      'Modern Fast-casual Setting',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1600520611035-84157ad4084d?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
-  {
-    'id': 'crave_restaurant',
-    'name': 'Crave',
-    'city': 'Cairo',
-    'category': 'Food',
-    'type': 'restaurant',
-    'address': 'Sheikh Zayed City, Giza, Egypt',
-    'latitude': 30.0300,
-    'longitude': 30.9700,
-    'rating': 4.5,
-    'reviews_count': 1670,
-    'short_description':
-        'Modern casual dining spot popular in West Cairo suburbs...',
-    'about':
-        'A trendy West Cairo restaurant serving a contemporary mix of burgers, pasta, and Egyptian-fusion plates in a relaxed setting.',
-    'highlights': [
-      'Modern Fusion Menu',
-      'West Cairo Suburb Location',
-      'Casual Trendy Vibe',
-    ],
-    'image_url':
-        'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop',
-    'is_favorite': false,
-  },
+
+
+
 ];

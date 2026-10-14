@@ -35,8 +35,36 @@ class CommunityRepository {
   }) async {
     try {
       final page = await _posts.feed(limit: limit, startAfter: startAfter);
+      // Per-user like state lives in `posts/{id}/likes/{uid}`, which the
+      // mapper can't see — enrich here so rebuilt feeds keep hearts lit.
+      // Skipped for signed-out previews (CommunityCubit uid 'me'): those
+      // like docs can never exist. Likes written before this fix are
+      // already in the subcollection, so they light up with no migration.
+      final liked = currentUid == 'me' || currentUid.isEmpty
+          ? <String>{}
+          : await _posts.likedIds(
+              page.items.map((d) => d.id).toList(), currentUid);
+      // True totals come from the live `likes` subcollection, NOT the
+      // stored `likesCount` field (only refreshed by the
+      // `onPostLikeWritten` Function when deployed). Parallel counts;
+      // a failure keeps the stored aggregate instead of failing the feed.
+      Map<String, int> counts = const {};
+      try {
+        final entries = await Future.wait(
+          page.items.map((d) async => MapEntry(d.id, await _posts.countLikes(d.id))),
+        );
+        counts = Map.fromEntries(entries);
+      } catch (_) {}
       final items = page.items
-          .map((d) => FirestoreMappers.postDocToPost(d, currentUid: currentUid))
+          .map((d) {
+            final post = FirestoreMappers.postDocToPost(
+              d,
+              currentUid: currentUid,
+              isLiked: liked.contains(d.id),
+            );
+            if (counts.containsKey(d.id)) post.likesCount = counts[d.id]!;
+            return post;
+          })
           .toList();
       if (items.isEmpty) return const FirestoreEmpty();
       return FirestoreOk(items);

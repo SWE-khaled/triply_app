@@ -80,9 +80,9 @@ class _GuideDashboardView extends StatelessWidget {
                 child: BlocBuilder<DashboardCubit, DashboardState>(
                   builder: (context, state) {
                     final stats = state.stats;
-                    final avatarUrl = firebasePhoto.isNotEmpty
-                        ? firebasePhoto
-                        : stats.avatarUrl;
+                    // No photo uploaded → empty: NetworkImageFallback renders
+                    // the grey person-icon placeholder. Never the mock avatar.
+                    final avatarUrl = firebasePhoto;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

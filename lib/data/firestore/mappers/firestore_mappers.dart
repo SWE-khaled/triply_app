@@ -20,6 +20,12 @@ import 'package:triply/features/tour_guide/my_trips_tg/model/guide_trip.dart'
     as guide_ui;
 import 'package:triply/features/tour_guide/trip_details_tg/model/guide_trip_details.dart'
     as guide_details_ui;
+import 'package:triply/features/tour_guide/homeandNotificationTr/model/guide_dashboard_booking_request.dart'
+    as guide_request;
+import 'package:triply/features/tour_guide/homeandNotificationTr/model/booking_details.dart'
+    as guide_booking_details;
+import 'package:triply/features/tour_guide/travelers_tg/model/traveler.dart'
+    as guide_traveler;
 
 /// Pure mappers: canonical Firestore docs → existing UI models.
 ///
@@ -223,7 +229,11 @@ class FirestoreMappers {
 
   // ── Community ──
 
-  static CommunityPost postDocToPost(PostDoc d, {required String currentUid}) {
+  static CommunityPost postDocToPost(
+    PostDoc d, {
+    required String currentUid,
+    bool isLiked = false,
+  }) {
     return CommunityPost(
       id: d.id,
       authorName: d.authorName,
@@ -236,6 +246,7 @@ class FirestoreMappers {
       likesCount: d.likesCount,
       commentsCount: d.commentsCount,
       isMine: d.authorId == currentUid,
+      isLiked: isLiked,
     );
   }
 
@@ -279,6 +290,87 @@ class FirestoreMappers {
       isRead: d.isRead,
       timeLabel: _timeAgo(d.createdAt),
     );
+  }
+
+  // ── Guide bookings ──
+
+  static String _bookingDateLabel(BookingDoc d) {
+    final t = d.tripDate ?? d.appointmentAt ?? d.createdAt;
+    if (t == null) return '';
+    return '${t.day}/${t.month}/${t.year}';
+  }
+
+  /// `bookings/{id}` → guide dashboard "New bookings" row.
+  static guide_request.BookingRequest bookingDocToBookingRequest(
+    BookingDoc d, {
+    String guestName = '',
+    String tourTitle = '',
+    String avatarUrl = '',
+  }) {
+    final label = [
+      if (_bookingDateLabel(d).isNotEmpty) _bookingDateLabel(d),
+      '${d.seats} ${d.seats == 1 ? 'traveler' : 'travelers'}',
+    ].join(' · ');
+    return guide_request.BookingRequest(
+      id: d.id,
+      guestName: guestName.isNotEmpty ? guestName : 'Traveler',
+      tourTitle: tourTitle,
+      detailLabel: label,
+      avatarUrl: avatarUrl,
+      isPrivate: d.isPrivate,
+    );
+  }
+
+  /// `bookings/{id}` → guide booking-details screen.
+  static guide_booking_details.BookingDetails bookingDocToBookingDetails(
+    BookingDoc d, {
+    String guestName = '',
+    String country = '',
+    String avatarUrl = '',
+    String tourTitle = '',
+    String location = '',
+  }) {
+    return guide_booking_details.BookingDetails(
+      id: d.id,
+      guestName: guestName.isNotEmpty ? guestName : 'Traveler',
+      country: country,
+      travelerCount: d.seats,
+      avatarUrl: avatarUrl,
+      isPrivate: d.isPrivate,
+      tourTitle: tourTitle,
+      datetimeLabel: _bookingDateLabel(d),
+      location: location,
+      bookingCode: d.id.length > 8 ? d.id.substring(0, 8).toUpperCase() : d.id,
+      priceLabel:
+          '${d.currency} ${d.totalAmount.toStringAsFixed(d.totalAmount.truncateToDouble() == d.totalAmount ? 0 : 2)}',
+    );
+  }
+
+  /// `bookings/{id}` → traveler row for one guide trip.
+  static guide_traveler.Traveler bookingDocToTraveler(
+    BookingDoc d, {
+    String name = '',
+    String avatarUrl = '',
+  }) {
+    return guide_traveler.Traveler(
+      id: d.touristId.isNotEmpty ? '${d.id}_${d.touristId}' : d.id,
+      tripId: d.tripId ?? '',
+      name: name.isNotEmpty ? name : 'Traveler',
+      tagline: '${d.seats} ${d.seats == 1 ? 'seat' : 'seats'} · ${d.status}',
+      avatarUrl: avatarUrl,
+      seatsLabel: '${d.seats} ${d.seats == 1 ? 'seat' : 'seats'}',
+    );
+  }
+
+  /// Sums payable earnings over non-cancelled bookings.
+  /// Definition: gross collected totals excluding cancelled bookings.
+  static double guideEarningsTotal(List<BookingDoc> bookings) {
+    var total = 0.0;
+    for (final b in bookings) {
+      if (b.status == 'cancelled') continue;
+      total += b.totalAmount;
+    }
+    return total;
   }
 
   // ── Bookings ──

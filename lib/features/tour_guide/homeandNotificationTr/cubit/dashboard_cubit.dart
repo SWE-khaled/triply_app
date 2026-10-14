@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/firebase/firestore_result.dart';
+import 'package:triply/data/firestore/datasources/trips_datasource.dart';
+import 'package:triply/data/firestore/datasources/users_datasource.dart';
+import 'package:triply/data/firestore/mappers/firestore_mappers.dart';
 import 'package:triply/data/firestore/models/booking_doc.dart';
 import 'package:triply/data/firestore/repositories/bookings_repository.dart';
 import 'package:triply/data/firestore/repositories/guide_trips_repository.dart';
@@ -17,23 +20,31 @@ import 'dashboard_state.dart';
 /// available, session/mock store otherwise.
 ///
 /// [totalBookings] counts the guide's booking documents; trip cards count
-/// remote trips by mapped status (approved → active). [earningsLabel] has
-/// no guide-scoped backend source yet and stays mock, as do the New
-/// bookings rows (separate screens own those entities).
+/// remote trips by mapped status (approved → active). [earningsLabel] sums
+/// non-cancelled booking totals and the New bookings rows map the newest
+/// active bookings — both fall back to mock until the first successful load.
 class DashboardCubit extends Cubit<DashboardState> {
   final GuideTripsRepository _tripsRepo;
   final BookingsRepository _bookingsRepo;
+  final TripsDatasource _tripsDs;
+  final UsersDatasource _usersDs;
 
   /// Last successful remote fetch. Null until the first success — counts
   /// fall back to the session/mock store meanwhile.
   List<GuideTrip>? _remoteTrips;
   int? _remoteTotalBookings;
+  List<BookingRequest>? _remoteBookings;
+  String? _remoteEarningsLabel;
 
   DashboardCubit({
     GuideTripsRepository? trips,
     BookingsRepository? bookings,
+    TripsDatasource? tripsDs,
+    UsersDatasource? usersDs,
   })  : _tripsRepo = trips ?? GuideTripsRepository(),
         _bookingsRepo = bookings ?? BookingsRepository(),
+        _tripsDs = tripsDs ?? TripsDatasource(),
+        _usersDs = usersDs ?? UsersDatasource(),
         super(_initial()) {
     GuideTripsStore.addListener(_rebuild);
     _rebuild();
@@ -103,10 +114,10 @@ class DashboardCubit extends Cubit<DashboardState> {
           upcomingTrips: active + pending,
           activeTrips: active,
           completedTrips: count(GuideTripStatus.completed),
-          earningsLabel: base.earningsLabel,
+          earningsLabel: _remoteEarningsLabel ?? base.earningsLabel,
           pendingRequests: pending,
         ),
-        bookings:
+        bookings: _remoteBookings ??
             mockBookingRequestsRaw.map(BookingRequest.fromJson).toList(),
         isLoading: state.isLoading,
         countsError: state.countsError,
@@ -139,16 +150,54 @@ class DashboardCubit extends Cubit<DashboardState> {
       _remoteTrips = tripsRes is FirestoreOk<List<GuideTrip>>
           ? tripsRes.data
           : const [];
-      _remoteTotalBookings =
-          bookingsRes is FirestoreOk<List<BookingDoc>>
-              ? bookingsRes.data.length
-              : 0;
+      final bookingDocs = bookingsRes is FirestoreOk<List<BookingDoc>>
+          ? bookingsRes.data
+          : const <BookingDoc>[];
+      _remoteTotalBookings = bookingDocs.length;
+      // "New bookings" rows + earnings from the same server snapshot.
+      // Active (non-cancelled) bookings first, newest first, capped at 5.
+      final active = bookingDocs
+          .where((b) => b.status != 'cancelled')
+          .toList()
+        ..sort((a, b) => (b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .compareTo(a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
+      final rows = <BookingRequest>[];
+      for (final b in active.take(5)) {
+        var guestName = '';
+        var avatarUrl = '';
+        try {
+          final user = await _usersDs.getById(b.touristId);
+          guestName = user?.fullName ?? '';
+          avatarUrl = user?.avatarUrl ?? '';
+        } catch (_) {}
+        var tourTitle = '';
+        if (b.tripId != null && b.tripId!.isNotEmpty) {
+          try {
+            tourTitle =
+                await _tripsDs.getById(b.tripId!).then((t) => t?.title ?? '');
+          } catch (_) {}
+        }
+        rows.add(FirestoreMappers.bookingDocToBookingRequest(
+          b,
+          guestName: guestName,
+          tourTitle: tourTitle,
+          avatarUrl: avatarUrl,
+        ));
+      }
+      if (rows.isNotEmpty) _remoteBookings = rows;
+      final earnings = FirestoreMappers.guideEarningsTotal(bookingDocs);
+      if (earnings > 0) {
+        _remoteEarningsLabel =
+            'EGP ${earnings.toStringAsFixed(earnings.truncateToDouble() == earnings ? 0 : 2)}';
+      }
       _rebuild();
       emit(state.copyWith(isLoading: false, countsError: null));
     } catch (e) {
       debugPrint('Triply: DashboardCubit.loadRemote failed: $e');
       _remoteTrips = null;
       _remoteTotalBookings = null;
+      _remoteBookings = null;
+      _remoteEarningsLabel = null;
       _rebuild();
       emit(
         state.copyWith(

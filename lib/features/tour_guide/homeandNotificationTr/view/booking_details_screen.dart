@@ -15,22 +15,55 @@ const Color _cream = Color(0xFFFAF5EA);
 
 /// Traveler profile + trip booking details for one New Booking.
 /// Opened from [DashboardScreen] with a booking id.
-class BookingDetailsScreen extends StatelessWidget {
+class BookingDetailsScreen extends StatefulWidget {
   final String bookingId;
 
   const BookingDetailsScreen({super.key, required this.bookingId});
 
   @override
+  State<BookingDetailsScreen> createState() => _BookingDetailsScreenState();
+}
+
+class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
+  late final BookingDetailsCubit _cubit;
+  bool _loadRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = BookingDetailsCubit(bookingId: widget.bookingId);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+  }
+
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
+
+  Future<void> _refresh() async {
+    if (!mounted || _loadRequested) return;
+    _loadRequested = true;
+    try {
+      await _cubit.loadRemote();
+    } finally {
+      _loadRequested = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => BookingDetailsCubit(bookingId: bookingId),
-      child: const _BookingDetailsView(),
+    return BlocProvider.value(
+      value: _cubit,
+      child: _BookingDetailsView(onRetry: _refresh),
     );
   }
 }
 
 class _BookingDetailsView extends StatelessWidget {
-  const _BookingDetailsView();
+  final Future<void> Function() onRetry;
+
+  const _BookingDetailsView({required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +95,37 @@ class _BookingDetailsView extends StatelessWidget {
               const SizedBox(height: 16),
               BlocBuilder<BookingDetailsCubit, BookingDetailsState>(
                 builder: (context, state) {
+                  if (state.isLoading && state.details == null) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                  if (state.error != null && state.details == null) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Column(
+                          children: [
+                            Text(
+                              state.error!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.subtitle),
+                            ),
+                            const SizedBox(height: 12),
+                            TextButton(
+                              onPressed: () => onRetry(),
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                   final details = state.details;
                   if (details == null) {
                     return const Text(

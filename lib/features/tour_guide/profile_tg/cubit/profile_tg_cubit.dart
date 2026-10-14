@@ -1,21 +1,30 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:triply/core/data/mock/tourist/mock_guides.dart';
 import 'package:triply/core/data/mock/tourist/mock_trips.dart';
+import 'package:triply/data/firestore/datasources/guide_profiles_datasource.dart';
+import 'package:triply/data/firestore/datasources/users_datasource.dart';
+import 'package:triply/data/firestore/mappers/firestore_mappers.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 import 'package:triply/features/tourist/guides/model/trip.dart';
 import 'profile_tg_state.dart';
 
 /// Feature-focused cubit for GuideProfileScreen.
-/// Reads local mock data only. Bookmark is UI-local (no favorites screen
-/// exists in Figma, so nothing is persisted).
+///
+/// Baseline is local mock data; [loadRemoteProfile] swaps in the signed-in
+/// guide's Firestore profile (`users` + `guideProfiles`) on success.
+/// Bookmark is UI-local (no favorites screen exists in Figma).
 class ProfileTgCubit extends Cubit<ProfileTgState> {
-  final String guideId;
-
-  ProfileTgCubit({required this.guideId})
-      : super(
+  ProfileTgCubit({
+    required this.guideId,
+    GuideProfilesDatasource? profiles,
+    UsersDatasource? users,
+  })  : _profiles = profiles ?? GuideProfilesDatasource(),
+        _users = users ?? UsersDatasource(),
+        super(
           ProfileTgState(
             guide: mockGuides.firstWhere(
               (g) => g.id == guideId,
@@ -24,17 +33,48 @@ class ProfileTgCubit extends Cubit<ProfileTgState> {
           ),
         );
 
-  /// Reads phone/about/location from Firestore. Safe to call repeatedly;
-  /// failures leave previous values (or fallbacks) in place.
+  final String guideId;
+  final GuideProfilesDatasource _profiles;
+  final UsersDatasource _users;
+
+  /// Reads the signed-in guide's Firestore profile (`users` phone/about/
+  /// location + `guideProfiles` public fields + avatar). On success the
+  /// header/stats bind the remote guide; failures keep the mock baseline.
+  /// Safe to call repeatedly; never crashes.
   Future<void> loadRemoteProfile() async {
     try {
       final profile = await TourGuideAuthService().fetchMyProfile();
       final phone = profile?.phone.trim() ?? '';
       final about = profile?.about.trim() ?? '';
       final location = profile?.location.trim() ?? '';
+      Guide? remoteGuide;
+      String avatarUrl = '';
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null && uid.isNotEmpty) {
+        try {
+          final gp = await _profiles.getByUserId(uid);
+          if (gp != null) {
+            try {
+              final user = await _users.getById(uid);
+              avatarUrl = user?.avatarUrl ?? '';
+            } catch (_) {}
+            remoteGuide = FirestoreMappers.guideProfileToGuide(
+              gp,
+              displayName: gp.displayName.isNotEmpty
+                  ? gp.displayName
+                  : (FirebaseAuth
+                          .instance.currentUser?.displayName?.trim() ??
+                      ''),
+              avatarUrl: avatarUrl,
+            );
+          }
+        } catch (e) {
+          debugPrint('Triply: ProfileTgCubit guideProfiles failed: $e');
+        }
+      }
       emit(
         ProfileTgState(
-          guide: state.guide,
+          guide: remoteGuide ?? state.guide,
           nameOverride: state.nameOverride,
           photoOverride: state.photoOverride,
           coverPath: state.coverPath,
@@ -103,11 +143,15 @@ class ProfileTgCubit extends Cubit<ProfileTgState> {
     );
   }
 
+  /// Firebase photo, session override, or empty (no image).
+  /// Empty means "user never uploaded": callers render the grey person-icon
+  /// placeholder. Never falls back to the mock guide's avatar — that showed
+  /// another person's photo as the default.
   String get displayAvatar {
     final firebasePhoto =
         FirebaseAuth.instance.currentUser?.photoURL?.trim() ?? '';
     if (firebasePhoto.isNotEmpty) return firebasePhoto;
-    return state.photoOverride ?? state.guide.avatarUrl;
+    return state.photoOverride ?? '';
   }
 
   /// Picks a gallery cover for local preview only (no upload yet).

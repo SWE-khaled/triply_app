@@ -128,6 +128,10 @@ class TourGuideAuthService {
   /// Signs in with email/password and returns the role from Firestore.
   /// Disabled accounts (`isActive == false`) are signed straight back out
   /// so a banned user is never left in a logged-in state.
+  /// Role separation is strict and fail-closed: only `role == 'guide'` may
+  /// use the guide flow. Tourist/admin accounts, missing docs, missing
+  /// role fields, and unreadable docs are all signed straight back out
+  /// and rejected, so one account can never cross into the other side.
   Future<({UserCredential credential, String role})> signInGuide({
     required String email,
     required String password,
@@ -138,13 +142,25 @@ class TourGuideAuthService {
     );
 
     final uid = credential.user!.uid;
-    final doc = await _db.collection('users').doc(uid).get();
+    Map<String, dynamic>? data;
+    bool readable = true;
+    try {
+      data = (await _db.collection('users').doc(uid).get()).data();
+    } catch (_) {
+      readable = false;
+    }
 
-    if (!doc.exists) {
+    if (!readable) {
+      await _auth.signOut();
+      throw Exception(
+        'Could not verify guide account. Check your connection and try again.',
+      );
+    }
+    if (data == null) {
+      await _auth.signOut();
       throw Exception('User profile not found. Please contact support.');
     }
 
-    final data = doc.data() ?? {};
     if (data['isActive'] == false) {
       await _auth.signOut();
       throw Exception(
@@ -152,7 +168,19 @@ class TourGuideAuthService {
       );
     }
 
-    final role = (data['role'] as String?) ?? 'tourist';
+    final role = data['role'] as String?;
+    if (role == null || role.isEmpty) {
+      await _auth.signOut();
+      throw Exception('User profile is incomplete. Please contact support.');
+    }
+    if (role != 'guide') {
+      await _auth.signOut();
+      throw Exception(
+        role == 'tourist'
+            ? 'This email is registered as a tourist account. Please sign in on the tourist side.'
+            : 'This account is not registered as a tour guide. Please contact support.',
+      );
+    }
     return (credential: credential, role: role);
   }
 
@@ -300,6 +328,10 @@ class TourGuideAuthService {
           return error.message ?? 'An unexpected error occurred.';
       }
     }
-    return error.toString();
+    // Service-level rejections (role mismatch, disabled, missing profile)
+    // arrive as `Exception: <message>` — strip the prefix for the UI.
+    final text = error.toString();
+    const prefix = 'Exception: ';
+    return text.startsWith(prefix) ? text.substring(prefix.length) : text;
   }
 }

@@ -219,19 +219,17 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 16, 0),
-              child: Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 5,
-                  children: [
-                    Text('My Trips', style: AppTextStyles.screenTitle),
-                    Text(
-                      'Create and manage all your trips.',
-                      style: AppTextStyles.screenSubtitle,
-                    ),
-                    SizedBox(height: 5),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 5,
+                children: [
+                  Text('My Trips', style: AppTextStyles.screenTitle),
+                  Text(
+                    'Create and manage all your trips.',
+                    style: AppTextStyles.screenSubtitle,
+                  ),
+                  SizedBox(height: 5),
+                ],
               ),
             ),
             const SizedBox(height: 14),

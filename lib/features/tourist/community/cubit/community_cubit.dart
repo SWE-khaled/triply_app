@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/firebase/firestore_result.dart';
+import 'package:triply/data/firestore/datasources/cloudinary_uploader.dart';
+import 'package:triply/data/firestore/datasources/community_media_storage.dart';
+import 'package:triply/data/firestore/datasources/firestore_query_helper.dart';
 import 'package:triply/data/firestore/repositories/community_repository.dart';
 import '../../../../core/data/mock/tourist/mock_community.dart';
 import '../model/community_post.dart';
@@ -112,11 +117,63 @@ class CommunityCubit extends Cubit<CommunityState> {
     return deleteStory(story);
   }
 
-  /// Creates a text/location post on the backend and prepends the real
-  /// record. Image posts are rejected: no upload backend exists in this
-  /// phase, and persisting local file paths as URLs would mislead every
-  /// other viewer. Throws with a user-facing message on any failure, in
-  /// which case nothing is added locally.
+  /// Uploads a gallery photo and persists it as a `stories/` document
+  /// (24h expiry), then prepends the real record to MY stories. Unlike
+  /// [addMyStory] (session-local preview), the story survives tab switches
+  /// and restarts via [refreshRemote]. Throws with a user-facing message
+  /// on any failure, in which case nothing is added locally.
+  Future<String> createStoryRemote({
+    required String imagePath,
+    required String userName,
+  }) async {
+    if (uid.isEmpty || uid == 'me') {
+      throw Exception('Please sign in to share a story.');
+    }
+    final path = imagePath.trim();
+    if (path.isEmpty) {
+      throw Exception('Select a photo first.');
+    }
+    final String mediaUrl;
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      mediaUrl = path;
+    } else {
+      final file = File(path);
+      if (!await file.exists()) {
+        throw Exception('Photo could not be read.');
+      }
+      mediaUrl = await CloudinaryUploader().uploadImageFile(file);
+    }
+    try {
+      final id = await _repository.addStory(
+        userId: uid,
+        userName: userName,
+        mediaUrl: mediaUrl,
+      );
+      emit(
+        state.copyWith(
+          myStories: [
+            CommunityStory(
+              id: id,
+              userId: uid,
+              userName: 'You',
+              imageUrl: mediaUrl,
+              isMine: true,
+            ),
+            ...state.myStories,
+          ],
+        ),
+      );
+      return id;
+    } catch (e) {
+      throw Exception(FirestoreQueryHelper.friendlyError(e));
+    }
+  }
+
+  /// Creates a text/location/photo post on the backend and prepends the
+  /// real record. Gallery photos are uploaded (Cloudinary) first; their
+  /// download URLs persist in `posts/{id}.imageUrls` so every viewer sees
+  /// the same images. Throws with a user-facing message on any failure,
+  /// in which case nothing is added locally.
   Future<String> createPost({
     String? text,
     required List<String> imagePaths,
@@ -124,20 +181,24 @@ class CommunityCubit extends Cubit<CommunityState> {
     required String authorName,
     required String authorAvatarUrl,
   }) async {
+    List<String> imageUrls = const [];
     if (imagePaths.isNotEmpty) {
-      throw Exception(
-        'Photo uploads are not available yet. You can post text for now.',
+      imageUrls = await CommunityMediaStorage().uploadPostImages(
+        uid,
+        imagePaths,
       );
     }
     if (text == null || text.trim().isEmpty) {
-      throw Exception('Write something first.');
+      if (imageUrls.isEmpty) {
+        throw Exception('Write something or select at least one image.');
+      }
     }
     final id = await _repository.addPost(
       authorId: uid,
       authorName: authorName,
       authorAvatarUrl: authorAvatarUrl,
-      text: text.trim(),
-      imageUrls: const [],
+      text: (text ?? '').trim(),
+      imageUrls: imageUrls,
       location: location ?? '',
     );
     emit(
@@ -149,9 +210,9 @@ class CommunityCubit extends Cubit<CommunityState> {
             authorAvatarUrl: authorAvatarUrl,
             timeAgo: 'Just now',
             location: location ?? '',
-            imageUrl: '',
-            imageUrls: const [],
-            text: text.trim(),
+            imageUrl: imageUrls.isNotEmpty ? imageUrls.first : '',
+            imageUrls: imageUrls,
+            text: (text ?? '').trim(),
             likesCount: 0,
             commentsCount: 0,
             isMine: true,

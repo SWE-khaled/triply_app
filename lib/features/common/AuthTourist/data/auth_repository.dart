@@ -33,9 +33,12 @@ class AuthRepository {
 
   /// Best-effort user profile save (never fails sign-up/sign-in when
   /// offline or when Firestore rules/connection are unavailable).
-  /// `role: tourist` on create is allowed by rules; later changes to
-  /// `admin` are rejected server-side. `isActive` defaults true.
-  /// Merge-only: never overwrites an existing role or verification state.
+  /// `role: tourist` is written ONLY when the doc does not exist yet
+  /// (first sign-up / first Google sign-in). Merge-only otherwise: an
+  /// existing role (e.g. `guide`) is never overwritten, so signing in on
+  /// the wrong side can no longer demote the account.
+  /// `isActive` defaults true. Merge-only: never overwrites verification
+  /// state.
   Future<void> _ensureUserDoc({
     required String? uid,
     required String fullName,
@@ -44,12 +47,15 @@ class AuthRepository {
   }) async {
     try {
       if (uid != null) {
-        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        final ref = FirebaseFirestore.instance.collection('users').doc(uid);
+        final existing = await ref.get();
+        await ref.set({
           'fullName': fullName,
           'email': email,
           if (phone != null && phone.isNotEmpty) 'phone': phone,
-          'role': 'tourist',
-          'isActive': true,
+          if (!existing.exists) 'role': 'tourist',
+          // Create-only as well: must never reactivate a disabled account.
+          if (!existing.exists) 'isActive': true,
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
@@ -75,6 +81,48 @@ class AuthRepository {
     } on Exception catch (e) {
       if (e.toString().contains('disabled')) rethrow;
     } catch (_) {}
+  }
+
+  /// Strict role separation for the tourist flow: only `role == 'tourist'`
+  /// may sign in here. Anything else — guide/admin role, missing doc,
+  /// missing role field, or an unreadable doc — is signed straight back
+  /// out and rejected, so one account can never cross into the other
+  /// side. Fail-closed by design: an unverifiable account is never let in.
+  Future<void> _requireTouristRole(String uid) async {
+    Map<String, dynamic>? data;
+    bool readable = true;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      data = doc.data();
+    } catch (_) {
+      readable = false;
+    }
+    if (!readable) {
+      await _firebaseAuth.signOut();
+      throw Exception(
+        'Could not verify account type. Check your connection and try again.',
+      );
+    }
+    if (data == null) {
+      await _firebaseAuth.signOut();
+      throw Exception('User profile not found. Please contact support.');
+    }
+    final role = data['role'] as String?;
+    if (role == null || role.isEmpty) {
+      await _firebaseAuth.signOut();
+      throw Exception('User profile is incomplete. Please contact support.');
+    }
+    if (role != 'tourist') {
+      await _firebaseAuth.signOut();
+      throw Exception(
+        role == 'guide'
+            ? 'This email is registered as a tour guide account. Please sign in on the tour guide side.'
+            : 'This account is not registered as a tourist. Please contact support.',
+      );
+    }
   }
 
   /// Saved phone number (e.g. +2010...) or null when absent/unreachable.
@@ -141,7 +189,10 @@ class AuthRepository {
       password: password,
     );
     final uid = credential.user?.uid;
-    if (uid != null) await _requireActiveAccount(uid);
+    if (uid != null) {
+      await _requireActiveAccount(uid);
+      await _requireTouristRole(uid);
+    }
     return credential;
   }
 
@@ -164,7 +215,10 @@ class AuthRepository {
       fullName: user?.displayName ?? '',
       email: user?.email ?? '',
     );
-    if (user != null) await _requireActiveAccount(user.uid);
+    if (user != null) {
+      await _requireActiveAccount(user.uid);
+      await _requireTouristRole(user.uid);
+    }
     return userCredential;
   }
 
@@ -202,6 +256,10 @@ class AuthRepository {
           return error.message ?? 'An unexpected error occurred';
       }
     }
-    return error.toString();
+    // Service-level rejections (role mismatch, disabled, missing profile)
+    // arrive as `Exception: <message>` — strip the prefix for the UI.
+    final text = error.toString();
+    const prefix = 'Exception: ';
+    return text.startsWith(prefix) ? text.substring(prefix.length) : text;
   }
 }

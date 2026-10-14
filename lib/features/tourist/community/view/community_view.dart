@@ -82,24 +82,55 @@ class _CommunityScreenState extends State<CommunityScreen> {
     if (!mounted) return;
 
     if (result.isStory) {
-      if (result.image != null) {
-        cubit.addMyStory(result.image!.path);
-      }
+      if (result.image == null) return;
       if (!mounted) return;
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Posted!',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      bool uploadingNotice = false;
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+        uploadingNotice = true;
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Uploading story…'),
+            duration: Duration(seconds: 30),
           ),
-        ),
-      );
+        );
+        await cubit.createStoryRemote(
+          imagePath: result.image!.path,
+          userName: user?.displayName?.trim().isNotEmpty == true
+              ? user!.displayName!.trim()
+              : 'You',
+        );
+        if (!mounted) return;
+        messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Posted!',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+          ),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        if (uploadingNotice) messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(SnackBar(content: Text(_postError(e))));
+      }
       return;
     }
-    // Text/location posts persist on the backend; photo posts are refused
-    // (no upload backend in this phase) instead of faking success.
+    // Text/location/photo posts persist on the backend (photos upload to
+    // Storage first). Failures surface the reason instead of faking success.
+    bool uploadingNotice = false;
     try {
       final user = FirebaseAuth.instance.currentUser;
+      if (result.images.isNotEmpty) {
+        uploadingNotice = true;
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Uploading photos…'),
+            duration: Duration(seconds: 30),
+          ),
+        );
+      }
       await cubit.createPost(
         text: result.text,
         imagePaths: result.images.map((e) => e.path).toList(),
@@ -108,6 +139,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
         authorAvatarUrl: user?.photoURL ?? '',
       );
       if (!mounted) return;
+      if (uploadingNotice) messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
         const SnackBar(
           content: Text(
@@ -118,6 +150,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       );
     } catch (e) {
       if (!mounted) return;
+      if (uploadingNotice) messenger.hideCurrentSnackBar();
       messenger.showSnackBar(SnackBar(content: Text(_postError(e))));
     }
   }
@@ -137,6 +170,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     // Captured before the async gap (avoids BuildContext across awaits).
     final cubit = context.read<CommunityCubit>();
     final messenger = ScaffoldMessenger.of(context);
+    bool uploadingNotice = false;
     try {
       final XFile? picked = await _picker.pickImage(
         source: ImageSource.gallery,
@@ -144,8 +178,22 @@ class _CommunityScreenState extends State<CommunityScreen> {
       );
       if (picked == null) return;
       if (!mounted) return;
-      cubit.addMyStory(picked.path);
+      final user = FirebaseAuth.instance.currentUser;
+      uploadingNotice = true;
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Uploading story…'),
+          duration: Duration(seconds: 30),
+        ),
+      );
+      await cubit.createStoryRemote(
+        imagePath: picked.path,
+        userName: user?.displayName?.trim().isNotEmpty == true
+            ? user!.displayName!.trim()
+            : 'You',
+      );
       if (!mounted) return;
+      messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
         const SnackBar(
           content: Text(
@@ -156,9 +204,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      messenger.showSnackBar(
-        SnackBar(content: Text("Can't open the gallery: $e")),
-      );
+      if (uploadingNotice) {
+        messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(SnackBar(content: Text(_postError(e))));
+      } else {
+        messenger.showSnackBar(
+          SnackBar(content: Text("Can't open the gallery: $e")),
+        );
+      }
     }
   }
 

@@ -9,8 +9,6 @@ import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart'
 import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
 import 'tour_guide_signup_screen.dart';
 import 'tour_guide_verification_screen.dart';
-// Tourist home (for role-based redirect when a tourist logs in here)
-import '../../../tourist/home/view/home_screen.dart';
 
 class TourGuideLoginScreen extends StatefulWidget {
   const TourGuideLoginScreen({super.key});
@@ -51,7 +49,9 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
-    } else if (role == 'guide') {
+    } else {
+      // Role is guaranteed 'guide' here: the service signs out and rejects
+      // tourist/admin accounts, so `role` can never be anything else.
       // Verified guides go straight home; others complete verification.
       // Verification state lives in Firestore, so it survives logout/login.
       final approved =
@@ -64,13 +64,6 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
               ? const GuideDashboardScreen()
               : const TourGuideVerificationScreen(),
         ),
-        (route) => false,
-      );
-    } else {
-      // Tourist account logged in via guide screen → redirect to tourist home
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
         (route) => false,
       );
     }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:triply/data/firestore/datasources/firestore_query_helper.dart';
+import 'package:triply/data/firestore/datasources/trip_cover_storage.dart';
 import 'package:triply/data/firestore/datasources/trips_datasource.dart';
 import 'package:triply/data/firestore/models/trip_doc.dart';
 import 'package:triply/data/firestore/repositories/guide_trips_repository.dart';
@@ -134,7 +135,8 @@ class CreateTripCubit extends Cubit<CreateTripState> {
     );
   }
 
-  /// Picks a gallery cover for local preview only (no upload yet).
+  /// Picks a gallery cover for local preview. The file is uploaded to
+  /// Firebase Storage on submit/edit; until then it stays a device path.
   /// Returns an error message when picking fails, else null.
   Future<String?> pickCoverImage() async {
     try {
@@ -326,7 +328,6 @@ class CreateTripCubit extends Cubit<CreateTripState> {
       final price =
           double.tryParse(priceCtrl.text.trim()) ?? existingTrip.priceEgp;
       final capacity = int.tryParse(maxTravelersCtrl.text.trim());
-      final cover = state.coverImagePath ?? existingTrip.imageUrl;
       final fields = <String, dynamic>{
         'title': nameCtrl.text.trim(),
         'description': aboutCtrl.text.trim(),
@@ -372,7 +373,17 @@ class CreateTripCubit extends Cubit<CreateTripState> {
             : labelCtrl.text.trim(),
       };
       if (capacity != null && capacity >= 1) fields['capacity'] = capacity;
-      if (cover.startsWith('http')) fields['coverImageUrl'] = cover;
+      // Cover: upload a freshly picked device file to Storage; keep the
+      // existing remote URL when there is no new local image (or the
+      // upload fails, e.g. Storage rules not deployed).
+      final cover = state.coverImagePath ?? existingTrip.imageUrl;
+      final uploaded = await TripCoverStorage().uploadIfLocal(
+        FirebaseAuth.instance.currentUser?.uid ?? '',
+        cover,
+      );
+      if (uploaded != null && uploaded.startsWith('http')) {
+        fields['coverImageUrl'] = uploaded;
+      }
       await _repository.updateTrip(existingTrip.id, fields);
       return null;
     } catch (e) {
@@ -452,6 +463,16 @@ class CreateTripCubit extends Cubit<CreateTripState> {
     }
     final trip = local.trip!;
     try {
+      // Upload a freshly picked device cover to Storage; keep the
+      // preview URL (picsum) when there is no local image or the
+      // upload fails — the trip submit never fails on storage.
+      var coverUrl = trip.imageUrl;
+      final localCover = state.coverImagePath;
+      if (localCover != null && localCover.isNotEmpty) {
+        final uploaded =
+            await TripCoverStorage().uploadIfLocal(guideId, localCover);
+        if (uploaded != null && uploaded.isNotEmpty) coverUrl = uploaded;
+      }
       await _repository.createTrip(
         TripDoc(
           id: '',
@@ -493,7 +514,7 @@ class CreateTripCubit extends Cubit<CreateTripState> {
           languages: languagesCtrl.text.trim().isEmpty
               ? const []
               : [languagesCtrl.text.trim()],
-          coverImageUrl: trip.imageUrl,
+          coverImageUrl: coverUrl,
           category: labelCtrl.text.trim().isEmpty
               ? 'historical'
               : labelCtrl.text.trim(),

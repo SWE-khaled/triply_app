@@ -12,24 +12,63 @@ import '../widgets/traveler_card.dart';
 /// Traveler list for one guide trip. Self-provides its cubit.
 /// View Profile has no destination screen in Figma → placeholder toast.
 /// Check-in is display-only in this phase (no backend).
-class TravelersScreen extends StatelessWidget {
+class TravelersScreen extends StatefulWidget {
   final GuideTrip trip;
 
   const TravelersScreen({super.key, required this.trip});
 
   @override
+  State<TravelersScreen> createState() => _TravelersScreenState();
+}
+
+class _TravelersScreenState extends State<TravelersScreen> {
+  late final TravelersCubit _cubit;
+  bool _loadRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = TravelersCubit()..loadTrip(widget.trip.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh());
+  }
+
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
+
+  Future<void> _refresh() async {
+    if (!mounted || _loadRequested) return;
+    _loadRequested = true;
+    try {
+      final ok = await _cubit.loadRemote(widget.trip.id);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Couldn't refresh travelers — showing saved ones."),
+          ),
+        );
+      }
+    } finally {
+      _loadRequested = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TravelersCubit()..loadTrip(trip.id),
-      child: _TravelersView(trip: trip),
+    return BlocProvider.value(
+      value: _cubit,
+      child: _TravelersView(trip: widget.trip, onRetry: _refresh),
     );
   }
 }
 
 class _TravelersView extends StatelessWidget {
   final GuideTrip trip;
+  final Future<void> Function() onRetry;
 
-  const _TravelersView({required this.trip});
+  const _TravelersView({required this.trip, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +146,36 @@ class _TravelersView extends StatelessWidget {
               const SizedBox(height: 8),
               BlocBuilder<TravelersCubit, TravelersState>(
                 builder: (context, state) {
+                  if (state.isLoading && state.travelers.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (state.error != null && state.travelers.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              state.error!,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: AppColors.subtitle,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            TextButton(
+                              onPressed: () => onRetry(),
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                   if (state.travelers.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24),

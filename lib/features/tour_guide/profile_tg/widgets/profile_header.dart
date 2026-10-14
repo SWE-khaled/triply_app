@@ -46,18 +46,29 @@ class ProfileHeader extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 3),
                   ),
                   child: ClipOval(
-                    child: Image.network(
-                      displayAvatar,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        color: const Color(0xFFE6ECEF),
-                        child: const Icon(
-                          Icons.person,
-                          color: AppColors.subtitle,
-                          size: 40,
-                        ),
-                      ),
-                    ),
+                    child: displayAvatar.isEmpty
+                        // No photo uploaded: grey circle + person icon.
+                        // Never a mock/network default image.
+                        ? Container(
+                            color: const Color(0xFFE6ECEF),
+                            child: const Icon(
+                              Icons.person,
+                              color: AppColors.subtitle,
+                              size: 40,
+                            ),
+                          )
+                        : Image.network(
+                            displayAvatar,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Container(
+                              color: const Color(0xFFE6ECEF),
+                              child: const Icon(
+                                Icons.person,
+                                color: AppColors.subtitle,
+                                size: 40,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 10),

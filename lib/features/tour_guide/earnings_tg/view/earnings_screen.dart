@@ -33,6 +33,35 @@ class _EarningsView extends StatelessWidget {
         child: BlocBuilder<EarningsCubit, EarningsState>(
           builder: (context, state) {
             final summary = state.summary;
+            if (state.isLoading && summary == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state.error != null && summary == null) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        state.error!,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: AppColors.subtitle,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () =>
+                            context.read<EarningsCubit>().loadRemote(),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
             if (summary == null) {
               return const Center(child: CircularProgressIndicator());
             }
