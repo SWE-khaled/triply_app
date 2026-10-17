@@ -3,47 +3,39 @@ import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const  OnboardingScreen ({super.key});
+  const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen > createState() =>
-      _OnboardingScreen ();
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreen  extends State< OnboardingScreen > {
+class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   bool _precached = false;
 
-  // IMPORTANT: replace the first two URLs (Google thumbnails, very low
-  // resolution) with high-quality images, or better, local assets:
-  //   'image': 'assets/images/onboarding/guide_1.jpg'
-  // and switch _buildImage() to use Image.asset.
- final List<Map<String, dynamic>> _slides = [
-  {
-    'title': 'Discover Egypt\nYour Way',
-    'subtitle':
-        'Explore Egypt, discover amazing places, and create\nunforgettable memories along the way.',
-    'image':
-        'https://i.pinimg.com/1200x/80/b3/a4/80b3a4fc0871c2e9250799c6666a8a90.jpg',
-  },
-  {
-    'title': 'Find & Book\nExperiences',
-    'subtitle':
-        'Discover unique trips, local guides, and experiences\nmade for the way you want to travel.',
-    'image':
-        'https://i.pinimg.com/736x/a3/10/08/a310089ffdca5b243745e2876b5ca2e5.jpg',
-    'pills': ['Discover Trips', 'Find Guides', 'Book Experiences'],
-  },
-  {
-    'title': 'Enjoy Your\nJourney',
-    'subtitle':
-        'Manage your bookings, connect with guides, explore\nnew places and enjoy every moment of your trip.',
-    'image':
-        'https://i.pinimg.com/736x/6a/61/4f/6a614f0a26c359dbd89c9fa53cf0b842.jpg',
-    'pills': ['My Trips', 'Messages', 'Bookings', 'Experiences'],
-  },
-];
+  final List<Map<String, dynamic>> _slides = [
+    {
+      'title': 'Discover Egypt\nYour Way',
+      'subtitle':
+          'Explore Egypt, discover amazing places, and create\nunforgettable memories along the way.',
+      'image': 'assets/onboarding_images/one.jpg',
+    },
+    {
+      'title': 'Find & Book\nExperiences',
+      'subtitle':
+          'Discover unique trips, local guides, and experiences\nmade for the way you want to travel.',
+      'image': 'assets/onboarding_images/two.jpg',
+      'pills': ['Discover Trips', 'Find Guides', 'Book Experiences'],
+    },
+    {
+      'title': 'Enjoy Your\nJourney',
+      'subtitle':
+          'Manage your bookings, connect with guides, explore\nnew places and enjoy every moment of your trip.',
+      'image': 'assets/onboarding_images/three.jpg',
+      'pills': ['My Trips', 'Messages', 'Bookings', 'Experiences'],
+    },
+  ];
 
   @override
   void didChangeDependencies() {
@@ -51,8 +43,8 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
     if (_precached) return;
     _precached = true;
     for (final slide in _slides) {
-      final url = slide['image'] as String?;
-      if (url != null) precacheImage(NetworkImage(url), context);
+      final path = slide['image'] as String?;
+      if (path != null) precacheImage(AssetImage(path), context);
     }
   }
 
@@ -62,21 +54,13 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
     super.dispose();
   }
 
-  Widget _buildImage(String url) {
-    return Image.network(
-      url,
+  Widget _buildImage(String path) {
+    return Image.asset(
+      path,
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
       filterQuality: FilterQuality.high,
-      loadingBuilder: (context, child, progress) {
-        if (progress == null) return child;
-        return Container(
-          color: TourGuideColors.deepNile,
-          alignment: Alignment.center,
-          child: const CircularProgressIndicator(color: Colors.white),
-        );
-      },
       errorBuilder: (context, error, stack) => Container(
         color: TourGuideColors.deepNile,
         alignment: Alignment.center,
@@ -175,8 +159,7 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                                         border: Border.all(
                                             color: Colors.white
                                                 .withValues(alpha: 0.3)),
-                                        borderRadius:
-                                            BorderRadius.circular(24),
+                                        borderRadius: BorderRadius.circular(24),
                                       ),
                                       child: Text(
                                         pill,
@@ -233,7 +216,7 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                       width: _currentPage == index ? 24 : 6,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? const Color(0xFFE6A15C) // gold color matching Figma
+                            ? const Color(0xFFE6A15C)
                             : Colors.white.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(3),
                       ),

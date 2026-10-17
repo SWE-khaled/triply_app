@@ -15,32 +15,25 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
   int _currentPage = 0;
   bool _precached = false;
 
-  // IMPORTANT: replace the first two URLs (Google thumbnails, very low
-  // resolution) with high-quality images, or better, local assets:
-  //   'image': 'assets/images/onboarding/guide_1.jpg'
-  // and switch _buildImage() to use Image.asset.
   final List<Map<String, dynamic>> _slides = [
     {
       'title': 'Share Egypt\nYour Way',
       'subtitle':
           'Turn your knowledge of Egypt into unforgettable\nexperiences for travelers.',
-      'image':
-          'https://i.pinimg.com/originals/d1/c3/95/d1c3953a9139828e37a900bf7d92d47b.jpg?nii=t',
+      'image': 'assets/onboarding_images/one1.jpg',
     },
     {
       'title': 'Create\nExperiences',
       'subtitle':
           'Create trips and guide services that travelers can\ndiscover and book.',
-      'image':
-          'https://i.pinimg.com/736x/89/a5/5a/89a55a6c68a452991cb93fa4c6c71c5c.jpg',
+      'image': 'assets/onboarding_images/two2.jpg',
       'pills': ['Create Trips', 'Offer Guide Services', 'Promote Experiences'],
     },
     {
       'title': 'Grow Your\nGuide Business',
       'subtitle':
           'Manage bookings, communicate with travelers, host\nyour trips and track your earnings — all in one place.',
-      'image':
-          'https://i.pinimg.com/736x/0c/3c/22/0c3c22bdc3c2d57bd5df89af8ec7c396.jpg',
+      'image': 'assets/onboarding_images/three3.jpg',
       'pills': ['Bookings', 'Messages', 'Trips', 'Earnings'],
     },
   ];
@@ -51,8 +44,8 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
     if (_precached) return;
     _precached = true;
     for (final slide in _slides) {
-      final url = slide['image'] as String?;
-      if (url != null) precacheImage(NetworkImage(url), context);
+      final path = slide['image'] as String?;
+      if (path != null) precacheImage(AssetImage(path), context);
     }
   }
 
@@ -62,21 +55,13 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
     super.dispose();
   }
 
-  Widget _buildImage(String url) {
-    return Image.network(
-      url,
+  Widget _buildImage(String path) {
+    return Image.asset(
+      path,
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
       filterQuality: FilterQuality.high,
-      loadingBuilder: (context, child, progress) {
-        if (progress == null) return child;
-        return Container(
-          color: TourGuideColors.deepNile,
-          alignment: Alignment.center,
-          child: const CircularProgressIndicator(color: Colors.white),
-        );
-      },
       errorBuilder: (context, error, stack) => Container(
         color: TourGuideColors.deepNile,
         alignment: Alignment.center,
@@ -175,8 +160,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                                         border: Border.all(
                                             color: Colors.white
                                                 .withValues(alpha: 0.3)),
-                                        borderRadius:
-                                            BorderRadius.circular(24),
+                                        borderRadius: BorderRadius.circular(24),
                                       ),
                                       child: Text(
                                         pill,
@@ -233,7 +217,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                       width: _currentPage == index ? 24 : 6,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? const Color(0xFFE6A15C) // gold color matching Figma
+                            ? const Color(0xFFE6A15C)
                             : Colors.white.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(3),
                       ),

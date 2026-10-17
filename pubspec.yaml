@@ -57,3 +57,9 @@ flutter:
   assets:
     #- .env
     - assets/images/svg/
+    - assets/onboarding_images/one.jpg
+    - assets/onboarding_images/two.jpg
+    - assets/onboarding_images/three.jpg
+    - assets/onboarding_images/one1.jpg
+    - assets/onboarding_images/two2.jpg
+    - assets/onboarding_images/three3.jpg
