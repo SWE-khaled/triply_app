@@ -39,10 +39,14 @@ class AppTextStyles {
     fontSize: 12,
     color: Colors.white70,
   );
-  static const TextStyle body =
-      TextStyle(fontSize: 14, color: AppColors.textDark);
-  static const TextStyle bodyGrey =
-      TextStyle(fontSize: 13, color: AppColors.textGrey);
+  static const TextStyle body = TextStyle(
+    fontSize: 14,
+    color: AppColors.textDark,
+  );
+  static const TextStyle bodyGrey = TextStyle(
+    fontSize: 13,
+    color: AppColors.textGrey,
+  );
   static const TextStyle price = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.bold,
@@ -51,25 +55,25 @@ class AppTextStyles {
 
   // ================= Trips (Poppins) =================
   static TextStyle get screenTitle => GoogleFonts.poppins(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primary,
-      );
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    color: AppColors.primary,
+  );
 
   static TextStyle get screenSubtitle =>
       GoogleFonts.poppins(fontSize: 13, color: AppColors.guideLabel);
 
   static TextStyle get tripCardTitle => GoogleFonts.poppins(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-        color: AppColors.titleDark,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+    color: AppColors.titleDark,
+  );
 
   static TextStyle get tripSectionTitle => GoogleFonts.poppins(
-        fontSize: 15,
-        fontWeight: FontWeight.w700,
-        color: AppColors.titleDark,
-      );
+    fontSize: 15,
+    fontWeight: FontWeight.w700,
+    color: AppColors.titleDark,
+  );
 
   static TextStyle get bodySmall =>
       GoogleFonts.poppins(fontSize: 12, color: AppColors.dateText);
@@ -78,16 +82,14 @@ class AppTextStyles {
       GoogleFonts.poppins(fontSize: 11, color: AppColors.guideLabel);
 
   static TextStyle get priceLarge => GoogleFonts.poppins(
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        color: AppColors.priceTeal,
-      );
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: AppColors.priceTeal,
+  );
 
   static TextStyle button({double size = 14}) => GoogleFonts.poppins(
-        fontSize: size,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-      );
+    fontSize: size,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
+  );
 }
-
-

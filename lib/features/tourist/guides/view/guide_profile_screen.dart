@@ -46,19 +46,19 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
         value: _controller,
         child: BlocBuilder<GuideProfileCubit, GuideProfileState>(
           builder: (context, _) {
-          final guide = _controller.guide;
-          final trips = _controller.trips;
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(child: _buildCover(guide.coverUrl)),
-              // SliverToBoxAdapter(child: _buildIdentity()),
-              SliverToBoxAdapter(child: _buildStats()),
-              SliverToBoxAdapter(child: _buildLanguages()),
-              SliverToBoxAdapter(child: _buildAbout()),
-              SliverToBoxAdapter(child: _buildTrips(trips)),
-              SliverToBoxAdapter(child: SizedBox(height: 96)),
-            ],
-          );
+            final guide = _controller.guide;
+            final trips = _controller.trips;
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(child: _buildCover(guide.coverUrl)),
+                // SliverToBoxAdapter(child: _buildIdentity()),
+                SliverToBoxAdapter(child: _buildStats()),
+                SliverToBoxAdapter(child: _buildLanguages()),
+                SliverToBoxAdapter(child: _buildAbout()),
+                SliverToBoxAdapter(child: _buildTrips(trips)),
+                SliverToBoxAdapter(child: SizedBox(height: 96)),
+              ],
+            );
           },
         ),
       ),
@@ -75,7 +75,9 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           Positioned.fill(
             child: ColorFiltered(
               colorFilter: ColorFilter.mode(
-                Color(0xFF0E5261).withValues(alpha: 0.3), // Adjust color and opacity
+                Color(
+                  0xFF0E5261,
+                ).withValues(alpha: 0.3), // Adjust color and opacity
                 BlendMode.srcATop, // Or BlendMode.darken / BlendMode.multiply
               ),
               child: Image.network(
@@ -261,15 +263,13 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           ),
           _divider(),
           _StatItem(
-            value:
-            '${guide.pricePerHour}${guide.currency}',
+            value: '${guide.pricePerHour}${guide.currency}',
             label: 'Price/hr',
           ),
         ],
       ),
     );
   }
-
 
   Widget _divider() {
     return Container(width: 1, height: 32, color: Color(0xFF8A9EA3));
@@ -346,7 +346,8 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  Widget _buildTrips(List trips) {    return Padding(
+  Widget _buildTrips(List trips) {
+    return Padding(
       padding: EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,10 +374,8 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
               itemBuilder: (context, i) => TripCard(
                 trip: trips[i],
                 // Opens the trip details first; booking starts from there.
-                onTap: () => _openTripDetails(
-                  context,
-                  trips[i] as guide_trip.Trip,
-                ),
+                onTap: () =>
+                    _openTripDetails(context, trips[i] as guide_trip.Trip),
               ),
             ),
         ],
@@ -463,4 +462,3 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
-

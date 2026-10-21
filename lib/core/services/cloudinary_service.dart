@@ -14,11 +14,19 @@ class CloudinaryService {
 
   /// Uploads a file to Cloudinary and returns its secure URL.
   Future<String> uploadFile(PlatformFile file, String userId) async {
+    if (file.path == null) {
+      throw Exception('File path is null');
+    }
+    return uploadFileAtPath(file.path!, userId);
+  }
+
+  /// Uploads a local file by its path and returns its secure URL.
+  ///
+  /// Used by the flows that pick an image with the gallery, which hands
+  /// over a path rather than a picked file.
+  Future<String> uploadFileAtPath(String path, String userId) async {
     try {
-      if (file.path == null) {
-        throw Exception('File path is null');
-      }
-      final localFile = File(file.path!);
+      final localFile = File(path);
       if (!localFile.existsSync() || localFile.lengthSync() == 0) {
         throw Exception(
           'Selected file is empty or unreadable. Please pick the file again.',
@@ -30,7 +38,7 @@ class CloudinaryService {
 
       final response = await _cloudinary.uploadFile(
         CloudinaryFile.fromFile(
-          file.path!,
+          path,
           folder: folderPath,
           resourceType: CloudinaryResourceType.Auto,
         ),

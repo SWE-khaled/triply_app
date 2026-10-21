@@ -11,7 +11,7 @@ import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
-import '../../../common/AuthTourist/providers/auth_provider.dart';
+import '../../../common/AuthTourist/cubit/auth_cubit.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 import '../model/trip.dart';
@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
+    final user = context.watch<AuthCubit>().user;
     final photoUrl = user?.photoURL;
     final name = user?.displayName ?? '';
 
@@ -58,153 +58,166 @@ class _HomeScreenState extends State<HomeScreen> {
         extendBody: true,
         body: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, _) => SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeroHeader(context, photoUrl, name),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SectionHeader(
-                title: 'Popular Places',
-                
-                onSeeAllTap: () {
-         
-            Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen())));
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 220,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.places.length,
-                itemBuilder: (context, i) {
-                  final place = controller.places[i];
-                  return PlaceCard(
-                    place: place,
-                    onTap: () {
-                      Navigator.of(context).push(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeroHeader(context, photoUrl, name),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SectionHeader(
+                    title: 'Popular Places',
+
+                    onSeeAllTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: ((context) => MapScreen())),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 220,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: controller.places.length,
+                    itemBuilder: (context, i) {
+                      final place = controller.places[i];
+                      return PlaceCard(
+                        place: place,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  PlaceDetailScreen(placeId: place.id),
+                            ),
+                          );
+                        },
+                        onFavoriteTap: () =>
+                            controller.toggleFavorite(place.id),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SectionHeader(
+                    title: 'Local Guides',
+                    // TODO(Figma): no destination in Figma yet.
+                    onSeeAllTap: () {
+                      Navigator.push(
+                        context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              PlaceDetailScreen(placeId: place.id),
+                          builder: ((context) => GuidesListScreen()),
                         ),
                       );
                     },
-                    onFavoriteTap: () => controller.toggleFavorite(place.id),
-                  );
-                },
-              ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      for (final guide in controller.guides)
+                        GuideTile(
+                          guide: guide,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    GuideProfileScreen(guideId: guide.id),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SectionHeader(
+                    title: 'Popular Trips',
+                    // TODO(Figma): no destination in Figma yet.
+                    onSeeAllTap: () {
+                      Navigator.of(context).push(AppRoutes.popular());
+                    },
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 180,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: controller.trips.length,
+                    itemBuilder: (context, i) {
+                      final trip = controller.trips[i];
+                      return TripCard(
+                        trip: trip,
+                        onTap: () => _openTripDetails(context, trip),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Travelers in Egypt',
+                        style: AppTextStyles.sectionTitle,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CommunityBanner(
+                    // TODO(Figma): no destination in Figma yet.
+                    onJoinTap: () {},
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: CommunityStatsRow(),
+                ),
+                const SizedBox(height: 84),
+              ],
             ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SectionHeader(
-                title: 'Local Guides',
-                // TODO(Figma): no destination in Figma yet.
-                onSeeAllTap: () {
-                Navigator.push(context,MaterialPageRoute(builder: ((context)=>GuidesListScreen())));
-
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  for (final guide in controller.guides)
-                    GuideTile(
-                      guide: guide,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                GuideProfileScreen(guideId: guide.id),
-                          ),
-                        );
-                      },
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SectionHeader(
-                title: 'Popular Trips',
-                // TODO(Figma): no destination in Figma yet.
-                onSeeAllTap: () {
-                  Navigator.of(context).push(AppRoutes.popular());
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 180,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.trips.length,
-                itemBuilder: (context, i) {
-                  final trip = controller.trips[i];
-                  return TripCard(
-                    trip: trip,
-                    onTap: () => _openTripDetails(context, trip),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Travelers in Egypt', style: AppTextStyles.sectionTitle),
-                
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: CommunityBanner(
-                // TODO(Figma): no destination in Figma yet.
-                onJoinTap: () {},
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: CommunityStatsRow(),
-            ),
-            const SizedBox(height: 84),
-          ],
-        ),
           ),
         ),
-      bottomNavigationBar: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, _) => AppBottomNav(
-          currentIndex: controller.bottomNavIndex,
-          onTap: (index) {
-            if (index == 0) {
-              controller.setBottomNavIndex(index);
-            }else if (index == 1) {
-            Navigator.of(context).push(AppRoutes.myTrips());
-            } else if (index == 2) {
-              Navigator.push(context,MaterialPageRoute(builder: ((context)=>MapScreen()))); //map
-            }
-             else if (index == 3) {
-              Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen())));//community
-           }
-             else if (index == 4) {
-              Navigator.pushNamed(context, AppRoutes.profile);
-            }
-          },
+        bottomNavigationBar: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, _) => AppBottomNav(
+            currentIndex: controller.bottomNavIndex,
+            onTap: (index) {
+              if (index == 0) {
+                controller.setBottomNavIndex(index);
+              } else if (index == 1) {
+                Navigator.of(context).push(AppRoutes.myTrips());
+              } else if (index == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: ((context) => MapScreen())),
+                ); //map
+              } else if (index == 3) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: ((context) => CommunityScreen())),
+                ); //community
+              } else if (index == 4) {
+                Navigator.pushNamed(context, AppRoutes.profile);
+              }
+            },
+          ),
         ),
-      ),
       ),
     );
   }
@@ -214,9 +227,9 @@ class _HomeScreenState extends State<HomeScreen> {
       (e) => e['id'] == trip.id || e['title'] == trip.title,
       orElse: () => mockTripsJson.first,
     );
-    Navigator.of(context).push(
-      AppRoutes.tripDetails(trips_model.Trip.fromJson(match)),
-    );
+    Navigator.of(
+      context,
+    ).push(AppRoutes.tripDetails(trips_model.Trip.fromJson(match)));
   }
 
   Widget _buildHeroHeader(BuildContext context, String? photoUrl, String name) {

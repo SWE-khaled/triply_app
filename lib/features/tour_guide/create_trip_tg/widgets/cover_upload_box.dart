@@ -4,23 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 
-/// Dashed upload box (Figma). Shows the picked cover preview when set.
-/// Picking stays gallery-local in this phase (no upload, no backend).
+/// Dashed upload box (Figma). Shows the cover when there is one — the
+/// freshly picked file, or the URL the trip already has — and the
+/// dashed box when there is none.
 class CoverUploadBox extends StatelessWidget {
-  final String? imagePath;
+  /// The picked local file, or the URL of the saved cover.
+  final String? cover;
+
   final VoidCallback onTap;
   final VoidCallback? onRemove;
 
   const CoverUploadBox({
     super.key,
     required this.onTap,
-    this.imagePath,
+    this.cover,
     this.onRemove,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (imagePath != null) {
+    final image = cover;
+    if (image != null && image.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Stack(
@@ -28,14 +32,7 @@ class CoverUploadBox extends StatelessWidget {
             SizedBox(
               height: 150,
               width: double.infinity,
-              child: Image.file(
-                File(imagePath!),
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                  color: const Color(0xFFE6ECEF),
-                  child: const Icon(Icons.image, color: AppColors.subtitle),
-                ),
-              ),
+              child: _coverImage(image),
             ),
             Positioned(
               top: 8,
@@ -114,6 +111,27 @@ class CoverUploadBox extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  /// Renders the cover: a local file that was just picked, or a URL the
+  /// trip already has.
+  Widget _coverImage(String image) {
+    final placeholder = Container(
+      color: const Color(0xFFE6ECEF),
+      child: const Icon(Icons.image, color: AppColors.subtitle),
+    );
+    if (image.startsWith('http')) {
+      return Image.network(
+        image,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => placeholder,
+      );
+    }
+    return Image.file(
+      File(image),
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => placeholder,
     );
   }
 }

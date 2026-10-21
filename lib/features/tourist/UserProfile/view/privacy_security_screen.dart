@@ -23,8 +23,7 @@ class PrivacySecurityScreen extends StatelessWidget {
                   SizedBox(width: 12),
                   Text(
                     'Privacy & security',
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -40,8 +39,9 @@ class PrivacySecurityScreen extends StatelessWidget {
                       icon: Icons.lock_reset_outlined,
                       title: 'Reset password',
                       showDivider: false,
-                      onTap: () => Navigator.of(context)
-                          .pushNamed(AppRoutes.forgotPassword),
+                      onTap: () => Navigator.of(
+                        context,
+                      ).pushNamed(AppRoutes.forgotPassword),
                     ),
                   ],
                 ),
@@ -74,8 +74,7 @@ class PrivacySecurityScreen extends StatelessWidget {
                   'Your account is secured with Firebase Authentication. '
                   'Trip and preference data on this device is local mock data only '
                   'and is not uploaded to any server.',
-                  style:
-                      TextStyle(fontSize: 13, color: AppColors.textGrey),
+                  style: TextStyle(fontSize: 13, color: AppColors.textGrey),
                 ),
               ),
             ],

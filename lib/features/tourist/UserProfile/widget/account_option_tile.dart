@@ -38,8 +38,7 @@ class AccountOptionTile extends StatelessWidget {
                     color: AppColors.inputFill,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon,
-                      size: 22, color: AppColors.guidesName),
+                  child: Icon(icon, size: 22, color: AppColors.guidesName),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -63,11 +62,16 @@ class AccountOptionTile extends StatelessWidget {
                     Text(
                       trailingText!,
                       style: const TextStyle(
-                          fontSize: 14, color: AppColors.textGrey),
+                        fontSize: 14,
+                        color: AppColors.textGrey,
+                      ),
                     ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.chevron_right,
-                      size: 22, color: AppColors.textGrey),
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 22,
+                    color: AppColors.textGrey,
+                  ),
                 ],
               ],
             ),

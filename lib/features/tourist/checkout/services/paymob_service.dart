@@ -31,9 +31,7 @@ class PaymobService {
     _envLoaded = true;
     try {
       await dotenv.load(fileName: '.env');
-    } catch (_) {
-
-    }
+    } catch (_) {}
   }
 
   /// `.env` value wins; sandbox fallback otherwise (never null/empty).
@@ -70,10 +68,10 @@ class PaymobService {
     try {
       return await http
           .post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(body),
-      )
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
           .timeout(_timeout);
     } on SocketException {
       throw const PaymobException(
@@ -142,7 +140,9 @@ class PaymobService {
     print('Response Body: ${res.body}');
 
     if (res.statusCode != 200 && res.statusCode != 201) {
-      throw PaymobException('Order failed (HTTP ${res.statusCode}):${res.body}');
+      throw PaymobException(
+        'Order failed (HTTP ${res.statusCode}):${res.body}',
+      );
     }
     final id = _decode(res, 'Order')['id'];
     if (id == null) throw const PaymobException('Order failed: no id.');
@@ -171,7 +171,9 @@ class PaymobService {
     print('Response Body: ${res.body}');
 
     if (res.statusCode != 200 && res.statusCode != 201) {
-      throw PaymobException('Payment key failed (HTTP ${res.statusCode}):${res.body}');
+      throw PaymobException(
+        'Payment key failed (HTTP ${res.statusCode}):${res.body}',
+      );
     }
     final token = _decode(res, 'Payment key')['token'] as String?;
     if (token == null || token.isEmpty) {

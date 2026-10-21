@@ -28,11 +28,7 @@ class StoryViewerHeader extends StatelessWidget {
           backgroundColor: AppColors.chipGrey,
           backgroundImage: isMine ? null : NetworkImage(imageUrl),
           child: isMine
-              ? const Icon(
-                  Icons.person,
-                  size: 18,
-                  color: AppColors.textGrey,
-                )
+              ? const Icon(Icons.person, size: 18, color: AppColors.textGrey)
               : null,
         ),
         const SizedBox(width: 8),

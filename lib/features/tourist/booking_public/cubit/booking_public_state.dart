@@ -11,7 +11,11 @@ class BookingPublicState {
     required this.maxSpots,
   });
 
-  BookingPublicState copyWith({int? seats, String? specialRequests, int? maxSpots}) {
+  BookingPublicState copyWith({
+    int? seats,
+    String? specialRequests,
+    int? maxSpots,
+  }) {
     return BookingPublicState(
       seats: seats ?? this.seats,
       specialRequests: specialRequests ?? this.specialRequests,

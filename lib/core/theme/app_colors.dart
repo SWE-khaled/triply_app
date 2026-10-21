@@ -52,6 +52,7 @@ class AppColors {
 
   // ---- Guided tour ----
   static const Color guidedTourText = Color(0xFF4DA7A0);
-  static final Color guidedTourBg =
-      const Color(0xFF4DA7A0).withValues(alpha: 0.15);
+  static final Color guidedTourBg = const Color(
+    0xFF4DA7A0,
+  ).withValues(alpha: 0.15);
 }

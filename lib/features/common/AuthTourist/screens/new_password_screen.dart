@@ -39,14 +39,15 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         newPassword: _passwordController.text,
       );
       if (mounted) {
-        Navigator.of(context)
-            .pushReplacementNamed(PasswordResetSuccessScreen.routeName);
+        Navigator.of(
+          context,
+        ).pushReplacementNamed(PasswordResetSuccessScreen.routeName);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to reset password: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to reset password: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -71,8 +72,10 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   onBack: () => Navigator.of(context).pop(),
                 ),
                 const SizedBox(height: 32),
-                const Text('New Password',
-                    style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text(
+                  'New Password',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 8),
                 AuthTextField(
                   controller: _passwordController,
@@ -84,8 +87,10 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                       : null,
                 ),
                 const SizedBox(height: 20),
-                const Text('Confirm Password',
-                    style: TextStyle(fontWeight: FontWeight.w600)),
+                const Text(
+                  'Confirm Password',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const SizedBox(height: 8),
                 AuthTextField(
                   controller: _confirmPasswordController,

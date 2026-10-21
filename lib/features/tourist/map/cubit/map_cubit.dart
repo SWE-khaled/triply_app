@@ -7,10 +7,9 @@ class MapCubit extends Cubit<MapState> {
   final List<Place> allPlaces;
 
   MapCubit()
-      // Current: local mock. Future: Google Places API response -> Place.fromJson.
-      : allPlaces =
-            mockPlaces.map((e) => Place.fromJson(e)).toList(),
-        super(const MapState(visiblePlaces: [])) {
+    // Current: local mock. Future: Google Places API response -> Place.fromJson.
+    : allPlaces = mockPlaces.map((e) => Place.fromJson(e)).toList(),
+      super(const MapState(visiblePlaces: [])) {
     _applyFilters();
   }
 
@@ -47,7 +46,8 @@ class MapCubit extends Cubit<MapState> {
     final q = state.searchQuery.trim().toLowerCase();
     final visible = allPlaces.where((p) {
       final matchesFilter = state.selectedFilter.matches(p);
-      final matchesQuery = q.isEmpty ||
+      final matchesQuery =
+          q.isEmpty ||
           p.name.toLowerCase().contains(q) ||
           p.city.toLowerCase().contains(q) ||
           p.address.toLowerCase().contains(q);

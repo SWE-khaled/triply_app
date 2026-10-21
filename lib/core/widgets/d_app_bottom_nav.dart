@@ -120,9 +120,7 @@ class _NavTile extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isActive
-                  ? Colors.white
-                  : AppColors.sidebarInactiveText,
+              color: isActive ? Colors.white : AppColors.sidebarInactiveText,
             ),
             const SizedBox(width: 10),
             Text(

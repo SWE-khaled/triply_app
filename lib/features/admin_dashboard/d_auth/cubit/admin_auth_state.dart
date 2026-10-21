@@ -1,27 +1,35 @@
-import '../model/admin_session.dart';
+part of 'admin_auth_cubit.dart';
 
-enum AdminAuthStatus { initial, loading, success, error, loggedOut }
+@immutable
+sealed class AdminAuthState {
+  const AdminAuthState();
+}
 
-class AdminAuthState {
-  final AdminAuthStatus status;
-  final String? errorMessage;
-  final AdminSession? session;
+/// Nothing happened yet.
+final class AdminAuthInitial extends AdminAuthState {
+  const AdminAuthInitial();
+}
 
-  const AdminAuthState({
-    this.status = AdminAuthStatus.initial,
-    this.errorMessage,
-    this.session,
-  });
+/// A login / sign-up is running.
+final class AdminAuthLoading extends AdminAuthState {
+  const AdminAuthLoading();
+}
 
-  AdminAuthState copyWith({
-    AdminAuthStatus? status,
-    String? errorMessage,
-    AdminSession? session,
-  }) {
-    return AdminAuthState(
-      status: status ?? this.status,
-      errorMessage: errorMessage,
-      session: session ?? this.session,
-    );
-  }
+/// The admin is in.
+final class AdminAuthSuccess extends AdminAuthState {
+  final AdminSession session;
+
+  const AdminAuthSuccess({required this.session});
+}
+
+/// The last action failed.
+final class AdminAuthError extends AdminAuthState {
+  final String error;
+
+  const AdminAuthError({required this.error});
+}
+
+/// The admin signed out.
+final class AdminAuthLoggedOut extends AdminAuthState {
+  const AdminAuthLoggedOut();
 }

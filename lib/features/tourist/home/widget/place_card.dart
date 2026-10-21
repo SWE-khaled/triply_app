@@ -7,7 +7,12 @@ class PlaceCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onFavoriteTap;
 
-  const PlaceCard({super.key, required this.place, this.onTap, this.onFavoriteTap});
+  const PlaceCard({
+    super.key,
+    required this.place,
+    this.onTap,
+    this.onFavoriteTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +58,10 @@ class PlaceCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(place.name, style: AppTextStyles.cardTitle),
-                  Text('${place.city}, ${place.country}',
-                      style: AppTextStyles.cardSubtitle),
+                  Text(
+                    '${place.city}, ${place.country}',
+                    style: AppTextStyles.cardSubtitle,
+                  ),
                 ],
               ),
             ),

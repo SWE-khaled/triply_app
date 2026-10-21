@@ -39,19 +39,14 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
 
     _stories = List<CommunityStory>.from(widget.stories);
 
-    _currentIndex =
-        widget.initialIndex.clamp(0, _stories.length - 1).toInt();
+    _currentIndex = widget.initialIndex.clamp(0, _stories.length - 1).toInt();
 
-    _pageController = PageController(
-      initialPage: _currentIndex,
-    );
+    _pageController = PageController(initialPage: _currentIndex);
 
-    _progressController = AnimationController(
-      vsync: this,
-      duration: _storyDuration,
-    )
-      ..addStatusListener(_onProgressStatus)
-      ..forward();
+    _progressController =
+        AnimationController(vsync: this, duration: _storyDuration)
+          ..addStatusListener(_onProgressStatus)
+          ..forward();
   }
 
   @override
@@ -109,65 +104,53 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     _progressController.forward();
   }
 
- Future<void> _confirmDelete(CommunityStory story) async {
-  _pause();
+  Future<void> _confirmDelete(CommunityStory story) async {
+    _pause();
 
-  final confirmed = await ConfirmDeleteDialog.show(
-    context,
-    title: 'Deleting story',
-    content: 'Are you sure you want to delete this story?',
-  );
-
-  if (!confirmed) {
-    _resume();
-    return;
-  }
-
-  final deleted =
-      context.read<CommunityCubit>().deleteStory(story);
-
-  if (!mounted) return;
-
-  if (!deleted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          "You can't delete others story"
-                ),
-      ),
+    final confirmed = await ConfirmDeleteDialog.show(
+      context,
+      title: 'Deleting story',
+      content: 'Are you sure you want to delete this story?',
     );
 
-    _resume();
-    return;
+    if (!confirmed) {
+      _resume();
+      return;
+    }
+
+    final deleted = context.read<CommunityCubit>().deleteStory(story);
+
+    if (!mounted) return;
+
+    if (!deleted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You can't delete others story")),
+      );
+
+      _resume();
+      return;
+    }
+
+    _stories.removeWhere((s) => s.id == story.id);
+
+    if (_stories.isEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    if (_currentIndex >= _stories.length) {
+      _currentIndex = _stories.length - 1;
+    }
+
+    setState(() {});
+
+    _pageController.jumpToPage(_currentIndex);
+
+    _progressController
+      ..reset()
+      ..forward();
   }
 
-
-  _stories.removeWhere(
-    (s) => s.id == story.id,
-  );
-
- 
-  if (_stories.isEmpty) {
-    Navigator.of(context).pop();
-    return;
-  }
-
-
-  if (_currentIndex >= _stories.length) {
-    _currentIndex = _stories.length - 1;
-  }
-
-
-  setState(() {});
-
-  _pageController.jumpToPage(
-    _currentIndex,
-  );
-
-  _progressController
-    ..reset()
-    ..forward();
-}
   @override
   Widget build(BuildContext context) {
     final story = _stories[_currentIndex];
@@ -192,8 +175,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                   onTapUp: (details) {
                     _resume();
 
-                    final width =
-                        MediaQuery.of(context).size.width;
+                    final width = MediaQuery.of(context).size.width;
 
                     if (details.globalPosition.dx < width / 2) {
                       _goToPrevious();
@@ -203,14 +185,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                   },
                   child: Center(
                     child: item.isLocalFile
-                        ? Image.file(
-                            File(item.imageUrl),
-                            fit: BoxFit.contain,
-                          )
-                        : Image.network(
-                            item.imageUrl,
-                            fit: BoxFit.contain,
-                          ),
+                        ? Image.file(File(item.imageUrl), fit: BoxFit.contain)
+                        : Image.network(item.imageUrl, fit: BoxFit.contain),
                   ),
                 );
               },

@@ -12,8 +12,9 @@ class AppSettingsView extends StatefulWidget {
 }
 
 class _AppSettingsViewState extends State<AppSettingsView> {
-  final TextEditingController _commissionCtrl =
-      TextEditingController(text: '12');
+  final TextEditingController _commissionCtrl = TextEditingController(
+    text: '12',
+  );
   String _approvalMode = 'Manual admin approval';
 
   final List<String> _approvalOptions = [
@@ -38,7 +39,6 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                         'Search, review, edit and control all app settings.',
                   ),
                 ),
-
               ],
             ),
             const SizedBox(height: 20),
@@ -63,8 +63,10 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Platform commission',
-                            style: AppTextStyles.fieldLabel),
+                        Text(
+                          'Platform commission',
+                          style: AppTextStyles.fieldLabel,
+                        ),
                         const SizedBox(height: 10),
                         TextField(
                           controller: _commissionCtrl,
@@ -101,14 +103,18 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                           initialValue: _approvalMode,
                           style: AppTextStyles.tableCell,
                           decoration: const InputDecoration(),
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.textMuted),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: AppColors.textMuted,
+                          ),
                           items: _approvalOptions
                               .map(
                                 (opt) => DropdownMenuItem(
                                   value: opt,
-                                  child: Text(opt,
-                                      style: AppTextStyles.tableCell),
+                                  child: Text(
+                                    opt,
+                                    style: AppTextStyles.tableCell,
+                                  ),
                                 ),
                               )
                               .toList(),
@@ -136,7 +142,9 @@ class _AppSettingsViewState extends State<AppSettingsView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 24, vertical: 14),
+                  horizontal: 24,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

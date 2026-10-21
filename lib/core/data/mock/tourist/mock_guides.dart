@@ -102,8 +102,9 @@ const List<Map<String, dynamic>> _rawGuides = [
 ];
 
 /// Public mock list as Models (View consumes this, never [_rawGuides]).
-final List<Guide> mockGuides =
-    _rawGuides.map((m) => Guide.fromJson(m)).toList(growable: false);
+final List<Guide> mockGuides = _rawGuides
+    .map((m) => Guide.fromJson(m))
+    .toList(growable: false);
 
 /// Language filter chips shown in Figma: All + top languages.
 const List<String> mockGuideLanguageFilters = [

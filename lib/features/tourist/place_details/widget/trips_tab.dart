@@ -22,8 +22,9 @@ class TripsTab extends StatelessWidget {
           .map(
             (t) => TripCard(
               trip: t,
-              onViewDetails:
-                  onViewDetails == null ? null : () => onViewDetails!(t),
+              onViewDetails: onViewDetails == null
+                  ? null
+                  : () => onViewDetails!(t),
               onChat: onChat == null ? null : () => onChat!(t),
             ),
           )

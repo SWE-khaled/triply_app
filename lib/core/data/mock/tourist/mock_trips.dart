@@ -46,8 +46,9 @@ const List<Map<String, dynamic>> _rawTrips = [
   },
 ];
 
-final List<Trip> mockTrips =
-    _rawTrips.map((m) => Trip.fromJson(m)).toList(growable: false);
+final List<Trip> mockTrips = _rawTrips
+    .map((m) => Trip.fromJson(m))
+    .toList(growable: false);
 
 List<Trip> mockTripsForGuide(String guideId) =>
     mockTrips.where((t) => t.guideId == guideId).toList();

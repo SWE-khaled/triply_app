@@ -15,31 +15,44 @@ class CommunityBanner extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: const DecorationImage(
-          image: NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBQ8iDG5Hk8guqcSGPtMI6kq6YchZ67Ig8j5hvwBSiHA&s=10'),
+          image: NetworkImage(
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBQ8iDG5Hk8guqcSGPtMI6kq6YchZ67Ig8j5hvwBSiHA&s=10',
+          ),
           fit: BoxFit.cover,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Join 2,400+ travelers exploring Egypt',
-              style: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          const Text(
+            'Join 2,400+ travelers exploring Egypt',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(height: 4),
-          const Text('Luxor · 6 hours · Private',
-              style: TextStyle(fontSize: 12, color: Colors.white70)),
+          const Text(
+            'Luxor · 6 hours · Private',
+            style: TextStyle(fontSize: 12, color: Colors.white70),
+          ),
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: (){
-                  Navigator.push(context,MaterialPageRoute(builder: ((context)=>CommunityScreen())));//community
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: ((context) => CommunityScreen())),
+                ); //community
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accentOrange,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
               child: const Text('Join community →'),
             ),
@@ -79,8 +92,10 @@ class _Stat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(value,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         Text(label, style: AppTextStyles.bodyGrey),
       ],
     );

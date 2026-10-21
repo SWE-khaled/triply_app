@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/data/repositories/admin_trips_repository.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../data/mock/d_mock_trips.dart';
+import '../../../../core/data/mock/dashboard/d_mock_trips.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Trips management screen.
+///
+/// The trips are read from Firestore — the same documents the guides
+/// publish and the tourists book.
 class TripsView extends StatefulWidget {
   const TripsView({super.key});
 
@@ -16,14 +20,45 @@ class TripsView extends StatefulWidget {
 
 class _TripsViewState extends State<TripsView> {
   final TextEditingController _search = TextEditingController();
+  final AdminTripsRepository _repository = AdminTripsRepository();
+
   late List<MockTrip> _trips;
   String _query = '';
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     _trips = List.from(mockTrips);
+    _load();
   }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  /// Reads every guide's trips from Firestore.
+  Future<void> _load() async {
+    final trips = await _repository.fetchTrips();
+    if (!mounted) return;
+    setState(() {
+      _trips = trips.map(_toTrip).toList();
+      _loading = false;
+    });
+  }
+
+  /// Maps a Firestore trip onto the row the table renders.
+  MockTrip _toTrip(AdminTrip trip) => MockTrip(
+    tripId: trip.tripId,
+    title: trip.title,
+    guide: trip.guideName,
+    date: trip.scheduleLabel,
+    travelers: trip.travelers,
+    price: trip.priceLabel,
+    status: trip.approvalStatus,
+  );
 
   List<MockTrip> get _filtered {
     final q = _query.trim().toLowerCase();
@@ -43,20 +78,75 @@ class _TripsViewState extends State<TripsView> {
     );
   }
 
-  void _cancelTrip(MockTrip trip) {
-    setState(() {
-      final index = _trips.indexOf(trip);
-      if (index != -1) {
-        _trips[index] = MockTrip(
-          title: trip.title,
-          guide: trip.guide,
-          date: trip.date,
-          travelers: trip.travelers,
-          price: trip.price,
-          status: 'cancelled',
-        );
-      }
-    });
+  /// Rejects a trip and tells the guide why.
+  Future<void> _cancelTrip(MockTrip trip) async {
+    if (trip.tripId.isEmpty) return;
+    final reason = await _askRejectionReason();
+    if (reason == null || !mounted) return;
+    final ok = await _repository.decide(
+      tripId: trip.tripId,
+      approve: false,
+      rejectionReason: reason,
+    );
+    if (!mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not reject the trip.')),
+      );
+      return;
+    }
+    await _load();
+  }
+
+  /// Asks the admin why the trip was rejected — the guide sees it.
+  Future<String?> _askRejectionReason() async {
+    final controller = TextEditingController();
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Reject trip',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Please provide a reason for rejection:'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'e.g., the meeting point is not specific...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            child: const Text(
+              'Confirm Reject',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    return reason;
   }
 
   @override
@@ -81,9 +171,10 @@ class _TripsViewState extends State<TripsView> {
 
             // Search + Filter
             SearchFilterRow(
-                hintText: 'Search trips...',
-                controller: _search,
-                onChanged: (v) => setState(() => _query = v)),
+              hintText: 'Search trips...',
+              controller: _search,
+              onChanged: (v) => setState(() => _query = v),
+            ),
             const SizedBox(height: 20),
 
             // Table header
@@ -112,9 +203,13 @@ class _TripsViewState extends State<TripsView> {
               ),
             ),
             if (_filtered.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: Text('No trips found.')),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text(
+                    _loading ? 'Loading trips...' : 'No trips found.',
+                  ),
+                ),
               ),
           ],
         ),
@@ -153,24 +248,30 @@ class _TripRow extends StatelessWidget {
             children: [
               Expanded(
                 flex: 4,
-                child: Text(trip.title,
-                    style: AppTextStyles.tableCell,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  trip.title,
+                  style: AppTextStyles.tableCell,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 3,
-                child: Text(trip.guide,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  trip.guide,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 2,
-                child: Text(trip.date,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  trip.date,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 2,
@@ -210,8 +311,6 @@ class _TripRow extends StatelessWidget {
     );
   }
 }
-
-
 
 /// View Trip Details Dialog
 class _ViewTripDialog extends StatelessWidget {

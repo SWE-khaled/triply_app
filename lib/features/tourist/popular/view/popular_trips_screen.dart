@@ -32,10 +32,7 @@ class PopularTripsScreen extends StatelessWidget {
                 children: [
                   const CircleBackButton(),
                   const SizedBox(width: 12),
-                  Text(
-                    'Popular Trips',
-                    style: AppTextStyles.screenTitle,
-                  ),
+                  Text('Popular Trips', style: AppTextStyles.screenTitle),
                 ],
               ),
             ),
@@ -53,53 +50,48 @@ class PopularTripsScreen extends StatelessWidget {
               child: BlocBuilder<PopularCubit, PopularState>(
                 builder: (context, state) {
                   return Row(
-                    children: List.generate(
-                      PopularCubit.categories.length,
-                      (i) {
-                        final label =
-                            PopularCubit.categories[i];
-                        final selected =
-                            label == state.selectedCategory;
-                        return Padding(
-                          padding:
-                              const EdgeInsets.only(right: 8),
-                          child: GestureDetector(
-                            onTap: () => context
-                                .read<PopularCubit>()
-                                .selectCategory(label),
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8),
-                              decoration: BoxDecoration(
+                    children: List.generate(PopularCubit.categories.length, (
+                      i,
+                    ) {
+                      final label = PopularCubit.categories[i];
+                      final selected = label == state.selectedCategory;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: GestureDetector(
+                          onTap: () => context
+                              .read<PopularCubit>()
+                              .selectCategory(label),
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? AppColors.tabSelectedBg
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
                                 color: selected
                                     ? AppColors.tabSelectedBg
-                                    : Colors.white,
-                                borderRadius:
-                                    BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: selected
-                                      ? AppColors.tabSelectedBg
-                                      : AppColors.cardBorder,
-                                ),
+                                    : AppColors.cardBorder,
                               ),
-                              child: Text(
-                                label,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: selected
-                                      ? Colors.white
-                                      : AppColors.subtitle,
-                                ),
+                            ),
+                            child: Text(
+                              label,
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: selected
+                                    ? Colors.white
+                                    : AppColors.subtitle,
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    }),
                   );
                 },
               ),
@@ -121,19 +113,15 @@ class PopularTripsScreen extends StatelessWidget {
                     );
                   }
                   return ListView.separated(
-                    padding:
-                        const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                     itemCount: trips.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final trip = trips[index];
                       return TripCard(
                         trip: trip,
-                        onTap: () =>
-                            _openDetails(context, trip),
-                        onViewDetails: () =>
-                            _openDetails(context, trip),
+                        onTap: () => _openDetails(context, trip),
+                        onViewDetails: () => _openDetails(context, trip),
                         // Chat: placeholder — no chat screen exists yet.
                         onChat: () => showAppSnackBar(
                           context,

@@ -30,8 +30,9 @@ class AuthStepIcon extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios_new, size: 18),
             style: IconButton.styleFrom(
               backgroundColor: AuthColors.fieldBackground,
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
         const SizedBox(height: 32),
@@ -51,9 +52,10 @@ class AuthStepIcon extends StatelessWidget {
           child: Text(
             title,
             style: const TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: AuthColors.textDark),
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: AuthColors.textDark,
+            ),
           ),
         ),
         const SizedBox(height: 12),

@@ -45,8 +45,7 @@ class MyBookingsPublic {
     required double totalPaid,
     String status = statusPending,
   }) {
-    final key =
-        'pvt-${guideId}_${DateTime.now().millisecondsSinceEpoch}';
+    final key = 'pvt-${guideId}_${DateTime.now().millisecondsSinceEpoch}';
     _entries[key] = _BookingEntry(
       seats: travelers,
       totalPaid: totalPaid,
@@ -74,20 +73,17 @@ class MyBookingsPublic {
 
   static int seatsFor(String tripId) => _entries[tripId]?.seats ?? 0;
 
-  static double totalPaidFor(String tripId) =>
-      _entries[tripId]?.totalPaid ?? 0;
+  static double totalPaidFor(String tripId) => _entries[tripId]?.totalPaid ?? 0;
 
   /// 'public' or 'private'. Defaults to 'public' for legacy records.
-  static String kindFor(String tripId) =>
-      _entries[tripId]?.kind ?? 'public';
+  static String kindFor(String tripId) => _entries[tripId]?.kind ?? 'public';
 
   static bool isPrivate(String tripId) => kindFor(tripId) == 'private';
 
   static String statusFor(String tripId) =>
       _entries[tripId]?.status ?? statusPending;
 
-  static bool isPending(String tripId) =>
-      statusFor(tripId) == statusPending;
+  static bool isPending(String tripId) => statusFor(tripId) == statusPending;
 
   static _BookingEntry? entryFor(String tripId) => _entries[tripId];
 
@@ -97,8 +93,9 @@ class MyBookingsPublic {
 
   /// Synthetic-trip fields for private bookings (MyTripsCubit builds the
   /// public Trip models from these; no data is duplicated).
-  static Iterable<_BookingEntry> get privateEntries =>
-      _entries.entries.where((e) => e.value.kind == 'private').map((e) => e.value);
+  static Iterable<_BookingEntry> get privateEntries => _entries.entries
+      .where((e) => e.value.kind == 'private')
+      .map((e) => e.value);
 
   static Iterable<MapEntry<String, _BookingEntry>> get privateRecords =>
       _entries.entries.where((e) => e.value.kind == 'private');

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
+import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
-import '../../homeandNotificationTr/view/guide_notifications_screen.dart';
-import '../../homeandNotificationTr/widget/guide_bottom_nav.dart';
+import '../../home_and_notification_tg/view/guide_notifications_screen.dart';
+import '../../home_and_notification_tg/widget/guide_bottom_nav.dart';
 import '../cubit/profile_tg_cubit.dart';
-import '../cubit/profile_tg_state.dart';
 import '../view/guide_availability_screen.dart';
 import '../view/guide_settings_screen.dart';
 import '../widgets/edit_profile_sheet.dart';
@@ -84,6 +83,7 @@ class _ProfileTourGuideView extends StatelessWidget {
         about: cubit.displayAbout,
         location: cubit.displayLocation,
         phone: cubit.displayPhone ?? '',
+        pricePerHour: cubit.pricePerHour,
       ),
     );
     // The sheet persists to Firebase/Firestore; pull the saved values in.
@@ -101,26 +101,28 @@ class _ProfileTourGuideView extends StatelessWidget {
         child: BlocBuilder<ProfileTgCubit, ProfileTgState>(
           builder: (context, state) {
             final cubit = context.read<ProfileTgCubit>();
-            final guide = cubit.guide;
             return SingleChildScrollView(
               child: Column(
                 children: [
                   ProfileHeader(
-                    guide: guide,
                     displayName: cubit.displayName,
                     displayAvatar: cubit.displayAvatar,
                     displayLocation: cubit.displayLocation,
                     displayPhone: cubit.displayPhone,
+                    isVerified: cubit.isVerified,
+                    specialty: cubit.specialty,
+                    rating: cubit.rating,
+                    reviewCount: cubit.reviewCount,
                     onEdit: () => _editName(context),
                   ),
                   const SizedBox(height: 30),
                   ProfileStatsCard(
-                    reviews: guide.reviewCount.toString(),
-                    languages: guide.languages.length.toString(),
-                    price: '${guide.pricePerHour}${guide.currency}',
+                    reviews: cubit.reviewCount.toString(),
+                    languages: cubit.languages.length.toString(),
+                    price: cubit.pricePerHourLabel,
                   ),
                   ProfileMenuSection(
-                    languages: guide.languages,
+                    languages: cubit.languages,
                     about: cubit.displayAbout,
                     onAvailability: () => Navigator.of(context).push(
                       MaterialPageRoute(
@@ -150,15 +152,22 @@ class _ProfileTourGuideView extends StatelessWidget {
       bottomNavigationBar: GuideBottomNav(
         currentIndex: bottomIndex,
         onTap: (index) {
-         if (index==0){
-          // Back to the previous guide screen (dashboard or trips pushed this).
-         Navigator.push(context, MaterialPageRoute(builder: (context)=>GuideDashboardScreen()));
-         }
-         else if(index==1)
-         {
-          Navigator.of(context).push(AppRoutes.guideTrips());
-         }
-
+          // The old screens are removed instead of stacked: every screen
+          // owns a live Firestore subscription, so keeping them alive
+          // would pile them up.
+          if (index == 0) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => const GuideDashboardScreen(),
+              ),
+              (route) => route.isFirst,
+            );
+          } else if (index == 1) {
+            Navigator.of(context).pushAndRemoveUntil(
+              AppRoutes.guideTrips(),
+              (route) => route.isFirst,
+            );
+          }
         },
       ),
     );

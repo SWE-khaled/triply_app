@@ -37,34 +37,38 @@ class _EmergencyBody extends StatelessWidget {
   }
 
   Future<void> _copyNumber(
-      BuildContext context, EmergencyContact contact) async {
+    BuildContext context,
+    EmergencyContact contact,
+  ) async {
     await Clipboard.setData(ClipboardData(text: contact.number));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text(
-              '${contact.name} number ${contact.number} copied')),
+        content: Text('${contact.name} number ${contact.number} copied'),
+      ),
     );
   }
 
   Future<void> _callNumber(
-      BuildContext context, EmergencyContact contact) async {
+    BuildContext context,
+    EmergencyContact contact,
+  ) async {
     final uri = Uri(scheme: 'tel', path: contact.number);
     try {
       final launched = await launchUrl(uri);
       if (!launched && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  'Could not open the dialer for ${contact.name}')),
+            content: Text('Could not open the dialer for ${contact.name}'),
+          ),
         );
       }
     } catch (_) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text('Could not open the dialer for ${contact.name}')),
+          content: Text('Could not open the dialer for ${contact.name}'),
+        ),
       );
     }
   }
@@ -86,16 +90,14 @@ class _EmergencyBody extends StatelessWidget {
                   SizedBox(width: 12),
                   Text(
                     'SOS / Emergency',
-                    style: TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               const Text(
                 'Egypt emergency numbers. Calling opens the phone dialer.',
-                style:
-                    TextStyle(fontSize: 13, color: AppColors.textGrey),
+                style: TextStyle(fontSize: 13, color: AppColors.textGrey),
               ),
               const SizedBox(height: 16),
               for (final contact in contacts)

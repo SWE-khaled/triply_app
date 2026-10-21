@@ -41,8 +41,10 @@ class TripCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text('${trip.duration} · ${trip.location}',
-                        style: AppTextStyles.cardSubtitle),
+                    child: Text(
+                      '${trip.duration} · ${trip.location}',
+                      style: AppTextStyles.cardSubtitle,
+                    ),
                   ),
                   Text('\$${trip.price.toInt()}', style: AppTextStyles.price),
                 ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/create_trip_cubit.dart';
-import '../cubit/create_trip_state.dart';
 import '../model/guide_trip_draft.dart';
 import 'guide_form_field.dart';
 

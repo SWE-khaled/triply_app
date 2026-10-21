@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../common/AuthTourist/providers/auth_provider.dart'; // عدّل المسار لو مختلف
+import '../../../common/AuthTourist/cubit/auth_cubit.dart'; // عدّل المسار لو مختلف
 
 class MyStoryBubble extends StatelessWidget {
   final bool hasStory;
@@ -17,7 +17,7 @@ class MyStoryBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
+    final user = context.watch<AuthCubit>().user;
     final photoUrl = user?.photoURL;
     final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
 

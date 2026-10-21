@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/common/AuthTourguide/providers/tour_guide_auth_provider.dart';
+import 'package:triply/features/common/AuthTourguide/cubit/tour_guide_auth_cubit.dart';
 import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_header.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
-import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
+import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import 'tour_guide_signup_screen.dart';
 import 'tour_guide_verification_screen.dart';
-// Tourist home (for role-based redirect when a tourist logs in here)
-import '../../../tourist/home/view/home_screen.dart';
 
 class TourGuideLoginScreen extends StatefulWidget {
   const TourGuideLoginScreen({super.key});
@@ -31,10 +29,10 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin(TourGuideAuthProvider provider) async {
+  Future<void> _handleLogin(TourGuideAuthCubit cubit) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final role = await provider.signInGuide(
+    final role = await cubit.signInGuide(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
@@ -42,20 +40,21 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
     if (!mounted) return;
 
     if (role == null) {
-      // Error is set in provider, show snackbar
+      // Error is set in the cubit, show snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(provider.errorMessage ?? 'Login failed'),
+          content: Text(cubit.errorMessage ?? 'Login failed'),
           backgroundColor: Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     } else if (role == 'guide') {
       // Verified guides go straight home; others complete verification.
       // Verification state lives in Firestore, so it survives logout/login.
-      final approved =
-          await TourGuideAuthService().isVerificationApproved();
+      final approved = await TourGuideAuthService().isVerificationApproved();
       if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
@@ -67,21 +66,30 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
         (route) => false,
       );
     } else {
-      // Tourist account logged in via guide screen → redirect to tourist home
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-        (route) => false,
+      // A non-guide account: the roles are exclusive, so the sign-in is
+      // refused with a message instead of being redirected silently.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            cubit.errorMessage ?? 'This account cannot use the guide portal.',
+          ),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TourGuideAuthProvider(),
-      child: Consumer<TourGuideAuthProvider>(
-        builder: (context, provider, _) {
+    return BlocProvider(
+      create: (_) => TourGuideAuthCubit(),
+      child: BlocBuilder<TourGuideAuthCubit, TourGuideAuthState>(
+        builder: (context, state) {
+          final cubit = context.read<TourGuideAuthCubit>();
           return Scaffold(
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -159,8 +167,8 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                             const SizedBox(height: 24),
                             AuthButton(
                               label: 'Log In',
-                              isLoading: provider.isLoading,
-                              onPressed: () => _handleLogin(provider),
+                              isLoading: cubit.isLoading,
+                              onPressed: () => _handleLogin(cubit),
                             ),
                             const SizedBox(height: 24),
                             Center(
@@ -168,8 +176,9 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                 children: [
                                   const Text(
                                     "Don't have an account? ",
-                                    style:
-                                        TextStyle(color: AuthColors.textGrey),
+                                    style: TextStyle(
+                                      color: AuthColors.textGrey,
+                                    ),
                                   ),
                                   GestureDetector(
                                     onTap: () => Navigator.of(context).push(

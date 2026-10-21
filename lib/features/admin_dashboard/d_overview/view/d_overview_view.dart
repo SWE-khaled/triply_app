@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
-import '../../../../data/mock/d_mock_guides.dart';
+import '../../../../core/data/mock/dashboard/d_mock_guides.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Overview / Dashboard page.
@@ -26,8 +26,15 @@ class _OverviewViewState extends State<OverviewView> {
       final i = _guides.indexOf(guide);
       if (i != -1) {
         _guides[i] = MockGuide(
-          name: guide.name, email: guide.email, document: guide.document, city: guide.city, status: status,
-          phone: guide.phone, submitted: guide.submitted, docFileName: guide.docFileName, uploadedTrips: guide.uploadedTrips,
+          name: guide.name,
+          email: guide.email,
+          document: guide.document,
+          city: guide.city,
+          status: status,
+          phone: guide.phone,
+          submitted: guide.submitted,
+          docFileName: guide.docFileName,
+          uploadedTrips: guide.uploadedTrips,
         );
       }
     });
@@ -35,7 +42,9 @@ class _OverviewViewState extends State<OverviewView> {
 
   @override
   Widget build(BuildContext context) {
-    final pendingGuidesCount = _guides.where((g) => g.status == 'pending').length;
+    final pendingGuidesCount = _guides
+        .where((g) => g.status == 'pending')
+        .length;
     // Trip applications hardcoded to 3 for now, since this view only edits guides
     final pendingTripsCount = 3;
     final totalPending = pendingGuidesCount + pendingTripsCount;
@@ -130,7 +139,10 @@ class _OverviewViewState extends State<OverviewView> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _PendingActionsCard(guidesCount: pendingGuidesCount, tripsCount: pendingTripsCount),
+                      _PendingActionsCard(
+                        guidesCount: pendingGuidesCount,
+                        tripsCount: pendingTripsCount,
+                      ),
                       const SizedBox(height: 16),
                       _GuideApplicationsCard(
                         guides: _guides,
@@ -144,7 +156,13 @@ class _OverviewViewState extends State<OverviewView> {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(width: leftW, child: _PendingActionsCard(guidesCount: pendingGuidesCount, tripsCount: pendingTripsCount)),
+                    SizedBox(
+                      width: leftW,
+                      child: _PendingActionsCard(
+                        guidesCount: pendingGuidesCount,
+                        tripsCount: pendingTripsCount,
+                      ),
+                    ),
                     const SizedBox(width: 16),
                     SizedBox(
                       width: rightW,
@@ -221,23 +239,27 @@ class _StatCard extends StatelessWidget {
                 style: badgeDanger
                     ? AppTextStyles.statPercentDanger
                     : (badgeIsText
-                        ? AppTextStyles.sectionSubtitle.copyWith(
-                            color: AppColors.positiveGreen,
-                          )
-                        : AppTextStyles.statPercent),
+                          ? AppTextStyles.sectionSubtitle.copyWith(
+                              color: AppColors.positiveGreen,
+                            )
+                          : AppTextStyles.statPercent),
               ),
             ],
           ),
           const SizedBox(height: 14),
-          Text(value,
-              style: AppTextStyles.statValue,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1),
+          Text(
+            value,
+            style: AppTextStyles.statValue,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
           const SizedBox(height: 4),
-          Text(label,
-              style: AppTextStyles.statLabel,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1),
+          Text(
+            label,
+            style: AppTextStyles.statLabel,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
         ],
       ),
     );
@@ -248,8 +270,11 @@ class _StatCard extends StatelessWidget {
 class _PendingActionsCard extends StatelessWidget {
   final int guidesCount;
   final int tripsCount;
-  
-  const _PendingActionsCard({required this.guidesCount, required this.tripsCount});
+
+  const _PendingActionsCard({
+    required this.guidesCount,
+    required this.tripsCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -337,7 +362,10 @@ class _GuideApplicationsCard extends StatelessWidget {
   final List<MockGuide> guides;
   final void Function(MockGuide, String) onUpdateStatus;
 
-  const _GuideApplicationsCard({required this.guides, required this.onUpdateStatus});
+  const _GuideApplicationsCard({
+    required this.guides,
+    required this.onUpdateStatus,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -360,27 +388,44 @@ class _GuideApplicationsCard extends StatelessWidget {
                 children: [
                   Text('Guide Applications', style: AppTextStyles.sectionTitle),
                   const SizedBox(height: 2),
-                  Text('Review documents, guide activity and uploaded content', style: AppTextStyles.sectionSubtitle),
+                  Text(
+                    'Review documents, guide activity and uploaded content',
+                    style: AppTextStyles.sectionSubtitle,
+                  ),
                 ],
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(color: AppColors.statusPendingBg, borderRadius: BorderRadius.circular(20)),
-                child: Text('${pendingGuides.length} pending', style: AppTextStyles.tableCellMuted.copyWith(color: AppColors.statusPendingText, fontWeight: FontWeight.w600)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.statusPendingBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${pendingGuides.length} pending',
+                  style: AppTextStyles.tableCellMuted.copyWith(
+                    color: AppColors.statusPendingText,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           _MiniGuideTableHeader(),
           const Divider(color: AppColors.divider, height: 1),
-          ...guides.map((g) => _MiniGuideRow(
-            guide: g,
-            onApprove: () => onUpdateStatus(g, 'approved'),
-            onReject: () => onUpdateStatus(g, 'suspended'),
-            onSuspend: () => onUpdateStatus(g, 'suspended'),
-            onActivate: () => onUpdateStatus(g, 'approved'),
-          )),
+          ...guides.map(
+            (g) => _MiniGuideRow(
+              guide: g,
+              onApprove: () => onUpdateStatus(g, 'approved'),
+              onReject: () => onUpdateStatus(g, 'suspended'),
+              onSuspend: () => onUpdateStatus(g, 'suspended'),
+              onActivate: () => onUpdateStatus(g, 'approved'),
+            ),
+          ),
         ],
       ),
     );
@@ -430,7 +475,7 @@ class _MiniGuideRow extends StatelessWidget {
   final VoidCallback onReject;
   final VoidCallback onSuspend;
   final VoidCallback onActivate;
-  
+
   const _MiniGuideRow({
     required this.guide,
     required this.onApprove,
@@ -453,14 +498,18 @@ class _MiniGuideRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(guide.name,
-                        style: AppTextStyles.tableCell,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
-                    Text(guide.email,
-                        style: AppTextStyles.tableCellMuted,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
+                    Text(
+                      guide.name,
+                      style: AppTextStyles.tableCell,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      guide.email,
+                      style: AppTextStyles.tableCellMuted,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ],
                 ),
               ),
@@ -469,10 +518,12 @@ class _MiniGuideRow extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(guide.document,
-                          style: AppTextStyles.tableCellMuted,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1),
+                      child: Text(
+                        guide.document,
+                        style: AppTextStyles.tableCellMuted,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Text('View file', style: AppTextStyles.linkText),
@@ -481,19 +532,15 @@ class _MiniGuideRow extends StatelessWidget {
               ),
               Expanded(
                 flex: 2,
-                child: Text(guide.city,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  guide.city,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
-              Expanded(
-                flex: 2,
-                child: _buildStatusChip(guide.status),
-              ),
-              Expanded(
-                flex: 3,
-                child: _buildActions(guide, context),
-              ),
+              Expanded(flex: 2, child: _buildStatusChip(guide.status)),
+              Expanded(flex: 3, child: _buildActions(guide, context)),
             ],
           ),
         ),

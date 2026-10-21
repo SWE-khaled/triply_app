@@ -10,17 +10,17 @@ const String currentUserId = 'me';
 
 class CommunityCubit extends Cubit<CommunityState> {
   CommunityCubit()
-      : super(
-          CommunityState(
-            stories: mockCommunityStories
-                .map((e) => CommunityStory.fromJson(e))
-                .toList(),
-            myStories: [],
-            posts: mockCommunityPosts
-                .map((e) => CommunityPost.fromJson(e))
-                .toList(),
-          ),
-        );
+    : super(
+        CommunityState(
+          stories: mockCommunityStories
+              .map((e) => CommunityStory.fromJson(e))
+              .toList(),
+          myStories: [],
+          posts: mockCommunityPosts
+              .map((e) => CommunityPost.fromJson(e))
+              .toList(),
+        ),
+      );
 
   /// Stories of a single user only — the viewer must never mix users.
   List<CommunityStory> storiesOf(String userId) {
@@ -78,8 +78,7 @@ class CommunityCubit extends Cubit<CommunityState> {
   bool deleteStory(CommunityStory story) {
     if (!story.isMine || story.userId != currentUserId) return false;
     final before = state.myStories.length;
-    final myStories =
-        state.myStories.where((s) => s.id != story.id).toList();
+    final myStories = state.myStories.where((s) => s.id != story.id).toList();
     final removed = myStories.length < before;
     if (removed) emit(state.copyWith(myStories: myStories));
     return removed;

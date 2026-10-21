@@ -8,7 +8,6 @@ import '../../../../core/widgets/circle_back_button.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
 import '../../trip_details_tg/model/guide_trip_details.dart';
 import '../cubit/create_trip_cubit.dart';
-import '../cubit/create_trip_state.dart';
 import '../widgets/cover_upload_box.dart';
 import '../widgets/form_bottom_bar.dart';
 import '../widgets/form_sections.dart';
@@ -101,15 +100,17 @@ class _CreateTripView extends StatelessWidget {
   }
 
   void _preview(BuildContext context) {
-    final trip = context.read<CreateTripCubit>().buildTrip();
-    if (trip.title.isEmpty) {
+    // The trip is not published yet, so its details are cached in the
+    // session for the preview screen to read back.
+    final preview = context.read<CreateTripCubit>().buildPreview();
+    if (preview.trip.title.isEmpty) {
       _toast(context, 'Enter a trip name to preview');
       return;
     }
-    Navigator.of(context).push(AppRoutes.guideTripDetails(trip));
+    Navigator.of(context).push(AppRoutes.guideTripDetails(preview.trip));
   }
 
-  void _submit(BuildContext context, bool isEditing) {
+  Future<void> _submit(BuildContext context, bool isEditing) async {
     final cubit = context.read<CreateTripCubit>();
     if (isEditing) {
       final trip = editingTrip;
@@ -118,10 +119,11 @@ class _CreateTripView extends StatelessWidget {
         _toast(context, 'Cannot save: missing original trip');
         return;
       }
-      final error = cubit.saveEdit(
+      final error = await cubit.saveEdit(
         existingTrip: trip,
         existingDetails: details,
       );
+      if (!context.mounted) return;
       if (error != null) {
         _toast(context, error);
         return;
@@ -130,7 +132,8 @@ class _CreateTripView extends StatelessWidget {
       Navigator.of(context).pop(true);
       return;
     }
-    final result = cubit.submitTrip();
+    final result = await cubit.submitTrip();
+    if (!context.mounted) return;
     if (result.error != null) {
       _toast(context, result.error!);
       return;
@@ -208,7 +211,7 @@ class _CreateTripView extends StatelessWidget {
               BlocBuilder<CreateTripCubit, CreateTripState>(
                 builder: (context, state) {
                   return CoverUploadBox(
-                    imagePath: state.coverImagePath,
+                    cover: state.cover,
                     onTap: () async {
                       final error = await context
                           .read<CreateTripCubit>()

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../constants/auth_colors.dart';
-import '../providers/auth_provider.dart';
+import '../cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
@@ -29,24 +29,24 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  Future<void> _handleSignIn(AuthProvider authProvider) async {
+  Future<void> _handleSignIn(AuthCubit authCubit) async {
     if (!_formKey.currentState!.validate()) return;
-    final success = await authProvider.signIn(
+    final success = await authCubit.signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
     if (success && mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
-    } else if (mounted && authProvider.errorMessage != null) {
+    } else if (mounted && authCubit.errorMessage != null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(authProvider.errorMessage!)));
+      ).showSnackBar(SnackBar(content: Text(authCubit.errorMessage!)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authCubit = context.watch<AuthCubit>();
 
     return Scaffold(
       body: Column(
@@ -107,7 +107,8 @@ class _SignInScreenState extends State<SignInScreen> {
                         hintText: '••••••••',
                         icon: Icons.lock_outline,
                         isPassword: true,
-                        validator: (value) => (value == null || value.length < 6)
+                        validator: (value) =>
+                            (value == null || value.length < 6)
                             ? 'Minimum 6 characters'
                             : null,
                       ),
@@ -124,8 +125,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       const SizedBox(height: 12),
                       AuthButton(
                         label: 'Sign In',
-                        isLoading: authProvider.isLoading,
-                        onPressed: () => _handleSignIn(authProvider),
+                        isLoading: authCubit.isLoading,
+                        onPressed: () => _handleSignIn(authCubit),
                       ),
                       const SizedBox(height: 24),
                       const Row(
@@ -146,16 +147,19 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                                onPressed: () async {
-                                final success =
-                                    await authProvider.signInWithGoogle();
+                              onPressed: () async {
+                                final success = await authCubit
+                                    .signInWithGoogle();
                                 if (success && mounted) {
-                                  Navigator.of(context)
-                                      .pushReplacementNamed('/home');
+                                  Navigator.of(
+                                    context,
+                                  ).pushReplacementNamed('/home');
                                 }
                               },
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -167,7 +171,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     radius: 12,
                                     backgroundColor: Colors.transparent,
                                     backgroundImage: NetworkImage(
-                                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy4zFEszrwjQU1F97cIIJ6nZXSnsVSYorM81q05EqFvA&s=10', 
+                                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy4zFEszrwjQU1F97cIIJ6nZXSnsVSYorM81q05EqFvA&s=10',
                                     ),
                                   ),
                                   SizedBox(width: 8),
@@ -179,14 +183,16 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12), 
+                          const SizedBox(width: 12),
                           Expanded(
                             child: OutlinedButton(
                               onPressed: () {
                                 // TODO: implement Apple sign-in
                               },
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -198,7 +204,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                     radius: 12,
                                     backgroundColor: Colors.transparent,
                                     backgroundImage: NetworkImage(
-                                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv_-CwxoQcTdL_h0fGDNwtqfo9y18Fu7cE-p9pvCJ23w&s', 
+                                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv_-CwxoQcTdL_h0fGDNwtqfo9y18Fu7cE-p9pvCJ23w&s',
                                     ),
                                   ),
                                   SizedBox(width: 8),

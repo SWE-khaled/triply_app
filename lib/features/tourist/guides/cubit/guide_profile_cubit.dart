@@ -11,8 +11,7 @@ import 'guide_profile_state.dart';
 class GuideProfileCubit extends Cubit<GuideProfileState> {
   final String guideId;
 
-  GuideProfileCubit({required this.guideId})
-      : super(const GuideProfileState());
+  GuideProfileCubit({required this.guideId}) : super(const GuideProfileState());
 
   Guide get guide {
     return mockGuides.firstWhere(

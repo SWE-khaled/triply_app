@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -104,9 +104,9 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Center(child: Text('Unable to open gallery: $e'))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Center(child: Text('Unable to open gallery: $e'))),
+      );
     }
   }
 
@@ -119,9 +119,9 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
   }
 
   Future<void> _onLocationTap() async {
-    final result = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) =>  LocationPickerScreen()),
-    );
+    final result = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => LocationPickerScreen()));
     if (result != null) {
       setState(() => location = result);
     }
@@ -136,7 +136,10 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
         : postImages.isNotEmpty || trimmedText.isNotEmpty;
     if (!hasContent) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Center(child: Text('Select at least one image.')),backgroundColor: AppColors.primaryTeal,),
+        const SnackBar(
+          content: Center(child: Text('Select at least one image.')),
+          backgroundColor: AppColors.primaryTeal,
+        ),
       );
       return;
     }
@@ -163,10 +166,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
           children: [
-            AppHeader(
-              title: title,
-              onBack: () => Navigator.of(context).pop(),
-            ),
+            AppHeader(title: title, onBack: () => Navigator.of(context).pop()),
             const SizedBox(height: 16),
             ShareSegmentTabs(
               isStory: isStory,
@@ -211,4 +211,3 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     );
   }
 }
-

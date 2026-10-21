@@ -3,14 +3,13 @@ import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const  OnboardingScreen ({super.key});
+  const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen > createState() =>
-      _OnboardingScreen ();
+  State<OnboardingScreen> createState() => _OnboardingScreen();
 }
 
-class _OnboardingScreen  extends State< OnboardingScreen > {
+class _OnboardingScreen extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   bool _precached = false;
@@ -19,31 +18,31 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
   // resolution) with high-quality images, or better, local assets:
   //   'image': 'assets/images/onboarding/guide_1.jpg'
   // and switch _buildImage() to use Image.asset.
- final List<Map<String, dynamic>> _slides = [
-  {
-    'title': 'Discover Egypt\nYour Way',
-    'subtitle':
-        'Explore Egypt, discover amazing places, and create\nunforgettable memories along the way.',
-    'image':
-        'https://i.pinimg.com/1200x/80/b3/a4/80b3a4fc0871c2e9250799c6666a8a90.jpg',
-  },
-  {
-    'title': 'Find & Book\nExperiences',
-    'subtitle':
-        'Discover unique trips, local guides, and experiences\nmade for the way you want to travel.',
-    'image':
-        'https://i.pinimg.com/736x/a3/10/08/a310089ffdca5b243745e2876b5ca2e5.jpg',
-    'pills': ['Discover Trips', 'Find Guides', 'Book Experiences'],
-  },
-  {
-    'title': 'Enjoy Your\nJourney',
-    'subtitle':
-        'Manage your bookings, connect with guides, explore\nnew places and enjoy every moment of your trip.',
-    'image':
-        'https://i.pinimg.com/736x/6a/61/4f/6a614f0a26c359dbd89c9fa53cf0b842.jpg',
-    'pills': ['My Trips', 'Messages', 'Bookings', 'Experiences'],
-  },
-];
+  final List<Map<String, dynamic>> _slides = [
+    {
+      'title': 'Discover Egypt\nYour Way',
+      'subtitle':
+          'Explore Egypt, discover amazing places, and create\nunforgettable memories along the way.',
+      'image':
+          'https://i.pinimg.com/1200x/80/b3/a4/80b3a4fc0871c2e9250799c6666a8a90.jpg',
+    },
+    {
+      'title': 'Find & Book\nExperiences',
+      'subtitle':
+          'Discover unique trips, local guides, and experiences\nmade for the way you want to travel.',
+      'image':
+          'https://i.pinimg.com/736x/a3/10/08/a310089ffdca5b243745e2876b5ca2e5.jpg',
+      'pills': ['Discover Trips', 'Find Guides', 'Book Experiences'],
+    },
+    {
+      'title': 'Enjoy Your\nJourney',
+      'subtitle':
+          'Manage your bookings, connect with guides, explore\nnew places and enjoy every moment of your trip.',
+      'image':
+          'https://i.pinimg.com/736x/6a/61/4f/6a614f0a26c359dbd89c9fa53cf0b842.jpg',
+      'pills': ['My Trips', 'Messages', 'Bookings', 'Experiences'],
+    },
+  ];
 
   @override
   void didChangeDependencies() {
@@ -122,14 +121,18 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                   // Content
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 48.0),
+                      horizontal: 24.0,
+                      vertical: 48.0,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
@@ -167,25 +170,30 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                             spacing: 12,
                             runSpacing: 12,
                             children: (slide['pills'] as List<String>)
-                                .map((pill) => Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                        border: Border.all(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.3)),
-                                        borderRadius:
-                                            BorderRadius.circular(24),
-                                      ),
-                                      child: Text(
-                                        pill,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                .map(
+                                  (pill) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
                                         ),
                                       ),
-                                    ))
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    child: Text(
+                                      pill,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                )
                                 .toList(),
                           ),
                         const SizedBox(height: 80),
@@ -209,8 +217,11 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                   color: Colors.white.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.chevron_left,
-                    color: Colors.white, size: 28),
+                child: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
             ),
           ),
@@ -233,7 +244,9 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                       width: _currentPage == index ? 24 : 6,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? const Color(0xFFE6A15C) // gold color matching Figma
+                            ? const Color(
+                                0xFFE6A15C,
+                              ) // gold color matching Figma
                             : Colors.white.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(3),
                       ),
@@ -246,7 +259,9 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                     backgroundColor: Colors.white,
                     foregroundColor: TourGuideColors.deepNile,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -262,16 +277,16 @@ class _OnboardingScreen  extends State< OnboardingScreen > {
                     } else {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const SignInScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const SignInScreen()),
                       );
                     }
                   },
                   child: Text(
                     _currentPage < _slides.length - 1 ? 'Next' : 'Get Started',
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],

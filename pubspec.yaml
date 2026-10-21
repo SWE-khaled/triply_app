@@ -25,7 +25,6 @@ dependencies:
   google_sign_in: ^6.2.1
 
   # State management & networking
-  provider: ^6.1.2
   flutter_bloc: ^9.1.1
   http: ^1.6.0
 
@@ -54,5 +53,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - .env
+  #  - .env
     - assets/images/svg/

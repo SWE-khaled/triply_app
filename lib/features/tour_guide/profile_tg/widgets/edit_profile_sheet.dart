@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/widgets/profile_avatar.dart';
 import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
-import '../../../common/AuthTourist/providers/auth_provider.dart';
+import '../../../common/AuthTourist/cubit/auth_cubit.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;
@@ -15,6 +17,10 @@ class EditProfileSheet extends StatefulWidget {
   final String about;
   final String location;
   final String phone;
+
+  /// The guide's hourly rate in EGP — 0 when they have not set one.
+  final double pricePerHour;
+
   const EditProfileSheet({
     super.key,
     required this.name,
@@ -22,6 +28,7 @@ class EditProfileSheet extends StatefulWidget {
     this.about = '',
     this.location = '',
     this.phone = '',
+    this.pricePerHour = 0,
   });
 
   @override
@@ -33,6 +40,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   late final TextEditingController _aboutController;
   late final TextEditingController _locationController;
   late final TextEditingController _phoneController;
+  late final TextEditingController _priceController;
   File? _pickedImage;
   bool _loading = false;
 
@@ -43,6 +51,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     _aboutController = TextEditingController(text: widget.about);
     _locationController = TextEditingController(text: widget.location);
     _phoneController = TextEditingController(text: widget.phone);
+    _priceController = TextEditingController(
+      text: widget.pricePerHour > 0
+          ? widget.pricePerHour.toStringAsFixed(0)
+          : '',
+    );
   }
 
   @override
@@ -51,6 +64,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     _aboutController.dispose();
     _locationController.dispose();
     _phoneController.dispose();
+    _priceController.dispose();
     super.dispose();
   }
 
@@ -95,7 +109,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
     setState(() => _loading = true);
     try {
-      final auth = context.read<AuthProvider>();
+      final auth = context.read<AuthCubit>();
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         if (mounted) {
@@ -128,6 +142,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         about: _aboutController.text.trim(),
         location: _locationController.text.trim(),
         phone: _phoneController.text.trim(),
+        pricePerHour: double.tryParse(_priceController.text.trim()) ?? 0,
       );
       await auth.refreshUser();
 
@@ -144,12 +159,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
   @override
   Widget build(BuildContext context) {
-    ImageProvider? avatar;
-    if (_pickedImage != null) {
-      avatar = FileImage(_pickedImage!);
-    } else if (widget.displayAvatar.isNotEmpty) {
-  avatar = NetworkImage(widget.displayAvatar);
-}
+    final picked = _pickedImage;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -167,87 +177,114 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-          GestureDetector(
-            onTap: _loading ? null : _pickImage,
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: avatar,
-                  child: avatar == null
-                      ? Text(
-                          widget.name.isNotEmpty
-                              ? widget.name[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(fontSize: 36),
-                        )
-                      : null,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Theme.of(context).primaryColor,
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 16,
-                      color: Colors.white,
+            GestureDetector(
+              onTap: _loading ? null : _pickImage,
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: const Color(0xFFE6ECEF),
+                    child: picked != null
+                        ? ClipOval(
+                            child: Image.file(
+                              picked,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : ClipOval(
+                            child: ProfileAvatar(
+                              imageUrl: widget.displayAvatar,
+                              width: 100,
+                              height: 100,
+                            ),
+                          ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Theme.of(context).primaryColor,
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 16,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _aboutController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'About',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _locationController,
+              decoration: const InputDecoration(
+                labelText: 'Location',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: 'Phone number',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _priceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Price per hour (EGP)',
+                hintText: 'e.g. 75',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryTeal,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 2,
                 ),
-              ],
+                onPressed: _loading ? null : _save,
+                child: _loading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save'),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _aboutController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'About',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _locationController,
-            decoration: const InputDecoration(
-              labelText: 'Location',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(
-              labelText: 'Phone number',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: _loading ? null : _save,
-              child: _loading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Save'),
-            ),
-          ),
           ],
         ),
       ),

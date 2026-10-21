@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
@@ -78,9 +78,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Can't open the gallery: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Can't open the gallery: $e")));
     }
   }
 
@@ -95,17 +95,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
             fullscreenDialog: true,
             builder: (_) => BlocProvider.value(
               value: cubit,
-              child: StoryViewerScreen(
-                stories: userStories,
-              ),
+              child: StoryViewerScreen(stories: userStories),
             ),
           ),
         )
         .then((_) {
-      // Refresh rings after possible deletions inside the viewer.
-      // (Cubit emits rebuild this screen automatically; kept for parity.)
-      if (mounted) setState(() {});
-    });
+          // Refresh rings after possible deletions inside the viewer.
+          // (Cubit emits rebuild this screen automatically; kept for parity.)
+          if (mounted) setState(() {});
+        });
   }
 
   @override
@@ -122,7 +120,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
             extendBody: true, // content extends under the glass nav
             backgroundColor: Colors.white,
             body: SafeArea(
-              bottom: false, // <-- let the content reach the bottom of the screen
+              bottom:
+                  false, // <-- let the content reach the bottom of the screen
               child: Column(
                 children: [
                   Padding(
@@ -133,7 +132,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         const Text(
                           'Community',
                           style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.w700),
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         CircleIconButton(
                           icon: Icons.add,
@@ -148,7 +149,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   const SizedBox(height: 6),
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.only(bottom: 100), // <-- space for nav
+                      padding: const EdgeInsets.only(
+                        bottom: 100,
+                      ), // <-- space for nav
                       children: [
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -160,9 +163,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                 MyStoryBubble(
                                   hasStory: hasMyStory,
                                   onAddTap: () => _pickMyStoryImage(context),
-                                  onViewTap: () =>
-                                      _openStoryViewerForUser(
-                                          context, currentUserId),
+                                  onViewTap: () => _openStoryViewerForUser(
+                                    context,
+                                    currentUserId,
+                                  ),
                                 ),
                                 for (var i = 0; i < rings.length; i++) ...[
                                   const SizedBox(width: 14),
@@ -174,7 +178,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                       AppColors.accentOrange,
                                     ][i % 3],
                                     onTap: () => _openStoryViewerForUser(
-                                        context, rings[i].userId),
+                                      context,
+                                      rings[i].userId,
+                                    ),
                                   ),
                                 ],
                               ],
@@ -196,7 +202,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       backgroundColor: AppColors.primaryTeal,
-                                      content: Text("You can't delete others post!",style: TextStyle(color: Colors.white),),
+                                      content: Text(
+                                        "You can't delete others post!",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
                                     ),
                                   );
                                 }

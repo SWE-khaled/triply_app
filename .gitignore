@@ -52,3 +52,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Node related (never used by the Flutter app)
+node_modules/
+npm-debug.log*

@@ -29,19 +29,31 @@ class NotificationTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.title,
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(item.body,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 13, color: AppColors.textGrey)),
+                  Text(
+                    item.body,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textGrey,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(item.timeLabel,
-                      style: const TextStyle(
-                          fontSize: 11, color: AppColors.textGrey)),
+                  Text(
+                    item.timeLabel,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textGrey,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -51,7 +63,9 @@ class NotificationTile extends StatelessWidget {
                 height: 8,
                 margin: const EdgeInsets.only(top: 6, left: 8),
                 decoration: const BoxDecoration(
-                    color: AppColors.accentOrange, shape: BoxShape.circle),
+                  color: AppColors.accentOrange,
+                  shape: BoxShape.circle,
+                ),
               ),
           ],
         ),
@@ -62,34 +76,30 @@ class NotificationTile extends StatelessWidget {
   (Color, IconData, Color) _styleForType(String type) {
     switch (type) {
       case 'booking':
-        return (
-          const Color(0xFFE3F3E7),
-          Icons.check,
-          const Color(0xFF2E9E5B)
-        );
+        return (const Color(0xFFE3F3E7), Icons.check, const Color(0xFF2E9E5B));
       case 'reminder':
         return (
           const Color(0xFFFFEBDC),
           Icons.access_time,
-          AppColors.accentOrange
+          AppColors.accentOrange,
         );
       case 'message':
         return (
           const Color(0xFFE6F3F3),
           Icons.chat_bubble_outline,
-          AppColors.primaryTeal
+          AppColors.primaryTeal,
         );
       case 'like':
         return (
           const Color(0xFFFFE8E8),
           Icons.favorite_border,
-          const Color(0xFFE86A6A)
+          const Color(0xFFE86A6A),
         );
       default:
         return (
           const Color(0xFFF2F2F2),
           Icons.notifications_none,
-          AppColors.textGrey
+          AppColors.textGrey,
         );
     }
   }

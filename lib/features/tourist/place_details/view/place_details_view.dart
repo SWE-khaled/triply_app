@@ -46,201 +46,200 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
       value: controller,
       child: BlocBuilder<PlaceDetailCubit, PlaceDetailState>(
         builder: (context, _) {
-    final place = controller.place;
+          final place = controller.place;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                NetworkImageFallback(
-                  imageUrl: place.imageUrl,
-                  width: double.infinity,
-                  height: 320,
-                  fit: BoxFit.cover,
-                ),
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Stack(
+                    children: [
+                      NetworkImageFallback(
+                        imageUrl: place.imageUrl,
+                        width: double.infinity,
+                        height: 320,
+                        fit: BoxFit.cover,
+                      ),
+                      SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [const CircleBackButton()],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Transform.translate(
+                    offset: const Offset(0, -28),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const CircleBackButton(),
+                          Text(
+                            place.name,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                size: 16,
+                                color: AppColors.accentOrange,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${place.city}  ·  ${place.category}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textGrey,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                size: 15,
+                                color: AppColors.starGold,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                place.rating.toString(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                              Text(
+                                ' (${place.reviewsCount.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},')} reviews)',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 13,
+                                  color: AppColors.textGrey,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            place.shortDescription,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              letterSpacing: 0,
+                              height: 2,
+                              color: Color(0xFF526B72),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: List.generate(tabs.length, (i) {
+                                final selected =
+                                    controller.selectedTabIndex == i;
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    right: i == tabs.length - 1 ? 0 : 8,
+                                  ),
+                                  child: ChoiceChip(
+                                    label: Text(tabs[i]),
+                                    selected: selected,
+                                    onSelected: (_) {
+                                      setState(() {
+                                        controller.selectTab(i);
+                                      });
+                                    },
+                                    selectedColor: AppColors.primaryTeal,
+                                    backgroundColor: AppColors.chipGrey,
+                                    labelStyle: TextStyle(
+                                      color: selected
+                                          ? Colors.white
+                                          : AppColors.chipTextGrey,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
+                                      letterSpacing: 0,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide.none,
+                                    ),
+                                    showCheckmark: false,
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (controller.selectedTabIndex == 0)
+                            AboutTab(place: place)
+                          else if (controller.selectedTabIndex == 1)
+                            GuidesTab(
+                              guides: controller.guides,
+                              onGuideTap: (guide) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => GuideProfileScreen(
+                                      guideId: controller.guideProfileIdFor(
+                                        guide,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          else if (controller.selectedTabIndex == 2)
+                            TripsTab(
+                              trips: controller.trips,
+                              onViewDetails: (trip) {
+                                Navigator.of(context).push(
+                                  AppRoutes.tripDetails(
+                                    controller.publicTripFor(trip),
+                                  ),
+                                );
+                              },
+                              onChat: (_) {},
+                            )
+                          else
+                            StoriesTab(
+                              stories: controller.stories,
+                              // Placeholder: no Story-detail in Figma.
+                              onStoryTap: (_) {},
+                            ),
                         ],
                       ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            Transform.translate(
-              offset: const Offset(0, -28),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      place.name,
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          size: 16,
-                          color: AppColors.accentOrange,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${place.city}  ·  ${place.category}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textGrey,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          size: 15,
-                          color: AppColors.starGold,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          place.rating.toString(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                        Text(
-                          ' (${place.reviewsCount.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},')} reviews)',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 13,
-                            color: AppColors.textGrey,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      place.shortDescription,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                        letterSpacing: 0,
-                        height: 2,
-                        color: Color(0xFF526B72),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List.generate(tabs.length, (i) {
-                          final selected = controller.selectedTabIndex == i;
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              right: i == tabs.length - 1 ? 0 : 8,
-                            ),
-                            child: ChoiceChip(
-                              label: Text(tabs[i]),
-                              selected: selected,
-                              onSelected: (_) {
-                                setState(() {
-                                  controller.selectTab(i);
-                                });
-                              },
-                              selectedColor: AppColors.primaryTeal,
-                              backgroundColor: AppColors.chipGrey,
-                              labelStyle: TextStyle(
-                                color: selected
-                                    ? Colors.white
-                                    : AppColors.chipTextGrey,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                letterSpacing: 0,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide.none,
-                              ),
-                              showCheckmark: false,
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (controller.selectedTabIndex == 0)
-                      AboutTab(place: place)
-                    else if (controller.selectedTabIndex == 1)
-                      GuidesTab(
-                        guides: controller.guides,
-                        onGuideTap: (guide) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => GuideProfileScreen(
-                                guideId:
-                                    controller.guideProfileIdFor(guide),
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    else if (controller.selectedTabIndex == 2)
-                      TripsTab(
-                        trips: controller.trips,
-                        onViewDetails: (trip) {
-                          Navigator.of(context).push(
-                            AppRoutes.tripDetails(
-                              controller.publicTripFor(trip),
-                            ),
-                          );
-                        },
-                        onChat: (_) {},
-                      )
-                    else
-                      StoriesTab(
-                        stories: controller.stories,
-                        // Placeholder: no Story-detail in Figma.
-                        onStoryTap: (_) {
-                        },
-                      ),
-                  ],
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
         },
       ),
     );

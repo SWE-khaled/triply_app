@@ -19,13 +19,16 @@ class TripCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Color(0xFFFAF5EC)
+          color: Color(0xFFFAF5EC),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius:BorderRadiusGeometry.only(topLeft:Radius.circular(16),bottomLeft: Radius.circular(16)),
+              borderRadius: BorderRadiusGeometry.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
               child: Image.network(
                 trip.imageUrl,
                 width: 75,
@@ -36,52 +39,55 @@ class TripCard extends StatelessWidget {
                   height: 82,
                   color: AppColors.primaryLight,
                   alignment: Alignment.center,
-                  child: const Icon(Icons.landscape,
-                      color: Color(0xFF0E5261), size: 28),
+                  child: const Icon(
+                    Icons.landscape,
+                    color: Color(0xFF0E5261),
+                    size: 28,
+                  ),
                 ),
               ),
             ),
-            
+
             const SizedBox(width: 12),
             Expanded(
-                child: Container(
-                  padding: EdgeInsets.only(top: 10,bottom: 10,),
-                  child: Column(
-
-                    mainAxisAlignment: .center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        trip.title,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.title,
-                        ),
+              child: Container(
+                padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: Column(
+                  mainAxisAlignment: .center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      trip.title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.title,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${trip.dateLabel} - ${trip.durationLabel}',
-                        style: const TextStyle(
-                            fontSize: 12, color: AppColors.subtitle),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${trip.dateLabel} - ${trip.durationLabel}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.subtitle,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        ' ${trip.price.toStringAsFixed(0)} ${trip.currency}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.price,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      ' ${trip.price.toStringAsFixed(0)} ${trip.currency}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.price,
                       ),
-                    ],
-                  ),
-                )
+                    ),
+                  ],
+                ),
               ),
-
+            ),
           ],
         ),
-      )
+      ),
     );
   }
 }

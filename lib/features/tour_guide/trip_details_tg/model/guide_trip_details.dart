@@ -6,8 +6,8 @@ class GuideItineraryStop {
 
   factory GuideItineraryStop.fromJson(Map<String, dynamic> json) {
     return GuideItineraryStop(
-      time: json['time'] as String,
-      title: json['title'] as String,
+      time: json['time'] as String? ?? '',
+      title: json['title'] as String? ?? '',
     );
   }
 
@@ -63,32 +63,46 @@ class GuideTripDetails {
     required this.imageUrl,
   });
 
+  /// Reads a trip-details document.
+  ///
+  /// Every field falls back to a default, so a document written by an
+  /// older version of the app never breaks the details screen.
   factory GuideTripDetails.fromJson(Map<String, dynamic> json) {
     return GuideTripDetails(
-      id: json['id'] as String,
-      tripId: json['tripId'] as String,
-      tag: json['tag'] as String,
-      title: json['title'] as String,
-      rating: (json['rating'] as num).toDouble(),
-      reviewsCount: json['reviewsCount'] as int,
-      location: json['location'] as String,
-      duration: json['duration'] as String,
-      groupType: json['groupType'] as String,
-      languages: json['languages'] as String,
-      about: json['about'] as String,
-      highlights: (json['highlights'] as List).map((e) => e as String).toList(),
-      itinerary: (json['itinerary'] as List)
-          .map((e) => GuideItineraryStop.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      notes: (json['notes'] as List).map((e) => e as String).toList(),
-      included: json['included'] as String,
-      meetingPoint: json['meetingPoint'] as String,
-      priceEgp: (json['priceEgp'] as num).toDouble(),
-      guideName: json['guideName'] as String,
-      guideAvatarUrl: json['guideAvatarUrl'] as String,
-      guideRating: (json['guideRating'] as num).toDouble(),
-      guideReviews: json['guideReviews'] as int,
-      imageUrl: json['imageUrl'] as String,
+      id: json['id'] as String? ?? '',
+      tripId: json['tripId'] as String? ?? '',
+      tag: json['tag'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      rating: (json['rating'] as num?)?.toDouble() ?? 0,
+      reviewsCount: (json['reviewsCount'] as num?)?.toInt() ?? 0,
+      location: json['location'] as String? ?? '',
+      duration: json['duration'] as String? ?? '',
+      groupType: json['groupType'] as String? ?? '',
+      languages: json['languages'] as String? ?? '',
+      about: json['about'] as String? ?? '',
+      highlights:
+          (json['highlights'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
+      itinerary:
+          (json['itinerary'] as List?)
+              ?.map(
+                (e) => GuideItineraryStop.fromJson(
+                  e is Map ? Map<String, dynamic>.from(e) : const {},
+                ),
+              )
+              .toList() ??
+          const [],
+      notes:
+          (json['notes'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
+      included: json['included'] as String? ?? '',
+      meetingPoint: json['meetingPoint'] as String? ?? '',
+      priceEgp: (json['priceEgp'] as num?)?.toDouble() ?? 0,
+      guideName: json['guideName'] as String? ?? '',
+      guideAvatarUrl: json['guideAvatarUrl'] as String? ?? '',
+      guideRating: (json['guideRating'] as num?)?.toDouble() ?? 0,
+      guideReviews: (json['guideReviews'] as num?)?.toInt() ?? 0,
+      imageUrl: json['imageUrl'] as String? ?? '',
     );
   }
 

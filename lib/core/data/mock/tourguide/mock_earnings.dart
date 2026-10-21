@@ -1,9 +1,26 @@
-// Raw mock source. Convert via EarningsSummary.fromJson().
-const Map<String, dynamic> mockEarningsJson = {
-  'availableBalance': 4850,
-  'month': 'October',
-  'activities': [
-    {'id': 'a1', 'title': 'Pyramids Sunset Tour', 'amountEgp': 1650},
-    {'id': 'a2', 'title': 'Cairo Food Experience', 'amountEgp': 2100},
-  ],
+import 'mock_booking_details.dart';
+import 'mock_guide_shared.dart';
+
+/// Raw mock source for the guide earnings screen.
+/// Convert via EarningsSummary.fromJson().
+///
+/// The activities are the guide's bookings, so the available balance
+/// always equals the sum of the listed activities.
+
+final Map<String, dynamic> mockEarningsJson = {
+  'availableBalance': mockBookingsTotal(),
+  'month': mockMonthName(mockNow),
+  'activities': _activities(),
 };
+
+List<Map<String, dynamic>> _activities() => mockBookingDetailsRaw
+    .map(
+      (booking) => <String, dynamic>{
+        'id': 'ea-${booking['id']}',
+        'bookingId': booking['id'],
+        'tripId': booking['tripId'],
+        'title': booking['tour_title'],
+        'amountEgp': booking['totalPrice'],
+      },
+    )
+    .toList();

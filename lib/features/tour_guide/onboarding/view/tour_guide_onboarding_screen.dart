@@ -52,7 +52,14 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
     _precached = true;
     for (final slide in _slides) {
       final url = slide['image'] as String?;
-      if (url != null) precacheImage(NetworkImage(url), context);
+      if (url == null) continue;
+      // Precache so the slides feel instant. A slow or unreachable host
+      // must never break the screen, so the failure is swallowed here —
+      // the image itself falls back to its own error builder.
+      precacheImage(
+        NetworkImage(url),
+        context,
+      ).then((_) {}, onError: (Object _) {});
     }
   }
 
@@ -122,14 +129,18 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                   // Content
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 48.0),
+                      horizontal: 24.0,
+                      vertical: 48.0,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
@@ -167,25 +178,30 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                             spacing: 12,
                             runSpacing: 12,
                             children: (slide['pills'] as List<String>)
-                                .map((pill) => Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                        border: Border.all(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.3)),
-                                        borderRadius:
-                                            BorderRadius.circular(24),
-                                      ),
-                                      child: Text(
-                                        pill,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
+                                .map(
+                                  (pill) => Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      border: Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
                                         ),
                                       ),
-                                    ))
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    child: Text(
+                                      pill,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                )
                                 .toList(),
                           ),
                         const SizedBox(height: 80),
@@ -209,8 +225,11 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                   color: Colors.white.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.chevron_left,
-                    color: Colors.white, size: 28),
+                child: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
             ),
           ),
@@ -233,7 +252,9 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                       width: _currentPage == index ? 24 : 6,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? const Color(0xFFE6A15C) // gold color matching Figma
+                            ? const Color(
+                                0xFFE6A15C,
+                              ) // gold color matching Figma
                             : Colors.white.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(3),
                       ),
@@ -246,7 +267,9 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                     backgroundColor: Colors.white,
                     foregroundColor: TourGuideColors.deepNile,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -271,7 +294,9 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                   child: Text(
                     _currentPage < _slides.length - 1 ? 'Next' : 'Get Started',
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],

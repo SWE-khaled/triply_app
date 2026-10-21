@@ -18,6 +18,14 @@ class GuideTripDetailsSource {
       .map((e) => GuideTripDetails.fromJson(e))
       .toList();
 
+  /// The details saved in this session for a trip, or null when there
+  /// are none.
+  ///
+  /// Unlike [getByTripId] this never falls back to the mock dataset —
+  /// it is the source for trips that are not published yet (a draft the
+  /// guide is previewing).
+  static GuideTripDetails? savedFor(String tripId) => _overrides[tripId];
+
   /// Trips without mock data fall back to the first entry but keep
   /// the trip's own card fields so they never show another trip.
   GuideTripDetails getByTripId(

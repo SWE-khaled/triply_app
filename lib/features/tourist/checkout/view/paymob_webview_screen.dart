@@ -4,7 +4,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../services/paymob_service.dart';
 
-
 class PaymobWebviewScreen extends StatefulWidget {
   final String paymentToken;
   final String guideName;
@@ -97,8 +96,7 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -114,23 +112,25 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
               child: Icon(
                 success ? Icons.check_circle : Icons.error_outline,
                 size: 36,
-                color: success
-                    ? AppColors.primary
-                    : const Color(0xFFC62828),
+                color: success ? AppColors.primary : const Color(0xFFC62828),
               ),
             ),
             const SizedBox(height: 12),
-            Text(title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.title)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: AppColors.title,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 13, color: AppColors.subtitle)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            ),
           ],
         ),
         actions: [
@@ -143,8 +143,7 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
                   _handled = false;
                   _loading = true;
                 });
-                final url = PaymobService()
-                    .iframeUrl(widget.paymentToken);
+                final url = PaymobService().iframeUrl(widget.paymentToken);
                 _web.loadRequest(Uri.parse(url));
               },
               child: const Text('Retry'),
@@ -167,7 +166,8 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
             child: Text(success ? 'Done' : 'Back'),
           ),
@@ -187,11 +187,14 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
           icon: const Icon(Icons.chevron_left, color: AppColors.title),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Secure Payment',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppColors.title)),
+        title: const Text(
+          'Secure Payment',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.title,
+          ),
+        ),
         centerTitle: true,
       ),
       body: Stack(
@@ -199,8 +202,7 @@ class _PaymobWebviewScreenState extends State<PaymobWebviewScreen> {
           WebViewWidget(controller: _web),
           if (_loading)
             const Center(
-              child: CircularProgressIndicator(
-                  color: AppColors.primary),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
         ],
       ),

@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 
 import '../../features/tour_guide/my_trips_tg/model/guide_trip.dart';

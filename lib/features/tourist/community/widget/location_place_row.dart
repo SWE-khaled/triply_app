@@ -7,11 +7,7 @@ class LocationPlaceRow extends StatelessWidget {
   final String place;
   final VoidCallback onTap;
 
-  const LocationPlaceRow({
-    super.key,
-    required this.place,
-    required this.onTap,
-  });
+  const LocationPlaceRow({super.key, required this.place, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

@@ -15,8 +15,7 @@ import 'place_detail_state.dart';
 class PlaceDetailCubit extends Cubit<PlaceDetailState> {
   final String placeId;
 
-  PlaceDetailCubit({required this.placeId})
-      : super(_load(placeId));
+  PlaceDetailCubit({required this.placeId}) : super(_load(placeId));
 
   static PlaceDetailState _load(String placeId) {
     final placeJson = mockPlaces.firstWhere(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:triply/features/common/AuthTourguide/providers/tour_guide_auth_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/features/common/AuthTourguide/cubit/tour_guide_auth_cubit.dart';
 import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_header.dart';
@@ -35,10 +35,10 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
     super.dispose();
   }
 
-  Future<void> _handleRegister(TourGuideAuthProvider provider) async {
+  Future<void> _handleRegister(TourGuideAuthCubit cubit) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await provider.registerGuide(
+    final success = await cubit.registerGuide(
       name: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -58,7 +58,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(provider.errorMessage ?? 'Registration failed'),
+          content: Text(cubit.errorMessage ?? 'Registration failed'),
           backgroundColor: Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -71,10 +71,11 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TourGuideAuthProvider(),
-      child: Consumer<TourGuideAuthProvider>(
-        builder: (context, provider, _) {
+    return BlocProvider(
+      create: (_) => TourGuideAuthCubit(),
+      child: BlocBuilder<TourGuideAuthCubit, TourGuideAuthState>(
+        builder: (context, state) {
+          final cubit = context.read<TourGuideAuthCubit>();
           return Scaffold(
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -119,8 +120,8 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                               icon: Icons.person_outline,
                               validator: (v) =>
                                   (v == null || v.trim().length < 3)
-                                      ? 'Enter your full name (min 3 characters)'
-                                      : null,
+                                  ? 'Enter your full name (min 3 characters)'
+                                  : null,
                             ),
                             const SizedBox(height: 20),
                             const Text(
@@ -145,13 +146,16 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                                 ),
                               ),
                               validator: (v) {
-                                final digits = (v ?? '')
-                                    .replaceAll(RegExp(r'\D'), '');
+                                final digits = (v ?? '').replaceAll(
+                                  RegExp(r'\D'),
+                                  '',
+                                );
                                 if (digits.isEmpty) {
                                   return 'Enter your phone number';
                                 }
-                                if (!RegExp(r'^1[0125]\d{8}$')
-                                    .hasMatch(digits)) {
+                                if (!RegExp(
+                                  r'^1[0125]\d{8}$',
+                                ).hasMatch(digits)) {
                                   return 'Enter a valid Egyptian mobile number';
                                 }
                                 return null;
@@ -223,8 +227,8 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                             const SizedBox(height: 28),
                             AuthButton(
                               label: 'Continue to Verification',
-                              isLoading: provider.isLoading,
-                              onPressed: () => _handleRegister(provider),
+                              isLoading: cubit.isLoading,
+                              onPressed: () => _handleRegister(cubit),
                             ),
                             const SizedBox(height: 24),
                             Center(
@@ -232,8 +236,9 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                                 children: [
                                   const Text(
                                     'Already have an account? ',
-                                    style:
-                                        TextStyle(color: AuthColors.textGrey),
+                                    style: TextStyle(
+                                      color: AuthColors.textGrey,
+                                    ),
                                   ),
                                   GestureDetector(
                                     onTap: () => Navigator.of(context).push(

@@ -1,31 +1,40 @@
-// Raw mock source for the tour-guide Dashboard (mimics future API JSON
-// shape, snake_case). No delays. New file only — existing mocks untouched.
-const Map<String, dynamic> mockGuideDashboardRaw = {
-  'guide_name': 'Yasmin Ali',
-  'avatar_url': 'https://i.pravatar.cc/100?img=5',
-  'total_bookings': 24,
-  'upcoming_trips': 1,
-  'active_trips': 1,
-  'completed_trips': 1,
-  'earnings_label': '\$4,120',
-  'pending_requests': 3,
+import '../../../../features/tour_guide/my_trips_tg/model/guide_trip.dart';
+import 'mock_booking_details.dart';
+import 'mock_guide_profile.dart';
+import 'mock_guide_shared.dart';
+import 'mock_guide_trips.dart';
+
+/// Raw mock source for the tour-guide Dashboard.
+/// Convert via GuideDashboardStats.fromJson() / BookingRequest.fromJson().
+///
+/// The counters are derived from the trips and bookings of this dataset,
+/// so the dashboard can never show a total that contradicts the lists
+/// rendered underneath it.
+
+final Map<String, dynamic> mockGuideDashboardRaw = {
+  'guide_name': mockGuideProfileJson['name'],
+  'avatar_url': mockGuideProfileJson['avatarUrl'],
+  'total_bookings': mockBookingDetailsRaw.length,
+  'upcoming_trips':
+      mockGuideTripsCountForTab(GuideTripStatus.active) +
+      mockGuideTripsCountForTab(GuideTripStatus.pending),
+  'active_trips': mockGuideTripsCountForTab(GuideTripStatus.active),
+  'completed_trips': mockGuideTripsCountForTab(GuideTripStatus.completed),
+  'earnings_label': mockAmountLabel(mockBookingsTotal()),
+  'pending_requests': mockGuideTripsCountForTab(GuideTripStatus.pending),
 };
 
-const List<Map<String, dynamic>> mockBookingRequestsRaw = [
-  {
-    'id': 'b1',
-    'guest_name': 'Sophie Martin',
-    'tour_title': 'Private guide booking', 
-    'detail_label': '1 traveler · Today',
-    'avatar_url': 'https://i.pravatar.cc/100?img=47',
-    'is_private': true,
-  },
-  {
-    'id': 'b2',
-    'guest_name': 'Daniel Kim',
-    'tour_title': 'Cairo Food Experience',
-    'detail_label': '3 people · Oct 28',
-    'avatar_url': 'https://i.pravatar.cc/100?img=12',
-    'is_private': false,
-  },
-];
+/// The "New bookings" rows of the dashboard, derived from the very same
+/// booking records the details screen reads.
+final List<Map<String, dynamic>> mockBookingRequestsRaw = mockBookingDetailsRaw
+    .map(
+      (booking) => <String, dynamic>{
+        'id': booking['id'],
+        'guest_name': booking['guest_name'],
+        'tour_title': booking['tour_title'],
+        'detail_label': booking['detail_label'],
+        'avatar_url': booking['avatar_url'],
+        'is_private': booking['is_private'],
+      },
+    )
+    .toList();

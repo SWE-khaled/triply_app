@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/location_tag_chip.dart';
-import '../../../common/AuthTourist/providers/auth_provider.dart'; 
+import '../../../common/AuthTourist/cubit/auth_cubit.dart';
 import '../model/community_post.dart';
 import 'post_images.dart';
-
 
 class PostCard extends StatelessWidget {
   final CommunityPost post;
@@ -31,8 +30,7 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final currentUser = context.watch<AuthProvider>().user;
+    final currentUser = context.watch<AuthCubit>().user;
     final avatarUrl = post.isMine
         ? (currentUser?.photoURL ?? post.authorAvatarUrl)
         : post.authorAvatarUrl;

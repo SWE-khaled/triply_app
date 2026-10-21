@@ -1,18 +1,30 @@
-import '../model/guide_trip.dart';
+part of 'guide_trips_cubit.dart';
 
-class GuideTripsState {
+@immutable
+sealed class GuideTripsState {
+  const GuideTripsState();
+}
+
+final class GuideTripsInitial extends GuideTripsState {
+  const GuideTripsInitial();
+}
+
+final class GuideTripsLoading extends GuideTripsState {
+  const GuideTripsLoading();
+}
+
+final class GuideTripsSuccess extends GuideTripsState {
+  /// The tab the list is filtered by.
   final GuideTripStatus selectedStatus;
+
+  /// The trips of that tab.
   final List<GuideTrip> trips;
 
-  const GuideTripsState({required this.selectedStatus, required this.trips});
+  const GuideTripsSuccess({required this.selectedStatus, required this.trips});
+}
 
-  GuideTripsState copyWith({
-    GuideTripStatus? selectedStatus,
-    List<GuideTrip>? trips,
-  }) {
-    return GuideTripsState(
-      selectedStatus: selectedStatus ?? this.selectedStatus,
-      trips: trips ?? this.trips,
-    );
-  }
+final class GuideTripsError extends GuideTripsState {
+  final String error;
+
+  const GuideTripsError({required this.error});
 }

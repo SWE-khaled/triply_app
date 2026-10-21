@@ -24,12 +24,17 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                   color: AuthColors.lightCircleBg,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(Icons.check,
-                    color: AuthColors.successTeal, size: 44),
+                child: const Icon(
+                  Icons.check,
+                  color: AuthColors.successTeal,
+                  size: 44,
+                ),
               ),
               const SizedBox(height: 24),
-              const Text('Password Reset!',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+              const Text(
+                'Password Reset!',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 12),
               const Text(
                 'Your password has been updated successfully. Sign in with your new password.',
@@ -40,7 +45,9 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               AuthButton(
                 label: 'Back to Sign In',
                 onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                    SignInScreen.routeName, (route) => false),
+                  SignInScreen.routeName,
+                  (route) => false,
+                ),
               ),
             ],
           ),

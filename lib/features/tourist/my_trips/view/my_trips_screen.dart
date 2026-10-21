@@ -137,8 +137,9 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
                                 alignment: Alignment.center,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                ),
                                 decoration: BoxDecoration(
                                   color: selected
                                       ? AppColors.tabSelectedBg
@@ -187,42 +188,45 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 4, bottom: 6),
-                            child: Row(
-                              children: [
-                                BookingKindIcon(isPrivate: isPrivate),
-                                if (isPending) ...[
-                                  const SizedBox(width: 12),
-                                  const PendingApprovalLabel(),
-                                ],
-                                const Spacer(),
-                                GestureDetector(
-                                  onTap: () => _confirmDelete(trip),
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.background,
-                                      border: Border.all(
-                                          color: AppColors.cardBorder),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(
-                                      Icons.delete_outline,
-                                      size: 18,
-                                      color: AppColors.accentOrange,
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 4,
+                                bottom: 6,
+                              ),
+                              child: Row(
+                                children: [
+                                  BookingKindIcon(isPrivate: isPrivate),
+                                  if (isPending) ...[
+                                    const SizedBox(width: 12),
+                                    const PendingApprovalLabel(),
+                                  ],
+                                  const Spacer(),
+                                  GestureDetector(
+                                    onTap: () => _confirmDelete(trip),
+                                    behavior: HitTestBehavior.opaque,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.background,
+                                        border: Border.all(
+                                          color: AppColors.cardBorder,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete_outline,
+                                        size: 18,
+                                        color: AppColors.accentOrange,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          TripCard(
-                            trip: trip,
-                            currencyLabel: isPrivate ? '\$' : 'EGP',
-                            onTap: () => _openDetails(trip),
+                            TripCard(
+                              trip: trip,
+                              currencyLabel: isPrivate ? '\$' : 'EGP',
+                              onTap: () => _openDetails(trip),
                               onViewDetails: () => _openDetails(trip),
                               // Chat: placeholder — no chat screen exists yet.
                               onChat: () {},

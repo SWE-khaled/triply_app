@@ -125,97 +125,98 @@ class _MapScreenState extends State<MapScreen> {
           bottom: false, // <-- let the map reach the bottom of the screen
           child: BlocBuilder<MapCubit, MapState>(
             builder: (context, _) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: MapSearchField(
-                controller: searchController,
-                searchQuery: controller.searchQuery,
-                onChanged: _onSearchChanged,
-                onSubmitted: _onSearchSubmitted,
-                onClear: () {
-                  searchController.clear();
-                  controller.clearSearch();
-                  _focusSelected();
-                },
-              ),
-            ),
-            MapFilterChips(
-              selectedFilter: controller.selectedFilter,
-              onFilterSelected: _onFilterSelected,
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: Stack(
-                children: [
-                  fmap.FlutterMap(
-                    mapController: _mapController,
-                    options: fmap.MapOptions(
-                      initialCenter: _initialCenter,
-                      initialZoom: _initialZoom,
-                    ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: MapSearchField(
+                    controller: searchController,
+                    searchQuery: controller.searchQuery,
+                    onChanged: _onSearchChanged,
+                    onSubmitted: _onSearchSubmitted,
+                    onClear: () {
+                      searchController.clear();
+                      controller.clearSearch();
+                      _focusSelected();
+                    },
+                  ),
+                ),
+                MapFilterChips(
+                  selectedFilter: controller.selectedFilter,
+                  onFilterSelected: _onFilterSelected,
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: Stack(
                     children: [
-                      fmap.TileLayer(
-                        urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.example.triply_app',
+                      fmap.FlutterMap(
+                        mapController: _mapController,
+                        options: fmap.MapOptions(
+                          initialCenter: _initialCenter,
+                          initialZoom: _initialZoom,
+                        ),
+                        children: [
+                          fmap.TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.example.triply_app',
+                          ),
+                          fmap.MarkerLayer(markers: _markers),
+                        ],
                       ),
-                      fmap.MarkerLayer(markers: _markers),
+                      if (selected != null)
+                        Positioned(
+                          left: 16,
+                          right: 16,
+                          bottom: 100, // keeps the card above the nav
+                          child: PlacePreviewCard(
+                            place: selected,
+                            onTap: () => _openPlaceDetail(selected),
+                            onViewDetails: () => _openPlaceDetail(selected),
+                          ),
+                        ),
+                      if (controller.visiblePlaces.isEmpty)
+                        const Positioned(
+                          left: 16,
+                          right: 16,
+                          bottom: 100,
+                          child: Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Text('No places found in Egypt.'),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                  if (selected != null)
-                    Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: 100, // keeps the card above the nav
-                      child: PlacePreviewCard(
-                        place: selected,
-                        onTap: () => _openPlaceDetail(selected),
-                        onViewDetails: () => _openPlaceDetail(selected),
-                      ),
-                    ),
-                  if (controller.visiblePlaces.isEmpty)
-                    const Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: 100,
-                      child: Card(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text('No places found in Egypt.'),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
             ),
           ),
         ),
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: 2,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
-            );
-          } else if (index == 1) {
-            Navigator.of(context).push(AppRoutes.myTrips());
-          } else if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const CommunityScreen()),
-            );
-          } else if (index == 4) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            );
-          }
-        },
+        bottomNavigationBar: AppBottomNav(
+          currentIndex: 2,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+              );
+            } else if (index == 1) {
+              Navigator.of(context).push(AppRoutes.myTrips());
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CommunityScreen()),
+              );
+            } else if (index == 4) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            }
+          },
+        ),
       ),
-    ));
+    );
   }
 }

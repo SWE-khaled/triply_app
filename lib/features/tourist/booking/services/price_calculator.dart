@@ -1,11 +1,13 @@
-
 class PriceCalculator {
   PriceCalculator._();
 
   static const double serviceFeeRate = 0.05;
 
   static double subtotal(
-      double pricePerHour, int durationHours, int travelers) {
+    double pricePerHour,
+    int durationHours,
+    int travelers,
+  ) {
     return pricePerHour * durationHours * travelers;
   }
 

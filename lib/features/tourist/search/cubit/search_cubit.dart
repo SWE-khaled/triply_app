@@ -8,11 +8,10 @@ import 'search_state.dart';
 /// Searches the existing Map places list (single source of truth).
 /// Popular searches / destinations reference Map places by id.
 class SearchCubit extends Cubit<SearchState> {
-  final List<Place> allPlaces =
-      mockPlaces.map(Place.fromJson).toList();
+  final List<Place> allPlaces = mockPlaces.map(Place.fromJson).toList();
 
   SearchCubit()
-      : super(SearchState(recentSearches: List.of(mockRecentSearches)));
+    : super(SearchState(recentSearches: List.of(mockRecentSearches)));
 
   static const _popularSearchIds = [
     'giza_pyramids',
@@ -35,38 +34,37 @@ class SearchCubit extends Cubit<SearchState> {
   List<String> get recentSearches => state.recentSearches;
   bool get submitted => state.submitted;
 
-  Place _byId(String id) => allPlaces.firstWhere(
-        (p) => p.id == id,
-        orElse: () => allPlaces.first,
-      );
+  Place _byId(String id) =>
+      allPlaces.firstWhere((p) => p.id == id, orElse: () => allPlaces.first);
 
-  List<Place> get popularSearches =>
-      [for (final id in _popularSearchIds) _byId(id)];
+  List<Place> get popularSearches => [
+    for (final id in _popularSearchIds) _byId(id),
+  ];
 
-  List<Place> get popularDestinations =>
-      [for (final id in _popularDestinationIds) _byId(id)];
+  List<Place> get popularDestinations => [
+    for (final id in _popularDestinationIds) _byId(id),
+  ];
 
   List<Place> get results {
     if (!state.submitted || state.query.trim().isEmpty) return [];
     final q = state.query.trim().toLowerCase();
     return allPlaces
-        .where((p) =>
-            p.name.toLowerCase().contains(q) ||
-            p.city.toLowerCase().contains(q) ||
-            p.category.toLowerCase().contains(q) ||
-            p.address.toLowerCase().contains(q))
+        .where(
+          (p) =>
+              p.name.toLowerCase().contains(q) ||
+              p.city.toLowerCase().contains(q) ||
+              p.category.toLowerCase().contains(q) ||
+              p.address.toLowerCase().contains(q),
+        )
         .toList();
   }
 
   bool get showEmptyState =>
       state.submitted && state.query.trim().isNotEmpty && results.isEmpty;
-  bool get showDefaultContent =>
-      !state.submitted || state.query.trim().isEmpty;
+  bool get showDefaultContent => !state.submitted || state.query.trim().isEmpty;
 
   void setQuery(String value) {
-    emit(
-      state.copyWith(query: value, submitted: value.trim().isNotEmpty),
-    );
+    emit(state.copyWith(query: value, submitted: value.trim().isNotEmpty));
   }
 
   void clearQuery() {
@@ -82,7 +80,9 @@ class SearchCubit extends Cubit<SearchState> {
         recents.removeLast();
       }
     }
-    emit(state.copyWith(query: value, submitted: true, recentSearches: recents));
+    emit(
+      state.copyWith(query: value, submitted: true, recentSearches: recents),
+    );
   }
 
   void setFilter(SearchFilter filter) {
@@ -92,8 +92,7 @@ class SearchCubit extends Cubit<SearchState> {
   void removeRecent(String value) {
     emit(
       state.copyWith(
-        recentSearches:
-            state.recentSearches.where((r) => r != value).toList(),
+        recentSearches: state.recentSearches.where((r) => r != value).toList(),
       ),
     );
   }

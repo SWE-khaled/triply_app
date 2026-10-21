@@ -27,9 +27,10 @@ class EmergencyContactCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFEEEEEE)),
         boxShadow: const [
           BoxShadow(
-              color: AppColors.cardShadow,
-              blurRadius: 8,
-              offset: Offset(0, 2)),
+            color: AppColors.cardShadow,
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
         ],
       ),
       child: Row(
@@ -60,9 +61,10 @@ class EmergencyContactCard extends StatelessWidget {
                 Text(
                   contact.number,
                   style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textDark),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textDark,
+                  ),
                 ),
               ],
             ),
@@ -70,8 +72,7 @@ class EmergencyContactCard extends StatelessWidget {
           IconButton(
             onPressed: onCopy,
             tooltip: 'Copy number',
-            icon: const Icon(Icons.copy_outlined,
-                color: AppColors.textGrey),
+            icon: const Icon(Icons.copy_outlined, color: AppColors.textGrey),
           ),
           const SizedBox(width: 4),
           ElevatedButton.icon(
@@ -80,9 +81,9 @@ class EmergencyContactCard extends StatelessWidget {
               backgroundColor: AppColors.guidesName,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             ),
             icon: const Icon(Icons.call_outlined, size: 18),
             label: const Text('Call'),

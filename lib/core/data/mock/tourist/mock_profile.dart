@@ -6,10 +6,6 @@ const Map<String, int> mockProfileStats = {
   'reviews': 0,
 };
 
-const List<String> mockLanguages = [
-  'English',
-  'Arabic',
-  'French',
-];
+const List<String> mockLanguages = ['English', 'Arabic', 'French'];
 
 const String mockDefaultLanguage = 'English';

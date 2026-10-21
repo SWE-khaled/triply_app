@@ -19,7 +19,8 @@ class GuidesCubit extends Cubit<GuidesState> {
   List<Guide> get filteredGuides {
     final q = state.searchQuery.trim().toLowerCase();
     return _allGuides.where((g) {
-      final matchesSearch = q.isEmpty ||
+      final matchesSearch =
+          q.isEmpty ||
           g.name.toLowerCase().contains(q) ||
           g.specialty.toLowerCase().contains(q);
       final matchesLang =

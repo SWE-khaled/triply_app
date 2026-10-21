@@ -15,15 +15,20 @@ class EmptyState extends StatelessWidget {
         children: [
           const Text('🔍', style: TextStyle(fontSize: 56)),
           const SizedBox(height: 16),
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryTeal)),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryTeal,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: AppColors.textGrey)),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: AppColors.textGrey),
+          ),
         ],
       ),
     );

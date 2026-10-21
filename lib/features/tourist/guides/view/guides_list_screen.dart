@@ -42,43 +42,43 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
           value: _controller,
           child: BlocBuilder<GuidesCubit, GuidesState>(
             builder: (context, _) {
-            final guides = _controller.filteredGuides;
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _buildHeader()),
-                SliverToBoxAdapter(child: _buildSearch()),
-                SliverToBoxAdapter(child: _buildFilters()),
-                if (guides.isEmpty)
-                  SliverToBoxAdapter(child: _EmptyState())
-                else
-                  SliverPadding(
-                    padding: EdgeInsetsGeometry.only(
-                      right: 12,
-                      bottom: 16,
-                      left: 12,
+              final guides = _controller.filteredGuides;
+              return CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: _buildHeader()),
+                  SliverToBoxAdapter(child: _buildSearch()),
+                  SliverToBoxAdapter(child: _buildFilters()),
+                  if (guides.isEmpty)
+                    SliverToBoxAdapter(child: _EmptyState())
+                  else
+                    SliverPadding(
+                      padding: EdgeInsetsGeometry.only(
+                        right: 12,
+                        bottom: 16,
+                        left: 12,
+                      ),
+                      sliver: SliverList.separated(
+                        itemCount: guides.length,
+                        separatorBuilder: (_, _) => SizedBox(height: 12),
+                        itemBuilder: (context, i) {
+                          final g = guides[i];
+                          return GuideCard(
+                            guide: g,
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      GuideProfileScreen(guideId: g.id),
+                                ),
+                              );
+                            },
+                            onChatPressed: () {},
+                          );
+                        },
+                      ),
                     ),
-                    sliver: SliverList.separated(
-                      itemCount: guides.length,
-                      separatorBuilder: (_, _) => SizedBox(height: 12),
-                      itemBuilder: (context, i) {
-                        final g = guides[i];
-                        return GuideCard(
-                          guide: g,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    GuideProfileScreen(guideId: g.id),
-                              ),
-                            );
-                          },
-                          onChatPressed: () {},
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            );
+                ],
+              );
             },
           ),
         ),
@@ -160,13 +160,13 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
             selected: selected,
             onSelected: (_) => _controller.setLanguage(lang),
             showCheckmark: false,
-            avatar: _controller.languageFilters[i]!="All"
-                ?Icon(
-              Icons.translate,
-              size: 15,
-              color: selected ? Colors.white : Color(0xFF526B72),
-            )
-                :null ,
+            avatar: _controller.languageFilters[i] != "All"
+                ? Icon(
+                    Icons.translate,
+                    size: 15,
+                    color: selected ? Colors.white : Color(0xFF526B72),
+                  )
+                : null,
             labelStyle: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,

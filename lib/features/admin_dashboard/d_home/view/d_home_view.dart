@@ -5,7 +5,6 @@ import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_app_bottom_nav.dart';
 import '../../d_auth/cubit/admin_auth_cubit.dart';
-import '../../d_auth/cubit/admin_auth_state.dart';
 import '../../d_overview/view/d_overview_view.dart';
 import '../../d_trips/view/d_trips_view.dart';
 import '../../d_users/view/d_users_view.dart';
@@ -14,6 +13,7 @@ import '../../d_user_posts/view/d_user_posts_view.dart';
 import '../../d_guides/view/d_guides_view.dart';
 import '../../d_trip_applications/view/d_trip_applications_view.dart';
 import '../../d_app_settings/view/d_app_settings_view.dart';
+
 // ignore_for_file: unused_import
 
 /// Root admin shell — sidebar + indexed page body.
@@ -78,12 +78,11 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final adminName =
-        context.watch<AdminAuthCubit>().state.session?.name ?? 'Admin';
+    final adminName = context.watch<AdminAuthCubit>().session?.name ?? 'Admin';
     final meta = _PageMeta(_titles[_selectedIndex], 'Welcome back, $adminName');
     final isDesktop = MediaQuery.of(context).size.width >= 800;
 
-    // ── Desktop layout: permanent sidebar on the left ────────────────────
+    // Desktop layout: permanent sidebar on the left.
     if (isDesktop) {
       return Scaffold(
         backgroundColor: AppColors.background,
@@ -113,23 +112,23 @@ class _HomeViewState extends State<HomeView> {
       );
     }
 
-    // ── Mobile layout: hamburger menu + Drawer ────────────────────────────
+    // Mobile layout: hamburger menu + Drawer.
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: Drawer(
         width: 240,
-          child: AdminSidebar(
-            selectedIndex: _selectedIndex,
-            adminName: adminName,
-            onItemSelected: (i) {
-              setState(() => _selectedIndex = i);
-              Navigator.of(context).pop(); // close drawer
-            },
-            onLogout: () {
-              Navigator.of(context).pop();
-              _confirmLogout(context);
-            },
-          ),
+        child: AdminSidebar(
+          selectedIndex: _selectedIndex,
+          adminName: adminName,
+          onItemSelected: (i) {
+            setState(() => _selectedIndex = i);
+            Navigator.of(context).pop(); // close drawer
+          },
+          onLogout: () {
+            Navigator.of(context).pop();
+            _confirmLogout(context);
+          },
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,7 +247,6 @@ class _PageHeader extends StatelessWidget {
               ],
             ),
           ),
-
         ],
       ),
     );

@@ -65,7 +65,9 @@ class ProfileMenuSection extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            about,
+            about.isEmpty
+                ? 'Add an about to tell tourists what makes your tours special.'
+                : about,
             style: GoogleFonts.poppins(
               fontSize: 13,
               height: 1.6,

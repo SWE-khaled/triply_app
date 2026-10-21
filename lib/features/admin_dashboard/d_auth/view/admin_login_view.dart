@@ -5,7 +5,6 @@ import 'package:triply/features/common/AuthTourist/widgets/auth_header.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
 import 'package:triply/features/admin_dashboard/d_home/view/d_home_view.dart';
 import '../cubit/admin_auth_cubit.dart';
-import '../cubit/admin_auth_state.dart';
 import 'admin_create_account_view.dart';
 
 /// Admin Login — same visual design as the Tourist Login
@@ -37,8 +36,8 @@ class _AdminLoginViewState extends State<AdminLoginView> {
       password: _passwordController.text,
     );
     if (!mounted) return;
-    if (success && cubit.state.session != null) {
-      final session = cubit.state.session!;
+    if (success && cubit.session != null) {
+      final session = cubit.session!;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -48,10 +47,10 @@ class _AdminLoginViewState extends State<AdminLoginView> {
         ),
         (_) => false,
       );
-    } else if (cubit.state.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(cubit.state.errorMessage!)),
-      );
+    } else if (cubit.errorMessage != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(cubit.errorMessage!)));
     }
   }
 
@@ -106,8 +105,8 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) =>
                                 (value == null || !value.contains('@'))
-                                    ? 'Enter a valid email'
-                                    : null,
+                                ? 'Enter a valid email'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           const Text(
@@ -122,14 +121,13 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                             isPassword: true,
                             validator: (value) =>
                                 (value == null || value.length < 6)
-                                    ? 'Minimum 6 characters'
-                                    : null,
+                                ? 'Minimum 6 characters'
+                                : null,
                           ),
                           const SizedBox(height: 24),
                           AuthButton(
                             label: 'Log In',
-                            isLoading:
-                                state.status == AdminAuthStatus.loading,
+                            isLoading: state is AdminAuthLoading,
                             onPressed: () => _handleLogin(cubit),
                           ),
                           const SizedBox(height: 24),

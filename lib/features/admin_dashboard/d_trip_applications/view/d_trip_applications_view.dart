@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import '../../../../core/data/mock/dashboard/d_mock_places.dart';
+import '../../../../core/data/repositories/admin_trips_repository.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../data/mock/d_mock_places.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Trip Applications management screen.
+///
+/// The applications are the trips of every guide, read from Firestore.
+/// The approve / reject buttons write the decision back and tell the
+/// guide about it.
 class TripApplicationsView extends StatefulWidget {
   const TripApplicationsView({super.key});
 
@@ -15,14 +20,51 @@ class TripApplicationsView extends StatefulWidget {
 
 class _TripApplicationsViewState extends State<TripApplicationsView> {
   final TextEditingController _search = TextEditingController();
+  final AdminTripsRepository _repository = AdminTripsRepository();
+
   late List<MockTripApplication> _apps;
   String _query = '';
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
     _apps = List.from(mockTripApplications);
+    _load();
   }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  /// Reads the trips of every guide from Firestore.
+  Future<void> _load() async {
+    final trips = await _repository.fetchTrips();
+    if (!mounted) return;
+    setState(() {
+      _apps = trips.map(_toApplication).toList();
+      _loading = false;
+    });
+  }
+
+  /// Maps a Firestore trip onto the row the table renders.
+  MockTripApplication _toApplication(AdminTrip trip) => MockTripApplication(
+    tripId: trip.tripId,
+    tripTitle: trip.title,
+    guide: trip.guideName,
+    date: trip.scheduleLabel,
+    price: trip.priceLabel,
+    status: trip.approvalStatus,
+    type: 'public',
+    travelers: trip.travelers,
+    location: trip.location,
+    itinerary: trip.itinerary,
+    participants: const [],
+    imageUrl: trip.imageUrl,
+    rejectionReason: trip.rejectionReason,
+  );
 
   List<MockTripApplication> get _filtered {
     final q = _query.trim().toLowerCase();
@@ -36,32 +78,29 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
     }).toList();
   }
 
-  void _approve(int index) {
-    setState(() {
-      final a = _apps[index];
-      _apps[index] = MockTripApplication(
-        tripTitle: a.tripTitle,
-        guide: a.guide,
-        date: a.date,
-        price: a.price,
-        status: 'approved',
-        type: a.type,
-        travelers: a.travelers,
-        location: a.location,
-        itinerary: a.itinerary,
-        participants: a.participants,
-        imageUrl: a.imageUrl,
-      );
-    });
+  /// Approves a trip and tells the guide.
+  Future<void> _approve(MockTripApplication app) async {
+    if (app.tripId.isEmpty) return;
+    final ok = await _repository.decide(tripId: app.tripId, approve: true);
+    if (!mounted) return;
+    if (!ok) {
+      _toast('Could not approve the trip. Are you signed in as an admin?');
+      return;
+    }
+    await _load();
   }
 
-  void _reject(int index) {
+  /// Rejects a trip with a reason and tells the guide.
+  Future<void> _reject(MockTripApplication app) async {
     final reasonController = TextEditingController();
-    showDialog(
+    final reason = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Reject Application', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Reject Application',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: SizedBox(
           width: 400,
           child: Column(
@@ -87,39 +126,46 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() {
-                final a = _apps[index];
-                _apps[index] = MockTripApplication(
-                  tripTitle: a.tripTitle,
-                  guide: a.guide,
-                  date: a.date,
-                  price: a.price,
-                  status: 'rejected',
-                  type: a.type,
-                  travelers: a.travelers,
-                  location: a.location,
-                  itinerary: a.itinerary,
-                  participants: a.participants,
-                  imageUrl: a.imageUrl,
-                  rejectionReason: reasonController.text,
-                );
-              });
-              Navigator.pop(ctx);
-            },
+            onPressed: () => Navigator.pop(ctx, reasonController.text.trim()),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
-            child: const Text('Confirm Reject', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Confirm Reject',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
     );
+    reasonController.dispose();
+    if (reason == null) return;
+    if (app.tripId.isEmpty) return;
+    final ok = await _repository.decide(
+      tripId: app.tripId,
+      approve: false,
+      rejectionReason: reason,
+    );
+    if (!mounted) return;
+    if (!ok) {
+      _toast('Could not reject the trip. Are you signed in as an admin?');
+      return;
+    }
+    await _load();
+  }
+
+  void _toast(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _showReviewDialog(MockTripApplication app) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('${app.tripTitle} - ${app.type.toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          '${app.tripTitle} - ${app.type.toUpperCase()}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: SizedBox(
           width: 500,
           child: SingleChildScrollView(
@@ -137,40 +183,68 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
                     errorBuilder: (context, error, stackTrace) => Container(
                       height: 200,
                       color: Colors.grey[200],
-                      child: const Center(child: Icon(Icons.image, size: 50, color: Colors.grey)),
+                      child: const Center(
+                        child: Icon(Icons.image, size: 50, color: Colors.grey),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Date: ${app.date}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'Date: ${app.date}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Text('Travelers: ${app.travelers} travelers'),
                 Text('Location: ${app.location}'),
-                Text('Price: ${app.price}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                Text(
+                  'Price: ${app.price}',
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 16),
-                const Text('Itinerary:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Text(
+                  'Itinerary:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
                 const SizedBox(height: 8),
-                ...app.itinerary.asMap().entries.map((e) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text('${(e.key + 1).toString().padLeft(2, '0')} ${e.value}'),
-                )),
+                ...app.itinerary.asMap().entries.map(
+                  (e) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      '${(e.key + 1).toString().padLeft(2, '0')} ${e.value}',
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 16),
-                const Text('Participants:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Text(
+                  'Participants:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                  children: app.participants.map((p) => Chip(
-                    label: Text(p),
-                    backgroundColor: Colors.blue.withValues(alpha: 0.1),
-                    side: BorderSide.none,
-                  )).toList(),
+                  children: app.participants
+                      .map(
+                        (p) => Chip(
+                          label: Text(p),
+                          backgroundColor: Colors.blue.withValues(alpha: 0.1),
+                          side: BorderSide.none,
+                        ),
+                      )
+                      .toList(),
                 ),
               ],
             ),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
@@ -192,7 +266,6 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
                         'Search, review, edit and control all trip applications.',
                   ),
                 ),
-
               ],
             ),
             const SizedBox(height: 20),
@@ -206,18 +279,24 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
 
             // Application rows (no headers — each is a standalone row)
             ..._filtered.asMap().entries.map(
-                  (entry) => _ApplicationItem(
-                    app: entry.value,
-                    onApprove: () => _approve(_apps.indexOf(entry.value)),
-                    onReject: () => _reject(_apps.indexOf(entry.value)),
-                    onReview: () => _showReviewDialog(entry.value),
-                    isFirst: entry.key == 0,
+              (entry) => _ApplicationItem(
+                app: entry.value,
+                onApprove: () => _approve(entry.value),
+                onReject: () => _reject(entry.value),
+                onReview: () => _showReviewDialog(entry.value),
+                isFirst: entry.key == 0,
+              ),
+            ),
+            if (_filtered.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Text(
+                    _loading
+                        ? 'Loading applications...'
+                        : 'No applications found.',
                   ),
                 ),
-            if (_filtered.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: Text('No applications found.')),
               ),
           ],
         ),
@@ -243,8 +322,7 @@ class _ApplicationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isProcessed =
-        app.status == 'approved' || app.status == 'rejected';
+    final isProcessed = app.status == 'approved' || app.status == 'rejected';
 
     return Column(
       children: [
@@ -261,28 +339,41 @@ class _ApplicationItem extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Text(app.tripTitle,
-                              style: AppTextStyles.tableCell.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                          child: Text(
+                            app.tripTitle,
+                            style: AppTextStyles.tableCell.copyWith(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1),
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
-                            color: app.type == 'private' ? Colors.purple.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.1),
+                            color: app.type == 'private'
+                                ? Colors.purple.withValues(alpha: 0.1)
+                                : Colors.blue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: app.type == 'private' ? Colors.purple.withValues(alpha: 0.3) : Colors.blue.withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: app.type == 'private'
+                                  ? Colors.purple.withValues(alpha: 0.3)
+                                  : Colors.blue.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Text(
                             app.type.toUpperCase(),
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: app.type == 'private' ? Colors.purple : Colors.blue,
+                              color: app.type == 'private'
+                                  ? Colors.purple
+                                  : Colors.blue,
                             ),
                           ),
                         ),
@@ -295,11 +386,17 @@ class _ApplicationItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    if (app.status == 'rejected' && app.rejectionReason != null && app.rejectionReason!.isNotEmpty) ...[
+                    if (app.status == 'rejected' &&
+                        app.rejectionReason != null &&
+                        app.rejectionReason!.isNotEmpty) ...[
                       const SizedBox(height: 6),
                       Text(
                         'Reason for rejection: ${app.rejectionReason}',
-                        style: const TextStyle(color: AppColors.danger, fontSize: 13, fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                          color: AppColors.danger,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ],

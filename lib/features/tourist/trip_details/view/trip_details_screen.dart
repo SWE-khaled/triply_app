@@ -69,8 +69,10 @@ class TripDetailsScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          _bookingRow('People',
-              '${entry.seats} ${entry.seats == 1 ? 'person' : 'people'}'),
+          _bookingRow(
+            'People',
+            '${entry.seats} ${entry.seats == 1 ? 'person' : 'people'}',
+          ),
           const SizedBox(height: 6),
           _bookingRow('Total paid', 'EGP ${formatEgp(entry.totalPaid)}'),
           const SizedBox(height: 6),
@@ -119,14 +121,13 @@ class TripDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _openGuideProfile(BuildContext context, String guideName) {    final guide = mockGuides.firstWhere(
+  void _openGuideProfile(BuildContext context, String guideName) {
+    final guide = mockGuides.firstWhere(
       (g) => g.name == guideName,
       orElse: () => mockGuides.first,
     );
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => GuideProfileScreen(guideId: guide.id),
-      ),
+      MaterialPageRoute(builder: (_) => GuideProfileScreen(guideId: guide.id)),
     );
   }
 
@@ -190,10 +191,8 @@ class TripDetailsScreen extends StatelessWidget {
                           builder: (context, snapshot) => GuideCard(
                             details: details,
                             guidePhone: snapshot.data,
-                            onTap: () => _openGuideProfile(
-                              context,
-                              details.guideName,
-                            ),
+                            onTap: () =>
+                                _openGuideProfile(context, details.guideName),
                           ),
                         ),
                         if (isBooked) ...[

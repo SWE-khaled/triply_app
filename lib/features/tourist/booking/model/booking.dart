@@ -1,4 +1,3 @@
-
 class Booking {
   final String id;
   final String guideId;

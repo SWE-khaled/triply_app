@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_routes.dart';
-import '../../../common/AuthTourist/providers/auth_provider.dart';
+import '../../../common/AuthTourist/cubit/auth_cubit.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;
@@ -76,7 +76,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
     setState(() => _loading = true);
     try {
-      final auth = context.read<AuthProvider>();
+      final auth = context.read<AuthCubit>();
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         if (mounted) {

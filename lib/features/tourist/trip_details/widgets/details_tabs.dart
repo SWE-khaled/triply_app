@@ -23,19 +23,27 @@ class DetailsTabs extends StatelessWidget {
           child: GestureDetector(
             onTap: () => onSelected(i),
             behavior: HitTestBehavior.opaque,
-            child: Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: selected ? AppColors.tabSelectedBg : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Text(
-                tabs[i],
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: selected ? Colors.white : AppColors.subtitle,
+            // The labels are spread over the row, but the selected pill
+            // hugs its own label instead of filling a slot.
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.tabSelectedBg
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  tabs[i],
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: selected ? Colors.white : AppColors.subtitle,
+                  ),
                 ),
               ),
             ),

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../../core/data/mock/dashboard/d_mock_places.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
-import '../../../../data/mock/d_mock_places.dart';
 import '../../d_home/view/d_home_view.dart';
 
-/// User Posts management screen — grid of post cards.
 class UserPostsView extends StatefulWidget {
   const UserPostsView({super.key});
 
@@ -50,10 +49,10 @@ class _UserPostsViewState extends State<UserPostsView> {
                 Expanded(
                   child: CardSectionHeader(
                     title: 'Manage User Posts',
-                    subtitle: 'Search, review, edit and control all user posts.',
+                    subtitle:
+                        'Search, review, edit and control all user posts.',
                   ),
                 ),
-
               ],
             ),
             const SizedBox(height: 20),
@@ -79,14 +78,16 @@ class _UserPostsViewState extends State<UserPostsView> {
                     spacing: 16,
                     runSpacing: 16,
                     children: _filtered
-                        .map((p) => SizedBox(
-                              width: cardW,
-                              child: _PostCard(
-                                post: p,
-                                onRemove: () => _removePost(p),
-                                onView: () => _viewPost(p),
-                              ),
-                            ))
+                        .map(
+                          (p) => SizedBox(
+                            width: cardW,
+                            child: _PostCard(
+                              post: p,
+                              onRemove: () => _removePost(p),
+                              onView: () => _viewPost(p),
+                            ),
+                          ),
+                        )
                         .toList(),
                   );
                 },
@@ -106,15 +107,30 @@ class _UserPostsViewState extends State<UserPostsView> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(post.imageUrl, height: 200, width: double.infinity, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => const Icon(Icons.image, size: 50)),
+            Image.network(
+              post.imageUrl,
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.image, size: 50),
+            ),
             const SizedBox(height: 16),
-            Text('Author: ${post.author}', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              'Author: ${post.author}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            const Text('This is a great post about a trip! Here would be the full content.'),
+            const Text(
+              'This is a great post about a trip! Here would be the full content.',
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
@@ -125,7 +141,11 @@ class _PostCard extends StatelessWidget {
   final MockPost post;
   final VoidCallback onRemove;
   final VoidCallback onView;
-  const _PostCard({required this.post, required this.onRemove, required this.onView});
+  const _PostCard({
+    required this.post,
+    required this.onRemove,
+    required this.onView,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -156,8 +176,11 @@ class _PostCard extends StatelessWidget {
               errorBuilder: (context, error, stackTrace) => Container(
                 height: 180,
                 color: AppColors.statBadgeBg.withValues(alpha: 1.0),
-                child: const Icon(Icons.image_outlined,
-                    size: 48, color: AppColors.textMuted),
+                child: const Icon(
+                  Icons.image_outlined,
+                  size: 48,
+                  color: AppColors.textMuted,
+                ),
               ),
             ),
           ),

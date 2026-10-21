@@ -15,8 +15,8 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   final PaymobService _service;
 
   CheckoutCubit({required this.summary, PaymobService? service})
-      : _service = service ?? PaymobService(),
-        super(const CheckoutState());
+    : _service = service ?? PaymobService(),
+      super(const CheckoutState());
 
   // ----- Card form state (kept in memory for masked display only) -----
   String cardNumber = '';
@@ -136,8 +136,9 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   /// Masked card for the summary screen, e.g. "Visa •••• 3456".
   String get maskedCard {
     final digits = cardNumber.replaceAll(RegExp(r'\D'), '');
-    final last4 =
-        digits.length >= 4 ? digits.substring(digits.length - 4) : '••••';
+    final last4 = digits.length >= 4
+        ? digits.substring(digits.length - 4)
+        : '••••';
     return '$_brand •••• $last4';
   }
 

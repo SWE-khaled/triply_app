@@ -115,7 +115,9 @@ class RejectedGuideTripCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  trip.rejectionReason ?? '',
+                  (trip.rejectionReason ?? '').trim().isEmpty
+                      ? 'No reason was given by the admin.'
+                      : trip.rejectionReason!.trim(),
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     height: 1.5,

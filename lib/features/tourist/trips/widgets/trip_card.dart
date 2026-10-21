@@ -78,8 +78,6 @@ class TripCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              
-
                             ],
                           ),
                           const SizedBox(height: 3),
@@ -170,9 +168,9 @@ class TripCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                              Text(
-                                currencyLabel,
-                                style: GoogleFonts.poppins(
+                                Text(
+                                  currencyLabel,
+                                  style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.price,

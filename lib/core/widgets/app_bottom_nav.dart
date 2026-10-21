@@ -86,11 +86,7 @@ class AppBottomNav extends StatelessWidget {
                           scale: selected ? 1.1 : 1.0,
                           duration: const Duration(milliseconds: 180),
                           curve: Curves.easeOut,
-                          child: Icon(
-                            _icons[i],
-                            size: 25,
-                            color: color,
-                          ),
+                          child: Icon(_icons[i], size: 25, color: color),
                         ),
                       ),
                     );

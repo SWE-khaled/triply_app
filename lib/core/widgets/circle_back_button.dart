@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 /// Round icon button. Defaults to a white back button with shadow.
 /// Pass [icon]/[backgroundColor]/[iconColor] for use over images.
 class CircleBackButton extends StatelessWidget {
@@ -24,8 +22,7 @@ class CircleBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final callback =
-        onTap ?? onPressed ?? () => Navigator.maybePop(context);
+    final callback = onTap ?? onPressed ?? () => Navigator.maybePop(context);
     return GestureDetector(
       onTap: callback,
       behavior: HitTestBehavior.opaque,
@@ -49,4 +46,3 @@ class CircleBackButton extends StatelessWidget {
     );
   }
 }
-

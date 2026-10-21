@@ -1,20 +1,32 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/data/mock/tourguide/mock_travelers.dart';
+import '../../../../core/utils/safe_emit_mixin.dart';
+
+import '../../../../core/data/repositories/guide_dashboard_repository.dart';
 import '../model/traveler.dart';
-import 'travelers_state.dart';
 
-/// Traveler list for one guide trip (mock -> Model, static in this phase).
-class TravelersCubit extends Cubit<TravelersState> {
-  TravelersCubit() : super(const TravelersState(travelers: []));
+part 'travelers_state.dart';
 
-  void loadTrip(String tripId) {
-    emit(
-      TravelersState(
-        travelers: mockTravelersJson
-            .map((e) => Traveler.fromJson(e))
-            .where((t) => t.tripId == tripId)
-            .toList(),
-      ),
-    );
+/// The travelers booked on one guide trip.
+///
+/// Reads the bookings of the trip from Firestore, with the mock dataset
+/// as fallback.
+class TravelersCubit extends Cubit<TravelersState>
+    with SafeEmitMixin<TravelersState> {
+  TravelersCubit({GuideDashboardRepository? repository})
+    : _repository = repository ?? GuideDashboardRepository(),
+      super(const TravelersInitial());
+
+  final GuideDashboardRepository _repository;
+
+  /// Loads the travelers of [tripId].
+  Future<void> loadTrip(String tripId) async {
+    safeEmit(const TravelersLoading());
+    try {
+      final travelers = await _repository.fetchTravelers(tripId);
+      safeEmit(TravelersSuccess(travelers: travelers));
+    } catch (e) {
+      safeEmit(TravelersError(error: e.toString()));
+    }
   }
 }

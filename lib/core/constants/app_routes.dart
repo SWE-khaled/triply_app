@@ -22,7 +22,6 @@ import '../../features/tourist/my_trips/view/my_trips_screen.dart';
 import '../../features/tourist/popular/cubit/popular_cubit.dart';
 import '../../features/tourist/popular/view/popular_trips_screen.dart';
 
-
 /// Single route table: named routes (String constants) + route builders.
 /// Views navigate via these builders, never inline MaterialPageRoute.
 class AppRoutes {

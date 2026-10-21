@@ -3,19 +3,20 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/common/AuthTourguide/view/tour_guide_login_screen.dart';
-import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
+import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/tour_guide_colors.dart';
 import '../../../../core/services/cloudinary_service.dart';
-
 
 class TourGuideVerificationScreen extends StatefulWidget {
   const TourGuideVerificationScreen({super.key});
 
   @override
-  State<TourGuideVerificationScreen> createState() => _TourGuideVerificationScreenState();
+  State<TourGuideVerificationScreen> createState() =>
+      _TourGuideVerificationScreenState();
 }
 
-class _TourGuideVerificationScreenState extends State<TourGuideVerificationScreen> {
+class _TourGuideVerificationScreenState
+    extends State<TourGuideVerificationScreen> {
   PlatformFile? _idFile;
   PlatformFile? _licenseFile;
   bool _isLoading = false;
@@ -52,9 +53,9 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking file: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error picking file: $e')));
     }
   }
 
@@ -64,7 +65,9 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Authentication error. Please log in again.')),
+        const SnackBar(
+          content: Text('Authentication error. Please log in again.'),
+        ),
       );
       return;
     }
@@ -75,7 +78,10 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
 
     try {
       final idDocUrl = await _cloudinaryService.uploadFile(_idFile!, user.uid);
-      final licenseDocUrl = await _cloudinaryService.uploadFile(_licenseFile!, user.uid);
+      final licenseDocUrl = await _cloudinaryService.uploadFile(
+        _licenseFile!,
+        user.uid,
+      );
 
       await _authService.submitVerificationDocuments(
         idDocumentUrl: idDocUrl,
@@ -114,7 +120,8 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
 
   @override
   Widget build(BuildContext context) {
-    final bool canSubmit = _idFile != null && _licenseFile != null && !_isLoading;
+    final bool canSubmit =
+        _idFile != null && _licenseFile != null && !_isLoading;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -123,13 +130,21 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
           children: [
             // Top Bar with back + skip
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Back Button
                   GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>TourGuideLoginScreen())),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TourGuideLoginScreen(),
+                      ),
+                    ),
                     child: Container(
                       width: 44,
                       height: 44,
@@ -141,20 +156,31 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                           width: 1,
                         ),
                       ),
-                      child: const Icon(Icons.arrow_back, color: TourGuideColors.deepNile, size: 20),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: TourGuideColors.deepNile,
+                        size: 20,
+                      ),
                     ),
                   ),
                   // Skip for now
                   TextButton(
-                    onPressed: _isLoading ? null : () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => const GuideDashboardScreen()),
-                        (route) => false,
-                      );
-                    },
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const GuideDashboardScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          },
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       backgroundColor: const Color(0xFFF5F5F5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -224,7 +250,10 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE8E8E8), width: 1),
+                        border: Border.all(
+                          color: const Color(0xFFE8E8E8),
+                          width: 1,
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,9 +282,14 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEDF6F8), // very light teal background
+                        color: const Color(
+                          0xFFEDF6F8,
+                        ), // very light teal background
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFFB8D8DF), width: 1),
+                        border: Border.all(
+                          color: const Color(0xFFB8D8DF),
+                          width: 1,
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,7 +307,9 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                             'You can use your dashboard while your documents are being reviewed, but you can\'t publish trips yet.',
                             style: TextStyle(
                               fontSize: 13,
-                              color: TourGuideColors.deepNile.withValues(alpha: 0.70),
+                              color: TourGuideColors.deepNile.withValues(
+                                alpha: 0.70,
+                              ),
                               height: 1.4,
                             ),
                           ),
@@ -296,7 +332,8 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                     _buildUploadBox(
                       number: '2',
                       title: 'Upload guide license',
-                      subtitle: 'Tourism ID, syndicate card or professional license',
+                      subtitle:
+                          'Tourism ID, syndicate card or professional license',
                       file: _licenseFile,
                       onTap: _isLoading ? null : () => _pickFile(2),
                     ),
@@ -307,7 +344,9 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: canSubmit ? TourGuideColors.deepNile : const Color(0xFF7A9B9F),
+                          backgroundColor: canSubmit
+                              ? TourGuideColors.deepNile
+                              : const Color(0xFF7A9B9F),
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
@@ -315,20 +354,23 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
                           elevation: 0,
                         ),
                         onPressed: canSubmit ? _submitForReview : null,
-                        child: _isLoading 
-                          ? const SizedBox(
-                              height: 20, 
-                              width: 20, 
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                            )
-                          : const Text(
-                              'Submit for Review',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : const Text(
+                                'Submit for Review',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -348,10 +390,7 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
       children: [
         const Text(
           '• ',
-          style: TextStyle(
-            color: TourGuideColors.deepNile,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: TourGuideColors.deepNile, fontSize: 13),
         ),
         Expanded(
           child: Text(
@@ -375,14 +414,16 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
     required VoidCallback? onTap,
   }) {
     final bool hasFile = file != null;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
         decoration: BoxDecoration(
-          color: hasFile ? const Color(0xFFF0F8F5) : Colors.white, // Subtle green tint if selected
+          color: hasFile
+              ? const Color(0xFFF0F8F5)
+              : Colors.white, // Subtle green tint if selected
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: hasFile ? Colors.green : const Color(0xFFD8D8D8),
@@ -394,7 +435,9 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
             Icon(
               hasFile ? Icons.check_circle : Icons.upload_outlined,
               size: 32,
-              color: hasFile ? Colors.green : TourGuideColors.deepNile.withValues(alpha: 0.70),
+              color: hasFile
+                  ? Colors.green
+                  : TourGuideColors.deepNile.withValues(alpha: 0.70),
             ),
             const SizedBox(height: 12),
             Text(
@@ -413,10 +456,7 @@ class _TourGuideVerificationScreenState extends State<TourGuideVerificationScree
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF7A9B9F),
-                ),
+                style: const TextStyle(fontSize: 13, color: Color(0xFF7A9B9F)),
               ),
             ] else ...[
               const SizedBox(height: 6),

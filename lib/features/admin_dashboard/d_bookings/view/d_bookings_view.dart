@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../data/mock/d_mock_notifications.dart';
+import '../../../../core/data/mock/dashboard/d_mock_notifications.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Bookings management screen.
@@ -52,7 +52,6 @@ class _BookingsViewState extends State<BookingsView> {
                     subtitle: 'Search, review, edit and control all bookings.',
                   ),
                 ),
-
               ],
             ),
             const SizedBox(height: 20),
@@ -97,10 +96,9 @@ class _BookingsViewState extends State<BookingsView> {
             ),
             const Divider(color: AppColors.divider, height: 1),
 
-            ..._filtered.map((b) => _BookingRow(
-                  booking: b,
-                  onView: () => _showDetails(b),
-                )),
+            ..._filtered.map(
+              (b) => _BookingRow(booking: b, onView: () => _showDetails(b)),
+            ),
             if (_filtered.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
@@ -113,13 +111,13 @@ class _BookingsViewState extends State<BookingsView> {
   }
 
   Widget _h(String label, int flex, {bool end = false}) => Expanded(
-        flex: flex,
-        child: Text(
-          label,
-          style: AppTextStyles.tableHeader,
-          textAlign: end ? TextAlign.end : TextAlign.start,
-        ),
-      );
+    flex: flex,
+    child: Text(
+      label,
+      style: AppTextStyles.tableHeader,
+      textAlign: end ? TextAlign.end : TextAlign.start,
+    ),
+  );
 }
 
 class _BookingRow extends StatelessWidget {
@@ -138,36 +136,41 @@ class _BookingRow extends StatelessWidget {
             children: [
               Expanded(
                 flex: 3,
-                child: Text(booking.user,
-                    style: AppTextStyles.tableCell,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  booking.user,
+                  style: AppTextStyles.tableCell,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 3,
-                child: Text(booking.trip,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  booking.trip,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 3,
-                child: Text(booking.guide,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  booking.guide,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 2,
-                child: Text(booking.date,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  booking.date,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
-              Expanded(
-                flex: 2,
-                child: StatusChip(status: booking.status),
-              ),
+              Expanded(flex: 2, child: StatusChip(status: booking.status)),
               Expanded(
                 flex: 2,
                 child: Text(booking.price, style: AppTextStyles.tableCellMuted),
@@ -180,9 +183,7 @@ class _BookingRow extends StatelessWidget {
                 flex: 2,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    OutlineActionButton(label: 'View', onTap: onView),
-                  ],
+                  children: [OutlineActionButton(label: 'View', onTap: onView)],
                 ),
               ),
             ],
@@ -213,21 +214,27 @@ class _ViewBookingDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text('Booking Details',
-                        style: AppTextStyles.dialogTitle),
+                    child: Text(
+                      'Booking Details',
+                      style: AppTextStyles.dialogTitle,
+                    ),
                   ),
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 7),
+                        horizontal: 14,
+                        vertical: 7,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.divider),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text('Close',
-                          style: AppTextStyles.buttonSecondary),
+                      child: Text(
+                        'Close',
+                        style: AppTextStyles.buttonSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -258,9 +265,7 @@ class _ViewBookingDialog extends StatelessWidget {
             width: 100,
             child: Text(label, style: AppTextStyles.fieldLabel),
           ),
-          Expanded(
-            child: Text(value, style: AppTextStyles.tableCell),
-          ),
+          Expanded(child: Text(value, style: AppTextStyles.tableCell)),
         ],
       ),
     );

@@ -91,8 +91,7 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
     if (!mounted) return;
     navigator.pop(); // Dismiss the loading dialog.
     if (token == null) {
-      final message =
-          checkout.payError ?? 'Payment failed. Please try again.';
+      final message = checkout.payError ?? 'Payment failed. Please try again.';
       checkout.dispose();
       messenger.showSnackBar(SnackBar(content: Text(message)));
       return;
@@ -103,11 +102,22 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
         builder: (_) => PaymobWebviewScreen(
           paymentToken: token,
           guideName: trip.guideName,
-          onSuccess: () {
-            final booking = cubit.confirm(
+          onSuccess: () async {
+            final booking = await cubit.confirm(
               tripId: trip.id,
               unitPrice: details.priceEgp,
             );
+            if (!mounted) return;
+            if (booking == null) {
+              messenger.showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'This trip just filled up. Please pick another one.',
+                  ),
+                ),
+              );
+              return;
+            }
             navigator.pushReplacement(
               AppRoutes.bookingConfirmed(
                 trip: trip,

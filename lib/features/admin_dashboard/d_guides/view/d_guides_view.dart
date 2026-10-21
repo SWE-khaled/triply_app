@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../data/mock/d_mock_guides.dart';
+import '../../../../core/data/repositories/admin_guides_repository.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Guides verification management screen.
@@ -14,69 +14,129 @@ class GuidesView extends StatefulWidget {
 }
 
 class _GuidesViewState extends State<GuidesView> {
-  late List<MockGuide> _guides;
+  final AdminGuidesRepository _repository = AdminGuidesRepository();
+
+  List<AdminGuide> _guides = const [];
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _guides = List.from(mockGuides);
+    _load();
   }
 
-  int get _pendingCount =>
-      _guides.where((g) => g.status == 'pending').length;
-
-  void _approve(MockGuide guide) {
+  /// Reads the guide accounts and their verification state.
+  Future<void> _load() async {
+    final guides = await _repository.fetchGuides();
+    if (!mounted) return;
     setState(() {
-      final i = _guides.indexOf(guide);
-      _guides[i] = MockGuide(
-        name: guide.name,
-        email: guide.email,
-        document: guide.document,
-        city: guide.city,
-        status: 'approved',
-        phone: guide.phone,
-        submitted: guide.submitted,
-        docFileName: guide.docFileName,
-        uploadedTrips: guide.uploadedTrips,
-      );
+      _guides = guides;
+      _loading = false;
     });
   }
 
-  void _reject(MockGuide guide) {
-    setState(() {
-      final i = _guides.indexOf(guide);
-      _guides[i] = MockGuide(
-        name: guide.name,
-        email: guide.email,
-        document: guide.document,
-        city: guide.city,
-        status: 'suspended', // Use suspended to act as rejected/blocked in UI
-        phone: guide.phone,
-        submitted: guide.submitted,
-        docFileName: guide.docFileName,
-        uploadedTrips: guide.uploadedTrips,
-      );
-    });
+  int get _pendingCount => _guides.where((g) => g.status == 'pending').length;
+
+  void _toast(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _suspend(MockGuide guide) {
-    setState(() {
-      final i = _guides.indexOf(guide);
-      _guides[i] = MockGuide(
-        name: guide.name,
-        email: guide.email,
-        document: guide.document,
-        city: guide.city,
-        status: 'suspended',
-        phone: guide.phone,
-        submitted: guide.submitted,
-        docFileName: guide.docFileName,
-        uploadedTrips: guide.uploadedTrips,
-      );
-    });
+  /// Approves the guide's documents and writes the decision back.
+  Future<void> _approve(AdminGuide guide) async {
+    final ok = await _repository.decideVerification(
+      guideId: guide.uid,
+      approve: true,
+    );
+    if (!mounted) return;
+    if (!ok) {
+      _toast('Could not approve the guide.');
+      return;
+    }
+    await _load();
   }
 
-  void _showDetails(MockGuide guide) {
+  /// Rejects the guide's documents and writes the decision back.
+  Future<void> _reject(AdminGuide guide) async {
+    final reason = await _askRejectionReason();
+    if (reason == null || !mounted) return;
+    final ok = await _repository.decideVerification(
+      guideId: guide.uid,
+      approve: false,
+      rejectionReason: reason,
+    );
+    if (!mounted) return;
+    if (!ok) {
+      _toast('Could not reject the guide.');
+      return;
+    }
+    await _load();
+  }
+
+  /// Asks the admin why the documents were refused.
+  Future<String?> _askRejectionReason() async {
+    final controller = TextEditingController();
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: const Text(
+          'Reject application',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Please provide a reason for rejection:'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'e.g., the license is not readable...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            child: const Text(
+              'Confirm Reject',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    return reason;
+  }
+
+  /// Suspends the guide — they can no longer publish or be booked.
+  Future<void> _suspend(AdminGuide guide) async {
+    final ok = await _repository.suspendGuide(guide.uid);
+    if (!mounted) return;
+    if (!ok) {
+      _toast('Could not suspend the guide.');
+      return;
+    }
+    await _load();
+  }
+
+  void _showDetails(AdminGuide guide) {
     showDialog(
       context: context,
       builder: (_) => _GuideDetailsDialog(guide: guide),
@@ -103,7 +163,9 @@ class _GuidesViewState extends State<GuidesView> {
                 if (_pendingCount > 0)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 7),
+                      horizontal: 14,
+                      vertical: 7,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.statusPendingBg,
                       borderRadius: BorderRadius.circular(20),
@@ -144,6 +206,16 @@ class _GuidesViewState extends State<GuidesView> {
                 onDetails: () => _showDetails(g),
               ),
             ),
+            if (_loading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            if (!_loading && _guides.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No guide accounts yet.')),
+              ),
           ],
         ),
       ),
@@ -151,17 +223,17 @@ class _GuidesViewState extends State<GuidesView> {
   }
 
   Widget _h(String label, int flex, {bool end = false}) => Expanded(
-        flex: flex,
-        child: Text(
-          label,
-          style: AppTextStyles.tableHeader,
-          textAlign: end ? TextAlign.end : TextAlign.start,
-        ),
-      );
+    flex: flex,
+    child: Text(
+      label,
+      style: AppTextStyles.tableHeader,
+      textAlign: end ? TextAlign.end : TextAlign.start,
+    ),
+  );
 }
 
 class _GuideRow extends StatelessWidget {
-  final MockGuide guide;
+  final AdminGuide guide;
   final VoidCallback onApprove;
   final VoidCallback onReject;
   final VoidCallback onSuspend;
@@ -192,14 +264,18 @@ class _GuideRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(guide.name,
-                        style: AppTextStyles.tableCell,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
-                    Text(guide.email,
-                        style: AppTextStyles.tableCellMuted,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1),
+                    Text(
+                      guide.name,
+                      style: AppTextStyles.tableCell,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      guide.email,
+                      style: AppTextStyles.tableCellMuted,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ],
                 ),
               ),
@@ -209,10 +285,12 @@ class _GuideRow extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Text(guide.document,
-                          style: AppTextStyles.tableCellMuted,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1),
+                      child: Text(
+                        guide.document,
+                        style: AppTextStyles.tableCellMuted,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     InkWell(
@@ -225,16 +303,15 @@ class _GuideRow extends StatelessWidget {
               // City
               Expanded(
                 flex: 2,
-                child: Text(guide.city,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  guide.city,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               // Status chip
-              Expanded(
-                flex: 2,
-                child: StatusChip(status: guide.status),
-              ),
+              Expanded(flex: 2, child: StatusChip(status: guide.status)),
               // Actions
               Expanded(
                 flex: 4,
@@ -272,16 +349,18 @@ class _GuideRow extends StatelessWidget {
 
 /// Guide details modal — shown on "Details" / "View file" tap.
 class _GuideDetailsDialog extends StatelessWidget {
-  final MockGuide guide;
+  final AdminGuide guide;
   const _GuideDetailsDialog({required this.guide});
 
-  void _showTripDialog(BuildContext context, MockUploadedTrip trip) {
+  void _showTripDialog(BuildContext context, AdminGuideTrip trip) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(trip.title,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          trip.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: Text('Status: ${trip.status}'),
         actions: [
           TextButton(
@@ -325,12 +404,17 @@ class _GuideDetailsDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 7),
+                        horizontal: 14,
+                        vertical: 7,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.divider),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text('Close', style: AppTextStyles.buttonSecondary),
+                      child: Text(
+                        'Close',
+                        style: AppTextStyles.buttonSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -358,7 +442,9 @@ class _GuideDetailsDialog extends StatelessWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     child: _InfoField(
-                        label: 'Submitted', value: guide.submitted),
+                      label: 'Submitted',
+                      value: guide.submitted,
+                    ),
                   ),
                 ],
               ),
@@ -381,18 +467,25 @@ class _GuideDetailsDialog extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(guide.document,
-                                  style: AppTextStyles.sectionTitle.copyWith(
-                                      fontSize: 15)),
-                              Text(guide.docFileName,
-                                  style: AppTextStyles.tableCellMuted),
+                              Text(
+                                guide.document,
+                                style: AppTextStyles.sectionTitle.copyWith(
+                                  fontSize: 15,
+                                ),
+                              ),
+                              Text(
+                                guide.docFileName,
+                                style: AppTextStyles.tableCellMuted,
+                              ),
                             ],
                           ),
                         ),
                         ElevatedButton(
                           onPressed: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Downloading document...')),
+                              const SnackBar(
+                                content: Text('Downloading document...'),
+                              ),
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -401,10 +494,14 @@ class _GuideDetailsDialog extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                           ),
-                          child: Text('Download',
-                              style: AppTextStyles.buttonPrimary),
+                          child: Text(
+                            'Download',
+                            style: AppTextStyles.buttonPrimary,
+                          ),
                         ),
                       ],
                     ),
@@ -420,11 +517,16 @@ class _GuideDetailsDialog extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.article_outlined,
-                              size: 40, color: AppColors.textMuted),
+                          const Icon(
+                            Icons.article_outlined,
+                            size: 40,
+                            color: AppColors.textMuted,
+                          ),
                           const SizedBox(height: 8),
-                          Text('Document preview',
-                              style: AppTextStyles.tableCellMuted),
+                          Text(
+                            'Document preview',
+                            style: AppTextStyles.tableCellMuted,
+                          ),
                         ],
                       ),
                     ),
@@ -448,23 +550,29 @@ class _GuideDetailsDialog extends StatelessWidget {
                               border: Border.all(color: AppColors.divider),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(t.title,
-                                      style: AppTextStyles.tableCell,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2),
-                                  Text(t.status,
-                                      style: AppTextStyles.tableCellMuted),
-                                  const SizedBox(height: 8),
-                                  InkWell(
-                                    onTap: () => _showTripDialog(context, t),
-                                    child: Text('View full trip',
-                                        style: AppTextStyles.linkText),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  t.title,
+                                  style: AppTextStyles.tableCell,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                                Text(
+                                  t.status,
+                                  style: AppTextStyles.tableCellMuted,
+                                ),
+                                const SizedBox(height: 8),
+                                InkWell(
+                                  onTap: () => _showTripDialog(context, t),
+                                  child: Text(
+                                    'View full trip',
+                                    style: AppTextStyles.linkText,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       )
@@ -497,10 +605,12 @@ class _InfoField extends StatelessWidget {
         children: [
           Text(label, style: AppTextStyles.tableCellMuted),
           const SizedBox(height: 4),
-          Text(value,
-              style: AppTextStyles.fieldValue,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2),
+          Text(
+            value,
+            style: AppTextStyles.fieldValue,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
         ],
       ),
     );

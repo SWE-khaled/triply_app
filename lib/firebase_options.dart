@@ -68,8 +68,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '396641823945',
     projectId: 'triply-f9b82',
     storageBucket: 'triply-f9b82.firebasestorage.app',
-    androidClientId: '396641823945-8ocqjhhbk0mj82k9ds085dov653m3jcu.apps.googleusercontent.com',
-    iosClientId: '396641823945-3um5pcg2ckh3bb482nfeib4tnres28uc.apps.googleusercontent.com',
+    androidClientId:
+        '396641823945-8ocqjhhbk0mj82k9ds085dov653m3jcu.apps.googleusercontent.com',
+    iosClientId:
+        '396641823945-3um5pcg2ckh3bb482nfeib4tnres28uc.apps.googleusercontent.com',
     iosBundleId: 'com.example.triply',
   );
 }

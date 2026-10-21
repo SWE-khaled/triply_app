@@ -5,13 +5,11 @@ import 'notifications_state.dart';
 
 class NotificationsCubit extends Cubit<NotificationsState> {
   NotificationsCubit()
-      : super(
-          NotificationsState(
-            items: mockNotificationsRaw
-                .map(NotificationItem.fromJson)
-                .toList(),
-          ),
-        );
+    : super(
+        NotificationsState(
+          items: mockNotificationsRaw.map(NotificationItem.fromJson).toList(),
+        ),
+      );
 
   List<NotificationItem> get today =>
       state.items.where((e) => e.section == 'today').toList();

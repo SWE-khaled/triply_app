@@ -41,15 +41,17 @@ class HomeCubit extends Cubit<HomeState> {
     // Same Local Guides source as See All, but Home shows only 2.
     final guides = guides_src.mockGuides
         .take(2)
-        .map((g) => Guide(
-              id: g.id,
-              name: g.name,
-              specialty: g.specialty,
-              avatarUrl: g.avatarUrl,
-              rating: g.rating,
-              reviewCount: g.reviewCount,
-              pricePerHour: g.pricePerHour,
-            ))
+        .map(
+          (g) => Guide(
+            id: g.id,
+            name: g.name,
+            specialty: g.specialty,
+            avatarUrl: g.avatarUrl,
+            rating: g.rating,
+            reviewCount: g.reviewCount,
+            pricePerHour: g.pricePerHour,
+          ),
+        )
         .toList();
     final trips = mockTripsRaw.map(Trip.fromJson).toList();
     emit(state.copyWith(places: places, guides: guides, trips: trips));
@@ -71,9 +73,10 @@ class HomeCubit extends Cubit<HomeState> {
     emit(
       state.copyWith(
         places: state.places
-            .map((p) => p.id == placeId
-                ? p.copyWith(isFavorite: !p.isFavorite)
-                : p)
+            .map(
+              (p) =>
+                  p.id == placeId ? p.copyWith(isFavorite: !p.isFavorite) : p,
+            )
             .toList(),
       ),
     );

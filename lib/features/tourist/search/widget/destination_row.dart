@@ -43,20 +43,30 @@ class DestinationRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryTeal)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryTeal,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(subtitle,
-                      style: const TextStyle(
-                          fontSize: 12, color: AppColors.textGrey)),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textGrey,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right,
-                size: 18, color: AppColors.textGrey),
+            const Icon(
+              Icons.chevron_right,
+              size: 18,
+              color: AppColors.textGrey,
+            ),
           ],
         ),
       ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import '../constants/auth_colors.dart';
-import '../providers/auth_provider.dart';
+import '../cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
@@ -36,7 +36,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   /// Egyptian mobile validation: 10 digits starting with 10/11/12/15
-  /// (accepts 01…, +20…, 0020… forms too).
+  /// (accepts 01..., +20..., 0020... forms too).
   static String? validateEgyptianPhone(String? value) {
     if (_egyptianLocalDigits(value) == null) {
       return 'Enter a valid Egyptian mobile (e.g. 1012345678)';
@@ -62,9 +62,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     return digits;
   }
 
-  Future<void> _handleCreateAccount(AuthProvider authProvider) async {
+  Future<void> _handleCreateAccount(AuthCubit authCubit) async {
     if (!_formKey.currentState!.validate()) return;
-    final success = await authProvider.signUp(
+    final success = await authCubit.signUp(
       fullName: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -72,16 +72,16 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     );
     if (success && mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
-    } else if (mounted && authProvider.errorMessage != null) {
+    } else if (mounted && authCubit.errorMessage != null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(authProvider.errorMessage!)));
+      ).showSnackBar(SnackBar(content: Text(authCubit.errorMessage!)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authCubit = context.watch<AuthCubit>();
 
     return Scaffold(
       body: Column(
@@ -222,8 +222,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     AuthButton(
                       label: 'Create Account',
                       backgroundColor: AuthColors.darkTeal,
-                      isLoading: authProvider.isLoading,
-                      onPressed: () => _handleCreateAccount(authProvider),
+                      isLoading: authCubit.isLoading,
+                      onPressed: () => _handleCreateAccount(authCubit),
                     ),
                     const SizedBox(height: 20),
                     Center(

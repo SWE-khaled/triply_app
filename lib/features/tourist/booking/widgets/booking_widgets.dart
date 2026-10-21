@@ -182,9 +182,10 @@ class SummaryRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(label,
-              style:
-                  const TextStyle(fontSize: 13, color: AppColors.subtitle)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          ),
           const Spacer(),
           Text(
             value,

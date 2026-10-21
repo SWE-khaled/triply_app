@@ -1,21 +1,32 @@
-import '../model/guide_trip_details.dart';
+part of 'guide_trip_details_cubit.dart';
 
-class GuideTripDetailsState {
-  final GuideTripDetails? details;
+@immutable
+sealed class GuideTripDetailsState {
+  const GuideTripDetailsState();
+}
+
+final class GuideTripDetailsInitial extends GuideTripDetailsState {
+  const GuideTripDetailsInitial();
+}
+
+final class GuideTripDetailsLoading extends GuideTripDetailsState {
+  const GuideTripDetailsLoading();
+}
+
+final class GuideTripDetailsSuccess extends GuideTripDetailsState {
+  final GuideTripDetails details;
+
+  /// The tab the details are showing.
   final int selectedTab;
 
-  const GuideTripDetailsState({
+  const GuideTripDetailsSuccess({
     required this.details,
     required this.selectedTab,
   });
+}
 
-  GuideTripDetailsState copyWith({
-    GuideTripDetails? details,
-    int? selectedTab,
-  }) {
-    return GuideTripDetailsState(
-      details: details ?? this.details,
-      selectedTab: selectedTab ?? this.selectedTab,
-    );
-  }
+final class GuideTripDetailsError extends GuideTripDetailsState {
+  final String error;
+
+  const GuideTripDetailsError({required this.error});
 }

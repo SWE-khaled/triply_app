@@ -1,17 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/data/guide_trips_store.dart';
+import '../../../../core/data/repositories/guide_trips_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
+import '../../my_trips_tg/model/guide_trip.dart';
 
 /// Guide availability derived from the guide's own trips (same
-/// [GuideTripsStore] source as My Trips): each trip with its schedule.
-class GuideAvailabilityScreen extends StatelessWidget {
+/// [GuideTripsRepository] source as My Trips): each trip with its
+/// schedule. The list updates live.
+class GuideAvailabilityScreen extends StatefulWidget {
   const GuideAvailabilityScreen({super.key});
 
   @override
+  State<GuideAvailabilityScreen> createState() =>
+      _GuideAvailabilityScreenState();
+}
+
+class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
+  late final Stream<List<GuideTrip>> _trips;
+
+  @override
+  void initState() {
+    super.initState();
+    _trips = GuideTripsRepository().watchTrips();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final trips = GuideTripsStore.allTrips();
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -43,58 +58,68 @@ class GuideAvailabilityScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              if (trips.isEmpty)
-                Text(
-                  'No trips yet — availability will appear here once you add trips.',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: AppColors.subtitle,
-                  ),
-                )
-              else
-                for (final trip in trips)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: AppColors.cardBorder),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.calendar_today_outlined,
-                          size: 20,
-                          color: AppColors.priceTeal,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              StreamBuilder<List<GuideTrip>>(
+                stream: _trips,
+                builder: (context, snapshot) {
+                  final trips = snapshot.data ?? const <GuideTrip>[];
+                  if (trips.isEmpty) {
+                    return Text(
+                      'No trips yet — availability will appear here once you add trips.',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: AppColors.subtitle,
+                      ),
+                    );
+                  }
+                  return Column(
+                    children: [
+                      for (final trip in trips)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: AppColors.cardBorder),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
                             children: [
-                              Text(
-                                trip.title,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.title,
-                                ),
+                              const Icon(
+                                Icons.calendar_today_outlined,
+                                size: 20,
+                                color: AppColors.priceTeal,
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                trip.scheduleLabel,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: AppColors.subtitle,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      trip.title,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.title,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      trip.scheduleLabel,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        color: AppColors.subtitle,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                    ],
+                  );
+                },
+              ),
             ],
           ),
         ),

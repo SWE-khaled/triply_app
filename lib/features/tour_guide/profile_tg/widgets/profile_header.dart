@@ -1,25 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../tourist/guides/model/guide.dart';
+import '../../../../core/widgets/profile_avatar.dart';
 
 /// Cover photo + avatar + identity block (Figma header part).
 /// Pure display: values + edit callback in, no controller.
+///
+/// Every value comes from the signed-in guide's own account — the
+/// tourist-facing listing of the mock guides is never used here.
 class ProfileHeader extends StatelessWidget {
-  final Guide guide;
+  /// The guide's name.
   final String displayName;
+
+  /// The guide's photo URL, or the bundled default.
   final String displayAvatar;
+
+  /// The location the guide set, or empty.
   final String? displayLocation;
+
+  /// The phone number the guide set, or null.
   final String? displayPhone;
+
+  /// Whether the admin approved this guide.
+  final bool isVerified;
+
+  /// The guide's specialty, or empty when they have not set one.
+  final String specialty;
+
+  /// The guide's average rating (0 when there are no reviews yet).
+  final double rating;
+
+  /// How many reviews the guide has (0 when there are none yet).
+  final int reviewCount;
+
   final VoidCallback? onEdit;
 
   const ProfileHeader({
     super.key,
-    required this.guide,
     required this.displayName,
     required this.displayAvatar,
     this.displayLocation,
     this.displayPhone,
+    this.isVerified = false,
+    this.specialty = '',
+    this.rating = 0,
+    this.reviewCount = 0,
     this.onEdit,
   });
 
@@ -46,17 +71,9 @@ class ProfileHeader extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 3),
                   ),
                   child: ClipOval(
-                    child: Image.network(
-                      displayAvatar,
+                    child: ProfileAvatar(
+                      imageUrl: displayAvatar,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        color: const Color(0xFFE6ECEF),
-                        child: const Icon(
-                          Icons.person,
-                          color: AppColors.subtitle,
-                          size: 40,
-                        ),
-                      ),
                     ),
                   ),
                 ),
@@ -77,7 +94,7 @@ class ProfileHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    if (guide.isVerified)
+                    if (isVerified)
                       Container(
                         width: 20,
                         height: 20,
@@ -94,39 +111,53 @@ class ProfileHeader extends StatelessWidget {
                       ),
                   ],
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  guide.specialty,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.85),
+                if (specialty.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    specialty,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
                   ),
-                ),
+                ],
                 const SizedBox(height: 10),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.star, size: 13, color: AppColors.starGold),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${guide.rating} (${guide.reviewCount})',
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                    if (reviewCount > 0) ...[
+                      const Icon(
+                        Icons.star,
+                        size: 13,
+                        color: AppColors.starGold,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        '$rating ($reviewCount)',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    if (displayLocation != null &&
+                        displayLocation!.isNotEmpty) ...[
+                      const Icon(
+                        Icons.location_on,
+                        size: 13,
                         color: Colors.white,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.location_on,
-                        size: 13, color: Colors.white),
-                    const SizedBox(width: 2),
-                    Text(
-                      displayLocation ?? guide.location,
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        color: Colors.white,
+                      const SizedBox(width: 2),
+                      Text(
+                        displayLocation!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
                 if (displayPhone != null && displayPhone!.isNotEmpty) ...[

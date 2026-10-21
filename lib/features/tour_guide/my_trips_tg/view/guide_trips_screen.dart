@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:triply/features/tour_guide/homeandNotificationTr/view/guide_dashboard_screen.dart';
+import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/data/guide_trip_details_source.dart';
+import '../../../../core/widgets/state_views.dart';
 import '../cubit/guide_trips_cubit.dart';
-import '../cubit/guide_trips_state.dart';
 import '../model/guide_trip.dart';
-import '../../homeandNotificationTr/widget/guide_bottom_nav.dart';
+import '../../home_and_notification_tg/widget/guide_bottom_nav.dart';
 import '../widgets/guide_trip_card.dart';
 import '../widgets/rejected_guide_trip_card.dart';
 
 /// Guide-side trips: create + manage own trips.
 /// Self-provides its cubit so every entry (route table, main, tabs)
-/// works — never rely on an ancestor provider.
-/// Create/View/Manage destinations don't exist in Figma yet → toasts.
+/// works â€” never rely on an ancestor provider.
+/// Create/View/Manage destinations don't exist in Figma yet â†’ toasts.
 class GuideTripsScreen extends StatelessWidget {
   /// Tab pre-selected on entry (e.g. from Dashboard cards).
   final GuideTripStatus initialStatus;
@@ -88,6 +88,24 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
     });
   }
 
+  /// Opens the edit form for a rejected trip. Saving it sends the trip
+  /// back for review.
+  void _openEditResubmit(BuildContext context, GuideTrip trip) {
+    final details = const GuideTripDetailsSource().getByTripId(
+      trip.id,
+      title: trip.title,
+      imageUrl: trip.imageUrl,
+      priceEgp: trip.priceEgp,
+    );
+    Navigator.of(
+      context,
+    ).push(AppRoutes.editTrip(trip: trip, details: details)).then((_) {
+      if (context.mounted) {
+        context.read<GuideTripsCubit>().refresh();
+      }
+    });
+  }
+
   void _todo(String what) {
     showAppSnackBar(
       context,
@@ -106,19 +124,17 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 25, 16, 0),
-              child: Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 5,
-                  children: [
-                    Text('My Trips', style: AppTextStyles.screenTitle),
-                    Text(
-                      'Create and manage all your trips.',
-                      style: AppTextStyles.screenSubtitle,
-                    ),
-                    SizedBox(height: 5),
-                  ],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 5,
+                children: [
+                  Text('My Trips', style: AppTextStyles.screenTitle),
+                  Text(
+                    'Create and manage all your trips.',
+                    style: AppTextStyles.screenSubtitle,
+                  ),
+                  SizedBox(height: 5),
+                ],
               ),
             ),
             const SizedBox(height: 14),
@@ -186,10 +202,13 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: BlocBuilder<GuideTripsCubit, GuideTripsState>(
                 builder: (context, state) {
+                  final selectedStatus = state is GuideTripsSuccess
+                      ? state.selectedStatus
+                      : GuideTripStatus.active;
                   return Row(
                     children: List.generate(tabValues.length, (i) {
                       final value = tabValues[i];
-                      final selected = value == state.selectedStatus;
+                      final selected = value == selectedStatus;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: GestureDetector(
@@ -230,40 +249,49 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
             Expanded(
               child: BlocBuilder<GuideTripsCubit, GuideTripsState>(
                 builder: (context, state) {
-                  final trips = state.trips;
-                  if (trips.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'No ${GuideTripsCubit.label(state.selectedStatus).toLowerCase()} trips yet',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: AppColors.subtitle,
-                        ),
-                      ),
-                    );
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                    itemCount: trips.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final trip = trips[index];
-                      if (trip.status == GuideTripStatus.rejected) {
-                        return RejectedGuideTripCard(
-                          trip: trip,
-                          onPreview: () => _openDetails(context, trip),
-                          onEditResubmit: () =>
-                              _todo('Editing and resubmitting'),
-                        );
-                      }
-                      return GuideTripCard(
-                        trip: trip,
-                        onMenu: () => _todo('Trip options'),
-                        onView: () => _openDetails(context, trip),
-                        onManage: () => _openManage(context, trip),
-                      );
-                    },
-                  );
+                  return switch (state) {
+                    GuideTripsSuccess(:final trips) =>
+                      trips.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No ${GuideTripsCubit.label(state.selectedStatus).toLowerCase()} trips yet',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  color: AppColors.subtitle,
+                                ),
+                              ),
+                            )
+                          : ListView.separated(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                              itemCount: trips.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final trip = trips[index];
+                                if (trip.status == GuideTripStatus.rejected) {
+                                  return RejectedGuideTripCard(
+                                    trip: trip,
+                                    onPreview: () =>
+                                        _openDetails(context, trip),
+                                    onEditResubmit: () =>
+                                        _openEditResubmit(context, trip),
+                                  );
+                                }
+                                return GuideTripCard(
+                                  trip: trip,
+                                  onMenu: () => _todo('Trip options'),
+                                  onView: () => _openDetails(context, trip),
+                                  onManage: () => _openManage(context, trip),
+                                );
+                              },
+                            ),
+                    GuideTripsInitial() ||
+                    GuideTripsLoading() => const AppLoadingView(),
+                    GuideTripsError(:final error) => AppErrorView(
+                      message: error,
+                      onRetry: () => context.read<GuideTripsCubit>().refresh(),
+                    ),
+                  };
                 },
               ),
             ),
@@ -280,8 +308,15 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
             return;
           }
           if (i == 0) {
-            // Back to guide Home (dashboard pushed this screen).
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>GuideDashboardScreen()));
+            // Back to guide Home. The old screens are removed instead of
+            // stacked: every screen owns a live Firestore subscription,
+            // so keeping them alive would pile them up.
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => const GuideDashboardScreen(),
+              ),
+              (route) => route.isFirst,
+            );
             return;
           }
         },

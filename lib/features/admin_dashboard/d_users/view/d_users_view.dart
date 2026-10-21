@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../data/mock/d_mock_search.dart';
+import '../../../../core/data/mock/dashboard/d_mock_search.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Users management screen.
@@ -74,7 +74,6 @@ class _UsersViewState extends State<UsersView> {
                     subtitle: 'Search, review, edit and control all users.',
                   ),
                 ),
-
               ],
             ),
             const SizedBox(height: 20),
@@ -103,11 +102,13 @@ class _UsersViewState extends State<UsersView> {
             ),
             const Divider(color: AppColors.divider, height: 1),
 
-            ..._filtered.map((u) => _UserRow(
-              user: u,
-              onView: () => _showViewDialog(u),
-              onToggleStatus: () => _toggleUserStatus(u),
-            )),
+            ..._filtered.map(
+              (u) => _UserRow(
+                user: u,
+                onView: () => _showViewDialog(u),
+                onToggleStatus: () => _toggleUserStatus(u),
+              ),
+            ),
             if (_filtered.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
@@ -120,13 +121,13 @@ class _UsersViewState extends State<UsersView> {
   }
 
   Widget _h(String label, int flex, {bool end = false}) => Expanded(
-        flex: flex,
-        child: Text(
-          label,
-          style: AppTextStyles.tableHeader,
-          textAlign: end ? TextAlign.end : TextAlign.start,
-        ),
-      );
+    flex: flex,
+    child: Text(
+      label,
+      style: AppTextStyles.tableHeader,
+      textAlign: end ? TextAlign.end : TextAlign.start,
+    ),
+  );
 }
 
 class _UserRow extends StatelessWidget {
@@ -134,7 +135,11 @@ class _UserRow extends StatelessWidget {
   final VoidCallback onView;
   final VoidCallback onToggleStatus;
 
-  const _UserRow({required this.user, required this.onView, required this.onToggleStatus});
+  const _UserRow({
+    required this.user,
+    required this.onView,
+    required this.onToggleStatus,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -148,43 +153,50 @@ class _UserRow extends StatelessWidget {
             children: [
               Expanded(
                 flex: 3,
-                child: Text(user.name,
-                    style: AppTextStyles.tableCell,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  user.name,
+                  style: AppTextStyles.tableCell,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 3,
-                child: Text(user.email,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  user.email,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 3,
-                child: Text(user.phone,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  user.phone,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 2,
-                child: Text(user.type,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  user.type,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
               Expanded(
                 flex: 2,
-                child: Text(user.activity,
-                    style: AppTextStyles.tableCellMuted,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1),
+                child: Text(
+                  user.activity,
+                  style: AppTextStyles.tableCellMuted,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
-              Expanded(
-                flex: 2,
-                child: StatusChip(status: user.status),
-              ),
+              Expanded(flex: 2, child: StatusChip(status: user.status)),
               Expanded(
                 flex: 2,
                 child: Row(
@@ -193,8 +205,14 @@ class _UserRow extends StatelessWidget {
                     OutlineActionButton(label: 'View', onTap: onView),
                     const SizedBox(width: 6),
                     isSuspended
-                        ? OutlineActionButton(label: 'Activate', onTap: onToggleStatus)
-                        : DangerActionButton(label: 'Suspend', onTap: onToggleStatus),
+                        ? OutlineActionButton(
+                            label: 'Activate',
+                            onTap: onToggleStatus,
+                          )
+                        : DangerActionButton(
+                            label: 'Suspend',
+                            onTap: onToggleStatus,
+                          ),
                   ],
                 ),
               ),
@@ -205,7 +223,6 @@ class _UserRow extends StatelessWidget {
     );
   }
 }
-
 
 /// View User Details Dialog
 class _ViewUserDialog extends StatelessWidget {
@@ -227,18 +244,27 @@ class _ViewUserDialog extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text('User Details', style: AppTextStyles.dialogTitle),
+                    child: Text(
+                      'User Details',
+                      style: AppTextStyles.dialogTitle,
+                    ),
                   ),
                   InkWell(
                     onTap: () => Navigator.pop(context),
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 7,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(color: AppColors.divider),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text('Close', style: AppTextStyles.buttonSecondary),
+                      child: Text(
+                        'Close',
+                        style: AppTextStyles.buttonSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -267,9 +293,7 @@ class _ViewUserDialog extends StatelessWidget {
             width: 100,
             child: Text(label, style: AppTextStyles.fieldLabel),
           ),
-          Expanded(
-            child: Text(value, style: AppTextStyles.tableCell),
-          ),
+          Expanded(child: Text(value, style: AppTextStyles.tableCell)),
         ],
       ),
     );

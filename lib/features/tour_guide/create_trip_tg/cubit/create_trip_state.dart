@@ -1,37 +1,59 @@
-import '../model/guide_trip_draft.dart';
+part of 'create_trip_cubit.dart';
 
-/// Dynamic rows + picked cover path. Static fields live in the
-/// cubit's controllers. Cover stays a local file path (mock phase:
-/// picked from gallery, previewed, never uploaded — no backend yet).
-class CreateTripState {
+@immutable
+sealed class CreateTripState {
+  /// The highlight rows of the form.
   final List<HighlightDraft> highlights;
+
+  /// The itinerary rows of the form.
   final List<ItineraryStopDraft> itinerary;
-  final String? coverImagePath;
+
+  /// The cover of the trip.
+  ///
+  /// Either the local path of a freshly picked file, or the URL of the
+  /// cover the trip already has — so editing a trip shows its current
+  /// image instead of an empty box.
+  final String? cover;
 
   const CreateTripState({
     required this.highlights,
     required this.itinerary,
-    required this.coverImagePath,
+    required this.cover,
   });
+}
 
-  factory CreateTripState.initial() {
-    return const CreateTripState(
-      highlights: [HighlightDraft(id: 'h0', text: '')],
-      itinerary: [ItineraryStopDraft(id: 's0', time: '', activity: '')],
-      coverImagePath: null,
-    );
-  }
+/// The form is pristine — nothing typed yet.
+final class CreateTripInitial extends CreateTripState {
+  const CreateTripInitial()
+    : super(highlights: const [], itinerary: const [], cover: null);
+}
 
-  CreateTripState copyWith({
-    List<HighlightDraft>? highlights,
-    List<ItineraryStopDraft>? itinerary,
-    String? coverImagePath,
-    bool clearCover = false,
-  }) {
-    return CreateTripState(
-      highlights: highlights ?? this.highlights,
-      itinerary: itinerary ?? this.itinerary,
-      coverImagePath: clearCover ? null : coverImagePath ?? this.coverImagePath,
-    );
-  }
+/// The trip is being sent to Firestore.
+final class CreateTripLoading extends CreateTripState {
+  const CreateTripLoading({
+    required super.highlights,
+    required super.itinerary,
+    required super.cover,
+  });
+}
+
+/// The form content — ready to submit.
+final class CreateTripSuccess extends CreateTripState {
+  const CreateTripSuccess({
+    required super.highlights,
+    required super.itinerary,
+    required super.cover,
+  });
+}
+
+/// The trip could not be submitted.
+final class CreateTripError extends CreateTripState {
+  final String error;
+
+  const CreateTripError({
+    required super.highlights,
+    required super.itinerary,
+    required super.cover,
+    required this.error,
+  });
 }

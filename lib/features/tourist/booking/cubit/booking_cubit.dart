@@ -40,8 +40,7 @@ class BookingCubit extends Cubit<BookingState> {
     'Giza Plateau Gate',
   ];
 
-  List<Place> get places =>
-      mockPlaces.map((e) => Place.fromJson(e)).toList();
+  List<Place> get places => mockPlaces.map((e) => Place.fromJson(e)).toList();
 
   Place? get selectedPlace => state.selectedPlace;
 
@@ -68,7 +67,10 @@ class BookingCubit extends Cubit<BookingState> {
       PriceCalculator.durationHoursFor(state.durationLabel);
 
   double get subtotal => PriceCalculator.subtotal(
-      guide.pricePerHour, durationHours, state.travelers);
+    guide.pricePerHour,
+    durationHours,
+    state.travelers,
+  );
   double get serviceFee => PriceCalculator.serviceFee(subtotal);
   double get total =>
       PriceCalculator.total(guide.pricePerHour, durationHours, state.travelers);
