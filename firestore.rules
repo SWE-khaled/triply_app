@@ -44,19 +44,12 @@ service cloud.firestore {
 
       allow create: if isOwner(userId)
         && (
-          // A tourist or a guide claims their own role. The role is
-          // mandatory: `.get('role', '')` returns an empty string when the
-          // field is missing, and an empty string is in neither list — so
-          // a profile without a role can never be created.
-          //
-          // `.get(..., default)` on purpose: dot-access on a missing
-          // field ERRORS, and that error denies the whole rule.
-          (request.resource.data.get('role', '') in ['tourist', 'guide']
+          // A tourist or a guide claims their own role.
+          (request.resource.data.role in ['tourist', 'guide']
             && (!('isActive' in request.resource.data)
                 || request.resource.data.isActive == true))
           // The first account of the project may claim the admin role.
-          || (request.resource.data.get('role', '') == 'admin'
-              && noAdminExists())
+          || (request.resource.data.role == 'admin' && noAdminExists())
         );
 
       allow update: if isAdmin()

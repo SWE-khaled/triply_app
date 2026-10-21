@@ -33,11 +33,6 @@ class DashboardCubit extends Cubit<DashboardState>
       onError: (Object error) =>
           safeEmit(DashboardError(error: error.toString())),
     );
-    _metricsSubscription = _dashboardRepository.watchMetrics().listen(
-      _onMetrics,
-      onError: (Object error) =>
-          safeEmit(DashboardError(error: error.toString())),
-    );
     load();
   }
 
@@ -45,7 +40,6 @@ class DashboardCubit extends Cubit<DashboardState>
   final GuideDashboardRepository _dashboardRepository;
 
   StreamSubscription<List<GuideTrip>>? _tripsSubscription;
-  StreamSubscription<GuideDashboardMetrics>? _metricsSubscription;
 
   /// The guide's trips — the source of the trip counters.
   List<GuideTrip> _trips = const [];
@@ -79,12 +73,6 @@ class DashboardCubit extends Cubit<DashboardState>
 
   void _onTrips(List<GuideTrip> trips) {
     _trips = trips;
-    if (state is DashboardSuccess) _emitSuccess();
-  }
-
-  /// A new booking arrived — the rows and the counters follow.
-  void _onMetrics(GuideDashboardMetrics metrics) {
-    _metrics = metrics;
     if (state is DashboardSuccess) _emitSuccess();
   }
 
@@ -126,7 +114,6 @@ class DashboardCubit extends Cubit<DashboardState>
   @override
   Future<void> close() {
     _tripsSubscription?.cancel();
-    _metricsSubscription?.cancel();
     return super.close();
   }
 }

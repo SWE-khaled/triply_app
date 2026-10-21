@@ -324,73 +324,20 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           ),
         ),
         const SizedBox(height: 12),
-        if (bookings.isEmpty)
-          _emptyBookings(context)
-        else
-          for (final b in bookings) ...[
-            BookingRequestCard(
-              booking: b,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => BookingDetailsScreen(bookingId: b.id),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-          ],
-      ],
-    );
-  }
-
-  /// Shown while no tourist booked a trip yet.
-  Widget _emptyBookings(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.event_available_outlined,
-            size: 34,
-            color: AppColors.subtitle.withValues(alpha: 0.7),
+        for (final b in bookings) ...[
+          BookingRequestCard(
+            booking: b,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BookingDetailsScreen(bookingId: b.id),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 12),
-          const Text(
-            'No bookings yet',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: AppColors.title,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'When a tourist books one of your trips, it shows up here.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12, color: AppColors.subtitle),
-          ),
-          const SizedBox(height: 14),
-          OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).push(AppRoutes.createTrip()),
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Create a trip'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.accentOrange,
-              side: const BorderSide(color: AppColors.accentOrange),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
         ],
-      ),
+      ],
     );
   }
 

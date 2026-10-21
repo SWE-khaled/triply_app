@@ -3,12 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// Model for a Tour Guide user profile stored in Firestore.
 class TourGuideProfile {
-  /// The role every guide account carries.
-  ///
-  /// The rules pin the role of a document, so an account is a guide for
-  /// its whole life — it can never become a tourist.
-  static const String guideRole = 'guide';
-
   final String uid;
   final String name;
   final String email;
@@ -32,7 +26,7 @@ class TourGuideProfile {
     required this.phone,
     required this.licenseNumber,
     required this.languages,
-    this.role = guideRole,
+    this.role = 'guide',
     this.isApproved = false,
     this.about = '',
     this.location = '',
@@ -48,7 +42,6 @@ class TourGuideProfile {
     'licenseNumber': licenseNumber,
     'languages': languages,
     'isApproved': isApproved,
-    'isActive': true,
     'pricePerHour': pricePerHour,
     'createdAt': FieldValue.serverTimestamp(),
   };
@@ -94,9 +87,6 @@ class TourGuideAuthService {
   // ──────────────── Registration ────────────────
 
   /// Creates a Firebase Auth user and writes the guide profile to Firestore.
-  ///
-  /// The profile carries the `guide` role, and the rules pin it — so the
-  /// account can never switch to the tourist role afterwards.
   Future<UserCredential> registerGuide({
     required String name,
     required String email,
@@ -128,12 +118,7 @@ class TourGuideAuthService {
       pricePerHour: pricePerHour,
     );
 
-    // Merged, so a re-registration never wipes the verification the admin
-    // already wrote.
-    await _db
-        .collection('users')
-        .doc(uid)
-        .set(profile.toMap(), SetOptions(merge: true));
+    await _db.collection('users').doc(uid).set(profile.toMap());
 
     return credential;
   }
@@ -141,9 +126,6 @@ class TourGuideAuthService {
   // ──────────────── Login ────────────────
 
   /// Signs in with email/password and returns the role from Firestore.
-  ///
-  /// Throws when the account is not a guide account: the roles are
-  /// exclusive, so a tourist account must use the tourist app.
   Future<({UserCredential credential, String role})> signInGuide({
     required String email,
     required String password,
@@ -157,20 +139,10 @@ class TourGuideAuthService {
     final doc = await _db.collection('users').doc(uid).get();
 
     if (!doc.exists) {
-      throw const TourGuideAuthException(
-        'User profile not found. Please contact support.',
-      );
+      throw Exception('User profile not found. Please contact support.');
     }
 
     final role = (doc.data()?['role'] as String?) ?? 'tourist';
-    if (role != TourGuideProfile.guideRole) {
-      // The session is closed again: the refused account does not stay
-      // signed in on the guide side.
-      await _auth.signOut();
-      throw const TourGuideAuthException(
-        'This is a tourist account. Sign in from the tourist app.',
-      );
-    }
     return (credential: credential, role: role);
   }
 
@@ -271,14 +243,10 @@ class TourGuideAuthService {
 
   /// Converts FirebaseAuthException codes into readable messages.
   String getErrorMessage(Object error) {
-    if (error is TourGuideAuthException) {
-      return error.message;
-    }
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'email-already-in-use':
-          return 'This email is already registered. Sign in with your '
-              'existing account instead.';
+          return 'This email is already registered. Please sign in instead.';
         case 'weak-password':
           return 'Password is too weak. Use at least 6 characters.';
         case 'invalid-email':
@@ -296,14 +264,4 @@ class TourGuideAuthService {
     }
     return error.toString();
   }
-}
-
-/// A failure the user can read as-is.
-class TourGuideAuthException implements Exception {
-  const TourGuideAuthException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => message;
 }

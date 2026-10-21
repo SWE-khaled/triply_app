@@ -9,6 +9,8 @@ import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart'
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import 'tour_guide_signup_screen.dart';
 import 'tour_guide_verification_screen.dart';
+// Tourist home (for role-based redirect when a tourist logs in here)
+import '../../../tourist/home/view/home_screen.dart';
 
 class TourGuideLoginScreen extends StatefulWidget {
   const TourGuideLoginScreen({super.key});
@@ -66,19 +68,11 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
         (route) => false,
       );
     } else {
-      // A non-guide account: the roles are exclusive, so the sign-in is
-      // refused with a message instead of being redirected silently.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            cubit.errorMessage ?? 'This account cannot use the guide portal.',
-          ),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      // Tourist account logged in via the guide screen - redirect to tourist home
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (route) => false,
       );
     }
   }

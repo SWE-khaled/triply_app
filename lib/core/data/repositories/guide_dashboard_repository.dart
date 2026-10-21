@@ -116,36 +116,6 @@ class GuideDashboardRepository {
     );
   }
 
-  /// The same numbers, live.
-  ///
-  /// A booking that arrives while the dashboard is open shows up without
-  /// a reload, and the counters stay in step with the rows.
-  Stream<GuideDashboardMetrics> watchMetrics() {
-    final uid = currentGuideId;
-    if (uid == null) return Stream.value(_mockMetrics());
-    try {
-      return _firestore.instance
-          .collection(bookingsCollection)
-          .where('guideId', isEqualTo: uid)
-          .snapshots()
-          .map(
-            (snapshot) => GuideDashboardMetrics(
-              totalBookings: snapshot.docs.length,
-              totalEarnings: snapshot.docs.fold<double>(
-                0,
-                (sum, doc) =>
-                    sum + ((doc.data()['totalPrice'] as num?)?.toDouble() ?? 0),
-              ),
-              bookings: snapshot.docs
-                  .map((doc) => _toBookingRequest(doc.data(), doc.id))
-                  .toList(),
-            ),
-          );
-    } catch (_) {
-      return Stream.value(_mockMetrics());
-    }
-  }
-
   /// One booking with all of its details.
   ///
   /// Falls back to the mock dataset when the guide is signed out, the
