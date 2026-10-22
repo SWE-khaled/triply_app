@@ -4,7 +4,7 @@ import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:latlong2/latlong.dart' as latlng;
 import 'package:triply/features/tourist/home/view/home_screen.dart';
 
-import '../../UserProfile/view/profile_screen.dart';
+import '../../user_profile/view/profile_screen.dart';
 import '../cubit/map_cubit.dart';
 import '../cubit/map_state.dart';
 import '../../../../core/constants/app_routes.dart';

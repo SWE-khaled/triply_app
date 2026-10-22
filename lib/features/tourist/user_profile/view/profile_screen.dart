@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/tourist/UserProfile/widget/edit_profile_sheet.dart';
+import 'package:triply/features/tourist/user_profile/widget/edit_profile_sheet.dart';
 import 'package:triply/features/tourist/community/view/community_view.dart';
 import 'package:triply/features/tourist/home/view/home_screen.dart';
 import 'package:triply/features/tourist/map/view/map_view.dart';

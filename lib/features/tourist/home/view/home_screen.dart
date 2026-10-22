@@ -12,7 +12,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../common/AuthTourist/cubit/auth_cubit.dart';
-import '../../UserProfile/view/profile_screen.dart';
+import '../../user_profile/view/profile_screen.dart';
 import '../cubit/home_cubit.dart';
 
 import '../model/trip.dart';
