@@ -1,3 +1,5 @@
+import 'package:triply/core/data/models/public_trip.dart';
+
 enum TripStatus { upcoming, ongoing, completed, cancelled }
 
 class Trip {
@@ -24,6 +26,22 @@ class Trip {
     required this.category,
     required this.capacity,
   });
+
+  /// Builds the card model from the neutral Firestore model.
+  factory Trip.fromPublicTrip(PublicTrip trip) {
+    return Trip(
+      id: trip.id,
+      title: trip.title,
+      dateLabel: trip.dateLabel,
+      guideName: trip.guideName,
+      peopleCount: trip.bookedSeats,
+      priceEgp: trip.priceEgp,
+      imageUrl: trip.imageUrl,
+      status: TripStatus.upcoming,
+      category: trip.category,
+      capacity: trip.capacity,
+    );
+  }
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(

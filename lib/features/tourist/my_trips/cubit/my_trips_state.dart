@@ -1,15 +1,30 @@
-import '../../trips/models/trip.dart';
+part of 'my_trips_cubit.dart';
 
-class MyTripsState {
+@immutable
+sealed class MyTripsState {
+  const MyTripsState();
+}
+
+final class MyTripsInitial extends MyTripsState {
+  const MyTripsInitial();
+}
+
+final class MyTripsLoading extends MyTripsState {
+  const MyTripsLoading();
+}
+
+final class MyTripsSuccess extends MyTripsState {
+  /// The tab the list is filtered by.
   final TripStatus selectedTab;
+
+  /// The booked trips of that tab.
   final List<Trip> trips;
 
-  const MyTripsState({required this.selectedTab, required this.trips});
+  const MyTripsSuccess({required this.selectedTab, required this.trips});
+}
 
-  MyTripsState copyWith({TripStatus? selectedTab, List<Trip>? trips}) {
-    return MyTripsState(
-      selectedTab: selectedTab ?? this.selectedTab,
-      trips: trips ?? this.trips,
-    );
-  }
+final class MyTripsError extends MyTripsState {
+  final String error;
+
+  const MyTripsError({required this.error});
 }

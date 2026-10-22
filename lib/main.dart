@@ -7,6 +7,10 @@ import 'package:triply/features/common/AuthTourist/screens/forgot_password_scree
 import 'package:triply/features/common/AuthTourist/screens/onboarding_screen.dart';
 import 'package:triply/features/common/AuthTourist/screens/password_reset_success_screen.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
+import 'features/tourist/UserProfile/view/emergency_screen.dart';
+import 'features/tourist/checkout/paymob_settings.dart';
+import 'features/tourist/UserProfile/view/privacy_security_screen.dart';
+import 'features/tourist/UserProfile/view/profile_screen.dart';
 import 'firebase_options.dart';
 import 'features/tour_guide/role_selection/view/role_selection_screen.dart';
 import 'core/constants/app_routes.dart';
@@ -15,9 +19,6 @@ import 'features/common/AuthTourist/cubit/auth_cubit.dart';
 import 'features/tourist/home/view/home_screen.dart';
 import 'features/tourist/notifications/view/notifications_screen.dart';
 import 'features/tourist/search/view/search_screen.dart';
-import 'features/tourist/UserProfile/view/profile_screen.dart';
-import 'features/tourist/UserProfile/view/privacy_security_screen.dart';
-import 'features/tourist/UserProfile/view/emergency_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: '.env');
   } catch (_) {}
+  PaymobSettings.initialize();
   runApp(const MyApp());
 }
 

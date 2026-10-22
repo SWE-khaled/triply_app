@@ -120,7 +120,78 @@ class TourGuideAuthService {
 
     await _db.collection('users').doc(uid).set(profile.toMap());
 
+    // The public profile: this is what the tourists browse. The id is the
+    // uid, so the trips of this guide are found by the very same key.
+    await _db.collection(guidesCollection).doc(uid).set({
+      'guideId': uid,
+      'name': name,
+      'specialty': '',
+      'avatarUrl': '',
+      'coverUrl': '',
+      'location': '',
+      'about': '',
+      'languages': languages,
+      'rating': 0,
+      'reviewCount': 0,
+      'pricePerHour': pricePerHour,
+      'currency': 'EGP',
+      'isApproved': false,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
     return credential;
+  }
+
+  // ──────────────── Public profile ────────────────
+
+  /// Firestore collection holding the public guide profiles.
+  static const String guidesCollection = 'guides';
+
+  /// Publishes the public profile of the signed-in guide.
+  ///
+  /// The tourists browse the approved guides, so the profile has to
+  /// exist before they can see the guide. The document is created from
+  /// the guide's own profile, and never overwrites the approval the
+  /// admin wrote.
+  Future<void> ensurePublicProfile() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return;
+    try {
+      final profile = await fetchMyProfile();
+      if (profile == null) return;
+      final doc = _db.collection(guidesCollection).doc(uid);
+      final existing = await doc.get();
+      if (existing.exists) {
+        // Only the fields the guide owns are refreshed — the approval
+        // belongs to the admin.
+        await doc.set({
+          'name': profile.name,
+          'location': profile.location,
+          'about': profile.about,
+          'languages': profile.languages,
+          'pricePerHour': profile.pricePerHour,
+        }, SetOptions(merge: true));
+        return;
+      }
+      await doc.set({
+        'guideId': uid,
+        'name': profile.name,
+        'specialty': '',
+        'avatarUrl': '',
+        'coverUrl': '',
+        'location': profile.location,
+        'about': profile.about,
+        'languages': profile.languages,
+        'rating': 0,
+        'reviewCount': 0,
+        'pricePerHour': profile.pricePerHour,
+        'currency': 'EGP',
+        'isApproved': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (_) {
+      // The profile is a convenience — the guide still works without it.
+    }
   }
 
   // ──────────────── Login ────────────────

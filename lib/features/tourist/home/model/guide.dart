@@ -1,3 +1,5 @@
+import 'package:triply/core/data/models/public_guide.dart';
+
 class Guide {
   final String id;
   final String name;
@@ -16,6 +18,19 @@ class Guide {
     required this.reviewCount,
     required this.pricePerHour,
   });
+
+  /// Builds the card model from the neutral Firestore model.
+  factory Guide.fromPublicGuide(PublicGuide guide) {
+    return Guide(
+      id: guide.id,
+      name: guide.name,
+      specialty: guide.specialty,
+      avatarUrl: guide.avatarUrl,
+      rating: guide.rating,
+      reviewCount: guide.reviewCount,
+      pricePerHour: guide.pricePerHour,
+    );
+  }
 
   factory Guide.fromJson(Map<String, dynamic> json) {
     return Guide(

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:latlong2/latlong.dart' as latlng;
-import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/tourist/home/view/home_screen.dart';
 
+import '../../UserProfile/view/profile_screen.dart';
 import '../cubit/map_cubit.dart';
 import '../cubit/map_state.dart';
 import '../../../../core/constants/app_routes.dart';

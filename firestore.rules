@@ -115,6 +115,42 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ── guides ─────────────────────────────────────────────────────────
+    // The public profile of a tour guide — what the tourists browse.
+    //
+    // The document id is the uid of the guide, the very same key the
+    // trip documents carry, so the trips of a guide are found without
+    // matching names.
+    //
+    // Only an approved guide is visible to the tourists; the guide
+    // themselves always sees their own profile.
+    match /guides/{guideId} {
+      // `.get('isApproved', false)` on purpose: dot-access on a missing
+      // field ERRORS, and that error denies the whole rule.
+      allow get: if resource.data.get('isApproved', false) == true
+        || isOwner(guideId)
+        || isAdmin();
+
+      allow list: if resource.data.get('isApproved', false) == true
+        || isAdmin();
+
+      // The guide publishes their own profile; the admin may create it
+      // too, when they approve a guide who did not publish one yet.
+      allow create: if isAdmin()
+        || (isOwner(guideId)
+            && request.resource.data.guideId == guideId);
+
+      // The guide refreshes the fields they own; the approval belongs to
+      // the admin, so it is pinned.
+      allow update: if isAdmin()
+        || (isOwner(guideId)
+            && request.resource.data.guideId == resource.data.guideId
+            && request.resource.data.get('isApproved', false)
+                == resource.data.get('isApproved', false));
+
+      allow delete: if isAdmin();
+    }
+
     // ── appSettings ────────────────────────────────────────────────────
     // Holds the project-wide settings, plus the `_bootstrap` marker that
     // closes the "first account claims the admin role" window.

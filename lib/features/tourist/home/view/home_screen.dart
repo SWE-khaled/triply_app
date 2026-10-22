@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/tourist/community/view/community_view.dart';
 import 'package:triply/features/tourist/guides/view/guides_list_screen.dart';
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
@@ -9,11 +8,13 @@ import 'package:triply/features/tourist/place_details/view/place_details_view.da
 import 'package:triply/core/data/mock/tourist/mock_trips_public.dart';
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../common/AuthTourist/cubit/auth_cubit.dart';
+import '../../UserProfile/view/profile_screen.dart';
 import '../cubit/home_cubit.dart';
-import '../cubit/home_state.dart';
+
 import '../model/trip.dart';
 import '../widget/community_banner.dart';
 import '../widget/guide_tile.dart';
@@ -272,14 +273,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.notifications);
-                  },
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    color: Colors.white,
-                  ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, AppRoutes.notifications);
+                      },
+                      icon: const Icon(
+                        Icons.notifications_none,
+                        color: Colors.white,
+                      ),
+                    ),
+                    if (controller.unreadNotifications > 0)
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: Container(
+                          constraints: const BoxConstraints(minWidth: 16),
+                          height: 16,
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: AppColors.accentOrange,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            controller.unreadNotifications > 9
+                                ? '9+'
+                                : '${controller.unreadNotifications}',
+                            style: const TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 InkWell(
                   onTap: () {

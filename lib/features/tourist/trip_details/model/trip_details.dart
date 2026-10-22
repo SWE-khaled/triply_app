@@ -1,3 +1,5 @@
+import 'package:triply/core/data/models/public_trip.dart';
+
 class ItineraryStop {
   final String time;
   final String title;
@@ -62,6 +64,36 @@ class TripDetails {
     required this.topRatedGuide,
     required this.imageUrl,
   });
+
+  /// Builds the details model from the neutral Firestore model.
+  factory TripDetails.fromPublicTrip(PublicTrip trip) {
+    return TripDetails(
+      id: trip.id,
+      tripId: trip.id,
+      tag: trip.tag,
+      title: trip.title,
+      rating: trip.rating,
+      reviewsCount: trip.reviewsCount,
+      location: trip.location,
+      duration: trip.durationLabel,
+      groupType: trip.groupType,
+      languages: trip.languages,
+      about: trip.about,
+      highlights: trip.highlights,
+      itinerary: trip.itinerary
+          .map((e) => ItineraryStop(time: e.time, title: e.title))
+          .toList(),
+      notes: trip.notes,
+      meetingPoint: trip.meetingPoint,
+      priceEgp: trip.priceEgp,
+      guideName: trip.guideName,
+      guideAvatarUrl: trip.guideAvatarUrl,
+      guideRating: trip.guideRating,
+      guideReviews: trip.guideReviews,
+      topRatedGuide: trip.topRatedGuide,
+      imageUrl: trip.imageUrl,
+    );
+  }
 
   factory TripDetails.fromJson(Map<String, dynamic> json) {
     return TripDetails(

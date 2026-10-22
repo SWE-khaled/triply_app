@@ -1,11 +1,27 @@
-import '../model/notification_item.dart';
+part of 'notifications_cubit.dart';
 
-class NotificationsState {
+@immutable
+sealed class NotificationsState {
+  const NotificationsState();
+}
+
+final class NotificationsInitial extends NotificationsState {
+  const NotificationsInitial();
+}
+
+final class NotificationsLoading extends NotificationsState {
+  const NotificationsLoading();
+}
+
+final class NotificationsSuccess extends NotificationsState {
+  /// The notifications of the tourist, newest first.
   final List<NotificationItem> items;
 
-  const NotificationsState({required this.items});
+  const NotificationsSuccess({required this.items});
+}
 
-  NotificationsState copyWith({List<NotificationItem>? items}) {
-    return NotificationsState(items: items ?? this.items);
-  }
+final class NotificationsError extends NotificationsState {
+  final String error;
+
+  const NotificationsError({required this.error});
 }

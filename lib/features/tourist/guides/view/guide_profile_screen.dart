@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/constants/app_routes.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/tourist/guides/cubit/guide_profile_cubit.dart';
-import 'package:triply/features/tourist/guides/cubit/guide_profile_state.dart';
+
 import 'package:triply/features/tourist/guides/model/trip.dart' as guide_trip;
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import 'package:triply/core/widgets/guide_shared_widgets.dart';

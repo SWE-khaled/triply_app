@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
+import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 
 /// Guide settings: only actions that really work in this project.
 /// Biometric login does not exist — it is not listed.
@@ -36,6 +37,20 @@ class GuideSettingsScreen extends StatelessWidget {
         icon: Icons.error_outline,
       );
     }
+  }
+
+  /// Publishes the public profile the tourists browse.
+  ///
+  /// Without it the guide is invisible in the guide list — the admin
+  /// still has to approve the profile afterwards.
+  Future<void> _publishProfile(BuildContext context) async {
+    await TourGuideAuthService().ensurePublicProfile();
+    if (!context.mounted) return;
+    showAppSnackBar(
+      context,
+      'Your profile is published. The admin approves it to make it visible.',
+      icon: Icons.check_circle,
+    );
   }
 
   @override
@@ -71,6 +86,12 @@ class GuideSettingsScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    _SettingsRow(
+                      icon: Icons.public_outlined,
+                      label: 'Publish my profile',
+                      onTap: () => _publishProfile(context),
+                    ),
+                    const Divider(color: AppColors.cardBorder, height: 1),
                     _SettingsRow(
                       icon: Icons.lock_reset_outlined,
                       label: 'Reset password',

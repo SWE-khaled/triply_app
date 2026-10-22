@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_snackbar.dart';
+import '../../../../core/widgets/state_views.dart';
 import '../../community/view/community_view.dart';
 import '../../home/view/home_screen.dart';
 import '../../map/view/map_view.dart';
@@ -15,7 +16,7 @@ import '../../trips/models/trip.dart';
 import '../../trips/widgets/empty_trips.dart';
 import '../../trips/widgets/trip_card.dart';
 import '../cubit/my_trips_cubit.dart';
-import '../cubit/my_trips_state.dart';
+
 import '../widgets/booking_badges.dart';
 
 /// Booked trips only. Opened after booking_public and from the bottom nav.
@@ -125,9 +126,12 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                   ),
                   child: BlocBuilder<MyTripsCubit, MyTripsState>(
                     builder: (context, state) {
+                      final selectedTab = state is MyTripsSuccess
+                          ? state.selectedTab
+                          : TripStatus.upcoming;
                       return Row(
                         children: List.generate(tabValues.length, (i) {
-                          final selected = tabValues[i] == state.selectedTab;
+                          final selected = tabValues[i] == selectedTab;
                           return Expanded(
                             child: GestureDetector(
                               onTap: () => context
@@ -169,6 +173,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
               Expanded(
                 child: BlocBuilder<MyTripsCubit, MyTripsState>(
                   builder: (context, state) {
+                    if (state is! MyTripsSuccess) {
+                      return state is MyTripsError
+                          ? AppErrorView(message: state.error)
+                          : const AppLoadingView();
+                    }
                     final trips = state.trips;
                     if (trips.isEmpty) {
                       return EmptyTrips(
@@ -184,7 +193,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                       itemBuilder: (context, index) {
                         final trip = trips[index];
                         final isPrivate = MyBookingsPublic.isPrivate(trip.id);
-                        final isPending = MyBookingsPublic.isPending(trip.id);
+                        // The status comes from the booking itself, not
+                        // from the session store.
+                        final isPending =
+                            context.read<MyTripsCubit>().statusFor(trip.id) ==
+                            'pending';
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

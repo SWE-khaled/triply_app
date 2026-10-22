@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:triply/features/tourist/UserProfile/view/profile_screen.dart';
 import 'package:triply/features/tourist/home/view/home_screen.dart';
 import 'package:triply/features/tourist/map/view/map_view.dart';
-
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
 import '../../../../core/constants/app_colors.dart';

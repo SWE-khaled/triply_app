@@ -1,24 +1,115 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/data/mock/tourist/mock_trips_public.dart';
-import '../../../../core/data/my_bookings_public.dart';
+import 'package:triply/core/data/mock/tourist/mock_trips_public.dart';
+import 'package:triply/core/data/models/public_trip.dart';
+import 'package:triply/core/data/models/tourist_booking.dart';
+import 'package:triply/core/data/my_bookings_public.dart';
+import 'package:triply/core/data/repositories/booking_repository.dart';
+import 'package:triply/core/data/repositories/public_trips_repository.dart';
+import 'package:triply/core/utils/safe_emit_mixin.dart';
 import '../../trips/models/trip.dart';
-import 'my_trips_state.dart';
 
-/// Booked-only list (My Trips). Reads the session booking_public store;
-/// unbooked trips never appear here, no matter their status.
-class MyTripsCubit extends Cubit<MyTripsState> {
-  MyTripsCubit()
-    : super(
-        MyTripsState(
-          selectedTab: TripStatus.upcoming,
-          trips: _booked(TripStatus.upcoming),
-        ),
-      );
+part 'my_trips_state.dart';
 
-  static List<Trip> _booked(TripStatus status) {
-    final public = mockTripsJson
+/// The trips the tourist booked.
+///
+/// The bookings come from Firestore — the ones the tourist made — and the
+/// trip details are joined from the trip documents. The session store is
+/// the fallback for when the read fails (offline).
+class MyTripsCubit extends Cubit<MyTripsState>
+    with SafeEmitMixin<MyTripsState> {
+  MyTripsCubit({
+    BookingRepository? bookingRepository,
+    PublicTripsRepository? tripsRepository,
+  }) : _bookingRepository = bookingRepository ?? BookingRepository(),
+       _tripsRepository = tripsRepository ?? PublicTripsRepository(),
+       super(const MyTripsInitial()) {
+    load();
+  }
+
+  final BookingRepository _bookingRepository;
+  final PublicTripsRepository _tripsRepository;
+
+  /// The tab the list is filtered by.
+  TripStatus _selectedTab = TripStatus.upcoming;
+
+  /// The bookings of the tourist, joined with their trips.
+  List<Trip> _booked = const [];
+
+  /// The status of every booking, by trip id — `pending`, `confirmed`…
+  final Map<String, String> _statusByTrip = {};
+
+  /// The status of the booking of [tripId], or an empty string when the
+  /// trip was not booked here.
+  String statusFor(String tripId) => _statusByTrip[tripId] ?? '';
+
+  /// Reads the bookings and applies the current tab.
+  Future<void> load() async {
+    safeEmit(const MyTripsLoading());
+    try {
+      final bookings = await _bookingRepository.fetchMyBookings();
+      _booked = bookings == null ? _sessionTrips() : await _tripsOf(bookings);
+      _applyTab(_selectedTab);
+    } catch (e) {
+      safeEmit(MyTripsError(error: e.toString()));
+    }
+  }
+
+  /// Switches the tab. No reload — the bookings are already loaded.
+  void selectTab(TripStatus status) => _applyTab(status);
+
+  /// Re-reads the bookings (call after returning from the booking flow).
+  void refresh() => load();
+
+  void _applyTab(TripStatus status) {
+    _selectedTab = status;
+    safeEmit(
+      MyTripsSuccess(
+        selectedTab: status,
+        trips: _booked.where((t) => t.status == status).toList(),
+      ),
+    );
+  }
+
+  /// Joins the bookings with the trip documents.
+  Future<List<Trip>> _tripsOf(List<TouristBooking> bookings) async {
+    final trips = await _tripsRepository.fetchTripsByIds(
+      bookings.map((b) => b.tripId).toList(),
+    );
+    final byId = {for (final trip in trips) trip.id: trip};
+
+    final joined = <Trip>[];
+    for (final booking in bookings) {
+      final trip = byId[booking.tripId];
+      if (trip == null) continue;
+      _statusByTrip[booking.tripId] = booking.status;
+      joined.add(_cardOf(trip, booking));
+    }
+    return joined;
+  }
+
+  /// The card of a booked trip: the seats taken and what was paid.
+  Trip _cardOf(PublicTrip trip, TouristBooking booking) {
+    return Trip(
+      id: trip.id,
+      title: trip.title,
+      dateLabel: trip.dateLabel,
+      guideName: trip.guideName,
+      peopleCount: booking.seats > 0 ? booking.seats : trip.bookedSeats,
+      priceEgp: booking.totalPrice > 0 ? booking.totalPrice : trip.priceEgp,
+      imageUrl: trip.imageUrl,
+      status: TripStatus.upcoming,
+      category: trip.category,
+      capacity: trip.capacity,
+    );
+  }
+
+  /// The bookings of the session store, used when Firestore is out of
+  /// reach.
+  List<Trip> _sessionTrips() {
+    final trips = mockTripsJson
         .map((e) => Trip.fromJson(e))
-        .where((t) => t.status == status && MyBookingsPublic.isBooked(t.id))
+        .where((t) => MyBookingsPublic.isBooked(t.id))
         .map((t) {
           // Show the actually booked seat count, not the mock headcount.
           final seats = MyBookingsPublic.seatsFor(t.id);
@@ -39,35 +130,26 @@ class MyTripsCubit extends Cubit<MyTripsState> {
           );
         })
         .toList();
+
     // Private guide bookings appear under Upcoming as synthetic trips
     // (built from the stored booking, never duplicated mock data).
-    if (status == TripStatus.upcoming) {
-      for (final record in MyBookingsPublic.privateRecords) {
-        final entry = record.value;
-        public.add(
-          Trip(
-            id: record.key,
-            title: entry.title ?? 'Private tour',
-            dateLabel: entry.dateLabel ?? '',
-            guideName: entry.guideName ?? '',
-            peopleCount: entry.seats,
-            priceEgp: entry.totalPaid,
-            imageUrl: entry.imageUrl ?? '',
-            status: TripStatus.upcoming,
-            category: 'private',
-            capacity: entry.seats,
-          ),
-        );
-      }
+    for (final record in MyBookingsPublic.privateRecords) {
+      final entry = record.value;
+      trips.add(
+        Trip(
+          id: record.key,
+          title: entry.title ?? 'Private tour',
+          dateLabel: entry.dateLabel ?? '',
+          guideName: entry.guideName ?? '',
+          peopleCount: entry.seats,
+          priceEgp: entry.totalPaid,
+          imageUrl: entry.imageUrl ?? '',
+          status: TripStatus.upcoming,
+          category: 'private',
+          capacity: entry.seats,
+        ),
+      );
     }
-    return public;
-  }
-
-  void selectTab(TripStatus status) {
-    emit(state.copyWith(selectedTab: status, trips: _booked(status)));
-  }
-
-  void refresh() {
-    emit(state.copyWith(trips: _booked(state.selectedTab)));
+    return trips;
   }
 }

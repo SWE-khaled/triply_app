@@ -1,3 +1,5 @@
+import 'package:triply/core/data/models/public_trip.dart';
+
 /// Trip offered by a guide (shown on GuideProfileScreen).
 /// UI consumes this Model, never raw Maps.
 class Trip {
@@ -20,6 +22,20 @@ class Trip {
     required this.price,
     required this.currency,
   });
+
+  /// Builds the card model from the neutral Firestore model.
+  factory Trip.fromPublicTrip(PublicTrip trip) {
+    return Trip(
+      id: trip.id,
+      guideId: trip.guideId,
+      title: trip.title,
+      imageUrl: trip.imageUrl,
+      dateLabel: trip.dateLabel,
+      durationLabel: trip.durationLabel,
+      price: trip.priceEgp,
+      currency: 'EGP',
+    );
+  }
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(

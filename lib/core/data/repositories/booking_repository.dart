@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../models/tourist_booking.dart';
 import '../remote/firestore_service.dart';
 import 'guide_notifications_repository.dart';
 
@@ -48,6 +49,9 @@ class BookingRepository {
   /// Firestore collection holding the trips.
   static const String tripsCollection = 'trips';
 
+  /// Firestore collection holding the user profiles.
+  static const String usersCollection = 'users';
+
   final FirestoreService _firestore;
   final GuideNotificationsRepository _notifications;
 
@@ -87,6 +91,10 @@ class BookingRepository {
     final serviceFee = unitPrice * seats * 0.05;
     final total = unitPrice * seats + serviceFee;
 
+    // The guest of the booking is the tourist who books — not the guide
+    // who owns the trip.
+    final guest = await _readGuestProfile(uid);
+
     await db.runTransaction((tx) async {
       final tripSnapshot = await tx.get(tripRef);
       if (!tripSnapshot.exists) {
@@ -117,11 +125,11 @@ class BookingRepository {
         'touristId': uid,
         'guideId': trip['guideId'] ?? '',
         'tour_title': trip['title'] ?? '',
-        'guest_name': trip['guideName'] ?? '',
+        'guest_name': guest?['name'] ?? guest?['fullName'] ?? '',
         'country': '',
         'traveler_count': seats,
         'seats': seats,
-        'avatar_url': trip['guideAvatarUrl'] ?? '',
+        'avatar_url': guest?['photoUrl'] ?? '',
         'is_private': false,
         'unitPrice': unitPrice,
         'serviceFee': serviceFee,
@@ -162,6 +170,26 @@ class BookingRepository {
     );
   }
 
+  /// The bookings of the signed-in tourist.
+  ///
+  /// Returns null when the read failed — the caller falls back to the
+  /// session store then.
+  Future<List<TouristBooking>?> fetchMyBookings() async {
+    final uid = currentTouristId;
+    if (uid == null) return null;
+    try {
+      final snapshot = await _firestore
+          .collection(bookingsCollection)
+          .where('touristId', isEqualTo: uid)
+          .get();
+      return snapshot.docs
+          .map((doc) => TouristBooking.fromDocument(doc.data(), doc.id))
+          .toList();
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Books a guide directly, without a published trip.
   Future<BookingReceipt> createPrivateBooking({
     required String guideId,
@@ -183,16 +211,19 @@ class BookingRepository {
 
     final db = _firestore.instance;
     final bookingRef = db.collection(bookingsCollection).doc();
+    // The guest of the booking is the tourist who books — not the guide
+    // who is booked.
+    final guest = await _readGuestProfile(uid);
     await bookingRef.set({
       'tripId': '',
       'touristId': uid,
       'guideId': guideId,
       'tour_title': title,
-      'guest_name': guideName,
+      'guest_name': guest?['name'] ?? guest?['fullName'] ?? '',
       'country': '',
       'traveler_count': travelers,
       'seats': travelers,
-      'avatar_url': '',
+      'avatar_url': guest?['photoUrl'] ?? '',
       'is_private': true,
       'totalPrice': totalPrice,
       'price_label': 'EGP ${totalPrice.toStringAsFixed(0)}',
@@ -229,6 +260,18 @@ class BookingRepository {
   Future<Map<String, dynamic>?> _readTrip(String tripId) async {
     try {
       return await _firestore.readDoc(tripsCollection, tripId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The profile of the tourist who books.
+  ///
+  /// The guide sees the guest, so the name and the photo come from the
+  /// tourist's own profile document.
+  Future<Map<String, dynamic>?> _readGuestProfile(String uid) async {
+    try {
+      return await _firestore.readDoc(usersCollection, uid);
     } catch (_) {
       return null;
     }

@@ -1,36 +1,45 @@
-import '../../map/model/place.dart';
-import '../model/guide.dart';
-import '../model/story.dart';
-import '../model/trip.dart';
+part of 'place_detail_cubit.dart';
 
-class PlaceDetailState {
+@immutable
+sealed class PlaceDetailState {
+  const PlaceDetailState();
+}
+
+final class PlaceDetailInitial extends PlaceDetailState {
+  const PlaceDetailInitial();
+}
+
+final class PlaceDetailLoading extends PlaceDetailState {
+  const PlaceDetailLoading();
+}
+
+final class PlaceDetailSuccess extends PlaceDetailState {
+  /// The place the screen shows.
   final Place place;
+
+  /// The guides of the place.
   final List<Guide> guides;
+
+  /// The trips of the place.
   final List<Trip> trips;
+
+  /// The stories of the place.
   final List<Story> stories;
+
+  /// The tab that is open.
   final int selectedTabIndex;
 
-  const PlaceDetailState({
+  const PlaceDetailSuccess({
     required this.place,
     required this.guides,
     required this.trips,
     required this.stories,
-    this.selectedTabIndex = 0,
+    required this.selectedTabIndex,
   });
+}
 
-  PlaceDetailState copyWith({
-    Place? place,
-    List<Guide>? guides,
-    List<Trip>? trips,
-    List<Story>? stories,
-    int? selectedTabIndex,
-  }) {
-    return PlaceDetailState(
-      place: place ?? this.place,
-      guides: guides ?? this.guides,
-      trips: trips ?? this.trips,
-      stories: stories ?? this.stories,
-      selectedTabIndex: selectedTabIndex ?? this.selectedTabIndex,
-    );
-  }
+final class PlaceDetailError extends PlaceDetailState {
+  final String error;
+
+  const PlaceDetailError({required this.error});
 }

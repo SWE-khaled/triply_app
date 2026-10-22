@@ -59,8 +59,12 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
   Future<void> loadRemoteProfile() async {
     if (state is ProfileTgInitial) safeEmit(const ProfileTgLoading());
     try {
-      final profile = await TourGuideAuthService().fetchMyProfile();
+      final service = TourGuideAuthService();
+      final profile = await service.fetchMyProfile();
       _profile = profile;
+      // Publish the public profile the tourists browse — without it the
+      // guide is invisible to them.
+      await service.ensurePublicProfile();
       final phone = profile?.phone.trim() ?? '';
       final about = profile?.about.trim() ?? '';
       final location = profile?.location.trim() ?? '';

@@ -6,10 +6,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
+import '../../../../core/widgets/state_views.dart';
 import '../../trips/models/trip.dart';
 import '../../trips/widgets/trip_card.dart';
 import '../cubit/popular_cubit.dart';
-import '../cubit/popular_state.dart';
 
 class PopularTripsScreen extends StatelessWidget {
   const PopularTripsScreen({super.key});
@@ -49,12 +49,15 @@ class PopularTripsScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: BlocBuilder<PopularCubit, PopularState>(
                 builder: (context, state) {
+                  final selectedCategory = state is PopularSuccess
+                      ? state.selectedCategory
+                      : 'All';
                   return Row(
                     children: List.generate(PopularCubit.categories.length, (
                       i,
                     ) {
                       final label = PopularCubit.categories[i];
-                      final selected = label == state.selectedCategory;
+                      final selected = label == selectedCategory;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: GestureDetector(
@@ -100,37 +103,45 @@ class PopularTripsScreen extends StatelessWidget {
             Expanded(
               child: BlocBuilder<PopularCubit, PopularState>(
                 builder: (context, state) {
-                  final trips = state.trips;
-                  if (trips.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No trips here yet',
-                        style: TextStyle(
-                          color: AppColors.subtitle,
-                          fontSize: 13,
-                        ),
-                      ),
-                    );
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-                    itemCount: trips.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final trip = trips[index];
-                      return TripCard(
-                        trip: trip,
-                        onTap: () => _openDetails(context, trip),
-                        onViewDetails: () => _openDetails(context, trip),
-                        // Chat: placeholder — no chat screen exists yet.
-                        onChat: () => showAppSnackBar(
-                          context,
-                          'Chat not available yet',
-                          icon: Icons.info_outline,
-                        ),
-                      );
-                    },
-                  );
+                  return switch (state) {
+                    PopularSuccess(:final trips) =>
+                      trips.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'No trips here yet',
+                                style: TextStyle(
+                                  color: AppColors.subtitle,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            )
+                          : ListView.separated(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                              itemCount: trips.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                final trip = trips[index];
+                                return TripCard(
+                                  trip: trip,
+                                  onTap: () => _openDetails(context, trip),
+                                  onViewDetails: () =>
+                                      _openDetails(context, trip),
+                                  // Chat: placeholder — no chat screen exists yet.
+                                  onChat: () => showAppSnackBar(
+                                    context,
+                                    'Chat not available yet',
+                                    icon: Icons.info_outline,
+                                  ),
+                                );
+                              },
+                            ),
+                    PopularError(:final error) => AppErrorView(
+                      message: error,
+                      onRetry: () => context.read<PopularCubit>().load(),
+                    ),
+                    _ => const AppLoadingView(),
+                  };
                 },
               ),
             ),

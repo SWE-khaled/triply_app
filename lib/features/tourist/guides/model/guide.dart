@@ -1,3 +1,5 @@
+import 'package:triply/core/data/models/public_guide.dart';
+
 /// Represents a tour guide shown in GuidesList (and later Profile/Chat/Booking).
 /// UI must consume this Model, never raw Maps or API JSON directly.
 class Guide {
@@ -30,6 +32,25 @@ class Guide {
     required this.currency,
     this.isVerified = true,
   });
+
+  /// Builds the list model from the neutral Firestore model.
+  factory Guide.fromPublicGuide(PublicGuide guide) {
+    return Guide(
+      id: guide.id,
+      name: guide.name,
+      specialty: guide.specialty,
+      avatarUrl: guide.avatarUrl,
+      coverUrl: guide.coverUrl,
+      location: guide.location,
+      about: guide.about,
+      languages: guide.languages,
+      rating: guide.rating,
+      reviewCount: guide.reviewCount,
+      pricePerHour: guide.pricePerHour,
+      currency: guide.currency,
+      isVerified: guide.isApproved,
+    );
+  }
 
   factory Guide.fromJson(Map<String, dynamic> json) {
     return Guide(

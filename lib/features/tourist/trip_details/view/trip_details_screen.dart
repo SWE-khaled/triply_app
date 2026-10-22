@@ -6,11 +6,12 @@ import '../../../../core/data/mock/tourist/mock_guides.dart';
 import '../../../common/AuthTourist/data/auth_repository.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/state_views.dart';
 import '../../guides/view/guide_profile_screen.dart';
 import '../../my_trips/widgets/booking_badges.dart';
 import '../../trips/models/trip.dart';
 import '../cubit/trip_details_cubit.dart';
-import '../cubit/trip_details_state.dart';
+
 import '../widgets/booking_bar.dart';
 import '../widgets/details_header.dart';
 import '../widgets/details_info.dart';
@@ -137,10 +138,12 @@ class TripDetailsScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: BlocBuilder<TripDetailsCubit, TripDetailsState>(
         builder: (context, state) {
-          final details = state.details;
-          if (details == null) {
-            return const Center(child: CircularProgressIndicator());
+          if (state is! TripDetailsSuccess) {
+            return state is TripDetailsError
+                ? AppErrorView(message: state.error)
+                : const AppLoadingView();
           }
+          final details = state.details;
           return SingleChildScrollView(
             child: Column(
               children: [

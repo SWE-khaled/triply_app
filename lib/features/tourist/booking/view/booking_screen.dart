@@ -6,9 +6,7 @@ import '../../../../core/widgets/circle_back_button.dart';
 import '../cubit/booking_cubit.dart';
 import '../cubit/booking_state.dart';
 import 'package:triply/features/tourist/booking/widgets/booking_widgets.dart';
-import 'package:triply/features/tourist/checkout/controller/checkout_controller.dart';
-import 'package:triply/features/tourist/checkout/model/booking_model.dart';
-import 'package:triply/features/tourist/checkout/view/paymob_webview_screen.dart';
+import 'package:pay_with_paymob/pay_with_paymob.dart';
 
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/data/repositories/booking_repository.dart';
@@ -828,91 +826,64 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  Future<void> _openCheckout(BuildContext context) async {
+  void _openCheckout(BuildContext context) {
     final guide = _controller.guide;
-    final summary = CheckoutBookingSummary(
-      guideId: _controller.guideId,
-      guideName: guide.name,
-      guideSpecialty: guide.specialty,
-      guideAvatarUrl: guide.avatarUrl,
-      dateLabel: _controller.dateLabel,
-      timeSlot: _controller.timeSlot ?? '',
-      durationLabel: _controller.durationLabel,
-      travelers: _controller.travelers,
-      meetingPoint: _controller.meetingPoint,
-      pricePerHour: guide.pricePerHour,
-      currency: guide.currency,
-      serviceFee: _controller.serviceFee,
-      total: _controller.total,
-    );
-    final checkout = CheckoutController(summary: summary);
     // Captured before the async gap (avoids BuildContext across awaits).
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
-      ),
-    );
-    final token = await checkout.startPayment();
-    if (!mounted) return;
-    navigator.pop(); // Dismiss the loading dialog.
-    if (token != null) {
-      final guideName = guide.name;
-      checkout.dispose(); // WebView only needs the token strings below.
-      navigator.push(
-        MaterialPageRoute(
-          builder: (_) => PaymobWebviewScreen(
-            paymentToken: token,
-            guideName: guideName,
-            onSuccess: () async {
-              if (!mounted) return;
-              final booking = _controller.confirm();
-              // Recorded only after successful payment: appears in
-              // My Trips (Upcoming) with pending approval status.
-              MyBookingsPublic.recordPrivate(
+
+    navigator.push(
+      MaterialPageRoute(
+        builder: (_) => PaymentView(
+          price: _controller.total,
+          onPaymentSuccess: () async {
+            if (!mounted) return;
+            final booking = _controller.confirm();
+            // Recorded only after successful payment: appears in
+            // My Trips (Upcoming) with pending approval status.
+            MyBookingsPublic.recordPrivate(
+              guideId: _controller.guideId,
+              guideName: guide.name,
+              title: 'Private tour with ${guide.name}',
+              imageUrl: guide.coverUrl.isNotEmpty
+                  ? guide.coverUrl
+                  : guide.avatarUrl,
+              dateLabel: _controller.timeSlot == null
+                  ? _controller.dateLabel
+                  : '${_controller.dateLabel} · ${_controller.timeSlot}',
+              travelers: booking.travelers,
+              totalPaid: booking.total,
+            );
+            // Persist it, so the guide sees the booking on their
+            // dashboard.
+            try {
+              await BookingRepository().createPrivateBooking(
                 guideId: _controller.guideId,
                 guideName: guide.name,
                 title: 'Private tour with ${guide.name}',
-                imageUrl: guide.coverUrl.isNotEmpty
-                    ? guide.coverUrl
-                    : guide.avatarUrl,
-                dateLabel: _controller.timeSlot == null
-                    ? _controller.dateLabel
-                    : '${_controller.dateLabel} · ${_controller.timeSlot}',
                 travelers: booking.travelers,
-                totalPaid: booking.total,
+                totalPrice: booking.total,
+                meetingPoint: _controller.meetingPoint,
               );
-              // Persist it, so the guide sees the booking on their
-              // dashboard.
-              try {
-                await BookingRepository().createPrivateBooking(
-                  guideId: _controller.guideId,
-                  guideName: guide.name,
-                  title: 'Private tour with ${guide.name}',
-                  travelers: booking.travelers,
-                  totalPrice: booking.total,
-                  meetingPoint: _controller.meetingPoint,
-                );
-              } on BookingException catch (e) {
-                messenger.showSnackBar(SnackBar(content: Text(e.message)));
-              }
-              // Same destination as AppRoutes.goToMyTrips, but through the
-              // navigator we already captured (no BuildContext across the
-              // async gap above).
-              navigator.popUntil((route) => route.isFirst);
-              navigator.push(AppRoutes.myTrips());
-            },
-          ),
+            } on BookingException catch (e) {
+              messenger.showSnackBar(SnackBar(content: Text(e.message)));
+            }
+            // Same destination as AppRoutes.goToMyTrips, but through the
+            // navigator we already captured (no BuildContext across the
+            // async gap above).
+            navigator.popUntil((route) => route.isFirst);
+            navigator.push(AppRoutes.myTrips());
+          },
+          onPaymentError: () {
+            messenger.showSnackBar(
+              const SnackBar(
+                content: Text('The payment failed. Please try again.'),
+              ),
+            );
+          },
         ),
-      );
-    } else {
-      final message = checkout.payError ?? 'Payment failed. Please try again.';
-      checkout.dispose();
-      messenger.showSnackBar(SnackBar(content: Text(message)));
-    }
+      ),
+    );
   }
 
   Widget _sectionLabel(String text) {

@@ -27,15 +27,16 @@ class AuthRepository {
     try {
       final uid = credential.user?.uid;
       if (uid != null) {
-        await FirebaseFirestore.instance.collection('users').doc(uid).set(
-          {
-            'fullName': fullName,
-            'email': email,
-            if (phone != null && phone.isNotEmpty) 'phone': phone,
-            'createdAt': FieldValue.serverTimestamp(),
-          },
-          SetOptions(merge: true),
-        );
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'fullName': fullName,
+          'email': email,
+          // The rules read the role with a dot-access, so the field has
+          // to be there — without it the whole document is refused and
+          // the profile never exists.
+          'role': 'tourist',
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
       }
     } catch (_) {}
     return credential;

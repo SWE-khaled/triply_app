@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/auth_repository.dart';
+import '../../../tourist/checkout/paymob_settings.dart';
 
 part 'auth_state.dart';
 
@@ -21,7 +22,10 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit({AuthRepository? authRepository})
     : _authRepository = authRepository ?? AuthRepository(),
       super(const AuthInitial()) {
-    _authSubscription = _authRepository.authStateChanges.listen(_onAuthState);
+    _authSubscription = _authRepository.authStateChanges.listen(
+      _onAuthState,
+      onError: (Object error) => emit(AuthError(error: error.toString())),
+    );
   }
 
   void _onAuthState(User? user) {
@@ -58,6 +62,7 @@ class AuthCubit extends Cubit<AuthState> {
         fullName: fullName,
         phone: phone,
       );
+      _shareBillingData(name: fullName, email: email, phone: phone);
       return true;
     } catch (e) {
       emit(AuthError(error: _authRepository.getErrorMessage(e)));
@@ -70,11 +75,23 @@ class AuthCubit extends Cubit<AuthState> {
     emit(const AuthLoading());
     try {
       await _authRepository.signInWithEmail(email: email, password: password);
+      final user = _authRepository.currentUser;
+      _shareBillingData(
+        name: user?.displayName,
+        email: email,
+        phone: await _authRepository.getUserPhone(user?.uid ?? ''),
+      );
       return true;
     } catch (e) {
       emit(AuthError(error: _authRepository.getErrorMessage(e)));
       return false;
     }
+  }
+
+  /// Hands the tourist's details to the payment, so the billing data of
+  /// the Paymob form carries them instead of "NA".
+  void _shareBillingData({String? name, String? email, String? phone}) {
+    PaymobSettings.initialize(name: name, email: email, phone: phone);
   }
 
   /// Signs in with Google. Returns false on failure.

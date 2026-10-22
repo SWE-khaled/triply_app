@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/tourist/guides/cubit/guides_cubit.dart';
-import 'package:triply/features/tourist/guides/cubit/guides_state.dart';
+
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
 import 'package:triply/features/tourist/guides/widgets/guide_card.dart';
 

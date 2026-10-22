@@ -68,6 +68,9 @@ class AdminGuidesRepository {
   /// Firestore collection holding the verification submissions.
   static const String verificationsCollection = 'guideVerifications';
 
+  /// Firestore collection holding the public guide profiles.
+  static const String guidesCollection = 'guides';
+
   final FirestoreService _firestore;
 
   /// Every guide account, with their verification state.
@@ -138,6 +141,10 @@ class AdminGuidesRepository {
       await _firestore.writeDoc(usersCollection, guideId, {
         'isApproved': approve,
       });
+      // The public profile is what the tourists browse.
+      await _firestore.writeDoc(guidesCollection, guideId, {
+        'isApproved': approve,
+      });
       return true;
     } catch (_) {
       return false;
@@ -150,6 +157,9 @@ class AdminGuidesRepository {
       await _firestore.writeDoc(usersCollection, guideId, {
         'isApproved': false,
         'isActive': false,
+      });
+      await _firestore.writeDoc(guidesCollection, guideId, {
+        'isApproved': false,
       });
       return true;
     } catch (_) {

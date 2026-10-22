@@ -26,13 +26,11 @@ dependencies:
 
   # State management & networking
   flutter_bloc: ^9.1.1
-  http: ^1.6.0
 
   # Utilities
   flutter_dotenv: ^6.0.1
   url_launcher: ^6.3.1
   image_picker: ^1.2.3
-  webview_flutter: ^4.14.1
   cloudinary_public: ^0.23.1
   file_picker: ^13.1.0
 
@@ -44,6 +42,9 @@ dependencies:
   iconsax_flutter: ^1.0.0
   pdf: ^3.13.1
 
+  # Payments — it brings dio and webview_flutter with it
+  pay_with_paymob: ^1.4.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -53,5 +54,5 @@ flutter:
   uses-material-design: true
 
   assets:
-  #  - .env
+    - .env
     - assets/images/svg/
