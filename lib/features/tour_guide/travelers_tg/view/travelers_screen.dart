@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
@@ -89,7 +88,7 @@ class _TravelersView extends StatelessWidget {
                             ? state.travelers.length
                             : 0;
                         return Text(
-                          '${trip.scheduleLabel} · $count travelers_tg',
+                          '${trip.scheduleLabel} · $count traveler${count == 1 ? '' : 's'}',
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             color: Colors.white.withValues(alpha: 0.75),
@@ -130,7 +129,7 @@ class _TravelersView extends StatelessWidget {
                               padding: EdgeInsets.symmetric(vertical: 24),
                               child: Center(
                                 child: Text(
-                                  'No travelers_tg yet',
+                                  'No travelers yet',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: AppColors.subtitle,
@@ -140,14 +139,7 @@ class _TravelersView extends StatelessWidget {
                             )
                           else
                             for (int i = 0; i < travelers.length; i++) ...[
-                              TravelerCard(
-                                traveler: travelers[i],
-                                onViewProfile: () => showAppSnackBar(
-                                  context,
-                                  'Traveler profile_tg is not available yet',
-                                  icon: Icons.info_outline,
-                                ),
-                              ),
+                              TravelerCard(traveler: travelers[i]),
                               if (i != travelers.length - 1)
                                 const SizedBox(height: 10),
                             ],

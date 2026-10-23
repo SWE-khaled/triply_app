@@ -8,9 +8,12 @@ part 'admin_auth_state.dart';
 
 /// Admin authentication, backed by Firebase Auth.
 ///
-/// The access rule is the `role` field of the signed-in user's Firestore
-/// document - not an email pattern - and the security rules enforce it
-/// again on every write.
+/// Two access conditions, both enforced here and again by the
+/// security rules on every write:
+/// 1. The `role` field of the signed-in user's Firestore document
+///    must be `admin`.
+/// 2. The email must carry the [requiredEmailFragment] fragment
+///    (e.g. `ayatriply@gmail.com`, `saratriply@gmail.com`).
 ///
 /// The very first account of a fresh project may claim the admin role
 /// itself (the rules allow it while the project has no admin yet).
@@ -37,6 +40,23 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
   static const String alreadyAnAdminMessage =
       'This project already has an admin. Ask that admin to set your role.';
 
+  /// The email fragment every admin account must contain, e.g.
+  /// `ayatriply@gmail.com`. Change this one constant if the naming
+  /// scheme ever changes.
+  static const String requiredEmailFragment = 'triply@gmail.com';
+
+  static const String emailNotAllowedMessage =
+      'This email is not suitable for the admin path.';
+
+  /// Whether [email] carries the required admin fragment.
+  /// Case-insensitive; the dashboard refuses anything else on top of
+  /// the `role: 'admin'` Firestore check.
+  static bool isAllowedAdminEmail(String? email) {
+    final value = (email ?? '').trim().toLowerCase();
+    if (value.isEmpty) return false;
+    return value.contains(requiredEmailFragment);
+  }
+
   /// The signed-in admin, or null.
   AdminSession? get session => switch (state) {
     AdminAuthSuccess(:final session) => session,
@@ -54,11 +74,24 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
 
   Future<bool> login({required String email, required String password}) async {
     emit(const AdminAuthLoading());
+    // Email naming rule first — no Firebase call for a wrong-format
+    // admin address.
+    if (!isAllowedAdminEmail(email)) {
+      emit(AdminAuthError(error: emailNotAllowedMessage));
+      return false;
+    }
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
+      // Re-check on the account identity itself, not only the typed
+      // text — the session is dropped for a non-Triply admin address.
+      if (!isAllowedAdminEmail(credential.user!.email)) {
+        await _auth.signOut();
+        emit(AdminAuthError(error: emailNotAllowedMessage));
+        return false;
+      }
       final uid = credential.user!.uid;
       final role = await _roleOf(uid);
       if (role != 'admin') {
@@ -98,6 +131,10 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
       }
       if (password.length < 6) {
         emit(AdminAuthError(error: 'Password must be at least 6 characters.'));
+        return false;
+      }
+      if (!isAllowedAdminEmail(email)) {
+        emit(AdminAuthError(error: emailNotAllowedMessage));
         return false;
       }
       final credential = await _auth.createUserWithEmailAndPassword(

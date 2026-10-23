@@ -5,7 +5,6 @@ import 'package:triply/features/tourist/guides/view/guides_list_screen.dart';
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
 import 'package:triply/features/tourist/map/view/map_view.dart';
 import 'package:triply/features/tourist/place_details/view/place_details_view.dart';
-import 'package:triply/core/data/mock/tourist/mock_trips_public.dart';
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -121,22 +120,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    children: [
-                      for (final guide in controller.guides)
-                        GuideTile(
-                          guide: guide,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    GuideProfileScreen(guideId: guide.id),
+                  child: controller.guides.isEmpty
+                      ? const _SectionEmpty(
+                          icon: Icons.person_search_outlined,
+                          message: 'No guides published yet — check back soon!',
+                        )
+                      : Column(
+                          children: [
+                            for (final guide in controller.guides)
+                              GuideTile(
+                                guide: guide,
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => GuideProfileScreen(
+                                        guideId: guide.id,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
-                            );
-                          },
+                          ],
                         ),
-                    ],
-                  ),
                 ),
                 const SizedBox(height: 12),
                 Padding(
@@ -150,21 +155,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                SizedBox(
-                  height: 180,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: controller.trips.length,
-                    itemBuilder: (context, i) {
-                      final trip = controller.trips[i];
-                      return TripCard(
-                        trip: trip,
-                        onTap: () => _openTripDetails(context, trip),
-                      );
-                    },
-                  ),
-                ),
+                controller.trips.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: _SectionEmpty(
+                          icon: Icons.map_outlined,
+                          message:
+                              'No trips published yet — guides are adding new trips!',
+                        ),
+                      )
+                    : SizedBox(
+                        height: 180,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: controller.trips.length,
+                          itemBuilder: (context, i) {
+                            final trip = controller.trips[i];
+                            return TripCard(
+                              trip: trip,
+                              onTap: () => _openTripDetails(context, trip),
+                            );
+                          },
+                        ),
+                      ),
                 const SizedBox(height: 24),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
@@ -224,13 +238,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openTripDetails(BuildContext context, Trip trip) {
-    final match = mockTripsJson.firstWhere(
-      (e) => e['id'] == trip.id || e['title'] == trip.title,
-      orElse: () => mockTripsJson.first,
+    // Open the real trip — no mock lookup. The details cubit re-reads
+    // the trip from Firestore by its id; the card fields carry over as
+    // the offline fallback so a trip never shows another trip's content.
+    Navigator.of(context).push(
+      AppRoutes.tripDetails(
+        trips_model.Trip(
+          id: trip.id,
+          title: trip.title,
+          dateLabel: trip.dateLabel,
+          guideName: trip.guideName,
+          peopleCount: 0,
+          priceEgp: trip.price,
+          imageUrl: trip.imageUrl,
+          status: trips_model.TripStatus.upcoming,
+          category: '',
+          capacity: trip.capacity,
+        ),
+      ),
     );
-    Navigator.of(
-      context,
-    ).push(AppRoutes.tripDetails(trips_model.Trip.fromJson(match)));
   }
 
   Widget _buildHeroHeader(BuildContext context, String? photoUrl, String name) {
@@ -348,6 +374,43 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The friendly placeholder shown when a home section has no data yet
+/// (no approved guides / no approved trips) — instead of blank space.
+class _SectionEmpty extends StatelessWidget {
+  const _SectionEmpty({required this.icon, required this.message});
+
+  final IconData icon;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: AppColors.primaryTeal, size: 30),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.textDark.withValues(alpha: 0.6),
+              height: 1.4,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -9,8 +9,6 @@ import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart'
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import 'tour_guide_signup_screen.dart';
 import 'tour_guide_verification_screen.dart';
-// Tourist home (for role-based redirect when a tourist logs in here)
-import '../../../tourist/home/view/home_screen.dart';
 
 class TourGuideLoginScreen extends StatefulWidget {
   const TourGuideLoginScreen({super.key});
@@ -42,7 +40,9 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
     if (!mounted) return;
 
     if (role == null) {
-      // Error is set in the cubit, show snackbar
+      // Error is set in the cubit, show snackbar (this also covers the
+      // cross-role guard: the service throws "tourist account" and signs
+      // the session out before anything opens).
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(cubit.errorMessage ?? 'Login failed'),
@@ -53,28 +53,24 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
           ),
         ),
       );
-    } else if (role == 'guide') {
-      // Verified guides go straight home; others complete verification.
-      // Verification state lives in Firestore, so it survives logout/login.
-      final approved = await TourGuideAuthService().isVerificationApproved();
-      if (!mounted) return;
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (_) => approved
-              ? const GuideDashboardScreen()
-              : const TourGuideVerificationScreen(),
-        ),
-        (route) => false,
-      );
-    } else {
-      // Tourist account logged in via the guide screen - redirect to tourist home
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-        (route) => false,
-      );
+      return;
     }
+
+    // The service only lets a guide account through (non-guide roles
+    // are signed out and thrown), so a successful sign-in is a guide.
+    // Verified guides go straight home; others complete verification.
+    // Verification state lives in Firestore, so it survives logout/login.
+    final approved = await TourGuideAuthService().isVerificationApproved();
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (_) => approved
+            ? const GuideDashboardScreen()
+            : const TourGuideVerificationScreen(),
+      ),
+      (route) => false,
+    );
   }
 
   @override

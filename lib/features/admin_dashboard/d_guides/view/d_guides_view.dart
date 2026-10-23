@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
@@ -18,21 +19,24 @@ class _GuidesViewState extends State<GuidesView> {
 
   List<AdminGuide> _guides = const [];
   bool _loading = true;
+  StreamSubscription<List<AdminGuide>>? _guidesSubscription;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _guidesSubscription = _repository.watchGuides().listen((guides) {
+      if (!mounted) return;
+      setState(() {
+        _guides = guides;
+        _loading = false;
+      });
+    });
   }
 
-  /// Reads the guide accounts and their verification state.
-  Future<void> _load() async {
-    final guides = await _repository.fetchGuides();
-    if (!mounted) return;
-    setState(() {
-      _guides = guides;
-      _loading = false;
-    });
+  @override
+  void dispose() {
+    _guidesSubscription?.cancel();
+    super.dispose();
   }
 
   int get _pendingCount => _guides.where((g) => g.status == 'pending').length;
@@ -54,7 +58,6 @@ class _GuidesViewState extends State<GuidesView> {
       _toast('Could not approve the guide.');
       return;
     }
-    await _load();
   }
 
   /// Rejects the guide's documents and writes the decision back.
@@ -71,7 +74,6 @@ class _GuidesViewState extends State<GuidesView> {
       _toast('Could not reject the guide.');
       return;
     }
-    await _load();
   }
 
   /// Asks the admin why the documents were refused.
@@ -133,7 +135,6 @@ class _GuidesViewState extends State<GuidesView> {
       _toast('Could not suspend the guide.');
       return;
     }
-    await _load();
   }
 
   void _showDetails(AdminGuide guide) {

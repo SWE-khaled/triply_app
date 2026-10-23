@@ -122,6 +122,18 @@ class AdminGuidesRepository {
     }
   }
 
+  /// Real-time view of every guide account and its verification state.
+  ///
+  /// Re-emits the full guide list whenever the verification collection
+  /// changes, so the admin dashboard stays in sync without a refresh.
+  Stream<List<AdminGuide>> watchGuides() async* {
+    await for (final _ in _firestore
+        .collection(verificationsCollection)
+        .snapshots()) {
+      yield await fetchGuides();
+    }
+  }
+
   /// Approves or rejects a guide's verification documents.
   ///
   /// Writes the decision on the submission and the `isApproved` flag on

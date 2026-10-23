@@ -95,6 +95,25 @@ class GuideDashboardRepository {
     }
   }
 
+  /// Watches the dashboard numbers live.
+  ///
+  /// Re-emits whenever any booking of this guide changes — a tourist
+  /// paying with Paymob creates a booking document, and the Firestore
+  /// snapshot listener fires without any tab switch or reload.
+  Stream<GuideDashboardMetrics> watchMetrics() async* {
+    final uid = currentGuideId;
+    if (uid == null) {
+      yield _mockMetrics();
+      return;
+    }
+    await for (final _ in _firestore
+        .collection(bookingsCollection)
+        .where('guideId', isEqualTo: uid)
+        .snapshots()) {
+      yield await fetchMetrics();
+    }
+  }
+
   /// The dashboard counters, combining the trips with the bookings.
   Future<GuideDashboardStats> fetchStats(List<GuideTrip> trips) async {
     final metrics = await fetchMetrics();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
+import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/constants/app_routes.dart';
@@ -46,12 +47,14 @@ class _GuideTripsView extends StatefulWidget {
 class _GuideTripsViewState extends State<_GuideTripsView> {
   int bottomIndex = 1; // My Trips
 
+  /// The status tabs of the screen. `completed` and `cancelled` are not
+  /// shown as tabs (the guide cannot act on those trips anymore) — but
+  /// the filter itself still accepts them, so the dashboard's
+  /// "Completed Trips" card can open the completed list directly.
   static const List<GuideTripStatus> tabValues = [
     GuideTripStatus.active,
     GuideTripStatus.pending,
     GuideTripStatus.rejected,
-    GuideTripStatus.completed,
-    GuideTripStatus.cancelled,
   ];
 
   void _openDetails(BuildContext context, GuideTrip trip) {
@@ -106,12 +109,74 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
     });
   }
 
-  void _todo(String what) {
-    showAppSnackBar(
-      context,
-      '$what is not available yet',
-      icon: Icons.info_outline,
+  /// Asks before deleting: a trip cannot come back from Firestore.
+  Future<void> _confirmDelete(BuildContext context, GuideTrip trip) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'Delete trip?',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.title,
+            ),
+          ),
+          content: Text(
+            '"${trip.title}" will be removed permanently, together with its details.',
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: AppColors.subtitle,
+              height: 1.4,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.subtitle,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Delete',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
+    if (confirmed != true || !context.mounted) return;
+    await context.read<GuideTripsCubit>().deleteTrip(trip);
+    if (!context.mounted) return;
+    final state = context.read<GuideTripsCubit>().state;
+    if (state is GuideTripsSuccess) {
+      showAppSnackBar(context, 'Trip deleted', icon: Icons.check_circle);
+    } else if (state is GuideTripsError) {
+      showAppSnackBar(context, state.error, icon: Icons.error_outline);
+    }
   }
 
   @override
@@ -279,9 +344,9 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                                 }
                                 return GuideTripCard(
                                   trip: trip,
-                                  onMenu: () => _todo('Trip options'),
                                   onView: () => _openDetails(context, trip),
                                   onManage: () => _openManage(context, trip),
+                                  onDelete: () => _confirmDelete(context, trip),
                                 );
                               },
                             ),
@@ -303,8 +368,18 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
         onTap: (i) {
           if (i == bottomIndex) return;
           if (i == 2) {
-            // Guide's own profile_tg (Nour Abdallah in mock data).
-            Navigator.of(context).push(AppRoutes.guideProfile('g2'));
+            // The guide's own profile — always the signed-in account,
+            // never a mock guide id.
+            final uid = context.read<AuthCubit>().user?.uid;
+            if (uid == null) {
+              showAppSnackBar(
+                context,
+                'Sign in to see your profile',
+                icon: Icons.info_outline,
+              );
+              return;
+            }
+            Navigator.of(context).push(AppRoutes.guideProfile(uid));
             return;
           }
           if (i == 0) {

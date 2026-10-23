@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,13 +26,59 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
 
   ProfileTgCubit({required this.guideId}) : super(const ProfileTgInitial()) {
     loadRemoteProfile();
+    // Live verification: the VERIFIED badge follows the admin's approve /
+    // reject decision through Firestore snapshots — no reload needed.
+    // Lives on guideVerifications/{uid}, exactly the document the admin
+    // dashboard writes, so the screen always agrees with it.
+    _verificationSubscription = TourGuideAuthService()
+        .watchVerificationSubmission()
+        .listen((data) {
+      // No submission yet: the profile value decides (never hide an
+      // approved badge because the guide has no document).
+      if (data == null) return;
+      _liveVerified = (data['status'] as String?) == 'approved';
+      _refreshVerificationOnly();
+    }, onError: (_) {
+      // Offline or no access: keep the loaded value, never crash.
+    });
+  }
+
+  /// Subscription to the guide's live verification status.
+  StreamSubscription<Map<String, dynamic>?>? _verificationSubscription;
+
+  /// The admin's latest verification decision, or null until a
+  /// submission document exists (then the profile value decides).
+  bool? _liveVerified;
+
+  /// Re-emits the current success state untouched — the screen's
+  /// BlocBuilder rebuilds and reads the fresh [isVerified].
+  void _refreshVerificationOnly() {
+    final current = state;
+    if (current is ProfileTgSuccess) {
+      safeEmit(
+        ProfileTgSuccess(
+          nameOverride: current.nameOverride,
+          photoOverride: current.photoOverride,
+          coverPath: current.coverPath,
+          bookmarked: current.bookmarked,
+          remotePhone: current.remotePhone,
+          remoteAbout: current.remoteAbout,
+          remoteLocation: current.remoteLocation,
+        ),
+      );
+    }
   }
 
   /// The languages the guide registered with, read from Firestore.
   List<String> get languages => _profile?.languages ?? const [];
 
-  /// Whether the admin approved this guide, read from Firestore.
-  bool get isVerified => _profile?.isApproved ?? false;
+  /// Whether the admin approved this guide — the live verification
+  /// decision when a submission exists, the profile value otherwise.
+  bool get isVerified {
+    final live = _liveVerified;
+    if (live != null) return live;
+    return _profile?.isApproved ?? false;
+  }
 
   /// The guide's specialty, or empty when they have not set one.
   String get specialty => '';
@@ -245,5 +293,11 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
         remoteLocation: current.remoteLocation,
       ),
     );
+  }
+
+  @override
+  Future<void> close() {
+    _verificationSubscription?.cancel();
+    return super.close();
   }
 }

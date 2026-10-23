@@ -43,6 +43,24 @@ class CreateTripScreen extends StatelessWidget {
         final details = initialDetails;
         if (details != null) cubit.prefill(details);
         cubit.phoneCtrl.text = initialTrip?.phone ?? '';
+        // The live capacity so the guide sees (and can change) the
+        // maximum travelers they saved — not an empty field.
+        final capacity = initialTrip?.capacity ?? 0;
+        cubit.maxTravelersCtrl.text = capacity > 0
+            ? capacity.toString()
+            : '';
+        // Experience Label is stored on the details, not the trip.
+        if (details != null) cubit.labelCtrl.text = details.tag.trim();
+        // The picked date/time come back in the exact formats the
+        // pickers write and `startAt` parses (d/m/yyyy, h:mm AM/PM).
+        final start = initialTrip?.startAt;
+        if (start != null) {
+          cubit.dateCtrl.text = '${start.day}/${start.month}/${start.year}';
+          final hour12 = start.hour % 12 == 0 ? 12 : start.hour % 12;
+          final marker = start.hour >= 12 ? 'PM' : 'AM';
+          cubit.timeCtrl.text =
+              '$hour12:${start.minute.toString().padLeft(2, '0')} $marker';
+        }
         return cubit;
       },
       child: _CreateTripView(

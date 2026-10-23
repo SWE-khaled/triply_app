@@ -5,9 +5,8 @@ import '../model/traveler.dart';
 
 class TravelerCard extends StatelessWidget {
   final Traveler traveler;
-  final VoidCallback? onViewProfile;
 
-  const TravelerCard({super.key, required this.traveler, this.onViewProfile});
+  const TravelerCard({super.key, required this.traveler});
 
   @override
   Widget build(BuildContext context) {
@@ -78,30 +77,6 @@ class TravelerCard extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: GestureDetector(
-              onTap: onViewProfile,
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.tabSelectedBg,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Text(
-                  'View Profile',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),

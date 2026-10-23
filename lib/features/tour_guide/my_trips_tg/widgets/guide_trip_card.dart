@@ -10,14 +10,14 @@ class GuideTripCard extends StatelessWidget {
   final GuideTrip trip;
   final VoidCallback? onView;
   final VoidCallback? onManage;
-  final VoidCallback? onMenu;
+  final VoidCallback? onDelete;
 
   const GuideTripCard({
     super.key,
     required this.trip,
     this.onView,
     this.onManage,
-    this.onMenu,
+    this.onDelete,
   });
 
   @override
@@ -68,14 +68,16 @@ class GuideTripCard extends StatelessWidget {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: onMenu,
+                                  onTap: onDelete,
                                   behavior: HitTestBehavior.opaque,
-                                  child: const Padding(
-                                    padding: EdgeInsets.only(left: 4),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 4),
                                     child: Icon(
-                                      Icons.more_horiz,
+                                      Icons.delete_outline,
                                       size: 20,
-                                      color: AppColors.subtitle,
+                                      color: onDelete == null
+                                          ? AppColors.subtitle
+                                          : Colors.redAccent,
                                     ),
                                   ),
                                 ),

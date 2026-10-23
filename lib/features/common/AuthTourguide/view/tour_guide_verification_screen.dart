@@ -318,59 +318,142 @@ class _TourGuideVerificationScreenState
                     ),
                     const SizedBox(height: 20),
 
-                    // Upload ID Box
-                    _buildUploadBox(
-                      number: '1',
-                      title: 'Upload your ID',
-                      subtitle: 'JPG, PNG or PDF · max 10 MB',
-                      file: _idFile,
-                      onTap: _isLoading ? null : () => _pickFile(1),
+                    // Live submission status — follows the admin's
+                    // decision through Firestore snapshots, no reload.
+                    StreamBuilder<Map<String, dynamic>?>(
+                      stream: _authService.watchVerificationSubmission(),
+                      builder: (context, snapshot) {
+                        final data = snapshot.data;
+                        final status = data?['status'] as String?;
+                        if (status == null) return const SizedBox.shrink();
+                        if (status == 'approved') {
+                          return _buildStatusCard(
+                            color: Colors.green,
+                            icon: Icons.verified,
+                            title: 'Documents approved',
+                            message:
+                                'Your documents are approved. You can publish trips now.',
+                          );
+                        }
+                        if (status == 'rejected') {
+                          final reason =
+                              (data?['rejectionReason'] as String?) ?? '';
+                          return _buildStatusCard(
+                            color: Colors.red,
+                            icon: Icons.cancel_outlined,
+                            title: 'Documents rejected',
+                            message: reason.isEmpty
+                                ? 'Please review and re-upload your documents.'
+                                : reason,
+                          );
+                        }
+                        return _buildStatusCard(
+                          color: const Color(0xFF2E7D8F),
+                          icon: Icons.hourglass_top,
+                          title: 'Documents under review',
+                          message:
+                              'We received your documents. The admin usually responds within 3–6 working days. You cannot re-upload until a decision is made.',
+                        );
+                      },
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 16),
 
-                    // Upload Guide License Box
-                    _buildUploadBox(
-                      number: '2',
-                      title: 'Upload guide license',
-                      subtitle:
-                          'Tourism ID, syndicate card or professional license',
-                      file: _licenseFile,
-                      onTap: _isLoading ? null : () => _pickFile(2),
+                    // Upload ID Box + Upload Guide License Box.
+                    // The pickers follow the live status: locked while the
+                    // submission is pending or approved — documents may
+                    // only be replaced after a rejection.
+                    StreamBuilder<Map<String, dynamic>?>(
+                      stream: _authService.watchVerificationSubmission(),
+                      builder: (context, snapshot) {
+                        final status =
+                            snapshot.data?['status'] as String?;
+                        final locked =
+                            status == 'pending' || status == 'approved';
+                        return Column(
+                          children: [
+                            _buildUploadBox(
+                              number: '1',
+                              title: 'Upload your ID',
+                              subtitle: 'JPG, PNG or PDF · max 10 MB',
+                              file: _idFile,
+                              onTap:
+                                  (locked || _isLoading) ? null : () => _pickFile(1),
+                            ),
+                            const SizedBox(height: 14),
+
+                            // Upload Guide License Box
+                            _buildUploadBox(
+                              number: '2',
+                              title: 'Upload guide license',
+                              subtitle:
+                                  'Tourism ID, syndicate card or professional license',
+                              file: _licenseFile,
+                              onTap:
+                                  (locked || _isLoading) ? null : () => _pickFile(2),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 36),
 
-                    // Submit for Review Button
+                    // Submit / Re-submit Button: disabled while the
+                    // submission is pending or approved — the admin
+                    // reviews exactly one submission at a time. Enabled
+                    // again after a rejection (resubmit).
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: canSubmit
-                              ? TourGuideColors.deepNile
-                              : const Color(0xFF7A9B9F),
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32),
-                          ),
-                          elevation: 0,
-                        ),
-                        onPressed: canSubmit ? _submitForReview : null,
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
-                              )
-                            : const Text(
-                                'Submit for Review',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                      child: StreamBuilder<Map<String, dynamic>?>(
+                        stream: _authService.watchVerificationSubmission(),
+                        builder: (context, snapshot) {
+                          final status =
+                              snapshot.data?['status'] as String?;
+                          final approved = status == 'approved';
+                          final pending = status == 'pending';
+                          // Submit when files are chosen, not loading,
+                          // and the submission is neither approved nor
+                          // already under review.
+                          final canSubmitNow =
+                              canSubmit && !approved && !pending && !_isLoading;
+                          return ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: canSubmitNow
+                                  ? TourGuideColors.deepNile
+                                  : const Color(0xFF7A9B9F),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 18,
                               ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32),
+                              ),
+                              elevation: 0,
+                            ),
+                            onPressed: canSubmitNow ? _submitForReview : null,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : Text(
+                                    approved
+                                        ? 'Documents approved ✓'
+                                        : pending
+                                            ? 'Under review — waiting for admin'
+                                            : status == 'rejected'
+                                                ? 'Re-upload documents'
+                                                : 'Submit for Review',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -403,6 +486,54 @@ class _TourGuideVerificationScreenState
           ),
         ),
       ],
+    );
+  }
+
+  /// One live verification status banner (approved / pending / rejected).
+  Widget _buildStatusCard({
+    required Color color,
+    required IconData icon,
+    required String title,
+    required String message,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 26),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: color.withValues(alpha: 0.9),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

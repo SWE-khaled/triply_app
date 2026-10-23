@@ -65,6 +65,22 @@ class GuideTripsCubit extends Cubit<GuideTripsState>
     );
   }
 
+  /// Deletes a trip.
+  ///
+  /// The Trip card disappears immediately (the live Firestore stream
+  /// confirms the same state a moment later). The app keeps no [copyWith],
+  /// so the success state is rebuilt the same way [refresh] does.
+  Future<void> deleteTrip(GuideTrip trip) async {
+    try {
+      await _repository.deleteTrip(trip.id);
+    } catch (e) {
+      safeEmit(GuideTripsError(error: 'Deleting "${trip.title}" failed: $e'));
+      return;
+    }
+    _all = _all.where((t) => t.id != trip.id).toList();
+    refresh();
+  }
+
   List<GuideTrip> _filter(GuideTripStatus status) =>
       _all.where((t) => t.status == status).toList();
 

@@ -197,6 +197,10 @@ class TourGuideAuthService {
   // ──────────────── Login ────────────────
 
   /// Signs in with email/password and returns the role from Firestore.
+  ///
+  /// Cross-role guard: a tourist (or admin) account is signed out
+  /// immediately and a readable exception is thrown — the guide app
+  /// never opens on a non-guide session.
   Future<({UserCredential credential, String role})> signInGuide({
     required String email,
     required String password,
@@ -214,6 +218,13 @@ class TourGuideAuthService {
     }
 
     final role = (doc.data()?['role'] as String?) ?? 'tourist';
+    if (role != 'guide') {
+      // Drop the session at once — the account belongs to another app.
+      await _auth.signOut();
+      throw Exception(
+        'This account is not a guide account — please use the tourist app to sign in.',
+      );
+    }
     return (credential: credential, role: role);
   }
 
@@ -253,6 +264,24 @@ class TourGuideAuthService {
     final doc = await _db.collection('users').doc(uid).get();
     if (!doc.exists || doc.data() == null) return null;
     return TourGuideProfile.fromMap(doc.data()!, uid);
+  }
+
+  /// Watches the signed-in guide's name, live from Firestore.
+  ///
+  /// Firebase Auth's `displayName` is empty for e-mail sign-ups, so
+  /// `users/{uid}.name` is the source of truth — this emits on every
+  /// change (e.g. the guide typing a new name in Edit Profile).
+  /// Emits '' when signed out or when the document carries no name.
+  Stream<String> watchMyName() async* {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) {
+      yield '';
+      return;
+    }
+    await for (final snapshot
+        in _db.collection('users').doc(uid).snapshots()) {
+      yield (((snapshot.data()?['name'] as String?) ?? '')).trim();
+    }
   }
 
   /// Merges profile fields into the guide's Firestore document.
@@ -298,6 +327,44 @@ class TourGuideAuthService {
     }
   }
 
+  /// Watches the signed-in guide's verification status in real time.
+  ///
+  /// Emits `true` when `guideVerifications/{uid}.status == 'approved'`,
+  /// `false` otherwise (pending, rejected, missing doc, offline). The
+  /// dashboard listéne to this so the verification banner disappears the
+  /// moment the admin approves — no tab switch or reload needed.
+  Stream<bool> watchVerificationStatus() async* {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) {
+      yield false;
+      return;
+    }
+    await for (final snapshot
+        in _db.collection('guideVerifications').doc(uid).snapshots()) {
+      final data = snapshot.data();
+      yield data != null && data['status'] == 'approved';
+    }
+  }
+
+  /// Watches the signed-in guide's verification submission live: the
+  /// whole `guideVerifications/{uid}` document.
+  ///
+  /// `null` when signed out or the submission does not exist yet.
+  /// The verification screen listens to this so "under review /
+  /// approved / rejected (+ reason)" always reflects the admin's
+  /// decision the moment it is written.
+  Stream<Map<String, dynamic>?> watchVerificationSubmission() async* {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) {
+      yield null;
+      return;
+    }
+    await for (final snapshot
+        in _db.collection('guideVerifications').doc(uid).snapshots()) {
+      yield snapshot.data();
+    }
+  }
+
   /// Signs out the current Firebase session. Permanent account data
   /// (profile, verification) stays in Firestore — relogin restores it.
   Future<void> signOut() async {
@@ -333,6 +400,9 @@ class TourGuideAuthService {
           return error.message ?? 'An unexpected error occurred.';
       }
     }
-    return error.toString();
+    // Plain `Exception('...')` prints with an "Exception: " prefix —
+    // strip it so the snackbar shows the message only.
+    final text = error.toString();
+    return text.startsWith('Exception: ') ? text.substring(11) : text;
   }
 }

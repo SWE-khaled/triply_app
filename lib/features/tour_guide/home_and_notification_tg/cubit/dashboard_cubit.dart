@@ -33,6 +33,34 @@ class DashboardCubit extends Cubit<DashboardState>
       onError: (Object error) =>
           safeEmit(DashboardError(error: error.toString())),
     );
+    // Live verification: the banner text follows the admin's decision
+    // (pending → "Waiting for admin approval", approved → banner gone).
+    // The Firestore snapshot listener fires without any tab switch or
+    // reload.
+    _verificationSubscription = TourGuideAuthService()
+        .watchVerificationSubmission()
+        .listen(
+          (data) {
+            final status = data?['status'] as String?;
+            _verificationStatus = status;
+            _showVerificationBanner = status != 'approved';
+            if (state is DashboardSuccess) _emitSuccess();
+          },
+          onError: (_) {
+            // Offline or no access: keep the banner, never crash.
+          },
+        );
+    // Live bookings: the counters and the "New bookings" rows follow
+    // every Firestore change — a tourist paying with Paymob shows up
+    // immediately, no tab switch or reload.
+    _metricsSubscription = _dashboardRepository.watchMetrics().listen(
+      (metrics) {
+        _metrics = metrics;
+        if (state is DashboardSuccess) _emitSuccess();
+      },
+      onError: (Object error) =>
+          safeEmit(DashboardError(error: error.toString())),
+    );
     load();
   }
 
@@ -40,15 +68,25 @@ class DashboardCubit extends Cubit<DashboardState>
   final GuideDashboardRepository _dashboardRepository;
 
   StreamSubscription<List<GuideTrip>>? _tripsSubscription;
+  StreamSubscription<Map<String, dynamic>?>? _verificationSubscription;
+  StreamSubscription<GuideDashboardMetrics>? _metricsSubscription;
+
+  /// Whether the verification banner is still shown.
+  bool _showVerificationBanner = true;
+
+  /// The live status from `guideVerifications/{uid}` (`approved`,
+  /// `pending`, `rejected`, or null while there is no submission).
+  String? _verificationStatus;
+
+  /// Read by the banner to pick its text: 'pending' → "Waiting for
+  /// admin approval", anything else → "Verification required".
+  String? get verificationStatus => _verificationStatus;
 
   /// The guide's trips — the source of the trip counters.
   List<GuideTrip> _trips = const [];
 
   /// Booking counters, null until they are loaded.
   GuideDashboardMetrics? _metrics;
-
-  /// Whether the verification banner is still shown.
-  bool _showVerificationBanner = true;
 
   /// Loads the booking counters and the verification status.
   Future<void> load() async {
@@ -114,6 +152,8 @@ class DashboardCubit extends Cubit<DashboardState>
   @override
   Future<void> close() {
     _tripsSubscription?.cancel();
+    _verificationSubscription?.cancel();
+    _metricsSubscription?.cancel();
     return super.close();
   }
 }

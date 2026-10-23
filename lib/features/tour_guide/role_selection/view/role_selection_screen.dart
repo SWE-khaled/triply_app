@@ -207,6 +207,7 @@ class _RoleCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(22),
             child: Stack(
+              fit: StackFit.expand,
               children: [
                 // Arrow icon top-right
                 Positioned(
@@ -226,38 +227,43 @@ class _RoleCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Bottom text
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
+                // Bottom text (bottom-aligned; scrolls instead of overflowing)
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          description,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          buttonText,
+                          style: const TextStyle(
+                            color: Color(0xFFE6A15C),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      description,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      buttonText,
-                      style: const TextStyle(
-                        color: Color(0xFFE6A15C),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),

@@ -11,6 +11,7 @@ class GuideTripsStore {
 
   static final List<GuideTrip> _created = <GuideTrip>[];
   static final Map<String, GuideTrip> _updated = <String, GuideTrip>{};
+  static final Set<String> _deleted = <String>{};
   static final List<VoidCallback> _listeners = <VoidCallback>[];
 
   /// Screens that must rebuild when trips change (e.g. Dashboard stats)
@@ -51,11 +52,25 @@ class GuideTripsStore {
     _notify();
   }
 
+  /// Drops a trip from the session: a locally created trip disappears for
+  /// good, and a session-deleted id is remembered so the mock fallback
+  /// keeps it hidden until the app restarts.
+  static void delete(String tripId) {
+    _created.removeWhere((t) => t.id == tripId);
+    _updated.remove(tripId);
+    _deleted.add(tripId);
+    _notify();
+  }
+
   static List<GuideTrip> get created => List.unmodifiable(_created);
 
-  /// Applies session edits over a base list (matched by id).
+  /// Applies session edits over a base list (matched by id), then filters
+  /// out the trips deleted during this session.
   static List<GuideTrip> applyUpdates(List<GuideTrip> base) {
-    if (_updated.isEmpty) return base;
-    return base.map((t) => _updated[t.id] ?? t).toList();
+    final withoutDeleted = _deleted.isEmpty
+        ? base
+        : base.where((t) => !_deleted.contains(t.id)).toList();
+    if (_updated.isEmpty) return withoutDeleted;
+    return withoutDeleted.map((t) => _updated[t.id] ?? t).toList();
   }
 }

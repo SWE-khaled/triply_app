@@ -88,14 +88,6 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Use an identifier containing "triplykl"',
-                            style: TextStyle(
-                              color: Color(0xFF94A3A8),
-                              fontSize: 15,
-                            ),
-                          ),
                           const SizedBox(height: 28),
                           const Text(
                             'Full Name',

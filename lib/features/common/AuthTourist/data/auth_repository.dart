@@ -2,6 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+/// A cross-role sign-in attempt: the account belongs to the other app.
+///
+/// Thrown when the signed-in account is recorded in Firestore as a
+/// `guide` — the session is signed out immediately so nothing of it
+/// survives. `AuthCubit` shows [message] through `getErrorMessage`.
+class RoleMismatchException implements Exception {
+  final String message;
+
+  RoleMismatchException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 /// Talks to Firebase directly. No UI logic here.
 class AuthRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -83,11 +97,15 @@ class AuthRepository {
   Future<UserCredential> signInWithEmail({
     required String email,
     required String password,
-  }) {
-    return _firebaseAuth.signInWithEmailAndPassword(
+  }) async {
+    final credential = await _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
+    // Reject the guide accounts right away: the session never reaches
+    // the tourist app.
+    await _ensureTouristRole(credential.user?.uid);
+    return credential;
   }
 
   Future<UserCredential> signInWithGoogle() async {
@@ -100,7 +118,45 @@ class AuthRepository {
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-    return _firebaseAuth.signInWithCredential(credential);
+    final result = await _firebaseAuth.signInWithCredential(credential);
+    await _ensureTouristRole(result.user?.uid);
+    return result;
+  }
+
+  /// Blocks every non-tourist account out of the tourist app.
+  ///
+  /// Reads `users/{uid}.role` right after a successful Firebase sign-in;
+  /// when the account is a guide (or an admin) the session is dropped at
+  /// once and a [RoleMismatchException] carries the reason to the UI. A
+  /// missing document (brand-new Google account, offline read) counts as
+  /// a tourist — e-mail sign-up always writes `role: 'tourist'` itself.
+  Future<void> _ensureTouristRole(String? uid) async {
+    if (uid == null) return;
+    final role = await _roleOf(uid);
+    if (role != null && role != 'tourist') {
+      await _firebaseAuth.signOut();
+      await _googleSignIn.signOut();
+      throw RoleMismatchException(
+        role == 'guide'
+            ? 'This account is registered as a guide — please use the guide app to sign in.'
+            : 'This account is not a tourist account — it cannot sign in here.',
+      );
+    }
+  }
+
+  /// The `role` stored on the user's Firestore document, or null.
+  Future<String?> _roleOf(String? uid) async {
+    if (uid == null) return null;
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      return doc.data()?['role'] as String?;
+    } catch (_) {
+      // Offline or rules refused the read: cannot tell, treat as tourist.
+      return null;
+    }
   }
 
   Future<void> sendPasswordResetEmail(String email) {
@@ -112,8 +168,11 @@ class AuthRepository {
     await _firebaseAuth.signOut();
   }
 
-  /// Converts FirebaseAuthException codes into readable messages for the UI.
+  /// Converts sign-in failures into readable messages for the UI.
   String getErrorMessage(Object error) {
+    if (error is RoleMismatchException) {
+      return error.message;
+    }
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'user-not-found':

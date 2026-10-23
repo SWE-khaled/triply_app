@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/data/mock/dashboard/d_mock_places.dart';
 import '../../../../core/data/repositories/admin_trips_repository.dart';
@@ -25,28 +26,26 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
   late List<MockTripApplication> _apps;
   String _query = '';
   bool _loading = true;
+  StreamSubscription<List<AdminTrip>>? _tripsSubscription;
 
   @override
   void initState() {
     super.initState();
     _apps = List.from(mockTripApplications);
-    _load();
+    _tripsSubscription = _repository.watchTrips().listen((trips) {
+      if (!mounted) return;
+      setState(() {
+        _apps = trips.map(_toApplication).toList();
+        _loading = false;
+      });
+    });
   }
 
   @override
   void dispose() {
+    _tripsSubscription?.cancel();
     _search.dispose();
     super.dispose();
-  }
-
-  /// Reads the trips of every guide from Firestore.
-  Future<void> _load() async {
-    final trips = await _repository.fetchTrips();
-    if (!mounted) return;
-    setState(() {
-      _apps = trips.map(_toApplication).toList();
-      _loading = false;
-    });
   }
 
   /// Maps a Firestore trip onto the row the table renders.
@@ -87,7 +86,6 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
       _toast('Could not approve the trip. Are you signed in as an admin?');
       return;
     }
-    await _load();
   }
 
   /// Rejects a trip with a reason and tells the guide.
@@ -149,7 +147,6 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
       _toast('Could not reject the trip. Are you signed in as an admin?');
       return;
     }
-    await _load();
   }
 
   void _toast(String message) {

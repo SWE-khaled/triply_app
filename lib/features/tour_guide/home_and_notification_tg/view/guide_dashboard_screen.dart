@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/constants/app_routes.dart';
 import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
+import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../../common/AuthTourguide/view/tour_guide_verification_screen.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/circle_icon_button.dart';
+import '../../../../../core/widgets/app_snackbar.dart';
 import '../../../../../core/widgets/profile_avatar.dart';
 import '../../../../../core/widgets/state_views.dart';
 import '../cubit/dashboard_cubit.dart';
@@ -14,7 +18,6 @@ import '../../my_trips_tg/model/guide_trip.dart';
 import '../widget/dashboard_booking_request_card.dart';
 import '../widget/guide_bottom_nav.dart';
 import '../widget/stat_card.dart';
-import '../../../../../core/data/mock/tourist/mock_guides.dart';
 import '../../../../../core/data/repositories/guide_notifications_repository.dart';
 import '../model/guide_notification.dart';
 import 'booking_details_screen.dart';
@@ -27,11 +30,6 @@ const Color _cream = Color(0xFFFAF5EA);
 /// Tour-guide home: header, verification banner, stat grid, new bookings.
 class GuideDashboardScreen extends StatelessWidget {
   const GuideDashboardScreen({super.key});
-
-  /// Guide profile opened from this dashboard (avatar + bottom nav).
-  /// Single literal so the welcome-name fallback below always matches
-  /// the profile being displayed.
-  static const _profileGuideId = 'g2';
 
   @override
   Widget build(BuildContext context) {
@@ -95,27 +93,49 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
   /// Live — the badge follows the notifications without a refresh.
   late final Stream<List<GuideNotification>> _notificationsStream;
 
+  /// Live — the guide's own name from Firestore. Firebase Auth's
+  /// `displayName` is empty for e-mail sign-ups, so this is the
+  /// fallback; the session-only mock name is never shown again.
+  String _firestoreName = '';
+  StreamSubscription<String>? _nameSubscription;
+
   @override
   void initState() {
     super.initState();
     _notificationsStream = _notifications.watchNotifications();
+    _nameSubscription = TourGuideAuthService()
+        .watchMyName()
+        .listen((name) {
+          if (!mounted) return;
+          setState(() => _firestoreName = name);
+        });
   }
 
-  /// Mock fallback identical to ProfileController.guide for
-  /// [GuideDashboardScreen._profileGuideId].
-  String get _fallbackGuideName {
-    return mockGuides
-        .firstWhere(
-          (g) => g.id == GuideDashboardScreen._profileGuideId,
-          orElse: () => mockGuides.first,
-        )
-        .name;
+  @override
+  void dispose() {
+    _nameSubscription?.cancel();
+    super.dispose();
   }
 
   void _openNotifications(BuildContext context) {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (_) => const GuideNotificationsScreen()));
+  }
+
+  /// Opens the profile of the signed-in guide — their own public page,
+  /// what the tourists see once the admin approves it.
+  void _openProfile(BuildContext context) {
+    final uid = context.read<AuthCubit>().user?.uid;
+    if (uid == null) {
+      showAppSnackBar(
+        context,
+        'Sign in to see your profile',
+        icon: Icons.info_outline,
+      );
+      return;
+    }
+    Navigator.of(context).push(AppRoutes.guideProfile(uid));
   }
 
   @override
@@ -130,7 +150,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
     final firebaseName = authUser?.displayName?.trim() ?? '';
     final guideName = firebaseName.isNotEmpty
         ? firebaseName
-        : _fallbackGuideName;
+        : (_firestoreName.isNotEmpty ? _firestoreName : 'Guide');
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -180,12 +200,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                     (route) => route.isFirst,
                   );
                 } else if (index == 2) {
-                  Navigator.push(
-                    context,
-                    AppRoutes.guideProfile(
-                      GuideDashboardScreen._profileGuideId,
-                    ),
-                  );
+                  _openProfile(context);
                 }
               },
             ),
@@ -207,9 +222,10 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
     final avatarUrl = firebasePhoto.isNotEmpty
         ? firebasePhoto
         : ProfileAvatar.defaultAvatar;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         _header(context, avatarUrl),
         const SizedBox(height: 16),
         if (showVerificationBanner) ...[
@@ -338,6 +354,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           const SizedBox(height: 12),
         ],
       ],
+    ),
     );
   }
 
@@ -367,7 +384,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                   onTap: () => _openNotifications(context),
                   backgroundColor: Colors.white,
                   iconColor: AppColors.title,
-                  size: 40,
+                  size: 50,
                   iconSize: 24,
                 ),
                 Positioned(
@@ -381,15 +398,10 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
         ),
         const SizedBox(width: 8),
         GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              AppRoutes.guideProfile(GuideDashboardScreen._profileGuideId),
-            );
-          },
+          onTap: () => _openProfile(context),
           behavior: HitTestBehavior.opaque,
           child: ClipOval(
-            child: ProfileAvatar(imageUrl: avatarUrl, width: 40, height: 40),
+            child: ProfileAvatar(imageUrl: avatarUrl, width: 45, height: 45),
           ),
         ),
       ],
@@ -403,6 +415,9 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
   }
 
   Widget _verificationBanner(BuildContext context) {
+    final cubit = context.read<DashboardCubit>();
+    final status = cubit.verificationStatus;
+    final pending = status == 'pending';
     return GestureDetector(
       onTap: () => _openVerification(context),
       behavior: HitTestBehavior.opaque,
@@ -422,19 +437,21 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.person_outline,
+              child: Icon(
+                pending ? Icons.hourglass_top : Icons.person_outline,
                 size: 22,
                 color: AppColors.title,
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Verification required',
+                    pending
+                        ? 'Waiting for admin approval'
+                        : 'Verification required',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -443,7 +460,9 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'Verify your guide license to publish trips.',
+                    pending
+                        ? 'Your documents are under review by the admin.'
+                        : 'Verify your guide license to publish trips.',
                     style: TextStyle(fontSize: 12, color: AppColors.subtitle),
                   ),
                 ],

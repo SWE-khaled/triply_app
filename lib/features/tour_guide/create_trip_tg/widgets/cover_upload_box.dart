@@ -30,7 +30,7 @@ class CoverUploadBox extends StatelessWidget {
         child: Stack(
           children: [
             SizedBox(
-              height: 150,
+              height: 240,
               width: double.infinity,
               child: _coverImage(image),
             ),
@@ -71,7 +71,7 @@ class CoverUploadBox extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Container(
-            height: 150,
+            height: 220,
             alignment: Alignment.center,
             child: Column(
               mainAxisSize: MainAxisSize.min,

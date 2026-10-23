@@ -42,8 +42,15 @@ dependencies:
   iconsax_flutter: ^1.0.0
   pdf: ^3.13.1
 
-  # Payments — it brings dio and webview_flutter with it
+  # Payments — it brings dio and webview_flutter with it.
+  # A pinned dependency that is overridden below: the local fork in
+  # third_party/ injects a mobile viewport into Paymob's hosted pages
+  # so the wallet / card checkout renders correctly on small screens.
   pay_with_paymob: ^1.4.0
+
+dependency_overrides:
+  pay_with_paymob:
+    path: third_party/pay_with_paymob
 
 dev_dependencies:
   flutter_test:

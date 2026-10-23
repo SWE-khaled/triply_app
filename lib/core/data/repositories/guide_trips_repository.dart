@@ -158,8 +158,24 @@ class GuideTripsRepository {
   }
 
   /// Deletes a trip.
+  ///
+  /// Signed out there is nothing in Firestore — the trip is dropped from
+  /// the session store instead. The store cleanup also runs after a
+  /// successful Firestore delete, so a just-created trip that has not
+  /// round-tripped yet cannot reappear before the snapshot arrives.
   Future<void> deleteTrip(String tripId) async {
-    await _firestore.deleteDoc(tripsCollection, tripId);
+    final uid = currentGuideId;
+    if (uid == null) {
+      GuideTripsStore.delete(tripId);
+      return;
+    }
+    try {
+      await _firestore.deleteDoc(tripsCollection, tripId);
+    } catch (e) {
+      debugPrint('GuideTripsRepository.deleteTrip($tripId) failed: $e');
+      rethrow;
+    }
+    GuideTripsStore.delete(tripId);
   }
 
   /// One trip by id, or null when it does not exist.

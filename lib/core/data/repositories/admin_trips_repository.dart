@@ -106,6 +106,18 @@ class AdminTripsRepository {
     }
   }
 
+  /// Real-time view of every guide's trip, newest first.
+  ///
+  /// Re-emits the full trip list whenever the trips collection changes,
+  /// so the admin dashboard stays in sync without a refresh.
+  Stream<List<AdminTrip>> watchTrips() async* {
+    await for (final _ in _firestore
+        .collection(GuideTripsRepository.tripsCollection)
+        .snapshots()) {
+      yield await fetchTrips();
+    }
+  }
+
   /// The trips waiting for a review.
   Future<List<AdminTrip>> fetchPendingTrips() async {
     final trips = await fetchTrips();
