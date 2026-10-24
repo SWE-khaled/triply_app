@@ -85,9 +85,10 @@ async function main() {
     throw new Error(`Refusing production write to ${PROD_PROJECT} without --allow-prod and CONFIRM_PROD=true.`);
   }
 
-  const admin = require('firebase-admin');
-  admin.initializeApp({projectId: project});
-  const db = admin.firestore();
+const { initializeApp } = require('firebase-admin/app');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
+initializeApp({ projectId: project });
+const db = getFirestore();
 
   let written = 0;
   const batchWrite = async (col, docs) => {
@@ -95,8 +96,7 @@ async function main() {
       const batch = db.batch();
       for (const d of docs.slice(i, i + 400)) {
         const {id, ...data} = d;
-        batch.set(db.collection(col).doc(id), {...data, updatedAt: admin.firestore.FieldValue.serverTimestamp()}, {merge: true});
-      }
+batch.set(db.collection(col).doc(id), {...data, updatedAt: FieldValue.serverTimestamp()}, {merge: true});      }
       await batch.commit();
       written += Math.min(400, docs.length - i);
       console.log(`  ${col}: ${Math.min(i + 400, docs.length)}/${docs.length}`);
