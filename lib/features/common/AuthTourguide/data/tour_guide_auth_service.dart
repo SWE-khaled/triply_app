@@ -16,6 +16,9 @@ class TourGuideProfile {
   final String about;
   final String location;
 
+  /// The guide's profile photo — shown on the public guide card seen by tourists.
+  final String photoUrl;
+
   /// The guide's hourly rate in EGP — what a private booking costs.
   final double pricePerHour;
 
@@ -30,6 +33,7 @@ class TourGuideProfile {
     this.isApproved = false,
     this.about = '',
     this.location = '',
+    this.photoUrl = '',
     this.pricePerHour = 0,
   });
 
@@ -43,6 +47,7 @@ class TourGuideProfile {
     'languages': languages,
     'isApproved': isApproved,
     'pricePerHour': pricePerHour,
+    'photoUrl': photoUrl,
     'createdAt': FieldValue.serverTimestamp(),
   };
 
@@ -60,6 +65,7 @@ class TourGuideProfile {
       isApproved: _isApproved(map),
       about: (map['about'] as String?) ?? '',
       location: (map['location'] as String?) ?? '',
+      photoUrl: (map['photoUrl'] as String?) ?? '',
       pricePerHour: (map['pricePerHour'] as num?)?.toDouble() ?? 0,
     );
   }
@@ -115,6 +121,7 @@ class TourGuideAuthService {
       phone: phone,
       licenseNumber: licenseNumber,
       languages: languages,
+      photoUrl: _auth.currentUser?.photoURL ?? '',
       pricePerHour: pricePerHour,
     );
 
@@ -126,7 +133,7 @@ class TourGuideAuthService {
       'guideId': uid,
       'name': name,
       'specialty': '',
-      'avatarUrl': '',
+      'avatarUrl': profile.photoUrl,
       'coverUrl': '',
       'location': '',
       'about': '',
@@ -170,6 +177,9 @@ class TourGuideAuthService {
           'about': profile.about,
           'languages': profile.languages,
           'pricePerHour': profile.pricePerHour,
+          'avatarUrl': profile.photoUrl.isNotEmpty
+              ? profile.photoUrl
+              : (_auth.currentUser?.photoURL ?? ''),
         }, SetOptions(merge: true));
         return;
       }
@@ -177,7 +187,7 @@ class TourGuideAuthService {
         'guideId': uid,
         'name': profile.name,
         'specialty': '',
-        'avatarUrl': '',
+        'avatarUrl': profile.photoUrl,
         'coverUrl': '',
         'location': profile.location,
         'about': profile.about,
@@ -291,6 +301,7 @@ class TourGuideAuthService {
     String? about,
     String? location,
     String? phone,
+    String? photoUrl,
     double? pricePerHour,
   }) async {
     final uid = _auth.currentUser?.uid;
@@ -302,6 +313,7 @@ class TourGuideAuthService {
       'about': ?about,
       'location': ?location,
       'phone': ?phone,
+      'photoUrl': ?photoUrl,
       'pricePerHour': ?pricePerHour,
     };
     if (data.isEmpty) return;

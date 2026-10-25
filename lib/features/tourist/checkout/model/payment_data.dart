@@ -1,10 +1,5 @@
-
-
-
-
-
-import 'package:pay_with_paymob/src/models/style.dart';
-import 'package:pay_with_paymob/src/models/user_data.dart';
+import '../style.dart';
+import 'user_data.dart';
 
 class PaymentData {
   static String _apiKey = "";
@@ -25,11 +20,11 @@ class PaymentData {
     PaymentData._style = style;
   }
 
-   String get apiKey => PaymentData._apiKey;
-   String get integrationCardId => PaymentData._integrationCardId;
-   String get integrationMobileWalletId => PaymentData._integrationMobileWalletId;
-   String get iframeId => PaymentData._iframeId;
-   UserData? get userData => PaymentData._userData;
-   Style? get style => PaymentData._style;
+  String get apiKey => PaymentData._apiKey;
+  String get integrationCardId => PaymentData._integrationCardId;
+  String get integrationMobileWalletId => PaymentData._integrationMobileWalletId;
+  String get iframeId => PaymentData._iframeId;
+  UserData? get userData => PaymentData._userData;
+  Style? get style => PaymentData._style;
 
 }

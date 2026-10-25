@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class AuthButton extends StatelessWidget {
   final String label;
@@ -12,7 +12,7 @@ class AuthButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isLoading = false,
-    this.backgroundColor = AuthColors.signInDark,
+    this.backgroundColor = AppColors.signInDark,
   });
 
   @override

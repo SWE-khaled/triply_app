@@ -105,7 +105,7 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
   /// Reads phone/about/location from Firestore. Safe to call repeatedly;
   /// failures leave the previous values in place.
   Future<void> loadRemoteProfile() async {
-    if (state is ProfileTgInitial) safeEmit(const ProfileTgLoading());
+    safeEmit(const ProfileTgLoading());
     try {
       final service = TourGuideAuthService();
       final profile = await service.fetchMyProfile();

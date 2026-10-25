@@ -290,14 +290,12 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
             const SizedBox(width: 12),
             Expanded(
               child: StatCard(
-                icon: Icons.layers_outlined,
-                value: '${stats.completedTrips}',
-                label: 'Completed Trips',
+                icon: Icons.cancel_outlined,
+                value: '${stats.rejectedTrips}',
+                label: 'Rejected Trips',
                 onTap: () => Navigator.push(
                   context,
-                  AppRoutes.guideTrips(
-                    initialStatus: GuideTripStatus.completed,
-                  ),
+                  AppRoutes.guideTrips(initialStatus: GuideTripStatus.rejected),
                 ),
               ),
             ),

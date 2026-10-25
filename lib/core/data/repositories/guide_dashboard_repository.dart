@@ -129,7 +129,7 @@ class GuideDashboardRepository {
       upcomingTrips:
           count(GuideTripStatus.active) + count(GuideTripStatus.pending),
       activeTrips: count(GuideTripStatus.active),
-      completedTrips: count(GuideTripStatus.completed),
+      rejectedTrips: count(GuideTripStatus.rejected),
       earningsLabel: _formatAmount(metrics.totalEarnings),
       pendingRequests: count(GuideTripStatus.pending),
     );

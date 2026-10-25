@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/cubit/tour_guide_auth_cubit.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_header.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
+import '../../../../core/constants/app_colors.dart';
 import 'tour_guide_login_screen.dart';
 import 'tour_guide_verification_screen.dart';
 
@@ -104,7 +104,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                             const Text(
                               'Create your professional guide account.',
                               style: TextStyle(
-                                color: AuthColors.textGrey,
+                                color: AppColors.textGrey,
                                 fontSize: 15,
                               ),
                             ),
@@ -141,7 +141,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                               prefix: const Text(
                                 '🇪🇬 +20 ',
                                 style: TextStyle(
-                                  color: AuthColors.textGrey,
+                                  color: AppColors.textGrey,
                                   fontSize: 15,
                                 ),
                               ),
@@ -237,7 +237,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                                   const Text(
                                     'Already have an account? ',
                                     style: TextStyle(
-                                      color: AuthColors.textGrey,
+                                      color: AppColors.textGrey,
                                     ),
                                   ),
                                   GestureDetector(
@@ -250,7 +250,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                                     child: const Text(
                                       'Log In',
                                       style: TextStyle(
-                                        color: AuthColors.signInDark,
+                                        color: AppColors.signInDark,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),

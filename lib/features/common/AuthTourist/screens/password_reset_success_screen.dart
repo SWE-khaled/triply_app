@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../widgets/auth_button.dart';
 import 'sign_in_screen.dart';
 
@@ -21,12 +21,12 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 width: 90,
                 height: 90,
                 decoration: BoxDecoration(
-                  color: AuthColors.lightCircleBg,
+                  color: AppColors.lightCircleBg,
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: const Icon(
                   Icons.check,
-                  color: AuthColors.successTeal,
+                  color: AppColors.successTeal,
                   size: 44,
                 ),
               ),
@@ -39,7 +39,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               const Text(
                 'Your password has been updated successfully. Sign in with your new password.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AuthColors.textGrey, fontSize: 15),
+                style: TextStyle(color: AppColors.textGrey, fontSize: 15),
               ),
               const SizedBox(height: 32),
               AuthButton(

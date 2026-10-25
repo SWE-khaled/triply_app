@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/safe_emit_mixin.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,12 +16,93 @@ import '../model/guide_trip_draft.dart';
 
 part 'create_trip_state.dart';
 
-/// Owns the Create Trip form: static field controllers + dynamic
-/// Highlights/Itinerary rows.
+/// The text the guide typed in the static fields of the form.
 ///
-/// Controllers are created here so every section/row reads one source;
-/// they are disposed in [close]. No validation UI here — [submitTrip] and
-/// [saveEdit] return a message and the View shows it.
+/// The View owns the controllers and hands this snapshot to the cubit
+/// when it previews or submits. Every value is already trimmed.
+class TripFormData {
+  final String name;
+  final String about;
+  final String location;
+  final String label;
+
+  /// `d/m/yyyy`, as the date picker writes it.
+  final String date;
+
+  /// `h:mm AM/PM`, as the time picker writes it.
+  final String time;
+  final String duration;
+  final String price;
+  final String maxTravelers;
+  final String meeting;
+  final String included;
+  final String notes;
+  final String languages;
+  final String phone;
+
+  const TripFormData({
+    required this.name,
+    required this.about,
+    required this.location,
+    required this.label,
+    required this.date,
+    required this.time,
+    required this.duration,
+    required this.price,
+    required this.maxTravelers,
+    required this.meeting,
+    required this.included,
+    required this.notes,
+    required this.languages,
+    required this.phone,
+  });
+
+  /// The moment the trip starts, parsed from the date + time fields.
+  ///
+  /// Returns null when the guide did not pick a date.
+  DateTime? get startAt {
+    if (date.isEmpty) return null;
+    final parts = date.split('/');
+    if (parts.length != 3) return null;
+    final day = int.tryParse(parts[0].trim());
+    final month = int.tryParse(parts[1].trim());
+    final year = int.tryParse(parts[2].trim());
+    if (day == null || month == null || year == null) return null;
+
+    var hour = 0;
+    var minute = 0;
+    if (time.isNotEmpty) {
+      final match = RegExp(
+        r'^(\d{1,2}):(\d{2})\s*(AM|PM|ص|م)$',
+        caseSensitive: false,
+      ).firstMatch(time);
+      if (match != null) {
+        hour = int.parse(match.group(1)!);
+        minute = int.parse(match.group(2)!);
+        final marker = match.group(3)!.toUpperCase();
+        final isPm = marker == 'PM' || marker == 'م';
+        if (isPm && hour != 12) hour += 12;
+        if (!isPm && hour == 12) hour = 0;
+      }
+    }
+    return DateTime(year, month, day, hour, minute);
+  }
+
+  /// The notes, one per line, without the empty ones.
+  List<String> get noteLines => notes
+      .split('\n')
+      .map((n) => n.trim())
+      .where((n) => n.isNotEmpty)
+      .toList();
+}
+
+/// Owns the dynamic part of the Create Trip form: the Highlights and
+/// Itinerary rows and the cover.
+///
+/// The text controllers of the static fields live in the View; the cubit
+/// receives their content as a [TripFormData] when it needs it.
+/// No validation UI here — [submitTrip] and [saveEdit] return a message
+/// and the View shows it.
 ///
 /// Submitting writes the trip to Firestore through [GuideTripsRepository]
 /// and keeps a session copy so the list updates instantly.
@@ -32,46 +113,8 @@ class CreateTripCubit extends Cubit<CreateTripState>
   final GuideTripsRepository _repository;
 
   CreateTripCubit({GuideTripsRepository? repository})
-    : _repository = repository ?? GuideTripsRepository(),
-      super(const CreateTripInitial());
-
-  final nameCtrl = TextEditingController();
-  final aboutCtrl = TextEditingController();
-  final locationCtrl = TextEditingController();
-  final labelCtrl = TextEditingController();
-  final dateCtrl = TextEditingController();
-  final timeCtrl = TextEditingController();
-  final durationCtrl = TextEditingController();
-  final priceCtrl = TextEditingController();
-  final maxTravelersCtrl = TextEditingController();
-  final meetingCtrl = TextEditingController();
-  final includedCtrl = TextEditingController();
-  final notesCtrl = TextEditingController();
-  final languagesCtrl = TextEditingController();
-  final phoneCtrl = TextEditingController();
-
-  @override
-  Future<void> close() {
-    for (final c in [
-      nameCtrl,
-      aboutCtrl,
-      locationCtrl,
-      labelCtrl,
-      dateCtrl,
-      timeCtrl,
-      durationCtrl,
-      priceCtrl,
-      maxTravelersCtrl,
-      meetingCtrl,
-      includedCtrl,
-      notesCtrl,
-      languagesCtrl,
-      phoneCtrl,
-    ]) {
-      c.dispose();
-    }
-    return super.close();
-  }
+      : _repository = repository ?? GuideTripsRepository(),
+        super(const CreateTripInitial());
 
   /// Re-emits the current form content — the dynamic rows changed.
   void _emitForm() {
@@ -200,20 +243,12 @@ class CreateTripCubit extends Cubit<CreateTripState>
     );
   }
 
-  /// Pre-fills the form for editing.
+  /// Pre-fills the dynamic part of the form for editing.
   ///
-  /// The cover the trip already has is kept, so the guide sees the
-  /// current image and only replaces it by picking a new one.
+  /// The text fields are filled by the View. The cover the trip already
+  /// has is kept, so the guide sees the current image and only replaces
+  /// it by picking a new one.
   void prefill(GuideTripDetails details) {
-    nameCtrl.text = details.title;
-    aboutCtrl.text = details.about;
-    locationCtrl.text = details.location;
-    durationCtrl.text = details.duration;
-    priceCtrl.text = details.priceEgp.toInt().toString();
-    meetingCtrl.text = details.meetingPoint;
-    includedCtrl.text = details.included;
-    notesCtrl.text = details.notes.join('\n');
-    languagesCtrl.text = details.languages;
     safeEmit(
       CreateTripSuccess(
         highlights: details.highlights
@@ -226,65 +261,29 @@ class CreateTripCubit extends Cubit<CreateTripState>
             .entries
             .map(
               (e) => ItineraryStopDraft(
-                id: 's${e.key}',
-                time: e.value.time,
-                activity: e.value.title,
-              ),
-            )
+            id: 's${e.key}',
+            time: e.value.time,
+            activity: e.value.title,
+          ),
+        )
             .toList(),
         cover: details.imageUrl,
       ),
     );
   }
 
-  /// The moment the trip starts, parsed from the date + time pickers.
-  ///
-  /// The date field holds `d/m/yyyy` and the time field holds
-  /// `h:mm AM/PM`. Returns null when the guide did not pick a date.
-  DateTime? get startAt {
-    final date = dateCtrl.text.trim();
-    if (date.isEmpty) return null;
-    final parts = date.split('/');
-    if (parts.length != 3) return null;
-    final day = int.tryParse(parts[0].trim());
-    final month = int.tryParse(parts[1].trim());
-    final year = int.tryParse(parts[2].trim());
-    if (day == null || month == null || year == null) return null;
-
-    var hour = 0;
-    var minute = 0;
-    final time = timeCtrl.text.trim();
-    if (time.isNotEmpty) {
-      final match = RegExp(
-        r'^(\d{1,2}):(\d{2})\s*(AM|PM|ص|م)$',
-        caseSensitive: false,
-      ).firstMatch(time);
-      if (match != null) {
-        hour = int.parse(match.group(1)!);
-        minute = int.parse(match.group(2)!);
-        final marker = match.group(3)!.toUpperCase();
-        final isPm = marker == 'PM' || marker == 'م';
-        if (isPm && hour != 12) hour += 12;
-        if (!isPm && hour == 12) hour = 0;
-      }
-    }
-    return DateTime(year, month, day, hour, minute);
-  }
-
   /// Builds the entered trip for preview/submit. Not stored.
-  GuideTrip buildTrip({String? coverUrl}) {
-    final price = double.tryParse(priceCtrl.text.trim()) ?? 0;
-    final starts = startAt;
+  GuideTrip buildTrip(TripFormData form, {String? coverUrl}) {
+    final price = double.tryParse(form.price) ?? 0;
+    final starts = form.startAt;
     final cover =
         coverUrl ??
-        state.cover ??
-        'https://picsum.photos/seed/${tripNameCtrlText.hashCode}/300/400';
+            state.cover ??
+            'https://picsum.photos/seed/${form.name.hashCode}/300/400';
     return GuideTrip(
       id: 'trip-${DateTime.now().millisecondsSinceEpoch}',
-      title: tripNameCtrlText,
-      location: locationCtrl.text.trim().isEmpty
-          ? 'Egypt'
-          : locationCtrl.text.trim(),
+      title: form.name,
+      location: form.location.isEmpty ? 'Egypt' : form.location,
       scheduleLabel: starts == null
           ? 'To be announced'
           : formatScheduleLabel(starts),
@@ -294,28 +293,24 @@ class CreateTripCubit extends Cubit<CreateTripState>
       // A guide always publishes a trip as pending — the admin dashboard
       // is what approves it.
       approval: GuideTripApproval.pending,
-      capacity: int.tryParse(maxTravelersCtrl.text.trim()) ?? 0,
-      phone: phoneCtrl.text.trim(),
+      capacity: int.tryParse(form.maxTravelers) ?? 0,
+      phone: form.phone,
       startAt: starts,
-      duration: durationCtrl.text.trim().isEmpty
-          ? null
-          : durationCtrl.text.trim(),
+      duration: form.duration.isEmpty ? null : form.duration,
     );
   }
 
-  String get tripNameCtrlText => nameCtrl.text.trim();
-
   /// Returns an error message, or null when the draft is submittable.
-  String? validate() {
-    if (nameCtrl.text.trim().isEmpty) {
+  String? validate(TripFormData form) {
+    if (form.name.isEmpty) {
       return 'Please enter the trip name';
     }
-    if (priceCtrl.text.trim().isEmpty) {
+    if (form.price.isEmpty) {
       return 'Please enter the price per person';
     }
     // The capacity is what limits the bookings, so it has to be a real
     // number — Firestore refuses a trip with a capacity of zero.
-    final capacity = int.tryParse(maxTravelersCtrl.text.trim()) ?? 0;
+    final capacity = int.tryParse(form.maxTravelers) ?? 0;
     if (capacity <= 0) {
       return 'Please enter the maximum number of travelers';
     }
@@ -347,10 +342,11 @@ class CreateTripCubit extends Cubit<CreateTripState>
   /// Writes to Firestore and keeps the session copy in sync.
   /// Returns an error message, or null on success.
   Future<String?> saveEdit({
+    required TripFormData form,
     required GuideTrip existingTrip,
     required GuideTripDetails existingDetails,
   }) async {
-    final error = validate();
+    final error = validate(form);
     if (error != null) {
       safeEmit(
         CreateTripError(
@@ -362,9 +358,8 @@ class CreateTripCubit extends Cubit<CreateTripState>
       );
       return error;
     }
-    final price =
-        double.tryParse(priceCtrl.text.trim()) ?? existingTrip.priceEgp;
-    final starts = startAt;
+    final price = double.tryParse(form.price) ?? existingTrip.priceEgp;
+    final starts = form.startAt;
     // The guide removed the cover when there is no cover left in the
     // form — the trip had one when the form opened.
     final removed = state.cover == null;
@@ -376,10 +371,8 @@ class CreateTripCubit extends Cubit<CreateTripState>
     final isResubmit = existingTrip.approval == GuideTripApproval.rejected;
     final trip = GuideTrip(
       id: existingTrip.id,
-      title: nameCtrl.text.trim(),
-      location: locationCtrl.text.trim().isEmpty
-          ? existingTrip.location
-          : locationCtrl.text.trim(),
+      title: form.name,
+      location: form.location.isEmpty ? existingTrip.location : form.location,
       scheduleLabel: starts == null
           ? existingTrip.scheduleLabel
           : formatScheduleLabel(starts),
@@ -387,16 +380,11 @@ class CreateTripCubit extends Cubit<CreateTripState>
       imageUrl: imageUrl,
       coverUrl: imageUrl,
       approval: isResubmit ? GuideTripApproval.pending : existingTrip.approval,
-      capacity:
-          int.tryParse(maxTravelersCtrl.text.trim()) ?? existingTrip.capacity,
+      capacity: int.tryParse(form.maxTravelers) ?? existingTrip.capacity,
       bookedSeats: existingTrip.bookedSeats,
-      phone: phoneCtrl.text.trim().isEmpty
-          ? existingTrip.phone
-          : phoneCtrl.text.trim(),
+      phone: form.phone.isEmpty ? existingTrip.phone : form.phone,
       startAt: starts ?? existingTrip.startAt,
-      duration: durationCtrl.text.trim().isEmpty
-          ? existingTrip.duration
-          : durationCtrl.text.trim(),
+      duration: form.duration.isEmpty ? existingTrip.duration : form.duration,
       rejectionReason: isResubmit ? null : existingTrip.rejectionReason,
       guideId: existingTrip.guideId,
     );
@@ -405,20 +393,20 @@ class CreateTripCubit extends Cubit<CreateTripState>
       id: existingDetails.id,
       tripId: existingDetails.tripId,
       tag: existingDetails.tag,
-      title: nameCtrl.text.trim(),
+      title: form.name,
       rating: existingDetails.rating,
       reviewsCount: existingDetails.reviewsCount,
-      location: locationCtrl.text.trim().isEmpty
+      location: form.location.isEmpty
           ? existingDetails.location
-          : locationCtrl.text.trim(),
-      duration: durationCtrl.text.trim().isEmpty
+          : form.location,
+      duration: form.duration.isEmpty
           ? existingDetails.duration
-          : durationCtrl.text.trim(),
+          : form.duration,
       groupType: existingDetails.groupType,
-      languages: languagesCtrl.text.trim().isEmpty
+      languages: form.languages.isEmpty
           ? existingDetails.languages
-          : languagesCtrl.text.trim(),
-      about: aboutCtrl.text.trim(),
+          : form.languages,
+      about: form.about,
       highlights: state.highlights
           .map((h) => h.text.trim())
           .where((t) => t.isNotEmpty)
@@ -426,27 +414,21 @@ class CreateTripCubit extends Cubit<CreateTripState>
       itinerary: state.itinerary
           .where(
             (s) => s.time.trim().isNotEmpty || s.activity.trim().isNotEmpty,
-          )
+      )
           .map(
             (s) => GuideItineraryStop(
-              time: s.time.trim(),
-              title: s.activity.trim(),
-            ),
-          )
+          time: s.time.trim(),
+          title: s.activity.trim(),
+        ),
+      )
           .toList(),
-      notes: notesCtrl.text.trim().isEmpty
-          ? existingDetails.notes
-          : notesCtrl.text
-                .split('\n')
-                .map((n) => n.trim())
-                .where((n) => n.isNotEmpty)
-                .toList(),
-      included: includedCtrl.text.trim().isEmpty
+      notes: form.notes.isEmpty ? existingDetails.notes : form.noteLines,
+      included: form.included.isEmpty
           ? existingDetails.included
-          : includedCtrl.text.trim(),
-      meetingPoint: meetingCtrl.text.trim().isEmpty
+          : form.included,
+      meetingPoint: form.meeting.isEmpty
           ? existingDetails.meetingPoint
-          : meetingCtrl.text.trim(),
+          : form.meeting,
       priceEgp: price,
       guideName: existingDetails.guideName,
       guideAvatarUrl: existingDetails.guideAvatarUrl,
@@ -479,8 +461,10 @@ class CreateTripCubit extends Cubit<CreateTripState>
   /// Also saves the entered details so View/Edit read this exact trip
   /// (same source of truth, no mock fallback), and writes both to
   /// Firestore. Returns null + error message when invalid.
-  Future<({GuideTrip? trip, String? error})> submitTrip() async {
-    final error = validate();
+  Future<({GuideTrip? trip, String? error})> submitTrip(
+      TripFormData form,
+      ) async {
+    final error = validate(form);
     if (error != null) {
       safeEmit(
         CreateTripError(
@@ -493,9 +477,9 @@ class CreateTripCubit extends Cubit<CreateTripState>
       return (trip: null, error: error);
     }
     final cover = await _resolveCoverUrl();
-    final trip = buildTrip(coverUrl: cover.isEmpty ? null : cover);
+    final trip = buildTrip(form, coverUrl: cover.isEmpty ? null : cover);
     GuideTripsStore.add(trip);
-    final details = _buildDetails(trip);
+    final details = _buildDetails(trip, form);
     GuideTripDetailsSource.save(details);
     safeEmit(
       CreateTripLoading(
@@ -534,28 +518,30 @@ class CreateTripCubit extends Cubit<CreateTripState>
   ///
   /// The details are cached in the session, because the trip is not
   /// published yet — the preview reads them back from there.
-  ({GuideTrip trip, GuideTripDetails details}) buildPreview() {
-    final trip = buildTrip();
-    final details = _buildDetails(trip);
+  ({GuideTrip trip, GuideTripDetails details}) buildPreview(
+      TripFormData form,
+      ) {
+    final trip = buildTrip(form);
+    final details = _buildDetails(trip, form);
     GuideTripDetailsSource.save(details);
     return (trip: trip, details: details);
   }
 
   /// Builds the long-form details of [trip] from the form.
-  GuideTripDetails _buildDetails(GuideTrip trip) {
+  GuideTripDetails _buildDetails(GuideTrip trip, TripFormData form) {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     return GuideTripDetails(
       id: 'details-${trip.id}',
       tripId: trip.id,
-      tag: labelCtrl.text.trim(),
+      tag: form.label,
       title: trip.title,
       rating: 0,
       reviewsCount: 0,
       location: trip.location,
-      duration: durationCtrl.text.trim(),
+      duration: form.duration,
       groupType: '',
-      languages: languagesCtrl.text.trim(),
-      about: aboutCtrl.text.trim(),
+      languages: form.languages,
+      about: form.about,
       highlights: state.highlights
           .map((h) => h.text.trim())
           .where((t) => t.isNotEmpty)
@@ -563,21 +549,17 @@ class CreateTripCubit extends Cubit<CreateTripState>
       itinerary: state.itinerary
           .where(
             (s) => s.time.trim().isNotEmpty || s.activity.trim().isNotEmpty,
-          )
+      )
           .map(
             (s) => GuideItineraryStop(
-              time: s.time.trim(),
-              title: s.activity.trim(),
-            ),
-          )
+          time: s.time.trim(),
+          title: s.activity.trim(),
+        ),
+      )
           .toList(),
-      notes: notesCtrl.text
-          .split('\n')
-          .map((n) => n.trim())
-          .where((n) => n.isNotEmpty)
-          .toList(),
-      included: includedCtrl.text.trim(),
-      meetingPoint: meetingCtrl.text.trim(),
+      notes: form.noteLines,
+      included: form.included,
+      meetingPoint: form.meeting,
       priceEgp: trip.priceEgp,
       guideName: firebaseUser?.displayName?.trim() ?? '',
       guideAvatarUrl: firebaseUser?.photoURL?.trim() ?? '',

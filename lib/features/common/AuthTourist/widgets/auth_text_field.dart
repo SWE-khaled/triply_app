@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../constants/auth_colors.dart';
+
+import '../../../../core/constants/app_colors.dart';
 
 class AuthTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -42,11 +43,11 @@ class _AuthTextFieldState extends State<AuthTextField> {
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       validator: widget.validator,
-      style: const TextStyle(color: AuthColors.textDark, fontSize: 15),
+      style: const TextStyle(color: AppColors.textDark, fontSize: 15),
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: const TextStyle(color: AuthColors.textGrey),
-        prefixIcon: Icon(widget.icon, color: AuthColors.iconGrey),
+        hintStyle: const TextStyle(color: AppColors.textGrey),
+        prefixIcon: Icon(widget.icon, color: AppColors.iconGrey),
         prefix: widget.prefix,
         suffixIcon: widget.isPassword
             ? IconButton(
@@ -54,29 +55,29 @@ class _AuthTextFieldState extends State<AuthTextField> {
                   _obscureText
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
-                  color: AuthColors.iconGrey,
+                  color: AppColors.iconGrey,
                 ),
                 onPressed: () => setState(() => _obscureText = !_obscureText),
               )
             : null,
         filled: true,
-        fillColor: AuthColors.fieldBackground,
+        fillColor: AppColors.fieldBackground,
         contentPadding: const EdgeInsets.symmetric(
           vertical: 18,
           horizontal: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AuthColors.fieldBorder),
+          borderSide: const BorderSide(color: AppColors.fieldBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AuthColors.fieldBorder),
+          borderSide: const BorderSide(color: AppColors.fieldBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(
-            color: AuthColors.signInDark,
+            color: AppColors.signInDark,
             width: 1.5,
           ),
         ),

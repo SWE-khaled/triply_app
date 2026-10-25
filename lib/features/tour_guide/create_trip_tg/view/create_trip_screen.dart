@@ -40,27 +40,10 @@ class CreateTripScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) {
         final cubit = CreateTripCubit();
+        // The cubit fills the Highlights / Itinerary rows and the cover;
+        // the text fields are filled by the view.
         final details = initialDetails;
         if (details != null) cubit.prefill(details);
-        cubit.phoneCtrl.text = initialTrip?.phone ?? '';
-        // The live capacity so the guide sees (and can change) the
-        // maximum travelers they saved — not an empty field.
-        final capacity = initialTrip?.capacity ?? 0;
-        cubit.maxTravelersCtrl.text = capacity > 0
-            ? capacity.toString()
-            : '';
-        // Experience Label is stored on the details, not the trip.
-        if (details != null) cubit.labelCtrl.text = details.tag.trim();
-        // The picked date/time come back in the exact formats the
-        // pickers write and `startAt` parses (d/m/yyyy, h:mm AM/PM).
-        final start = initialTrip?.startAt;
-        if (start != null) {
-          cubit.dateCtrl.text = '${start.day}/${start.month}/${start.year}';
-          final hour12 = start.hour % 12 == 0 ? 12 : start.hour % 12;
-          final marker = start.hour >= 12 ? 'PM' : 'AM';
-          cubit.timeCtrl.text =
-              '$hour12:${start.minute.toString().padLeft(2, '0')} $marker';
-        }
         return cubit;
       },
       child: _CreateTripView(
@@ -74,7 +57,7 @@ class CreateTripScreen extends StatelessWidget {
   }
 }
 
-class _CreateTripView extends StatelessWidget {
+class _CreateTripView extends StatefulWidget {
   final bool isEditing;
   final GuideTrip? editingTrip;
   final GuideTripDetails? editingDetails;
@@ -89,8 +72,110 @@ class _CreateTripView extends StatelessWidget {
     this.submitLabel = 'Submit for Approval',
   });
 
+  @override
+  State<_CreateTripView> createState() => _CreateTripViewState();
+}
+
+class _CreateTripViewState extends State<_CreateTripView> {
+  final _nameCtrl = TextEditingController();
+  final _aboutCtrl = TextEditingController();
+  final _locationCtrl = TextEditingController();
+  final _labelCtrl = TextEditingController();
+  final _dateCtrl = TextEditingController();
+  final _timeCtrl = TextEditingController();
+  final _durationCtrl = TextEditingController();
+  final _priceCtrl = TextEditingController();
+  final _maxTravelersCtrl = TextEditingController();
+  final _meetingCtrl = TextEditingController();
+  final _includedCtrl = TextEditingController();
+  final _notesCtrl = TextEditingController();
+  final _languagesCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fillFromExisting();
+  }
+
+  /// Pre-fills the text fields when the form opens for editing.
+  void _fillFromExisting() {
+    final details = widget.editingDetails;
+    final trip = widget.editingTrip;
+    if (details != null) {
+      _nameCtrl.text = details.title;
+      _aboutCtrl.text = details.about;
+      _locationCtrl.text = details.location;
+      _durationCtrl.text = details.duration;
+      _priceCtrl.text = details.priceEgp.toInt().toString();
+      _meetingCtrl.text = details.meetingPoint;
+      _includedCtrl.text = details.included;
+      _notesCtrl.text = details.notes.join('\n');
+      _languagesCtrl.text = details.languages;
+      // Experience Label is stored on the details, not the trip.
+      _labelCtrl.text = details.tag.trim();
+    }
+    _phoneCtrl.text = trip?.phone ?? '';
+    // The live capacity so the guide sees (and can change) the
+    // maximum travelers they saved — not an empty field.
+    final capacity = trip?.capacity ?? 0;
+    _maxTravelersCtrl.text = capacity > 0 ? capacity.toString() : '';
+    // The picked date/time come back in the exact formats the pickers
+    // write and `TripFormData.startAt` parses (d/m/yyyy, h:mm AM/PM).
+    final start = trip?.startAt;
+    if (start != null) {
+      _dateCtrl.text = '${start.day}/${start.month}/${start.year}';
+      final hour12 = start.hour % 12 == 0 ? 12 : start.hour % 12;
+      final marker = start.hour >= 12 ? 'PM' : 'AM';
+      _timeCtrl.text =
+      '$hour12:${start.minute.toString().padLeft(2, '0')} $marker';
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final c in [
+      _nameCtrl,
+      _aboutCtrl,
+      _locationCtrl,
+      _labelCtrl,
+      _dateCtrl,
+      _timeCtrl,
+      _durationCtrl,
+      _priceCtrl,
+      _maxTravelersCtrl,
+      _meetingCtrl,
+      _includedCtrl,
+      _notesCtrl,
+      _languagesCtrl,
+      _phoneCtrl,
+    ]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  /// The text of the static fields, handed to the cubit.
+  TripFormData _formData() {
+    return TripFormData(
+      name: _nameCtrl.text.trim(),
+      about: _aboutCtrl.text.trim(),
+      location: _locationCtrl.text.trim(),
+      label: _labelCtrl.text.trim(),
+      date: _dateCtrl.text.trim(),
+      time: _timeCtrl.text.trim(),
+      duration: _durationCtrl.text.trim(),
+      price: _priceCtrl.text.trim(),
+      maxTravelers: _maxTravelersCtrl.text.trim(),
+      meeting: _meetingCtrl.text.trim(),
+      included: _includedCtrl.text.trim(),
+      notes: _notesCtrl.text.trim(),
+      languages: _languagesCtrl.text.trim(),
+      phone: _phoneCtrl.text.trim(),
+    );
+  }
+
   Future<void> _pickDate(BuildContext context) async {
-    final cubit = context.read<CreateTripCubit>();
     final d = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -98,18 +183,17 @@ class _CreateTripView extends StatelessWidget {
       lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
     );
     if (d != null) {
-      cubit.dateCtrl.text = '${d.day}/${d.month}/${d.year}';
+      _dateCtrl.text = '${d.day}/${d.month}/${d.year}';
     }
   }
 
   Future<void> _pickTime(BuildContext context) async {
-    final cubit = context.read<CreateTripCubit>();
     final t = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
     if (t != null && context.mounted) {
-      cubit.timeCtrl.text = t.format(context);
+      _timeCtrl.text = t.format(context);
     }
   }
 
@@ -120,7 +204,7 @@ class _CreateTripView extends StatelessWidget {
   void _preview(BuildContext context) {
     // The trip is not published yet, so its details are cached in the
     // session for the preview screen to read back.
-    final preview = context.read<CreateTripCubit>().buildPreview();
+    final preview = context.read<CreateTripCubit>().buildPreview(_formData());
     if (preview.trip.title.isEmpty) {
       _toast(context, 'Enter a trip name to preview');
       return;
@@ -130,14 +214,16 @@ class _CreateTripView extends StatelessWidget {
 
   Future<void> _submit(BuildContext context, bool isEditing) async {
     final cubit = context.read<CreateTripCubit>();
+    final form = _formData();
     if (isEditing) {
-      final trip = editingTrip;
-      final details = editingDetails;
+      final trip = widget.editingTrip;
+      final details = widget.editingDetails;
       if (trip == null || details == null) {
         _toast(context, 'Cannot save: missing original trip');
         return;
       }
       final error = await cubit.saveEdit(
+        form: form,
         existingTrip: trip,
         existingDetails: details,
       );
@@ -150,7 +236,7 @@ class _CreateTripView extends StatelessWidget {
       Navigator.of(context).pop(true);
       return;
     }
-    final result = await cubit.submitTrip();
+    final result = await cubit.submitTrip(form);
     if (!context.mounted) return;
     if (result.error != null) {
       _toast(context, result.error!);
@@ -166,7 +252,7 @@ class _CreateTripView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<CreateTripCubit>();
+    final isEditing = widget.isEditing;
     final halfWidth = (MediaQuery.sizeOf(context).width - 42) / 2;
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -186,7 +272,7 @@ class _CreateTripView extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    isEditing ? formTitle : 'Create Trip',
+                    isEditing ? widget.formTitle : 'Create Trip',
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -245,25 +331,25 @@ class _CreateTripView extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               BasicsSection(
-                nameCtrl: cubit.nameCtrl,
-                aboutCtrl: cubit.aboutCtrl,
-                locationCtrl: cubit.locationCtrl,
-                labelCtrl: cubit.labelCtrl,
-                phoneCtrl: cubit.phoneCtrl,
+                nameCtrl: _nameCtrl,
+                aboutCtrl: _aboutCtrl,
+                locationCtrl: _locationCtrl,
+                labelCtrl: _labelCtrl,
+                phoneCtrl: _phoneCtrl,
               ),
               const SizedBox(height: 12),
               ScheduleSection(
-                dateCtrl: cubit.dateCtrl,
-                timeCtrl: cubit.timeCtrl,
-                durationCtrl: cubit.durationCtrl,
-                priceCtrl: cubit.priceCtrl,
+                dateCtrl: _dateCtrl,
+                timeCtrl: _timeCtrl,
+                durationCtrl: _durationCtrl,
+                priceCtrl: _priceCtrl,
                 onPickDate: () => _pickDate(context),
                 onPickTime: () => _pickTime(context),
               ),
               const SizedBox(height: 12),
               LogisticsSection(
-                maxTravelersCtrl: cubit.maxTravelersCtrl,
-                meetingCtrl: cubit.meetingCtrl,
+                maxTravelersCtrl: _maxTravelersCtrl,
+                meetingCtrl: _meetingCtrl,
               ),
               const SizedBox(height: 12),
               const HighlightsSection(),
@@ -271,9 +357,9 @@ class _CreateTripView extends StatelessWidget {
               const ItinerarySection(),
               const SizedBox(height: 6),
               ExtrasSection(
-                includedCtrl: cubit.includedCtrl,
-                notesCtrl: cubit.notesCtrl,
-                languagesCtrl: cubit.languagesCtrl,
+                includedCtrl: _includedCtrl,
+                notesCtrl: _notesCtrl,
+                languagesCtrl: _languagesCtrl,
               ),
             ],
           ),
@@ -281,7 +367,7 @@ class _CreateTripView extends StatelessWidget {
       ),
       bottomNavigationBar: FormBottomBar(
         halfWidth: halfWidth,
-        submitLabel: isEditing ? submitLabel : 'Submit for Approval',
+        submitLabel: isEditing ? widget.submitLabel : 'Submit for Approval',
         onPreview: () => _preview(context),
         onSubmit: () => _submit(context, isEditing),
       ),

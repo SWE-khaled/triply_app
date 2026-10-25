@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_step_icon.dart';
 import '../widgets/auth_text_field.dart';
@@ -104,7 +104,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                 const SizedBox(height: 28),
                 AuthButton(
                   label: 'Reset Password',
-                  backgroundColor: AuthColors.mutedTeal,
+                  backgroundColor: AppColors.mutedTeal,
                   isLoading: _isLoading,
                   onPressed: _handleResetPassword,
                 ),

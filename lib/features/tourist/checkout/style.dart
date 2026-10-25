@@ -21,7 +21,7 @@ class Style {
     this.buttonStyle,
     // this.showMobileWalletIcons = true,
   }){
-     buttonStyle = buttonStyle ??
+    buttonStyle = buttonStyle ??
         ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
           shape: RoundedRectangleBorder(

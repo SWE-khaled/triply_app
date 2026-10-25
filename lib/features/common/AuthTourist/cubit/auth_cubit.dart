@@ -20,8 +20,8 @@ class AuthCubit extends Cubit<AuthState> {
   StreamSubscription<User?>? _authSubscription;
 
   AuthCubit({AuthRepository? authRepository})
-    : _authRepository = authRepository ?? AuthRepository(),
-      super(const AuthInitial()) {
+      : _authRepository = authRepository ?? AuthRepository(),
+        super(const AuthInitial()) {
     _authSubscription = _authRepository.authStateChanges.listen(
       _onAuthState,
       onError: (Object error) => emit(AuthError(error: error.toString())),
@@ -29,7 +29,22 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void _onAuthState(User? user) {
+    // An action (sign in / sign up / Google / reset) owns the state while
+    // it runs: it publishes the final state itself when it is done. This
+    // keeps the button loading until the whole flow (including the role
+    // check) has finished, instead of stopping early.
+    if (state is AuthLoading) return;
     emit(user == null ? const AuthUnauthenticated() : AuthSuccess(user: user));
+  }
+
+  /// Publishes the state that matches the current Firebase user.
+  void _emitCurrentUser() {
+    final current = _authRepository.currentUser;
+    emit(
+      current == null
+          ? const AuthUnauthenticated()
+          : AuthSuccess(user: current),
+    );
   }
 
   /// The signed-in user, or null when signed out.
@@ -63,6 +78,7 @@ class AuthCubit extends Cubit<AuthState> {
         phone: phone,
       );
       _shareBillingData(name: fullName, email: email, phone: phone);
+      _emitCurrentUser();
       return true;
     } catch (e) {
       emit(AuthError(error: _authRepository.getErrorMessage(e)));
@@ -76,11 +92,20 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _authRepository.signInWithEmail(email: email, password: password);
       final user = _authRepository.currentUser;
-      _shareBillingData(
-        name: user?.displayName,
-        email: email,
-        phone: await _authRepository.getUserPhone(user?.uid ?? ''),
+      _shareBillingData(name: user?.displayName, email: email);
+      // The phone only feeds the payment form: load it in the background.
+      unawaited(
+        _authRepository
+            .getUserPhone(user?.uid ?? '')
+            .then(
+              (phone) => _shareBillingData(
+            name: user?.displayName,
+            email: email,
+            phone: phone,
+          ),
+        ),
       );
+      _emitCurrentUser();
       return true;
     } catch (e) {
       emit(AuthError(error: _authRepository.getErrorMessage(e)));
@@ -99,6 +124,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(const AuthLoading());
     try {
       await _authRepository.signInWithGoogle();
+      _emitCurrentUser();
       return true;
     } catch (e) {
       emit(AuthError(error: _authRepository.getErrorMessage(e)));

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_header.dart';
@@ -153,7 +153,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         child: Text(
                           '🇪🇬 +20',
                           style: TextStyle(
-                            color: AuthColors.textDark,
+                            color: AppColors.textDark,
                             fontSize: 15,
                           ),
                         ),
@@ -195,7 +195,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     RichText(
                       text: const TextSpan(
                         style: TextStyle(
-                          color: AuthColors.textGrey,
+                          color: AppColors.textGrey,
                           fontSize: 13,
                         ),
                         children: [
@@ -203,7 +203,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           TextSpan(
                             text: 'Terms of Service',
                             style: TextStyle(
-                              color: AuthColors.signInDark,
+                              color: AppColors.signInDark,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -211,7 +211,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           TextSpan(
                             text: 'Privacy Policy',
                             style: TextStyle(
-                              color: AuthColors.signInDark,
+                              color: AppColors.signInDark,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -221,7 +221,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     const SizedBox(height: 24),
                     AuthButton(
                       label: 'Create Account',
-                      backgroundColor: AuthColors.darkTeal,
+                      backgroundColor: AppColors.darkTeal,
                       isLoading: authCubit.isLoading,
                       onPressed: () => _handleCreateAccount(authCubit),
                     ),
@@ -231,7 +231,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         children: [
                           const Text(
                             'Already have an account? ',
-                            style: TextStyle(color: AuthColors.textGrey),
+                            style: TextStyle(color: AppColors.textGrey),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.push(
@@ -243,7 +243,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             child: const Text(
                               'Sign in',
                               style: TextStyle(
-                                color: AuthColors.signInDark,
+                                color: AppColors.signInDark,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

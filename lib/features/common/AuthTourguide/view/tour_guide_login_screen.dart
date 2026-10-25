@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/common/AuthTourguide/cubit/tour_guide_auth_cubit.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_header.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
+import '../../../../core/constants/app_colors.dart';
 import 'tour_guide_signup_screen.dart';
 import 'tour_guide_verification_screen.dart';
 
@@ -108,7 +108,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                             const Text(
                               'Sign in to manage your trips and travelers.',
                               style: TextStyle(
-                                color: AuthColors.textGrey,
+                                color: AppColors.textGrey,
                                 fontSize: 15,
                               ),
                             ),
@@ -167,7 +167,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                   const Text(
                                     "Don't have an account? ",
                                     style: TextStyle(
-                                      color: AuthColors.textGrey,
+                                      color: AppColors.textGrey,
                                     ),
                                   ),
                                   GestureDetector(
@@ -180,7 +180,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                     child: const Text(
                                       'Create Guide Account',
                                       style: TextStyle(
-                                        color: AuthColors.signInDark,
+                                        color: AppColors.signInDark,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),

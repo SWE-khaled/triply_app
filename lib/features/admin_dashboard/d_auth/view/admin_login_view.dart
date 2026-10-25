@@ -100,7 +100,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                           const SizedBox(height: 8),
                           AuthTextField(
                             controller: _emailController,
-                            hintText: 'khaled@gmail.com',
+                            hintText: 'your@gmail.com',
                             icon: Icons.mail_outline,
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) =>

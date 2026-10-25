@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_header.dart';
@@ -76,7 +76,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       const Text(
                         'Sign in to continue your journey',
                         style: TextStyle(
-                          color: AuthColors.textGrey,
+                          color: AppColors.textGrey,
                           fontSize: 15,
                         ),
                       ),
@@ -136,7 +136,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               'or continue with',
-                              style: TextStyle(color: AuthColors.textGrey),
+                              style: TextStyle(color: AppColors.textGrey),
                             ),
                           ),
                           Expanded(child: Divider()),
@@ -224,7 +224,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           children: [
                             const Text(
                               "Don't have an account? ",
-                              style: TextStyle(color: AuthColors.textGrey),
+                              style: TextStyle(color: AppColors.textGrey),
                             ),
                             GestureDetector(
                               onTap: () => Navigator.of(
@@ -233,7 +233,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               child: const Text(
                                 'Sign up',
                                 style: TextStyle(
-                                  color: AuthColors.signInDark,
+                                  color: AppColors.signInDark,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

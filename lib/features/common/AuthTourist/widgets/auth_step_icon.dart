@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 
 /// Light circle icon + title + subtitle, used on Forgot Password,
 /// New Password and Password Reset Success screens.
@@ -16,7 +16,7 @@ class AuthStepIcon extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.onBack,
-    this.iconColor = AuthColors.signInDark,
+    this.iconColor = AppColors.signInDark,
   });
 
   @override
@@ -29,7 +29,7 @@ class AuthStepIcon extends StatelessWidget {
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back_ios_new, size: 18),
             style: IconButton.styleFrom(
-              backgroundColor: AuthColors.fieldBackground,
+              backgroundColor: AppColors.fieldBackground,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -41,7 +41,7 @@ class AuthStepIcon extends StatelessWidget {
             width: 90,
             height: 90,
             decoration: BoxDecoration(
-              color: AuthColors.lightCircleBg,
+              color: AppColors.lightCircleBg,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Icon(icon, color: iconColor, size: 40),
@@ -54,7 +54,7 @@ class AuthStepIcon extends StatelessWidget {
             style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              color: AuthColors.textDark,
+              color: AppColors.textDark,
             ),
           ),
         ),
@@ -63,7 +63,7 @@ class AuthStepIcon extends StatelessWidget {
           child: Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 15, color: AuthColors.textGrey),
+            style: const TextStyle(fontSize: 15, color: AppColors.textGrey),
           ),
         ),
       ],

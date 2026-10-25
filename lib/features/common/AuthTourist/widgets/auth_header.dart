@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../constants/auth_colors.dart';
+
+import '../../../../core/constants/app_colors.dart';
 
 /// Teal gradient header used on the Sign In and Create Account screens.
 class AuthHeader extends StatelessWidget {
@@ -23,7 +24,7 @@ class AuthHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AuthColors.darkTeal, AuthColors.darkTealEnd],
+          colors: [AppColors.darkTeal, AppColors.darkTealEnd],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(32),

@@ -48,9 +48,7 @@ dependencies:
   # so the wallet / card checkout renders correctly on small screens.
   pay_with_paymob: ^1.4.0
 
-dependency_overrides:
-  pay_with_paymob:
-    path: third_party/pay_with_paymob
+
 
 dev_dependencies:
   flutter_test:

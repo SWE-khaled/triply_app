@@ -142,6 +142,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         about: _aboutController.text.trim(),
         location: _locationController.text.trim(),
         phone: _phoneController.text.trim(),
+        photoUrl: newPhotoUrl,
         pricePerHour: double.tryParse(_priceController.text.trim()) ?? 0,
       );
       await auth.refreshUser();

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:pay_with_paymob/pay_with_paymob.dart';
-
+import 'package:triply/features/tourist/checkout/style.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'model/payment_data.dart';
+import 'model/user_data.dart';
 
 /// The Paymob credentials of the app.
 ///

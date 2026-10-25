@@ -7,7 +7,7 @@ class UserData {
 
   UserData(
       {this.name = "NA",
-      this.lastName = "NA",
-      this.email = "NA",
-      this.phone = "NA"});
+        this.lastName = "NA",
+        this.email = "NA",
+        this.phone = "NA"});
 }

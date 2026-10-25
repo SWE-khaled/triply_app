@@ -131,7 +131,7 @@ class DashboardCubit extends Cubit<DashboardState>
           upcomingTrips:
               count(GuideTripStatus.active) + count(GuideTripStatus.pending),
           activeTrips: count(GuideTripStatus.active),
-          completedTrips: count(GuideTripStatus.completed),
+          rejectedTrips: count(GuideTripStatus.rejected),
           earningsLabel: metrics == null
               ? base.earningsLabel
               : formatEgp(metrics.totalEarnings),
