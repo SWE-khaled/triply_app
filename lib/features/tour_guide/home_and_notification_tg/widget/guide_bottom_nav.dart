@@ -5,8 +5,9 @@ import 'package:triply/core/theme/app_colors.dart';
 /// theme in `core/theme/` is left untouched.
 const Color _cream = Color(0xFFFAF5EA);
 
-/// 3-tab bottom bar from the guide Figma (Home / My Trips / Profile).
-/// Local to tour_guide: the shared `AppBottomNav` carries tourist tabs.
+/// 4-tab bottom bar from the guide Figma (Home / My Trips / Chats /
+/// Profile). Local to tour_guide: the shared `AppBottomNav` carries tourist
+/// tabs.
 ///
 /// Keeps its own selected index, so the active color changes on tap even if
 /// the parent doesn't rebuild. If the parent changes [currentIndex], the nav
@@ -15,7 +16,15 @@ class GuideBottomNav extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int>? onTap;
 
-  const GuideBottomNav({super.key, this.currentIndex = 0, this.onTap});
+  /// The sum of the guide's unread chats, shown on the Chats tab.
+  final int chatUnread;
+
+  const GuideBottomNav({
+    super.key,
+    this.currentIndex = 0,
+    this.onTap,
+    this.chatUnread = 0,
+  });
 
   @override
   State<GuideBottomNav> createState() => _GuideBottomNavState();
@@ -27,8 +36,43 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
   static const _items = [
     (Icons.home_outlined, 'Home'),
     (Icons.work_outline, 'My Trips'),
+    (Icons.chat_bubble_outline, 'Chats'),
     (Icons.person_outline, 'Profile'),
   ];
+
+  Widget _icon(int index, Color color) {
+    final icon = Icon(_items[index].$1, size: 22, color: color);
+    if (index != 2 || widget.chatUnread <= 0) return icon;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        icon,
+        Positioned(
+          top: -4,
+          right: -7,
+          child: Container(
+            key: const Key('guide-nav-chat-badge'),
+            constraints: const BoxConstraints(minWidth: 16),
+            height: 16,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: AppColors.accentOrange,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              widget.chatUnread > 99 ? '99+' : '${widget.chatUnread}',
+              style: const TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   void initState() {
@@ -80,7 +124,7 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
                         color: selected ? _cream : Colors.transparent,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: Icon(_items[i].$1, size: 22, color: color),
+                      child: _icon(i, color),
                     ),
                     const SizedBox(height: 2),
                     Text(

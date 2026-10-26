@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../home_and_notification_tg/view/guide_notifications_screen.dart';
 import '../../home_and_notification_tg/widget/guide_bottom_nav.dart';
+import '../../../chat/widgets/chat_unread_builder.dart';
 import '../cubit/profile_tg_cubit.dart';
 import '../view/guide_availability_screen.dart';
 import '../view/guide_settings_screen.dart';
@@ -35,7 +35,7 @@ class ProfileTourGuideScreen extends StatelessWidget {
 class _ProfileTourGuideView extends StatelessWidget {
   const _ProfileTourGuideView();
 
-  static const int bottomIndex = 2; // Profile
+  static const int bottomIndex = 3; // Profile
 
   Future<void> _confirmLogout(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -149,26 +149,32 @@ class _ProfileTourGuideView extends StatelessWidget {
           },
         ),
       ),
-      bottomNavigationBar: GuideBottomNav(
-        currentIndex: bottomIndex,
-        onTap: (index) {
-          // The old screens are removed instead of stacked: every screen
-          // owns a live Firestore subscription, so keeping them alive
-          // would pile them up.
-          if (index == 0) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => const GuideDashboardScreen(),
-              ),
-              (route) => route.isFirst,
-            );
-          } else if (index == 1) {
-            Navigator.of(context).pushAndRemoveUntil(
-              AppRoutes.guideTrips(),
-              (route) => route.isFirst,
-            );
-          }
-        },
+      bottomNavigationBar: ChatUnreadBuilder(
+        builder: (context, unread) => GuideBottomNav(
+          currentIndex: bottomIndex,
+          chatUnread: unread,
+          onTap: (index) {
+            // The old screens are removed instead of stacked: every screen
+            // owns a live Firestore subscription, so keeping them alive
+            // would pile them up.
+            if (index == 0) {
+              Navigator.of(context).pushAndRemoveUntil(
+                AppRoutes.guideDashboard(),
+                (route) => route.isFirst,
+              );
+            } else if (index == 1) {
+              Navigator.of(context).pushAndRemoveUntil(
+                AppRoutes.guideTrips(),
+                (route) => route.isFirst,
+              );
+            } else if (index == 2) {
+              Navigator.of(context).pushAndRemoveUntil(
+                AppRoutes.guideChats(),
+                (route) => route.isFirst,
+              );
+            }
+          },
+        ),
       ),
     );
   }

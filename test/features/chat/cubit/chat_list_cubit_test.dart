@@ -47,6 +47,11 @@ void main() {
     );
   }
 
+  ChatListSuccess successOf(ChatListCubit value) {
+    expect(value.state, isA<ChatListSuccess>());
+    return value.state as ChatListSuccess;
+  }
+
   setUp(() {
     repository = FakeChatRepository(currentUserId: tourist, clock: () => newer);
     cubit = ChatListCubit(repository: repository);
@@ -80,10 +85,10 @@ void main() {
 
       await cubit.load();
 
-      expect(cubit.state.isLoaded, isTrue);
-      expect(cubit.state.isLoading, isFalse);
-      expect(cubit.state.chats, hasLength(2));
-      expect(cubit.state.totalUnread, 5);
+      final state = successOf(cubit);
+      expect(state.chats, hasLength(2));
+      expect(state.totalUnread, 5);
+      expect(cubit.totalUnread, 5);
     });
 
     test('sorts by the newest activity, not by creation', () async {
@@ -106,7 +111,7 @@ void main() {
 
       await cubit.load();
 
-      expect(cubit.state.chats.map((chat) => chat.guideId).toList(), [
+      expect(successOf(cubit).chats.map((chat) => chat.guideId).toList(), [
         guideTwo,
         guideOne,
       ]);
@@ -133,9 +138,10 @@ void main() {
 
       await cubit.load();
 
-      expect(cubit.state.chats, hasLength(1));
-      expect(cubit.state.chats.single.guideId, guideOne);
-      expect(cubit.state.totalUnread, 0);
+      final state = successOf(cubit);
+      expect(state.chats, hasLength(1));
+      expect(state.chats.single.guideId, guideOne);
+      expect(state.totalUnread, 0);
     });
 
     test('reports a signed-out user instead of watching chats', () async {
@@ -144,9 +150,10 @@ void main() {
 
       await signedOutCubit.load();
 
-      expect(signedOutCubit.state.isLoaded, isTrue);
-      expect(signedOutCubit.state.chats, isEmpty);
-      expect(signedOutCubit.state.error, 'Sign in to see your chats.');
+      final state = signedOutCubit.state;
+      expect(state, isA<ChatListError>());
+      expect((state as ChatListError).error, 'Sign in to see your chats.');
+      expect(signedOutCubit.visibleChats, isEmpty);
 
       await signedOutCubit.close();
       await signedOut.dispose();
@@ -164,7 +171,7 @@ void main() {
       );
 
       await cubit.load();
-      expect(cubit.state.totalUnread, 1);
+      expect(cubit.totalUnread, 1);
 
       repository.seedChat(
         chatFor(
@@ -177,7 +184,7 @@ void main() {
       );
       await pumpEventQueue();
 
-      expect(cubit.state.totalUnread, 4);
+      expect(cubit.totalUnread, 4);
     });
   });
 
@@ -225,21 +232,90 @@ void main() {
 
       expect(cubit.visibleChats, isEmpty);
     });
+
+    test('keeps the query when the list changes', () async {
+      cubit.setSearchQuery('guide two');
+      repository.seedChat(
+        chatFor(
+          guideId: guideTwo,
+          guideName: 'Guide Two',
+          lastText: 'A new message',
+          lastAt: newer,
+        ),
+      );
+      await pumpEventQueue();
+
+      final state = successOf(cubit);
+      expect(state.searchQuery, 'guide two');
+      expect(cubit.visibleChats.map((chat) => chat.guideId), [guideTwo]);
+    });
+  });
+
+  group('unread filter', () {
+    setUp(() async {
+      repository.seedChat(
+        chatFor(
+          guideId: guideOne,
+          guideName: 'Guide One',
+          lastText: 'One',
+          lastAt: newer,
+          unread: 2,
+        ),
+      );
+      repository.seedChat(
+        chatFor(
+          guideId: guideTwo,
+          guideName: 'Guide Two',
+          lastText: 'Two',
+          lastAt: older,
+        ),
+      );
+      await cubit.load();
+    });
+
+    test('shows only conversations with unread messages', () {
+      cubit.setUnreadOnly(true);
+
+      expect(cubit.visibleChats.map((chat) => chat.guideId), [guideOne]);
+    });
+
+    test('the unread flag survives a later snapshot', () async {
+      cubit.setUnreadOnly(true);
+      repository.seedChat(
+        chatFor(
+          guideId: guideTwo,
+          guideName: 'Guide Two',
+          lastText: 'New',
+          lastAt: newer,
+          unread: 1,
+        ),
+      );
+      await pumpEventQueue();
+
+      final state = successOf(cubit);
+      expect(state.unreadOnly, isTrue);
+      expect(cubit.visibleChats, hasLength(2));
+    });
   });
 
   group('state', () {
-    test('copyWith keeps the unset fields', () {
-      const state = ChatListState(searchQuery: 'x', totalUnread: 2);
-      final next = state.copyWith(isLoading: true);
+    test('the success state is immutable and carries the filters', () {
+      const state = ChatListSuccess(
+        searchQuery: 'x',
+        unreadOnly: true,
+        totalUnread: 2,
+      );
 
-      expect(next.searchQuery, 'x');
-      expect(next.totalUnread, 2);
-      expect(next.isLoading, isTrue);
+      expect(state.searchQuery, 'x');
+      expect(state.totalUnread, 2);
+      expect(state.unreadOnly, isTrue);
+      expect(state.chats, isEmpty);
     });
 
-    test('copyWith clears the error explicitly', () {
-      const state = ChatListState(error: 'boom');
-      expect(state.copyWith(error: null).error, isNull);
+    test('the error state keeps the message', () {
+      const state = ChatListError('boom');
+
+      expect(state.error, 'boom');
     });
   });
 }

@@ -14,7 +14,7 @@ class ChatListCubit extends Cubit<ChatListState>
   ChatListCubit({required ChatRepository repository, String? userId})
     : _repository = repository,
       _userId = userId ?? repository.currentUserId,
-      super(const ChatListState());
+      super(const ChatListInitial());
 
   final ChatRepository _repository;
   final String? _userId;
@@ -23,25 +23,28 @@ class ChatListCubit extends Cubit<ChatListState>
 
   String? get userId => _userId;
 
-  /// The chats after the search filter, ready for the list.
-  List<Chat> get visibleChats => state.visibleChats(_userId);
+  ChatListSuccess? get _success =>
+      state is ChatListSuccess ? state as ChatListSuccess : null;
+
+  /// The chats after the search and unread filters, ready for the list.
+  List<Chat> get visibleChats =>
+      _success?.visibleChats(_userId) ?? const <Chat>[];
+
+  /// The badge value (sum of the caller's unread counters).
+  int get totalUnread => _success?.totalUnread ?? 0;
 
   /// Subscribes to the chats. Awaiting the first snapshot keeps tests
   /// deterministic and gives the screen a loaded/error state.
   Future<void> load() async {
+    if (state is ChatListLoading) return;
+
     final uid = _userId;
     if (uid == null || uid.isEmpty) {
-      safeEmit(
-        state.copyWith(
-          isLoading: false,
-          isLoaded: true,
-          error: 'Sign in to see your chats.',
-        ),
-      );
+      safeEmit(const ChatListError('Sign in to see your chats.'));
       return;
     }
 
-    safeEmit(state.copyWith(isLoading: true, error: null));
+    safeEmit(const ChatListLoading());
     await _subscription?.cancel();
 
     final first = Completer<void>();
@@ -65,30 +68,46 @@ class ChatListCubit extends Cubit<ChatListState>
       0,
       (sum, chat) => sum + chat.unreadFor(uid),
     );
+    final current = _success;
     safeEmit(
-      state.copyWith(
+      ChatListSuccess(
         chats: chats,
         totalUnread: totalUnread,
-        isLoading: false,
-        isLoaded: true,
-        error: null,
+        searchQuery: current?.searchQuery ?? '',
+        unreadOnly: current?.unreadOnly ?? false,
       ),
     );
   }
 
   void _onError(Object error) {
-    final mapped = ChatErrors.map(error);
+    safeEmit(ChatListError(ChatErrors.map(error).toString()));
+  }
+
+  void setSearchQuery(String query) {
+    final current = _success;
+    if (current == null) return;
     safeEmit(
-      state.copyWith(
-        isLoading: false,
-        isLoaded: true,
-        error: mapped.toString(),
+      ChatListSuccess(
+        chats: current.chats,
+        totalUnread: current.totalUnread,
+        searchQuery: query,
+        unreadOnly: current.unreadOnly,
       ),
     );
   }
 
-  void setSearchQuery(String query) {
-    safeEmit(state.copyWith(searchQuery: query));
+  /// Switches between "All" and "Unread only".
+  void setUnreadOnly(bool value) {
+    final current = _success;
+    if (current == null) return;
+    safeEmit(
+      ChatListSuccess(
+        chats: current.chats,
+        totalUnread: current.totalUnread,
+        searchQuery: current.searchQuery,
+        unreadOnly: value,
+      ),
+    );
   }
 
   @override

@@ -1,17 +1,32 @@
 import 'package:triply/core/data/models/chat.dart';
 import 'package:triply/core/data/models/chat_message.dart';
 
-const Object _unsetChatRoomError = Object();
+/// The state of one conversation.
+///
+/// Every phase is a distinct class (no `copyWith`): the screen switches on
+/// the state and reads only the fields that phase actually owns.
+sealed class ChatRoomState {
+  const ChatRoomState();
+}
 
-/// The chat room: messages, typing, read receipts and write state.
-class ChatRoomState {
+/// Nothing has been requested yet (also the first frame of a new chat).
+final class ChatRoomInitial extends ChatRoomState {
+  const ChatRoomInitial();
+}
+
+/// The chat, its messages and its typing markers are being subscribed.
+final class ChatRoomLoading extends ChatRoomState {
+  const ChatRoomLoading();
+}
+
+/// The live room.
+final class ChatRoomSuccess extends ChatRoomState {
   final Chat? chat;
   final List<ChatMessage> messages;
 
   /// Uids whose typing marker was active on the last snapshot.
   final Set<String> typingUids;
 
-  final bool isLoading;
   final bool isLoadingMore;
 
   /// True while another page of older messages may exist.
@@ -25,17 +40,13 @@ class ChatRoomState {
   final bool isDeleting;
   final bool isReporting;
 
-  /// A load/subscription failure.
-  final String? error;
-
   /// The last send/edit/delete/report failure.
   final String? actionError;
 
-  const ChatRoomState({
+  const ChatRoomSuccess({
     this.chat,
     this.messages = const <ChatMessage>[],
     this.typingUids = const <String>{},
-    this.isLoading = false,
     this.isLoadingMore = false,
     this.hasMore = false,
     this.isReadOnly = false,
@@ -43,45 +54,21 @@ class ChatRoomState {
     this.isEditing = false,
     this.isDeleting = false,
     this.isReporting = false,
-    this.error,
     this.actionError,
   });
 
   bool get isBusy => isSending || isEditing || isDeleting || isReporting;
 
-  ChatRoomState copyWith({
-    Chat? chat,
-    List<ChatMessage>? messages,
-    Set<String>? typingUids,
-    bool? isLoading,
-    bool? isLoadingMore,
-    bool? hasMore,
-    bool? isReadOnly,
-    bool? isSending,
-    bool? isEditing,
-    bool? isDeleting,
-    bool? isReporting,
-    Object? error = _unsetChatRoomError,
-    Object? actionError = _unsetChatRoomError,
-  }) {
-    return ChatRoomState(
-      chat: chat ?? this.chat,
-      messages: messages ?? this.messages,
-      typingUids: typingUids ?? this.typingUids,
-      isLoading: isLoading ?? this.isLoading,
-      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-      hasMore: hasMore ?? this.hasMore,
-      isReadOnly: isReadOnly ?? this.isReadOnly,
-      isSending: isSending ?? this.isSending,
-      isEditing: isEditing ?? this.isEditing,
-      isDeleting: isDeleting ?? this.isDeleting,
-      isReporting: isReporting ?? this.isReporting,
-      error: identical(error, _unsetChatRoomError)
-          ? this.error
-          : error as String?,
-      actionError: identical(actionError, _unsetChatRoomError)
-          ? this.actionError
-          : actionError as String?,
-    );
-  }
+  /// True when this is a conversation that has no messages yet.
+  bool get isEmpty => messages.isEmpty;
+}
+
+/// The room could not be loaded (missing chat, rules, network).
+final class ChatRoomError extends ChatRoomState {
+  final String error;
+
+  /// A denied read is shown as a read-only room, not as a retryable bug.
+  final bool isReadOnly;
+
+  const ChatRoomError(this.error, {this.isReadOnly = false});
 }

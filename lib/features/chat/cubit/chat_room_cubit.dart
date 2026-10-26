@@ -33,7 +33,7 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
          clock: clock,
          interval: typingInterval,
        ),
-       super(const ChatRoomState());
+       super(const ChatRoomInitial());
 
   final ChatRepository repository;
   final String? guideId;
@@ -47,12 +47,19 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
   StreamSubscription<List<ChatMessage>>? _messageSubscription;
   StreamSubscription<Set<String>>? _typingSubscription;
 
+  /// The newest inbound message whose read marker was already written, so
+  /// the live snapshot does not write the same read marker twice.
+  String? _lastMarkedReadMessageId;
+
   String? get chatId => _chatId;
 
   String? get myUserId => repository.currentUserId;
 
+  ChatRoomSuccess? get _success =>
+      state is ChatRoomSuccess ? state as ChatRoomSuccess : null;
+
   String? get otherUserId {
-    final chat = state.chat;
+    final chat = _success?.chat;
     final me = myUserId;
     if (chat == null || me == null) return null;
     return chat.otherUserId(me);
@@ -60,7 +67,7 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
 
   /// The other participant's `lastReadAt`, when the chat is loaded.
   DateTime? get otherLastReadAt {
-    final chat = state.chat;
+    final chat = _success?.chat;
     final other = otherUserId;
     if (chat == null || other == null) return null;
     return chat.lastReadOf(other);
@@ -68,7 +75,8 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
 
   bool get isOtherTyping {
     final other = otherUserId;
-    return other != null && state.typingUids.contains(other);
+    final typing = _success?.typingUids ?? const <String>{};
+    return other != null && typing.contains(other);
   }
 
   /// True when the other participant's read marker is at or after the
@@ -82,21 +90,22 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
     return !createdAt.isAfter(readAt);
   }
 
-  /// Subscribes to an existing chat.
+  /// Subscribes to an existing chat, or opens the empty composer for a
+  /// chat that will be created by its first message.
   Future<void> load() async {
     if (_chatId == null) {
       if (guideId == null) {
-        safeEmit(
-          state.copyWith(
-            isLoading: false,
-            error: 'This chat is not available.',
-          ),
-        );
+        safeEmit(const ChatRoomError('This chat is not available.'));
+        return;
       }
+      safeEmit(const ChatRoomSuccess());
       return;
     }
-    safeEmit(state.copyWith(isLoading: true, error: null));
+    safeEmit(const ChatRoomLoading());
     await _listen();
+    if (state is ChatRoomSuccess) {
+      unawaited(_refreshMyProfile());
+    }
   }
 
   Future<void> _listen() async {
@@ -104,6 +113,7 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
     if (chatId == null) return;
 
     await _cancelSubscriptions();
+    _lastMarkedReadMessageId = null;
 
     final firstChat = Completer<void>();
     final firstMessages = Completer<void>();
@@ -112,7 +122,7 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
         .watchChat(chatId)
         .listen(
           (chat) {
-            if (chat != null) safeEmit(state.copyWith(chat: chat));
+            _onChat(chat);
             if (!firstChat.isCompleted) firstChat.complete();
           },
           onError: (Object error) {
@@ -124,14 +134,7 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
         .watchMessages(chatId, limit: pageSize)
         .listen(
           (messages) {
-            safeEmit(
-              state.copyWith(
-                messages: messages,
-                isLoading: false,
-                hasMore: messages.length >= pageSize,
-                error: null,
-              ),
-            );
+            _onMessages(chatId, messages);
             if (!firstMessages.isCompleted) firstMessages.complete();
           },
           onError: (Object error) {
@@ -143,7 +146,7 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
         .watchTyping(chatId)
         .listen(
           (uids) {
-            safeEmit(state.copyWith(typingUids: uids));
+            _onTyping(uids);
             if (!firstTyping.isCompleted) firstTyping.complete();
           },
           onError: (Object error) {
@@ -158,14 +161,101 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
     ]);
   }
 
+  void _onChat(Chat? chat) {
+    final current = _success;
+    safeEmit(
+      ChatRoomSuccess(
+        chat: chat ?? current?.chat,
+        messages: current?.messages ?? const <ChatMessage>[],
+        typingUids: current?.typingUids ?? const <String>{},
+        isLoadingMore: current?.isLoadingMore ?? false,
+        hasMore: current?.hasMore ?? false,
+        isReadOnly: current?.isReadOnly ?? false,
+        isSending: current?.isSending ?? false,
+        isEditing: current?.isEditing ?? false,
+        isDeleting: current?.isDeleting ?? false,
+        isReporting: current?.isReporting ?? false,
+        actionError: current?.actionError,
+      ),
+    );
+  }
+
+  void _onMessages(String chatId, List<ChatMessage> messages) {
+    final current = _success;
+    safeEmit(
+      ChatRoomSuccess(
+        chat: current?.chat,
+        messages: messages,
+        typingUids: current?.typingUids ?? const <String>{},
+        isLoadingMore: false,
+        hasMore: messages.length >= pageSize,
+        isReadOnly: current?.isReadOnly ?? false,
+        isSending: current?.isSending ?? false,
+        isEditing: current?.isEditing ?? false,
+        isDeleting: current?.isDeleting ?? false,
+        isReporting: current?.isReporting ?? false,
+        actionError: current?.actionError,
+      ),
+    );
+
+    // Reading the room clears the badge: do it once per inbound message
+    // (the first snapshot and every later one), not on every rebuild.
+    final me = myUserId;
+    final newest = messages.isEmpty ? null : messages.first;
+    if (newest != null &&
+        me != null &&
+        newest.senderId != me &&
+        !(current?.isReadOnly ?? false) &&
+        _lastMarkedReadMessageId != newest.id) {
+      _lastMarkedReadMessageId = newest.id;
+      unawaited(markRead());
+    }
+  }
+
+  void _onTyping(Set<String> uids) {
+    final current = _success;
+    safeEmit(
+      ChatRoomSuccess(
+        chat: current?.chat,
+        messages: current?.messages ?? const <ChatMessage>[],
+        typingUids: uids,
+        isLoadingMore: current?.isLoadingMore ?? false,
+        hasMore: current?.hasMore ?? false,
+        isReadOnly: current?.isReadOnly ?? false,
+        isSending: current?.isSending ?? false,
+        isEditing: current?.isEditing ?? false,
+        isDeleting: current?.isDeleting ?? false,
+        isReporting: current?.isReporting ?? false,
+        actionError: current?.actionError,
+      ),
+    );
+  }
+
   void _onStreamError(Object error) {
     final mapped = ChatErrors.map(error);
+    final current = _success;
+    if (current == null) {
+      safeEmit(
+        ChatRoomError(
+          mapped.toString(),
+          isReadOnly: mapped is ChatPermissionException,
+        ),
+      );
+      return;
+    }
     safeEmit(
-      state.copyWith(
-        isLoading: false,
+      ChatRoomSuccess(
+        chat: current.chat,
+        messages: current.messages,
+        typingUids: current.typingUids,
         isLoadingMore: false,
-        error: mapped.toString(),
-        isReadOnly: mapped is ChatPermissionException ? true : state.isReadOnly,
+        hasMore: current.hasMore,
+        isReadOnly: current.isReadOnly || mapped is ChatPermissionException,
+        isSending: false,
+        isEditing: false,
+        isDeleting: false,
+        isReporting: false,
+        actionError: mapped.toString(),
       ),
     );
   }
@@ -173,8 +263,29 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
   /// Sends a message. With no chat yet, this creates the canonical chat
   /// and the message atomically through the repository.
   Future<void> sendMessage(String text) async {
-    if (state.isSending || state.isReadOnly) return;
-    safeEmit(state.copyWith(isSending: true, actionError: null));
+    // A new chat can be sent before `load()` is called; treat the initial
+    // state as the empty room. An existing chat id still needs its load.
+    final current =
+        _success ??
+        (state is ChatRoomInitial && _chatId == null && guideId != null
+            ? const ChatRoomSuccess()
+            : null);
+    if (current == null || current.isSending || current.isReadOnly) return;
+    safeEmit(
+      ChatRoomSuccess(
+        chat: current.chat,
+        messages: current.messages,
+        typingUids: current.typingUids,
+        isLoadingMore: current.isLoadingMore,
+        hasMore: current.hasMore,
+        isReadOnly: current.isReadOnly,
+        isSending: true,
+        isEditing: current.isEditing,
+        isDeleting: current.isDeleting,
+        isReporting: current.isReporting,
+        actionError: null,
+      ),
+    );
     try {
       final chatId = _chatId;
       if (chatId == null) {
@@ -189,12 +300,44 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
           firstMessage: text,
         );
         _chatId = chat.id;
-        safeEmit(state.copyWith(chat: chat));
+        final sent = _success;
+        safeEmit(
+          ChatRoomSuccess(
+            chat: chat,
+            messages: sent?.messages ?? const <ChatMessage>[],
+            typingUids: sent?.typingUids ?? const <String>{},
+            isLoadingMore: sent?.isLoadingMore ?? false,
+            hasMore: sent?.hasMore ?? false,
+            isReadOnly: sent?.isReadOnly ?? false,
+            isSending: false,
+            isEditing: sent?.isEditing ?? false,
+            isDeleting: sent?.isDeleting ?? false,
+            isReporting: sent?.isReporting ?? false,
+            actionError: null,
+          ),
+        );
         await _listen();
-        safeEmit(state.copyWith(isSending: false));
+        unawaited(_refreshMyProfile());
       } else {
         await repository.sendMessage(chatId: chatId, text: text);
-        safeEmit(state.copyWith(isSending: false));
+        final sent = _success;
+        if (sent != null) {
+          safeEmit(
+            ChatRoomSuccess(
+              chat: sent.chat,
+              messages: sent.messages,
+              typingUids: sent.typingUids,
+              isLoadingMore: sent.isLoadingMore,
+              hasMore: sent.hasMore,
+              isReadOnly: sent.isReadOnly,
+              isSending: false,
+              isEditing: sent.isEditing,
+              isDeleting: sent.isDeleting,
+              isReporting: sent.isReporting,
+              actionError: null,
+            ),
+          );
+        }
       }
     } catch (error) {
       _fail(error);
@@ -203,30 +346,59 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
 
   /// Loads the next page of older messages.
   Future<void> loadMore() async {
+    final current = _success;
     final chatId = _chatId;
-    if (chatId == null || state.isLoadingMore || !state.hasMore) return;
-    final oldest = state.messages.isEmpty
+    if (current == null ||
+        chatId == null ||
+        current.isLoadingMore ||
+        !current.hasMore) {
+      return;
+    }
+    final oldest = current.messages.isEmpty
         ? null
-        : state.messages.last.createdAt;
+        : current.messages.last.createdAt;
     if (oldest == null) return;
 
-    safeEmit(state.copyWith(isLoadingMore: true, actionError: null));
+    safeEmit(
+      ChatRoomSuccess(
+        chat: current.chat,
+        messages: current.messages,
+        typingUids: current.typingUids,
+        isLoadingMore: true,
+        hasMore: current.hasMore,
+        isReadOnly: current.isReadOnly,
+        isSending: current.isSending,
+        isEditing: current.isEditing,
+        isDeleting: current.isDeleting,
+        isReporting: current.isReporting,
+        actionError: null,
+      ),
+    );
     try {
       final older = await repository.loadMoreMessages(
         chatId: chatId,
         before: oldest,
         limit: pageSize,
       );
-      final known = state.messages.map((message) => message.id).toSet();
+      final known = current.messages.map((message) => message.id).toSet();
       final merged = <ChatMessage>[
-        ...state.messages,
+        ...current.messages,
         ...older.where((message) => !known.contains(message.id)),
       ];
+      final loaded = _success;
       safeEmit(
-        state.copyWith(
+        ChatRoomSuccess(
+          chat: loaded?.chat ?? current.chat,
           messages: merged,
+          typingUids: loaded?.typingUids ?? current.typingUids,
           isLoadingMore: false,
           hasMore: older.length >= pageSize,
+          isReadOnly: loaded?.isReadOnly ?? current.isReadOnly,
+          isSending: loaded?.isSending ?? current.isSending,
+          isEditing: loaded?.isEditing ?? current.isEditing,
+          isDeleting: loaded?.isDeleting ?? current.isDeleting,
+          isReporting: loaded?.isReporting ?? current.isReporting,
+          actionError: loaded?.actionError,
         ),
       );
     } catch (error) {
@@ -249,29 +421,93 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
     required String messageId,
     required String text,
   }) async {
-    if (state.isEditing) return;
-    safeEmit(state.copyWith(isEditing: true, actionError: null));
+    final current = _success;
+    if (current == null || current.isEditing || current.isReadOnly) return;
+    safeEmit(
+      ChatRoomSuccess(
+        chat: current.chat,
+        messages: current.messages,
+        typingUids: current.typingUids,
+        isLoadingMore: current.isLoadingMore,
+        hasMore: current.hasMore,
+        isReadOnly: current.isReadOnly,
+        isSending: current.isSending,
+        isEditing: true,
+        isDeleting: current.isDeleting,
+        isReporting: current.isReporting,
+        actionError: null,
+      ),
+    );
     try {
       await repository.editMessage(
         chatId: _requireChatId(),
         messageId: messageId,
         text: text,
       );
-      safeEmit(state.copyWith(isEditing: false));
+      final done = _success;
+      if (done != null) {
+        safeEmit(
+          ChatRoomSuccess(
+            chat: done.chat,
+            messages: done.messages,
+            typingUids: done.typingUids,
+            isLoadingMore: done.isLoadingMore,
+            hasMore: done.hasMore,
+            isReadOnly: done.isReadOnly,
+            isSending: done.isSending,
+            isEditing: false,
+            isDeleting: done.isDeleting,
+            isReporting: done.isReporting,
+            actionError: null,
+          ),
+        );
+      }
     } catch (error) {
       _fail(error);
     }
   }
 
   Future<void> deleteMessage(String messageId) async {
-    if (state.isDeleting) return;
-    safeEmit(state.copyWith(isDeleting: true, actionError: null));
+    final current = _success;
+    if (current == null || current.isDeleting || current.isReadOnly) return;
+    safeEmit(
+      ChatRoomSuccess(
+        chat: current.chat,
+        messages: current.messages,
+        typingUids: current.typingUids,
+        isLoadingMore: current.isLoadingMore,
+        hasMore: current.hasMore,
+        isReadOnly: current.isReadOnly,
+        isSending: current.isSending,
+        isEditing: current.isEditing,
+        isDeleting: true,
+        isReporting: current.isReporting,
+        actionError: null,
+      ),
+    );
     try {
       await repository.deleteMessage(
         chatId: _requireChatId(),
         messageId: messageId,
       );
-      safeEmit(state.copyWith(isDeleting: false));
+      final done = _success;
+      if (done != null) {
+        safeEmit(
+          ChatRoomSuccess(
+            chat: done.chat,
+            messages: done.messages,
+            typingUids: done.typingUids,
+            isLoadingMore: done.isLoadingMore,
+            hasMore: done.hasMore,
+            isReadOnly: done.isReadOnly,
+            isSending: done.isSending,
+            isEditing: done.isEditing,
+            isDeleting: false,
+            isReporting: done.isReporting,
+            actionError: null,
+          ),
+        );
+      }
     } catch (error) {
       _fail(error);
     }
@@ -282,8 +518,23 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
     required String reasonCode,
     String note = '',
   }) async {
-    if (state.isReporting) return;
-    safeEmit(state.copyWith(isReporting: true, actionError: null));
+    final current = _success;
+    if (current == null || current.isReporting) return;
+    safeEmit(
+      ChatRoomSuccess(
+        chat: current.chat,
+        messages: current.messages,
+        typingUids: current.typingUids,
+        isLoadingMore: current.isLoadingMore,
+        hasMore: current.hasMore,
+        isReadOnly: current.isReadOnly,
+        isSending: current.isSending,
+        isEditing: current.isEditing,
+        isDeleting: current.isDeleting,
+        isReporting: true,
+        actionError: null,
+      ),
+    );
     try {
       await repository.reportMessage(
         chatId: _requireChatId(),
@@ -291,7 +542,24 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
         reasonCode: reasonCode,
         note: note,
       );
-      safeEmit(state.copyWith(isReporting: false));
+      final done = _success;
+      if (done != null) {
+        safeEmit(
+          ChatRoomSuccess(
+            chat: done.chat,
+            messages: done.messages,
+            typingUids: done.typingUids,
+            isLoadingMore: done.isLoadingMore,
+            hasMore: done.hasMore,
+            isReadOnly: done.isReadOnly,
+            isSending: done.isSending,
+            isEditing: done.isEditing,
+            isDeleting: done.isDeleting,
+            isReporting: false,
+            actionError: null,
+          ),
+        );
+      }
     } catch (error) {
       _fail(error);
     }
@@ -301,6 +569,7 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
   Future<void> notifyTyping() async {
     final chatId = _chatId;
     if (chatId == null) return;
+    if (_success?.isReadOnly ?? false) return;
     if (!_typingThrottle.shouldSend(_clock())) return;
     try {
       await repository.setTyping(chatId);
@@ -323,6 +592,19 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
     }
   }
 
+  /// Keeps the caller's name/avatar current in every room they open.
+  ///
+  /// Silent by design: a profile refresh must never interrupt the chat.
+  Future<void> _refreshMyProfile() async {
+    final chatId = _chatId;
+    if (chatId == null) return;
+    try {
+      await repository.updateMyProfile(chatId: chatId);
+    } catch (_) {
+      // Best effort.
+    }
+  }
+
   String _requireChatId() {
     final chatId = _chatId;
     if (chatId == null) {
@@ -333,16 +615,29 @@ class ChatRoomCubit extends Cubit<ChatRoomState>
 
   void _fail(Object error) {
     final mapped = ChatErrors.map(error);
+    final current = _success;
+    if (current == null) {
+      safeEmit(
+        ChatRoomError(
+          mapped.toString(),
+          isReadOnly: mapped is ChatPermissionException,
+        ),
+      );
+      return;
+    }
     safeEmit(
-      state.copyWith(
-        actionError: mapped.toString(),
-        isReadOnly: mapped is ChatPermissionException ? true : state.isReadOnly,
+      ChatRoomSuccess(
+        chat: current.chat,
+        messages: current.messages,
+        typingUids: current.typingUids,
+        isLoadingMore: false,
+        hasMore: current.hasMore,
+        isReadOnly: current.isReadOnly || mapped is ChatPermissionException,
         isSending: false,
         isEditing: false,
         isDeleting: false,
         isReporting: false,
-        isLoadingMore: false,
-        isLoading: false,
+        actionError: mapped.toString(),
       ),
     );
   }

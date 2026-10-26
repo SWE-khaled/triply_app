@@ -5,6 +5,7 @@ import 'package:triply/features/tourist/guides/view/guides_list_screen.dart';
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
 import 'package:triply/features/tourist/map/view/map_view.dart';
 import 'package:triply/features/tourist/place_details/view/place_details_view.dart';
+import 'package:triply/features/chat/widgets/chat_unread_builder.dart';
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -133,9 +134,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onTap: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => GuideProfileScreen(
-                                        guideId: guide.id,
-                                      ),
+                                      builder: (_) =>
+                                          GuideProfileScreen(guideId: guide.id),
                                     ),
                                   );
                                 },
@@ -205,6 +205,46 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: CommunityStatsRow(),
                 ),
                 const SizedBox(height: 84),
+              ],
+            ),
+          ),
+        ),
+        floatingActionButton: ChatUnreadBuilder(
+          builder: (context, unread) => FloatingActionButton(
+            key: const Key('home-chat-button'),
+            tooltip: 'Messages',
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            onPressed: () => Navigator.of(context).push(AppRoutes.chatList()),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                const Icon(Icons.chat_bubble_outline, size: 23),
+                if (unread > 0)
+                  Positioned(
+                    top: -7,
+                    right: -8,
+                    child: Container(
+                      key: const Key('home-chat-badge'),
+                      constraints: const BoxConstraints(minWidth: 17),
+                      height: 17,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: AppColors.accentOrange,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        unread > 99 ? '99+' : '$unread',
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

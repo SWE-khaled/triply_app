@@ -19,6 +19,7 @@ import '../widget/dashboard_booking_request_card.dart';
 import '../widget/guide_bottom_nav.dart';
 import '../widget/stat_card.dart';
 import '../../../../../core/data/repositories/guide_notifications_repository.dart';
+import '../../../chat/widgets/chat_unread_builder.dart';
 import '../model/guide_notification.dart';
 import 'booking_details_screen.dart';
 import 'guide_notifications_screen.dart';
@@ -103,12 +104,10 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
   void initState() {
     super.initState();
     _notificationsStream = _notifications.watchNotifications();
-    _nameSubscription = TourGuideAuthService()
-        .watchMyName()
-        .listen((name) {
-          if (!mounted) return;
-          setState(() => _firestoreName = name);
-        });
+    _nameSubscription = TourGuideAuthService().watchMyName().listen((name) {
+      if (!mounted) return;
+      setState(() => _firestoreName = name);
+    });
   }
 
   @override
@@ -188,21 +187,29 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                 },
               ),
             ),
-            GuideBottomNav(
-              currentIndex: 0,
-              onTap: (index) {
-                if (index == 1) {
-                  // The old screens are removed instead of stacked: every
-                  // screen owns a live Firestore subscription, so keeping
-                  // them alive would pile them up.
-                  Navigator.of(context).pushAndRemoveUntil(
-                    AppRoutes.guideTrips(),
-                    (route) => route.isFirst,
-                  );
-                } else if (index == 2) {
-                  _openProfile(context);
-                }
-              },
+            ChatUnreadBuilder(
+              builder: (context, unread) => GuideBottomNav(
+                currentIndex: 0,
+                chatUnread: unread,
+                onTap: (index) {
+                  if (index == 1) {
+                    // The old screens are removed instead of stacked: every
+                    // screen owns a live Firestore subscription, so keeping
+                    // them alive would pile them up.
+                    Navigator.of(context).pushAndRemoveUntil(
+                      AppRoutes.guideTrips(),
+                      (route) => route.isFirst,
+                    );
+                  } else if (index == 2) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      AppRoutes.guideChats(),
+                      (route) => route.isFirst,
+                    );
+                  } else if (index == 3) {
+                    _openProfile(context);
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -226,135 +233,137 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-        _header(context, avatarUrl),
-        const SizedBox(height: 16),
-        if (showVerificationBanner) ...[
-          _verificationBanner(context),
-          const SizedBox(height: 20),
-        ] else
-          const SizedBox(height: 4),
-        const Text(
-          'Dashboard',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            color: AppColors.title,
+          _header(context, avatarUrl),
+          const SizedBox(height: 16),
+          if (showVerificationBanner) ...[
+            _verificationBanner(context),
+            const SizedBox(height: 20),
+          ] else
+            const SizedBox(height: 4),
+          const Text(
+            'Dashboard',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: AppColors.title,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Welcome back, $guideName',
-          style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: StatCard(
-                icon: Icons.people_outline,
-                value: '${stats.totalBookings}',
-                label: 'Total Bookings',
-                onTap: () {},
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: StatCard(
-                icon: Icons.calendar_today_outlined,
-                value: '${stats.upcomingTrips}',
-                label: 'Upcoming Trips',
-                // No Upcoming tab exists in My Trips; Active
-                // holds the scheduled upcoming trips.
-                onTap: () => Navigator.push(
-                  context,
-                  AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
+          const SizedBox(height: 4),
+          Text(
+            'Welcome back, $guideName',
+            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: StatCard(
+                  icon: Icons.people_outline,
+                  value: '${stats.totalBookings}',
+                  label: 'Total Bookings',
+                  onTap: () {},
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: StatCard(
-                icon: Icons.work_outline,
-                value: '${stats.activeTrips}',
-                label: 'Active Trips',
-                onTap: () => Navigator.push(
-                  context,
-                  AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: StatCard(
-                icon: Icons.layers_outlined,
-                value: '${stats.completedTrips}',
-                label: 'Completed Trips',
-                onTap: () => Navigator.push(
-                  context,
-                  AppRoutes.guideTrips(
-                    initialStatus: GuideTripStatus.completed,
+              const SizedBox(width: 12),
+              Expanded(
+                child: StatCard(
+                  icon: Icons.calendar_today_outlined,
+                  value: '${stats.upcomingTrips}',
+                  label: 'Upcoming Trips',
+                  // No Upcoming tab exists in My Trips; Active
+                  // holds the scheduled upcoming trips.
+                  onTap: () => Navigator.push(
+                    context,
+                    AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: StatCard(
-                icon: Icons.credit_card_outlined,
-                value: stats.earningsLabel,
-                label: 'Earnings',
-                highlighted: true,
-                valueTeal: true,
-                onTap: () => Navigator.push(context, AppRoutes.earnings()),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: StatCard(
-                icon: Icons.notifications_none_outlined,
-                value: '${stats.pendingRequests}',
-                label: 'Pending Requests',
-                onTap: () => Navigator.push(
-                  context,
-                  AppRoutes.guideTrips(initialStatus: GuideTripStatus.pending),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'New bookings',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-            color: AppColors.title,
-          ),
-        ),
-        const SizedBox(height: 12),
-        for (final b in bookings) ...[
-          BookingRequestCard(
-            booking: b,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => BookingDetailsScreen(bookingId: b.id),
-                ),
-              );
-            },
+            ],
           ),
           const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: StatCard(
+                  icon: Icons.work_outline,
+                  value: '${stats.activeTrips}',
+                  label: 'Active Trips',
+                  onTap: () => Navigator.push(
+                    context,
+                    AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: StatCard(
+                  icon: Icons.layers_outlined,
+                  value: '${stats.completedTrips}',
+                  label: 'Completed Trips',
+                  onTap: () => Navigator.push(
+                    context,
+                    AppRoutes.guideTrips(
+                      initialStatus: GuideTripStatus.completed,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: StatCard(
+                  icon: Icons.credit_card_outlined,
+                  value: stats.earningsLabel,
+                  label: 'Earnings',
+                  highlighted: true,
+                  valueTeal: true,
+                  onTap: () => Navigator.push(context, AppRoutes.earnings()),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: StatCard(
+                  icon: Icons.notifications_none_outlined,
+                  value: '${stats.pendingRequests}',
+                  label: 'Pending Requests',
+                  onTap: () => Navigator.push(
+                    context,
+                    AppRoutes.guideTrips(
+                      initialStatus: GuideTripStatus.pending,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'New bookings',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppColors.title,
+            ),
+          ),
+          const SizedBox(height: 12),
+          for (final b in bookings) ...[
+            BookingRequestCard(
+              booking: b,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BookingDetailsScreen(bookingId: b.id),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
         ],
-      ],
-    ),
+      ),
     );
   }
 

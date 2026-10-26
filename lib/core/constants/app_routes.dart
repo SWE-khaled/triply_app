@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/chat/model/chat_audience.dart';
+import '../../features/chat/view/chat_list_screen.dart';
+import '../../features/chat/view/chat_room_screen.dart';
+import '../../core/data/repositories/chat_repository.dart';
 import '../../features/tour_guide/create_trip_tg/view/create_trip_screen.dart';
 import '../../features/tour_guide/earnings_tg/view/earnings_screen.dart';
+import '../../features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import '../../features/tour_guide/my_trips_tg/model/guide_trip.dart';
 import '../../features/tour_guide/my_trips_tg/view/guide_trips_screen.dart';
 import '../../features/tour_guide/profile_tg/view/profile_tour_guide_screen.dart';
@@ -87,6 +92,11 @@ class AppRoutes {
     );
   }
 
+  static Route<void> guideDashboard() {
+    // Screen self-provides its cubits; route adds no provider.
+    return MaterialPageRoute(builder: (_) => const GuideDashboardScreen());
+  }
+
   static Route<void> guideTrips({
     GuideTripStatus initialStatus = GuideTripStatus.active,
   }) {
@@ -152,6 +162,59 @@ class AppRoutes {
   static Route<void> earnings() {
     // Screen self-provides its cubit; route adds no provider.
     return MaterialPageRoute(builder: (_) => const EarningsScreen());
+  }
+
+  /// The chat list of either role. Guides keep their four-tab navigation.
+  static Route<void> chatList({
+    ChatRepository? repository,
+    ChatAudience audience = ChatAudience.tourist,
+    bool showGuideNav = false,
+  }) {
+    return MaterialPageRoute(
+      builder: (_) => ChatListScreen(
+        repository: repository,
+        audience: audience,
+        showGuideNav: showGuideNav,
+      ),
+    );
+  }
+
+  static Route<void> guideChats() =>
+      chatList(audience: ChatAudience.guide, showGuideNav: true);
+
+  /// Opens an existing conversation by its canonical chat id.
+  static Route<void> chatRoom({
+    required String chatId,
+    ChatAudience audience = ChatAudience.tourist,
+    String fallbackName = '',
+    String fallbackAvatar = '',
+  }) {
+    return MaterialPageRoute(
+      builder: (_) => ChatRoomScreen(
+        chatId: chatId,
+        audience: audience,
+        fallbackName: fallbackName,
+        fallbackAvatar: fallbackAvatar,
+      ),
+    );
+  }
+
+  /// Opens the empty room for a guide; the chat is created by the first
+  /// message, not by opening this screen.
+  static Route<void> chatWithGuide({
+    required String guideId,
+    required String guideName,
+    String guideAvatar = '',
+  }) {
+    return MaterialPageRoute(
+      builder: (_) => ChatRoomScreen(
+        guideId: guideId,
+        guideName: guideName,
+        guideAvatar: guideAvatar,
+        fallbackName: guideName,
+        fallbackAvatar: guideAvatar,
+      ),
+    );
   }
 
   /// Post-booking destination: always lands on My Trips, where the

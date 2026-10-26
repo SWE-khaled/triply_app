@@ -35,6 +35,9 @@ class TripDetails {
   final double priceEgp;
   final String guideName;
   final String guideAvatarUrl;
+
+  /// The owning guide's uid; empty when the trip has no linked guide.
+  final String guideId;
   final double guideRating;
   final int guideReviews;
   final bool topRatedGuide;
@@ -59,6 +62,7 @@ class TripDetails {
     required this.priceEgp,
     required this.guideName,
     required this.guideAvatarUrl,
+    this.guideId = '',
     required this.guideRating,
     required this.guideReviews,
     required this.topRatedGuide,
@@ -88,6 +92,7 @@ class TripDetails {
       priceEgp: trip.priceEgp,
       guideName: trip.guideName,
       guideAvatarUrl: trip.guideAvatarUrl,
+      guideId: trip.guideId,
       guideRating: trip.guideRating,
       guideReviews: trip.guideReviews,
       topRatedGuide: trip.topRatedGuide,
@@ -117,6 +122,7 @@ class TripDetails {
       priceEgp: (json['priceEgp'] as num).toDouble(),
       guideName: json['guideName'] as String,
       guideAvatarUrl: json['guideAvatarUrl'] as String,
+      guideId: (json['guideId'] as String?) ?? '',
       guideRating: (json['guideRating'] as num).toDouble(),
       guideReviews: json['guideReviews'] as int,
       topRatedGuide: json['topRatedGuide'] as bool,
@@ -144,6 +150,7 @@ class TripDetails {
       'priceEgp': priceEgp,
       'guideName': guideName,
       'guideAvatarUrl': guideAvatarUrl,
+      'guideId': guideId,
       'guideRating': guideRating,
       'guideReviews': guideReviews,
       'topRatedGuide': topRatedGuide,

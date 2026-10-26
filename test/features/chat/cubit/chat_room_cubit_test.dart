@@ -32,6 +32,11 @@ void main() {
     await repository.dispose();
   });
 
+  ChatRoomSuccess successOf(ChatRoomCubit value) {
+    expect(value.state, isA<ChatRoomSuccess>());
+    return value.state as ChatRoomSuccess;
+  }
+
   Chat baseChat({Map<String, int>? unread, Map<String, DateTime>? lastReadAt}) {
     return Chat(
       id: chatId,
@@ -102,10 +107,11 @@ void main() {
       expect(chat.lastMessage!.text, 'hello');
       expect(chat.lastMessage!.senderId, tourist);
 
-      expect(cubit.state.chat!.id, chatId);
-      expect(cubit.state.messages, hasLength(1));
-      expect(cubit.state.messages.single.text, 'hello');
-      expect(cubit.state.isSending, isFalse);
+      final state = successOf(cubit);
+      expect(state.chat!.id, chatId);
+      expect(state.messages, hasLength(1));
+      expect(state.messages.single.text, 'hello');
+      expect(state.isSending, isFalse);
     });
 
     test('a guide cannot start a chat', () async {
@@ -124,11 +130,12 @@ void main() {
 
       await cubit.sendMessage('hello');
 
+      final state = successOf(cubit);
       expect(repository.chats, isEmpty);
       expect(cubit.chatId, isNull);
-      expect(cubit.state.isReadOnly, isTrue);
-      expect(cubit.state.actionError, 'Only tourists can start a chat.');
-      expect(cubit.state.isSending, isFalse);
+      expect(state.isReadOnly, isTrue);
+      expect(state.actionError, 'Only tourists can start a chat.');
+      expect(state.isSending, isFalse);
     });
 
     test('reuses an existing chat instead of creating a duplicate', () async {
@@ -157,9 +164,10 @@ void main() {
 
       await cubit.sendMessage('   ');
 
-      expect(cubit.state.actionError, 'Write a message first.');
-      expect(cubit.state.isSending, isFalse);
-      expect(cubit.state.isReadOnly, isFalse);
+      final state = successOf(cubit);
+      expect(state.actionError, 'Write a message first.');
+      expect(state.isSending, isFalse);
+      expect(state.isReadOnly, isFalse);
     });
   });
 
@@ -172,7 +180,7 @@ void main() {
       final chat = repository.chats[chatId]!;
       expect(chat.unreadFor(guide), 1);
       expect(chat.unreadFor(tourist), 0);
-      expect(cubit.state.isSending, isFalse);
+      expect(successOf(cubit).isSending, isFalse);
     });
 
     test('stores a preview capped at 120 characters', () async {
@@ -182,7 +190,7 @@ void main() {
       await pumpEventQueue();
 
       expect(repository.chats[chatId]!.lastMessage!.text, 'a' * 120);
-      expect(cubit.state.messages.single.text, 'a' * 150);
+      expect(successOf(cubit).messages.single.text, 'a' * 150);
     });
 
     test('a permission denial turns the room read-only', () async {
@@ -191,9 +199,10 @@ void main() {
 
       await cubit.sendMessage('hi');
 
-      expect(cubit.state.isReadOnly, isTrue);
-      expect(cubit.state.actionError, isNotNull);
-      expect(cubit.state.isSending, isFalse);
+      final state = successOf(cubit);
+      expect(state.isReadOnly, isTrue);
+      expect(state.actionError, isNotNull);
+      expect(state.isSending, isFalse);
     });
 
     test('an ordinary failure does not make the room read-only', () async {
@@ -202,8 +211,9 @@ void main() {
 
       await cubit.sendMessage('hi');
 
-      expect(cubit.state.isReadOnly, isFalse);
-      expect(cubit.state.actionError, 'Network down.');
+      final state = successOf(cubit);
+      expect(state.isReadOnly, isFalse);
+      expect(state.actionError, 'Network down.');
     });
   });
 
@@ -211,8 +221,10 @@ void main() {
     test('needs a chat id or a guide id', () async {
       await cubit.load();
 
-      expect(cubit.state.error, 'This chat is not available.');
-      expect(cubit.state.isLoading, isFalse);
+      final state = cubit.state;
+      expect(state, isA<ChatRoomError>());
+      expect((state as ChatRoomError).error, 'This chat is not available.');
+      expect(state.isReadOnly, isFalse);
     });
 
     test('reads the chat, its messages and the typing markers', () async {
@@ -226,10 +238,10 @@ void main() {
       repository.notify();
       await pumpEventQueue();
 
-      expect(cubit.state.chat!.id, chatId);
-      expect(cubit.state.messages.single.text, 'one');
-      expect(cubit.state.isLoading, isFalse);
-      expect(cubit.state.isReadOnly, isFalse);
+      final state = successOf(cubit);
+      expect(state.chat!.id, chatId);
+      expect(state.messages.single.text, 'one');
+      expect(state.isReadOnly, isFalse);
       expect(cubit.isOtherTyping, isTrue);
     });
 
@@ -243,9 +255,10 @@ void main() {
 
       await cubit.load();
 
-      expect(cubit.state.chat, isNull);
-      expect(cubit.state.messages, isEmpty);
-      expect(cubit.state.isReadOnly, isFalse);
+      final state = successOf(cubit);
+      expect(state.chat, isNull);
+      expect(state.messages, isEmpty);
+      expect(state.isReadOnly, isFalse);
     });
   });
 
@@ -278,8 +291,30 @@ void main() {
 
       await cubit.markRead();
 
-      expect(cubit.state.isReadOnly, isTrue);
-      expect(cubit.state.actionError, isNotNull);
+      final state = successOf(cubit);
+      expect(state.isReadOnly, isTrue);
+      expect(state.actionError, isNotNull);
+    });
+
+    test('opening a room with an inbound message clears the badge', () async {
+      repository.seedChat(
+        baseChat(unread: <String, int>{tourist: 2, guide: 0}),
+      );
+      repository.seedMessages(chatId, <ChatMessage>[
+        message('m1', senderId: guide, text: 'inbound'),
+      ]);
+      await cubit.close();
+      cubit = ChatRoomCubit(
+        repository: repository,
+        chatId: chatId,
+        clock: () => now,
+      );
+
+      await cubit.load();
+      await pumpEventQueue();
+
+      expect(repository.chats[chatId]!.unreadFor(tourist), 0);
+      expect(repository.chats[chatId]!.lastReadOf(tourist), now);
     });
   });
 
@@ -324,17 +359,19 @@ void main() {
       ];
       await loadExisting(messages: all);
 
-      expect(cubit.state.messages, hasLength(30));
-      expect(cubit.state.messages.first.id, 'm44');
-      expect(cubit.state.messages.last.id, 'm15');
-      expect(cubit.state.hasMore, isTrue);
+      final firstPage = successOf(cubit);
+      expect(firstPage.messages, hasLength(30));
+      expect(firstPage.messages.first.id, 'm44');
+      expect(firstPage.messages.last.id, 'm15');
+      expect(firstPage.hasMore, isTrue);
 
       await cubit.loadMore();
 
-      expect(cubit.state.messages, hasLength(45));
-      expect(cubit.state.messages.last.id, 'm0');
-      expect(cubit.state.hasMore, isFalse);
-      expect(cubit.state.isLoadingMore, isFalse);
+      final loaded = successOf(cubit);
+      expect(loaded.messages, hasLength(45));
+      expect(loaded.messages.last.id, 'm0');
+      expect(loaded.hasMore, isFalse);
+      expect(loaded.isLoadingMore, isFalse);
     });
 
     test('does nothing when the first page is short', () async {
@@ -344,8 +381,9 @@ void main() {
 
       await cubit.loadMore();
 
-      expect(cubit.state.messages, hasLength(1));
-      expect(cubit.state.hasMore, isFalse);
+      final state = successOf(cubit);
+      expect(state.messages, hasLength(1));
+      expect(state.hasMore, isFalse);
     });
   });
 
@@ -385,7 +423,7 @@ void main() {
 
       expect(cubit.otherLastReadAt, readAt);
       final byId = <String, ChatMessage>{
-        for (final item in cubit.state.messages) item.id: item,
+        for (final item in successOf(cubit).messages) item.id: item,
       };
       expect(cubit.isReadByOther(byId['read']!), isTrue);
       expect(cubit.isReadByOther(byId['unread']!), isFalse);
@@ -404,8 +442,9 @@ void main() {
       final edited = repository.messages[chatId]!.single;
       expect(edited.text, 'new');
       expect(edited.isEdited, isTrue);
-      expect(cubit.state.isEditing, isFalse);
-      expect(cubit.state.actionError, isNull);
+      final state = successOf(cubit);
+      expect(state.isEditing, isFalse);
+      expect(state.actionError, isNull);
     });
 
     test('rejects editing the other participant message', () async {
@@ -416,8 +455,9 @@ void main() {
       await cubit.editMessage(messageId: 'm1', text: 'mine now');
 
       expect(repository.messages[chatId]!.single.text, 'theirs');
-      expect(cubit.state.actionError, isNotNull);
-      expect(cubit.state.isReadOnly, isFalse);
+      final state = successOf(cubit);
+      expect(state.actionError, isNotNull);
+      expect(state.isReadOnly, isFalse);
     });
 
     test('rejects editing after 24 hours', () async {
@@ -435,7 +475,7 @@ void main() {
       await cubit.editMessage(messageId: 'm1', text: 'new');
 
       expect(repository.messages[chatId]!.single.text, 'old');
-      expect(cubit.state.actionError, isNotNull);
+      expect(successOf(cubit).actionError, isNotNull);
     });
 
     test('deletes my own message', () async {
@@ -451,7 +491,7 @@ void main() {
       expect(repository.messages[chatId]!.map((item) => item.id), <String>[
         'm2',
       ]);
-      expect(cubit.state.isDeleting, isFalse);
+      expect(successOf(cubit).isDeleting, isFalse);
     });
   });
 
@@ -489,7 +529,7 @@ void main() {
         expect(report.reasonCode, 'harassment');
         expect(report.note, 'please review');
         expect(report.status, 'open');
-        expect(cubit.state.isReporting, isFalse);
+        expect(successOf(cubit).isReporting, isFalse);
       },
     );
 
@@ -502,8 +542,9 @@ void main() {
       await cubit.reportMessage(message: target, reasonCode: 'spam');
 
       expect(repository.reports, isEmpty);
-      expect(cubit.state.actionError, isNotNull);
-      expect(cubit.state.isReporting, isFalse);
+      final state = successOf(cubit);
+      expect(state.actionError, isNotNull);
+      expect(state.isReporting, isFalse);
     });
 
     test('refuses an unknown reason code', () async {
@@ -515,7 +556,7 @@ void main() {
       await cubit.reportMessage(message: target, reasonCode: 'bogus');
 
       expect(repository.reports, isEmpty);
-      expect(cubit.state.actionError, isNotNull);
+      expect(successOf(cubit).actionError, isNotNull);
     });
   });
 
@@ -536,15 +577,25 @@ void main() {
   });
 
   group('state', () {
-    test('copyWith keeps the unset fields and clears errors on demand', () {
-      const state = ChatRoomState();
-      final failed = state.copyWith(actionError: 'boom', isSending: true);
-      final cleared = failed.copyWith(isSending: false, actionError: null);
+    test('the success state is immutable and carries the flags', () {
+      const state = ChatRoomSuccess(
+        isReadOnly: true,
+        isSending: true,
+        actionError: 'boom',
+      );
 
-      expect(failed.actionError, 'boom');
-      expect(cleared.actionError, isNull);
-      expect(cleared.isSending, isFalse);
-      expect(cleared.messages, isEmpty);
+      expect(state.isReadOnly, isTrue);
+      expect(state.isSending, isTrue);
+      expect(state.isBusy, isTrue);
+      expect(state.actionError, 'boom');
+      expect(state.messages, isEmpty);
+    });
+
+    test('the error state carries the read-only marker', () {
+      const state = ChatRoomError('denied', isReadOnly: true);
+
+      expect(state.error, 'denied');
+      expect(state.isReadOnly, isTrue);
     });
   });
 }

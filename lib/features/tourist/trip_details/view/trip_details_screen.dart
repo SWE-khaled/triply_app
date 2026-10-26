@@ -8,6 +8,7 @@ import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../guides/view/guide_profile_screen.dart';
+import 'package:triply/features/chat/widgets/message_guide_button.dart';
 import '../../my_trips/widgets/booking_badges.dart';
 import '../../trips/models/trip.dart';
 import '../cubit/trip_details_cubit.dart';
@@ -186,6 +187,15 @@ class TripDetailsScreen extends StatelessWidget {
                             context,
                           ).push(AppRoutes.booking(trip)),
                         ),
+                        if (details.guideId.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          MessageGuideButton(
+                            expanded: true,
+                            guideId: details.guideId,
+                            guideName: details.guideName,
+                            guideAvatar: details.guideAvatarUrl,
+                          ),
+                        ],
                         const SizedBox(height: 14),
                         FutureBuilder<String?>(
                           future: AuthRepository().getGuidePhoneByName(

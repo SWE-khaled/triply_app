@@ -9,6 +9,7 @@ import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import 'package:triply/core/widgets/guide_shared_widgets.dart';
 import 'package:triply/features/tourist/booking/view/booking_screen.dart';
 import 'package:triply/features/tourist/guides/widgets/trip_card.dart';
+import 'package:triply/features/chat/widgets/message_guide_button.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
@@ -413,22 +414,11 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                 ),
               ),
             ),
-            // const SizedBox(width: 12),
-            // InkWell(
-            //   // Chat screen does not exist yet — placeholder.
-            //   onTap: () {},
-            //   borderRadius: BorderRadius.circular(26),
-            //   child: Container(
-            //     width: 52,
-            //     height: 52,
-            //     decoration: BoxDecoration(
-            //       color: Color(0xFFFAF5EC),
-            //       border: Border.all(color: Color(0xFF8A9EA3)),
-            //       shape: BoxShape.circle,
-            //     ),
-            //     child: Icon(Icons.chat_outlined, color: Color(0xFF0E5261)),
-            //   ),
-            // ),
+            MessageGuideButton(
+              guideId: _controller.guide.id,
+              guideName: _controller.guide.name,
+              guideAvatar: _controller.guide.avatarUrl,
+            ),
           ],
         ),
       ),

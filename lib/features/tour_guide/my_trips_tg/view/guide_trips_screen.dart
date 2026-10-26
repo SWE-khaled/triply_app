@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -9,6 +8,7 @@ import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/data/guide_trip_details_source.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../../../chat/widgets/chat_unread_builder.dart';
 import '../cubit/guide_trips_cubit.dart';
 import '../model/guide_trip.dart';
 import '../../home_and_notification_tg/widget/guide_bottom_nav.dart';
@@ -363,38 +363,46 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
           ],
         ),
       ),
-      bottomNavigationBar: GuideBottomNav(
-        currentIndex: bottomIndex,
-        onTap: (i) {
-          if (i == bottomIndex) return;
-          if (i == 2) {
-            // The guide's own profile — always the signed-in account,
-            // never a mock guide id.
-            final uid = context.read<AuthCubit>().user?.uid;
-            if (uid == null) {
-              showAppSnackBar(
-                context,
-                'Sign in to see your profile',
-                icon: Icons.info_outline,
+      bottomNavigationBar: ChatUnreadBuilder(
+        builder: (context, unread) => GuideBottomNav(
+          currentIndex: bottomIndex,
+          chatUnread: unread,
+          onTap: (i) {
+            if (i == bottomIndex) return;
+            if (i == 2) {
+              Navigator.of(context).pushAndRemoveUntil(
+                AppRoutes.guideChats(),
+                (route) => route.isFirst,
               );
               return;
             }
-            Navigator.of(context).push(AppRoutes.guideProfile(uid));
-            return;
-          }
-          if (i == 0) {
-            // Back to guide Home. The old screens are removed instead of
-            // stacked: every screen owns a live Firestore subscription,
-            // so keeping them alive would pile them up.
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => const GuideDashboardScreen(),
-              ),
-              (route) => route.isFirst,
-            );
-            return;
-          }
-        },
+            if (i == 3) {
+              // The guide's own profile — always the signed-in account,
+              // never a mock guide id.
+              final uid = context.read<AuthCubit>().user?.uid;
+              if (uid == null) {
+                showAppSnackBar(
+                  context,
+                  'Sign in to see your profile',
+                  icon: Icons.info_outline,
+                );
+                return;
+              }
+              Navigator.of(context).push(AppRoutes.guideProfile(uid));
+              return;
+            }
+            if (i == 0) {
+              // Back to guide Home. The old screens are removed instead of
+              // stacked: every screen owns a live Firestore subscription,
+              // so keeping them alive would pile them up.
+              Navigator.of(context).pushAndRemoveUntil(
+                AppRoutes.guideDashboard(),
+                (route) => route.isFirst,
+              );
+              return;
+            }
+          },
+        ),
       ),
     );
   }
