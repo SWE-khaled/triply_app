@@ -60,6 +60,10 @@ class GuideTrip {
   /// human-readable form; Firestore stores this one and sorts on it.
   final DateTime? startAt;
 
+  /// The real moment the trip ends. Required for a bookable trip;
+  /// computed from `startAt` plus the selected duration in the form.
+  final DateTime? endAt;
+
   /// Wide cover image (details screen). Falls back to [imageUrl].
   final String coverUrl;
 
@@ -80,6 +84,7 @@ class GuideTrip {
     this.duration,
     this.rejectionReason,
     this.startAt,
+    this.endAt,
     this.coverUrl = '',
     this.guideId = '',
   });
@@ -130,6 +135,7 @@ class GuideTrip {
       duration: json['duration'] as String?,
       rejectionReason: json['rejectionReason'] as String?,
       startAt: parseGuideDate(json['startAt']),
+      endAt: parseGuideDate(json['endAt']),
       coverUrl:
           json['coverUrl'] as String? ?? json['imageUrl'] as String? ?? '',
       guideId: json['guideId'] as String? ?? '',
@@ -151,6 +157,7 @@ class GuideTrip {
       'duration': duration,
       'rejectionReason': rejectionReason,
       'startAt': startAt?.toIso8601String(),
+      'endAt': endAt?.toIso8601String(),
       'coverUrl': coverUrl,
       'guideId': guideId,
     };

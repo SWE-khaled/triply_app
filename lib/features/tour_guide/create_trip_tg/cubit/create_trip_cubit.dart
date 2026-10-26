@@ -41,6 +41,7 @@ class CreateTripCubit extends Cubit<CreateTripState>
   final labelCtrl = TextEditingController();
   final dateCtrl = TextEditingController();
   final timeCtrl = TextEditingController();
+  final endTimeCtrl = TextEditingController();
   final durationCtrl = TextEditingController();
   final priceCtrl = TextEditingController();
   final maxTravelersCtrl = TextEditingController();
@@ -59,6 +60,7 @@ class CreateTripCubit extends Cubit<CreateTripState>
       labelCtrl,
       dateCtrl,
       timeCtrl,
+      endTimeCtrl,
       durationCtrl,
       priceCtrl,
       maxTravelersCtrl,
@@ -208,7 +210,6 @@ class CreateTripCubit extends Cubit<CreateTripState>
     nameCtrl.text = details.title;
     aboutCtrl.text = details.about;
     locationCtrl.text = details.location;
-    durationCtrl.text = details.duration;
     priceCtrl.text = details.priceEgp.toInt().toString();
     meetingCtrl.text = details.meetingPoint;
     includedCtrl.text = details.included;
@@ -237,10 +238,28 @@ class CreateTripCubit extends Cubit<CreateTripState>
     );
   }
 
+  /// Parses an "h:mm AM/PM" time (Arabic meridiem also accepted) into a
+  /// 24-hour (hour, minute). Returns null when the text is unreadable.
+  (int hour, int minute)? _parseTime(String text) {
+    final match = RegExp(
+      r'^(\d{1,2}):(\d{2})\s*(AM|PM|ص|م)$',
+      caseSensitive: false,
+    ).firstMatch(text.trim());
+    if (match == null) return null;
+    var hour = int.parse(match.group(1)!);
+    final minute = int.parse(match.group(2)!);
+    final marker = match.group(3)!.toUpperCase();
+    final isPm = marker == 'PM' || marker == 'م';
+    if (isPm && hour != 12) hour += 12;
+    if (!isPm && hour == 12) hour = 0;
+    return (hour, minute);
+  }
+
   /// The moment the trip starts, parsed from the date + time pickers.
   ///
   /// The date field holds `d/m/yyyy` and the time field holds
   /// `h:mm AM/PM`. Returns null when the guide did not pick a date.
+  /// An unreadable time falls back to midnight (unchanged behaviour).
   DateTime? get startAt {
     final date = dateCtrl.text.trim();
     if (date.isEmpty) return null;
@@ -255,20 +274,41 @@ class CreateTripCubit extends Cubit<CreateTripState>
     var minute = 0;
     final time = timeCtrl.text.trim();
     if (time.isNotEmpty) {
-      final match = RegExp(
-        r'^(\d{1,2}):(\d{2})\s*(AM|PM|ص|م)$',
-        caseSensitive: false,
-      ).firstMatch(time);
-      if (match != null) {
-        hour = int.parse(match.group(1)!);
-        minute = int.parse(match.group(2)!);
-        final marker = match.group(3)!.toUpperCase();
-        final isPm = marker == 'PM' || marker == 'م';
-        if (isPm && hour != 12) hour += 12;
-        if (!isPm && hour == 12) hour = 0;
+      final parsed = _parseTime(time);
+      if (parsed != null) {
+        hour = parsed.$1;
+        minute = parsed.$2;
       }
+      // Unreadable time keeps the previous midnight fallback behaviour.
     }
     return DateTime(year, month, day, hour, minute);
+  }
+
+  /// The moment the trip ends, parsed from the picked date + end time.
+  ///
+  /// The End Time the guide picks is the single source of truth for endAt:
+  /// same day as the start, at the end time. Returns null when the date or
+  /// end time is missing or unreadable.
+  DateTime? get endAt {
+    final starts = startAt;
+    if (starts == null) return null;
+    final endTime = endTimeCtrl.text.trim();
+    if (endTime.isEmpty) return null;
+    final parsed = _parseTime(endTime);
+    if (parsed == null) return null;
+    return DateTime(starts.year, starts.month, starts.day, parsed.$1, parsed.$2);
+  }
+
+  /// Duration derived from start and end: "5 hours", "Full Day" for 8 h.
+  /// Null when start or end is missing, or end is not after start.
+  String? get durationLabel {
+    final starts = startAt;
+    final ends = endAt;
+    if (starts == null || ends == null) return null;
+    final diff = ends.difference(starts).inHours;
+    if (diff <= 0) return null;
+    if (diff == 8) return 'Full Day';
+    return '$diff hours';
   }
 
   /// Builds the entered trip for preview/submit. Not stored.
@@ -297,9 +337,8 @@ class CreateTripCubit extends Cubit<CreateTripState>
       capacity: int.tryParse(maxTravelersCtrl.text.trim()) ?? 0,
       phone: phoneCtrl.text.trim(),
       startAt: starts,
-      duration: durationCtrl.text.trim().isEmpty
-          ? null
-          : durationCtrl.text.trim(),
+      endAt: endAt,
+      duration: durationLabel,
     );
   }
 
@@ -318,6 +357,18 @@ class CreateTripCubit extends Cubit<CreateTripState>
     final capacity = int.tryParse(maxTravelersCtrl.text.trim()) ?? 0;
     if (capacity <= 0) {
       return 'Please enter the maximum number of travelers';
+    }
+    // A trip must have a real start and end moment so tourists can book it.
+    if (startAt == null) {
+      return 'Please pick the trip date and start time';
+    }
+    if (endAt == null) {
+      return 'Please pick the end time';
+    }
+    // End time must be after the start time on the same day — never roll
+    // over to the next day.
+    if (!endAt!.isAfter(startAt!)) {
+      return 'End time must be after the start time.';
     }
     return null;
   }
@@ -394,9 +445,8 @@ class CreateTripCubit extends Cubit<CreateTripState>
           ? existingTrip.phone
           : phoneCtrl.text.trim(),
       startAt: starts ?? existingTrip.startAt,
-      duration: durationCtrl.text.trim().isEmpty
-          ? existingTrip.duration
-          : durationCtrl.text.trim(),
+      endAt: endAt ?? existingTrip.endAt,
+      duration: durationLabel ?? existingTrip.duration,
       rejectionReason: isResubmit ? null : existingTrip.rejectionReason,
       guideId: existingTrip.guideId,
     );
@@ -411,9 +461,7 @@ class CreateTripCubit extends Cubit<CreateTripState>
       location: locationCtrl.text.trim().isEmpty
           ? existingDetails.location
           : locationCtrl.text.trim(),
-      duration: durationCtrl.text.trim().isEmpty
-          ? existingDetails.duration
-          : durationCtrl.text.trim(),
+      duration: durationLabel ?? existingDetails.duration,
       groupType: existingDetails.groupType,
       languages: languagesCtrl.text.trim().isEmpty
           ? existingDetails.languages

@@ -43,11 +43,13 @@ class AuthRepository {
       if (uid != null) {
         await FirebaseFirestore.instance.collection('users').doc(uid).set({
           'fullName': fullName,
+          'displayName': fullName,
           'email': email,
           // The rules read the role with a dot-access, so the field has
           // to be there — without it the whole document is refused and
           // the profile never exists.
           'role': 'tourist',
+          'avatarUrl': '',
           if (phone != null && phone.isNotEmpty) 'phone': phone,
           'createdAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));

@@ -48,7 +48,15 @@ class MyTripsCubit extends Cubit<MyTripsState>
     safeEmit(const MyTripsLoading());
     try {
       final bookings = await _bookingRepository.fetchMyBookings();
-      _booked = bookings == null ? _sessionTrips() : await _tripsOf(bookings);
+      if (bookings == null) {
+        _booked = _sessionTrips();
+      } else {
+        // Lazy expiry (no scheduler): cancel any of the tourist's own
+        // pending bookings whose `expiresAt` has passed and release their
+        // seats, then build the list from the (possibly cancelled) set.
+        final expiredIds = await _expirePending(bookings);
+        _booked = await _tripsOf(bookings, expiredIds);
+      }
       _applyTab(_selectedTab);
     } catch (e) {
       safeEmit(MyTripsError(error: e.toString()));
@@ -61,6 +69,28 @@ class MyTripsCubit extends Cubit<MyTripsState>
   /// Re-reads the bookings (call after returning from the booking flow).
   void refresh() => load();
 
+  /// Cancels the tourist's own pending bookings whose `expiresAt` has
+  /// passed and releases their seats. Returns the ids that were cancelled.
+  Future<Set<String>> _expirePending(List<TouristBooking> bookings) async {
+    final now = DateTime.now();
+    final cancelled = <String>{};
+    for (final booking in bookings) {
+      if (booking.status != 'pending') continue;
+      final expiresAt = booking.expiresAt;
+      if (expiresAt == null || !expiresAt.isBefore(now)) continue;
+      cancelled.add(booking.id);
+      try {
+        await _bookingRepository.cancelBooking(
+          bookingId: booking.id,
+          wasPaid: booking.paymentStatus == 'paid',
+        );
+      } catch (_) {
+        // Best effort — the booking is retried on the next load.
+      }
+    }
+    return cancelled;
+  }
+
   void _applyTab(TripStatus status) {
     _selectedTab = status;
     safeEmit(
@@ -72,7 +102,11 @@ class MyTripsCubit extends Cubit<MyTripsState>
   }
 
   /// Joins the bookings with the trip documents.
-  Future<List<Trip>> _tripsOf(List<TouristBooking> bookings) async {
+  /// [expiredIds] are bookings cancelled by the lazy expiry this load.
+  Future<List<Trip>> _tripsOf(
+    List<TouristBooking> bookings,
+    Set<String> expiredIds,
+  ) async {
     final trips = await _tripsRepository.fetchTripsByIds(
       bookings.map((b) => b.tripId).toList(),
     );
@@ -82,14 +116,30 @@ class MyTripsCubit extends Cubit<MyTripsState>
     for (final booking in bookings) {
       final trip = byId[booking.tripId];
       if (trip == null) continue;
-      _statusByTrip[booking.tripId] = booking.status;
-      joined.add(_cardOf(trip, booking));
+      final effective =
+          expiredIds.contains(booking.id) ? 'cancelled' : booking.status;
+      _statusByTrip[booking.tripId] = effective;
+      joined.add(_cardOf(trip, booking, _tripStatus(effective, booking)));
     }
     return joined;
   }
 
+  /// The display status of a booking: `cancelled` when cancelled or expired,
+  /// `completed` when a confirmed booking's `endAt` has passed (display
+  /// only, no write), otherwise `upcoming`.
+  TripStatus _tripStatus(String status, TouristBooking booking) {
+    if (status == 'cancelled') return TripStatus.cancelled;
+    if (status == 'confirmed') {
+      final endAt = booking.endAt;
+      if (endAt != null && endAt.isBefore(DateTime.now())) {
+        return TripStatus.completed;
+      }
+    }
+    return TripStatus.upcoming;
+  }
+
   /// The card of a booked trip: the seats taken and what was paid.
-  Trip _cardOf(PublicTrip trip, TouristBooking booking) {
+  Trip _cardOf(PublicTrip trip, TouristBooking booking, TripStatus status) {
     return Trip(
       id: trip.id,
       title: trip.title,
@@ -98,7 +148,7 @@ class MyTripsCubit extends Cubit<MyTripsState>
       peopleCount: booking.seats > 0 ? booking.seats : trip.bookedSeats,
       priceEgp: booking.totalPrice > 0 ? booking.totalPrice : trip.priceEgp,
       imageUrl: trip.imageUrl,
-      status: TripStatus.upcoming,
+      status: status,
       category: trip.category,
       capacity: trip.capacity,
     );

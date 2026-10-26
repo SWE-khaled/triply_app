@@ -61,6 +61,15 @@ class CreateTripScreen extends StatelessWidget {
           cubit.timeCtrl.text =
               '$hour12:${start.minute.toString().padLeft(2, '0')} $marker';
         }
+        // Pre-fill the end time from the existing trip, if any.
+        final end = initialTrip?.endAt;
+        if (end != null) {
+          final hour12 = end.hour % 12 == 0 ? 12 : end.hour % 12;
+          final marker = end.hour >= 12 ? 'PM' : 'AM';
+          cubit.endTimeCtrl.text =
+              '$hour12:${end.minute.toString().padLeft(2, '0')} $marker';
+        }
+        cubit.durationCtrl.text = cubit.durationLabel ?? '';
         return cubit;
       },
       child: _CreateTripView(
@@ -110,7 +119,26 @@ class _CreateTripView extends StatelessWidget {
     );
     if (t != null && context.mounted) {
       cubit.timeCtrl.text = t.format(context);
+      _refreshDuration(cubit);
     }
+  }
+
+  Future<void> _pickEndTime(BuildContext context) async {
+    final cubit = context.read<CreateTripCubit>();
+    final t = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (t != null && context.mounted) {
+      cubit.endTimeCtrl.text = t.format(context);
+      _refreshDuration(cubit);
+    }
+  }
+
+  /// Recomputes the derived duration from the current start + end and shows
+  /// it in the (read-only) Duration field.
+  void _refreshDuration(CreateTripCubit cubit) {
+    cubit.durationCtrl.text = cubit.durationLabel ?? '';
   }
 
   void _toast(BuildContext context, String msg) {
@@ -255,10 +283,12 @@ class _CreateTripView extends StatelessWidget {
               ScheduleSection(
                 dateCtrl: cubit.dateCtrl,
                 timeCtrl: cubit.timeCtrl,
+                endTimeCtrl: cubit.endTimeCtrl,
                 durationCtrl: cubit.durationCtrl,
                 priceCtrl: cubit.priceCtrl,
                 onPickDate: () => _pickDate(context),
                 onPickTime: () => _pickTime(context),
+                onPickEndTime: () => _pickEndTime(context),
               ),
               const SizedBox(height: 12),
               LogisticsSection(

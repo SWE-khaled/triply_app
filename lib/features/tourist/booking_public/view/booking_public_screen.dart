@@ -53,8 +53,10 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
     super.dispose();
   }
 
-  /// Confirm & Pay: the payment runs first; the trip is only recorded
-  /// (added to My Trips) after a successful payment.
+  /// Confirm & Pay: the booking is created as `pending`/`pending` and its
+  /// seats are reserved first; only a successful Paymob payment confirms it.
+  /// If the trip filled up or the payment fails, the booking stays pending
+  /// and is released by the lazy expiry after 30 minutes.
   void _confirm(BuildContext context) {
     final cubit = context.read<BookingPublicCubit>();
     final trip = widget.trip;
@@ -62,32 +64,54 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
+    _createThenPay(cubit, trip, navigator, messenger);
+  }
+
+  Future<void> _createThenPay(
+    BookingPublicCubit cubit,
+    Trip trip,
+    NavigatorState navigator,
+    ScaffoldMessengerState messenger,
+  ) async {
+    // 1. Create the booking as pending/pending and reserve the seats.
+    final bookingId = await cubit.createBooking(
+      tripId: trip.id,
+      unitPrice: details.priceEgp,
+    );
+    if (!mounted) return;
+    if (bookingId == null) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'This trip just filled up. Please pick another one.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    // 2. Pay through Paymob. On success confirm the booking; on failure or
+    // close it stays pending and expires after 30 minutes.
     navigator.push(
       MaterialPageRoute(
         builder: (_) => PaymentView(
           price: cubit.total(details.priceEgp),
           onPaymentSuccess: () async {
-            final booking = await cubit.confirm(
-              tripId: trip.id,
-              unitPrice: details.priceEgp,
+            if (!mounted) return;
+            await cubit.confirmPayment(
+              bookingId: bookingId,
+              // The PaymentView success callback does not expose the
+              // Paymob transaction id, so the booking id is recorded as
+              // the payment id (test-only demo; no real money moves).
+              paymentId: bookingId,
             );
             if (!mounted) return;
-            if (booking == null) {
-              messenger.showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'This trip just filled up. Please pick another one.',
-                  ),
-                ),
-              );
-              return;
-            }
             navigator.pushAndRemoveUntil(
               AppRoutes.bookingConfirmed(
                 trip: trip,
                 details: details,
-                seats: booking.seats,
-                total: booking.total,
+                seats: cubit.state.seats,
+                total: cubit.total(details.priceEgp),
               ),
               (route) => route.isFirst,
             );
@@ -217,6 +241,46 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                   fee: cubit.fee(details.priceEgp),
                   total: total,
                 ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AppColors.cardBorder),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Payment method',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.title,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          ChoiceChip(
+                            label: const Text('Card'),
+                            selected: state.paymentMethod == 'card',
+                            onSelected: (_) =>
+                                cubit.changePaymentMethod('card'),
+                          ),
+                          ChoiceChip(
+                            label: const Text('Wallet'),
+                            selected: state.paymentMethod == 'wallet',
+                            onSelected: (_) =>
+                                cubit.changePaymentMethod('wallet'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           );
@@ -233,7 +297,9 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
               return SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => _confirm(context),
+                  onPressed: () {
+                    _confirm(context);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.tabSelectedBg,
                     foregroundColor: Colors.white,

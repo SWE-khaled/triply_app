@@ -67,19 +67,23 @@ class BasicsSection extends StatelessWidget {
 class ScheduleSection extends StatelessWidget {
   final TextEditingController dateCtrl;
   final TextEditingController timeCtrl;
+  final TextEditingController endTimeCtrl;
   final TextEditingController durationCtrl;
   final TextEditingController priceCtrl;
   final VoidCallback onPickDate;
   final VoidCallback onPickTime;
+  final VoidCallback onPickEndTime;
 
   const ScheduleSection({
     super.key,
     required this.dateCtrl,
     required this.timeCtrl,
+    required this.endTimeCtrl,
     required this.durationCtrl,
     required this.priceCtrl,
     required this.onPickDate,
     required this.onPickTime,
+    required this.onPickEndTime,
   });
 
   @override
@@ -105,17 +109,27 @@ class ScheduleSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         GuideTwoCol(
-          leftLabel: 'Duration',
+          leftLabel: 'End Time',
           leftField: GuideFormField(
+            controller: endTimeCtrl,
+            hint: 'e.g. 9:00 PM',
+            readOnly: true,
+            onTap: onPickEndTime,
+          ),
+          rightLabel: 'Duration',
+          rightField: GuideFormField(
             controller: durationCtrl,
             hint: 'e.g. 5 hours',
+            readOnly: true,
           ),
-          rightLabel: 'Price per person',
-          rightField: GuideFormField(
-            controller: priceCtrl,
-            hint: 'EGP',
-            keyboardType: TextInputType.number,
-          ),
+        ),
+        const SizedBox(height: 12),
+        const GuideFormLabel(text: 'Price per person'),
+        const SizedBox(height: 6),
+        GuideFormField(
+          controller: priceCtrl,
+          hint: 'EGP',
+          keyboardType: TextInputType.number,
         ),
       ],
     );

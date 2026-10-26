@@ -75,6 +75,7 @@ class BookingRepository {
     required String tripId,
     required int seats,
     required double unitPrice,
+    required String paymentMethod,
     String specialRequests = '',
   }) async {
     final uid = currentTouristId;
@@ -84,12 +85,18 @@ class BookingRepository {
     if (seats <= 0) {
       throw const BookingException('Choose at least one seat.');
     }
+    if (paymentMethod != 'card' && paymentMethod != 'wallet') {
+      throw const BookingException('Choose a payment method.');
+    }
 
     final db = _firestore.instance;
     final tripRef = db.collection(tripsCollection).doc(tripId);
     final bookingRef = db.collection(bookingsCollection).doc();
     final serviceFee = unitPrice * seats * 0.05;
     final total = unitPrice * seats + serviceFee;
+
+    final now = DateTime.now();
+    final expiresAt = now.add(const Duration(minutes: 30));
 
     // The guest of the booking is the tourist who books — not the guide
     // who owns the trip.
@@ -103,6 +110,13 @@ class BookingRepository {
       final trip = tripSnapshot.data() ?? const <String, dynamic>{};
       if (trip['approvalStatus'] != 'approved') {
         throw const BookingException('This trip is not open for booking.');
+      }
+      // A trip without a real start moment cannot be booked yet — the
+      // guide still has to set the date and time (and end time) on it.
+      if (trip['startAt'] == null) {
+        throw const BookingException(
+          'This trip has no date or time set yet and cannot be booked.',
+        );
       }
       final capacity = (trip['capacity'] as num?)?.toInt() ?? 0;
       final booked = (trip['bookedSeats'] as num?)?.toInt() ?? 0;
@@ -140,8 +154,17 @@ class BookingRepository {
         'location': trip['location'] ?? '',
         'booking_code': bookingRef.id,
         'specialRequests': specialRequests,
+        // Payment is confirmed by the Paymob WebView; until then the
+        // booking stays pending so its seats can be released on expiry.
         'status': 'pending',
-        'paymentStatus': 'paid',
+        'paymentStatus': 'pending',
+        'paymentMethod': paymentMethod,
+        'refundStatus': 'none',
+        // The trip's real start moment (public trips carry startAt;
+        // endAt is filled in once trips require it, see S2).
+        'startAt': trip['startAt'],
+        'endAt': null,
+        'expiresAt': Timestamp.fromDate(expiresAt),
         'createdAt': FieldValue.serverTimestamp(),
       });
     });
@@ -197,6 +220,9 @@ class BookingRepository {
     required String title,
     required int travelers,
     required double totalPrice,
+    required String paymentMethod,
+    DateTime? startAt,
+    DateTime? endAt,
     String meetingPoint = '',
     String notes = '',
     String specialRequests = '',
@@ -208,12 +234,17 @@ class BookingRepository {
     if (travelers <= 0) {
       throw const BookingException('Choose at least one traveler.');
     }
+    if (paymentMethod != 'card' && paymentMethod != 'wallet') {
+      throw const BookingException('Choose a payment method.');
+    }
 
     final db = _firestore.instance;
     final bookingRef = db.collection(bookingsCollection).doc();
     // The guest of the booking is the tourist who books — not the guide
     // who is booked.
     final guest = await _readGuestProfile(uid);
+    final now = DateTime.now();
+    final expiresAt = now.add(const Duration(minutes: 30));
     await bookingRef.set({
       'tripId': '',
       'touristId': uid,
@@ -233,8 +264,15 @@ class BookingRepository {
       'booking_code': bookingRef.id,
       'notes': notes,
       'specialRequests': specialRequests,
+      // Payment is confirmed by the Paymob WebView; until then the
+      // booking stays pending so it can be released on expiry.
       'status': 'pending',
-      'paymentStatus': 'paid',
+      'paymentStatus': 'pending',
+      'paymentMethod': paymentMethod,
+      'refundStatus': 'none',
+      'startAt': startAt != null ? Timestamp.fromDate(startAt) : null,
+      'endAt': endAt != null ? Timestamp.fromDate(endAt) : null,
+      'expiresAt': Timestamp.fromDate(expiresAt),
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -255,6 +293,98 @@ class BookingRepository {
       seats: travelers,
       totalPrice: totalPrice,
     );
+  }
+
+  /// Confirms a pending booking after the Paymob WebView reports success.
+  ///
+  /// Sets `status: 'confirmed'`, `paymentStatus: 'paid'` and records the
+  /// `paymentId` returned by Paymob. Only the owning tourist may run this,
+  /// and only while the booking is still `pending`.
+  Future<void> confirmPayment({
+    required String bookingId,
+    required String paymentId,
+  }) async {
+    final uid = currentTouristId;
+    if (uid == null) {
+      throw const BookingException('Sign in before confirming a booking.');
+    }
+    final db = _firestore.instance;
+    final bookingRef = db.collection(bookingsCollection).doc(bookingId);
+    await db.runTransaction((tx) async {
+      final snapshot = await tx.get(bookingRef);
+      if (!snapshot.exists) {
+        throw const BookingException('This booking no longer exists.');
+      }
+      final data = snapshot.data() ?? const <String, dynamic>{};
+      if (data['touristId'] != uid) {
+        throw const BookingException('This booking is not yours.');
+      }
+      if (data['status'] != 'pending' || data['paymentStatus'] != 'pending') {
+        throw const BookingException('This booking cannot be confirmed.');
+      }
+      tx.update(bookingRef, {
+        'status': 'confirmed',
+        'paymentStatus': 'paid',
+        'paymentId': paymentId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  /// Cancels a booking the tourist owns and releases its seats.
+  ///
+  /// Sets `status: 'cancelled'`, `cancelledAt`, `cancelledBy: 'tourist'`
+  /// and `refundStatus` (`'owed'` when paid, otherwise `'none'`). Public
+  /// trip seats are released inside the same transaction (never below 0,
+  /// never above the trip's capacity). Private trips have no trip to
+  /// release seats on.
+  Future<void> cancelBooking({
+    required String bookingId,
+    required bool wasPaid,
+  }) async {
+    final uid = currentTouristId;
+    if (uid == null) {
+      throw const BookingException('Sign in before cancelling a booking.');
+    }
+    final db = _firestore.instance;
+    final bookingRef = db.collection(bookingsCollection).doc(bookingId);
+    final trips = db.collection(tripsCollection);
+    await db.runTransaction((tx) async {
+      final snapshot = await tx.get(bookingRef);
+      if (!snapshot.exists) {
+        throw const BookingException('This booking no longer exists.');
+      }
+      final data = snapshot.data() ?? const <String, dynamic>{};
+      if (data['touristId'] != uid) {
+        throw const BookingException('This booking is not yours.');
+      }
+      final tripId = (data['tripId'] as String?) ?? '';
+      final seats = (data['seats'] as num?)?.toInt() ?? 0;
+      final isPrivate = data['is_private'] == true;
+      tx.update(bookingRef, {
+        'status': 'cancelled',
+        'cancelledAt': FieldValue.serverTimestamp(),
+        'cancelledBy': 'tourist',
+        'refundStatus': wasPaid ? 'owed' : 'none',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      // Release the seats of a public trip (bounded by [0, capacity]).
+      // Private trips have no published trip to release seats on.
+      if (tripId.isNotEmpty && !isPrivate && seats > 0) {
+        final tripDoc = trips.doc(tripId);
+        final tripSnap = await tx.get(tripDoc);
+        if (tripSnap.exists) {
+          final trip = tripSnap.data() ?? const <String, dynamic>{};
+          final capacity = (trip['capacity'] as num?)?.toInt() ?? 0;
+          final booked = (trip['bookedSeats'] as num?)?.toInt() ?? 0;
+          final released = (booked - seats).clamp(0, capacity);
+          tx.update(tripDoc, {
+            'bookedSeats': released,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+    });
   }
 
   Future<Map<String, dynamic>?> _readTrip(String tripId) async {

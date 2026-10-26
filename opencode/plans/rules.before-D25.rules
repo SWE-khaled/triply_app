@@ -1,0 +1,566 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── helpers ─────────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // The role lives in the user's own document, never in client input.
+    //
+    // `.get('role', '')` with a default: dot-access on a missing field
+    // ERRORS, and that error denies the whole rule — so a user without a
+    // document would be locked out instead of simply not being an admin.
+    function userRole() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '')
+        : '';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && userRole() == 'admin';
+    }
+
+    // True while the project has no admin yet: the very first account may
+    // claim the admin role itself. Once the bootstrap marker exists, only
+    // a real admin can hand the role out.
+    function noAdminExists() {
+      return !exists(/databases/$(database)/documents/appSettings/_bootstrap);
+    }
+
+    // ── users ───────────────────────────────────────────────────────────
+    // One profile per account. The owner edits their own profile but can
+    // never change their own role — that stays an admin decision.
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      // Listing exposes phone + email, so it is admin-only.
+      allow list: if isAdmin();
+
+      allow create: if isOwner(userId)
+        && (
+          // A tourist or a guide claims their own role.
+          (request.resource.data.role in ['tourist', 'guide']
+            && (!('isActive' in request.resource.data)
+                || request.resource.data.isActive == true))
+          // The first account of the project may claim the admin role.
+          || (request.resource.data.role == 'admin' && noAdminExists())
+        );
+
+      allow update: if isAdmin()
+        || (isOwner(userId)
+            // `.get(..., default)` on purpose: dot-access on a missing
+            // field ERRORS, and that error denies the whole rule — so a
+            // guide whose document has no `isActive` could never edit
+            // their own profile.
+            && request.resource.data.get('role', '') == resource.data.get('role', '')
+            && request.resource.data.get('isActive', false) == resource.data.get('isActive', false)
+            && request.resource.data.get('isApproved', false) == resource.data.get('isApproved', false));
+
+      allow delete: if isAdmin();
+    }
+
+    // ── guideVerifications ───────────────────────────────────────────────
+    // The documents a guide sends for the verification, and the admin's
+    // decision on them.
+    //
+    // The keys are allow-listed: the guide may only write their own
+    // submission and only as `pending`, so they can never approve
+    // themselves. Only the admin writes the decision.
+    match /guideVerifications/{verificationId} {
+      // The owner reads their own document. A missing document has to be
+      // readable too, so a guide who never submitted gets an empty
+      // snapshot instead of permission-denied.
+      allow get: if isSignedIn()
+        && (resource == null
+            || resource.data.guideId == request.auth.uid
+            || isAdmin());
+
+      allow list: if isAdmin();
+
+      allow create: if isSignedIn()
+        && request.resource.data.guideId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly([
+             'guideId',
+             'idDocumentUrl',
+             'licenseDocumentUrl',
+             'status',
+             'submittedAt',
+             'rejectionReason',
+           ]);
+
+      // The owner may submit again while it is pending or after a
+      // rejection — always as `pending`, same key allowlist.
+      allow update: if isSignedIn()
+        && resource.data.guideId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && resource.data.status in ['pending', 'rejected']
+        && request.resource.data.keys().hasOnly([
+             'guideId',
+             'idDocumentUrl',
+             'licenseDocumentUrl',
+             'status',
+             'submittedAt',
+             'rejectionReason',
+           ]);
+
+      // The decision is the admin's alone.
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── guides ─────────────────────────────────────────────────────────
+    // The public profile of a tour guide — what the tourists browse.
+    //
+    // The document id is the uid of the guide, the very same key the
+    // trip documents carry, so the trips of a guide are found without
+    // matching names.
+    //
+    // Only an approved guide is visible to the tourists; the guide
+    // themselves always sees their own profile.
+    match /guides/{guideId} {
+      // `.get('isApproved', false)` on purpose: dot-access on a missing
+      // field ERRORS, and that error denies the whole rule.
+      allow get: if resource.data.get('isApproved', false) == true
+        || isOwner(guideId)
+        || isAdmin();
+
+      allow list: if resource.data.get('isApproved', false) == true
+        || isAdmin();
+
+      // The guide publishes their own profile; the admin may create it
+      // too, when they approve a guide who did not publish one yet.
+      allow create: if isAdmin()
+        || (isOwner(guideId)
+            && request.resource.data.guideId == guideId);
+
+      // The guide refreshes the fields they own; the approval belongs to
+      // the admin, so it is pinned.
+      allow update: if isAdmin()
+        || (isOwner(guideId)
+            && request.resource.data.guideId == resource.data.guideId
+            && request.resource.data.get('isApproved', false)
+                == resource.data.get('isApproved', false));
+
+      allow delete: if isAdmin();
+    }
+
+    // ── appSettings ────────────────────────────────────────────────────
+    // Holds the project-wide settings, plus the `_bootstrap` marker that
+    // closes the "first account claims the admin role" window.
+    match /appSettings/{key} {
+      allow read: if isAdmin();
+      // The marker is written once, by the account that claims the first
+      // admin role. It can never be removed.
+      allow create: if isSignedIn() && key == '_bootstrap'
+        && !exists(/databases/$(database)/documents/appSettings/_bootstrap);
+      allow update, delete: if false;
+    }
+
+    // ── trips ───────────────────────────────────────────────────────────
+    // A trip belongs to the guide that published it.
+    //
+    // `approvalStatus` is the admin workflow:
+    //   pending  → published, waiting for review
+    //   approved → visible to tourists
+    //   rejected → sent back with a reason
+    //   cancelled→ withdrawn by the guide or the admin
+    //
+    // A guide may only ever publish a `pending` trip, so nobody can
+    // self-approve. The admin dashboard is what flips the status.
+    match /trips/{tripId} {
+      // Tourists see approved trips, the owner sees their own, admins see
+      // everything. Rules are evaluated per document, so a query has to
+      // constrain itself (approved trips / own trips).
+      allow get: if resource.data.approvalStatus == 'approved'
+        || (isSignedIn() && resource.data.guideId == request.auth.uid)
+        || isAdmin();
+
+      allow list: if resource.data.approvalStatus == 'approved'
+        || (isSignedIn() && resource.data.guideId == request.auth.uid)
+        || isAdmin();
+
+      allow create: if isSignedIn()
+        && request.resource.data.guideId == request.auth.uid
+        && request.resource.data.approvalStatus == 'pending'
+        && request.resource.data.title is string
+        && request.resource.data.priceEgp is number
+        && request.resource.data.capacity is int
+        && request.resource.data.capacity > 0
+        // The booked counter is owned by the booking flow, never by the
+        // publisher.
+        && request.resource.data.bookedSeats == 0;
+
+      // The owner edits the content but cannot touch the workflow fields.
+      allow update: if isAdmin()
+        || (isSignedIn()
+            && resource.data.guideId == request.auth.uid
+            && request.resource.data.guideId == resource.data.guideId
+            && request.resource.data.bookedSeats == resource.data.bookedSeats
+            // The owner may not approve their own trip, but they may send
+            // a rejected one back for review.
+            && (request.resource.data.approvalStatus
+                  == resource.data.approvalStatus
+                || (resource.data.approvalStatus == 'rejected'
+                    && request.resource.data.approvalStatus == 'pending')));
+
+      // Booking a trip bumps the booked counter; cancelling or expiring a
+      // booking releases it. Only that counter may change, and it must
+      // stay within [0, capacity] (it may grow or shrink).
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['bookedSeats', 'updatedAt'])
+        && request.resource.data.bookedSeats >= 0
+        && request.resource.data.bookedSeats <= request.resource.data.capacity;
+
+      allow delete: if isAdmin()
+        || (isSignedIn() && resource.data.guideId == request.auth.uid);
+    }
+
+    // ── bookings ────────────────────────────────────────────────────────
+    // A booking joins a tourist and a guide. Both sides can read it; the
+    // tourist creates it inside a transaction that also reserves the
+    // seats on the trip.
+    match /bookings/{bookingId} {
+      allow get: if isSignedIn()
+        && (resource.data.touristId == request.auth.uid
+            || resource.data.guideId == request.auth.uid
+            || isAdmin());
+
+      allow list: if isSignedIn()
+        && (resource.data.touristId == request.auth.uid
+            || resource.data.guideId == request.auth.uid
+            || isAdmin());
+
+      allow create: if isSignedIn()
+        && request.resource.data.touristId == request.auth.uid
+        && request.resource.data.tripId is string
+        && request.resource.data.guideId is string
+        && request.resource.data.seats is int
+        && request.resource.data.seats > 0
+        && request.resource.data.totalPrice is number
+        // A client may only create an unpaid booking. Payment confirmation
+        // is the narrowly-scoped update below.
+        && request.resource.data.status == 'pending'
+        && request.resource.data.paymentStatus == 'pending';
+
+      // An owner may only confirm a pending payment or cancel their own
+      // pending/confirmed booking. Prices, seats, user ids, and every other
+      // booking field are pinned because they are not in either allowlist.
+      allow update: if isAdmin()
+        || (isSignedIn()
+            && resource.data.guideId == request.auth.uid
+            // Keep the pre-S3 guide branch, except that guides cannot
+            // change payment fields.
+            && !request.resource.data.diff(resource.data).affectedKeys()
+                 .hasAny(['paymentStatus', 'paymentId', 'refundStatus']))
+        || (isSignedIn() && resource.data.touristId == request.auth.uid
+            && (
+              // Paymob success: pending/pending -> confirmed/paid, with a
+              // transaction id and no unrelated field changes.
+              (resource.data.status == 'pending'
+                  && resource.data.paymentStatus == 'pending'
+                  && request.resource.data.status == 'confirmed'
+                  && request.resource.data.paymentStatus == 'paid'
+                  && request.resource.data.paymentId is string
+                  && request.resource.data.paymentId.size() > 0
+                  && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['status', 'paymentStatus', 'paymentId', 'updatedAt']))
+              // Cancellation keeps payment state and all immutable booking
+              // details unchanged; the refund flag follows payment state.
+              || (resource.data.status in ['pending', 'confirmed']
+                  && resource.data.paymentStatus in ['pending', 'paid']
+                  && request.resource.data.status == 'cancelled'
+                  && request.resource.data.paymentStatus
+                       == resource.data.paymentStatus
+                  && request.resource.data.cancelledAt is timestamp
+                  && request.resource.data.cancelledBy == 'tourist'
+                  && ((resource.data.paymentStatus == 'paid'
+                          && request.resource.data.refundStatus == 'owed')
+                      || (resource.data.paymentStatus == 'pending'
+                          && request.resource.data.refundStatus == 'none'))
+                  && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['status', 'cancelledAt', 'cancelledBy', 'refundStatus', 'updatedAt']))
+            ));
+
+      allow delete: if isAdmin()
+        || (isSignedIn() && resource.data.touristId == request.auth.uid
+            && resource.data.paymentStatus == 'pending');
+    }
+
+    // ── notifications ───────────────────────────────────────────────────
+    // Written by whoever caused the event: the guide for their own
+    // reminders, the admin for the guide's trip decision, the tourist for
+    // a new booking. Read by the recipient only.
+    match /notifications/{notificationId} {
+      allow get: if isSignedIn()
+        && (resource.data.userId == request.auth.uid || isAdmin());
+
+      allow list: if isSignedIn()
+        && (resource.data.userId == request.auth.uid || isAdmin());
+
+      // A notification may be addressed to its own author (a personal
+      // reminder), to the guide of a booking the sender owns, or — for an
+      // admin — to anybody.
+      allow create: if isSignedIn()
+        && request.resource.data.title is string
+        && request.resource.data.message is string
+        && (
+          request.resource.data.userId == request.auth.uid
+          || (
+            request.resource.data.relatedCollection == 'bookings'
+            && get(/databases/$(database)/documents/bookings/$(request.resource.data.relatedEntityId)).data.touristId == request.auth.uid
+          )
+          || isAdmin()
+        );
+
+      // The recipient may only flip the read flag; every other field is
+      // pinned to its current value.
+      allow update: if isSignedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['isRead']);
+
+      allow delete: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // ── chat helpers ────────────────────────────────────────────────────
+    // Chat is between a tourist and a guide, before any booking. No
+    // isAdmin() anywhere in the chat blocks: the chat is private to its
+    // two participants.
+
+    // The users document of a uid, as a path.
+    function chatUserPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    // A participant is active while their users doc is missing or carries
+    // isActive != false.
+    function chatUserActive(uid) {
+      return !exists(chatUserPath(uid))
+        || get(chatUserPath(uid)).data.get('isActive', true) != false;
+    }
+
+    // The guide of a chat must be a real, approved, active guide account.
+    function chatGuideOk(guideId) {
+      return exists(chatUserPath(guideId))
+        && get(chatUserPath(guideId)).data.role == 'guide'
+        && get(chatUserPath(guideId)).data.get('isApproved', false) == true
+        && get(chatUserPath(guideId)).data.get('isActive', true) != false;
+    }
+
+    // The other participant of a chat, given the caller is a participant.
+    // Takes the chat document data; the ids are pinned at create and
+    // never change afterwards, so the lookup is exact.
+    function chatOther(chatData) {
+      return chatData.touristId == request.auth.uid
+          ? chatData.guideId
+          : chatData.touristId;
+    }
+
+    // True while the lastReadAt entry of [uid] is unchanged between the
+    // current and the requested chat document (absent in both counts as
+    // unchanged). A participant may never move the OTHER's read marker.
+    function chatLastReadPinned(resource, uid) {
+      return (uid in resource.data.get('lastReadAt', {}))
+          == (uid in request.resource.data.get('lastReadAt', {}))
+          && (
+            !(uid in resource.data.get('lastReadAt', {}))
+            || resource.data.get('lastReadAt', {})[uid]
+               == request.resource.data.get('lastReadAt', {})[uid]
+          );
+    }
+
+    // ── chats ───────────────────────────────────────────────────────────
+    // One chat per (tourist, guide) pair, id `touristId_guideId`, created
+    // by the tourist when the first message is sent.
+    match /chats/{chatId} {
+      allow get, list: if isSignedIn()
+        && resource.data.participants.hasAny([request.auth.uid]);
+
+      // Only the tourist creates, and only the chat addressed to an
+      // approved, active guide whose id matches the document id.
+      allow create: if isSignedIn()
+        && userRole() == 'tourist'
+        && request.resource.data.touristId == request.auth.uid
+        && chatId == request.resource.data.touristId
+             + '_' + request.resource.data.guideId
+        && chatGuideOk(request.resource.data.guideId)
+        && request.resource.data.participants
+             == [request.auth.uid, request.resource.data.guideId]
+        && request.resource.data.profiles.keys().hasOnly(
+             [request.auth.uid, request.resource.data.guideId])
+        && request.resource.data.profiles[request.auth.uid].keys()
+             .hasOnly(['displayName', 'avatarUrl'])
+        && request.resource.data.profiles[request.resource.data.guideId].keys()
+             .hasOnly(['displayName', 'avatarUrl'])
+        && request.resource.data.createdAt is timestamp
+        && (
+          // A bare chat: no message yet, both counters at zero.
+          (!('lastMessage' in request.resource.data)
+             && !('lastMessageAt' in request.resource.data)
+             && !('lastReadAt' in request.resource.data)
+             && request.resource.data.unreadCount[request.auth.uid] == 0
+             && request.resource.data.unreadCount[request.resource.data.guideId] == 0)
+          // Or the first message in the same batch: the preview and the
+          // guide's counter follow it.
+          || (request.resource.data.lastMessage.text is string
+             && request.resource.data.lastMessage.text.size() > 0
+             && request.resource.data.lastMessage.text.size() <= 120
+             && request.resource.data.lastMessage.senderId == request.auth.uid
+             && request.resource.data.lastMessageAt is timestamp
+             && request.resource.data.unreadCount[request.auth.uid] == 0
+             && request.resource.data.unreadCount[request.resource.data.guideId] == 1)
+        );
+
+      // A participant may send (A), mark read (B) or refresh their own
+      // profile entry (C) — never anything else.
+allow update: if isSignedIn()
+        && resource.data.participants.hasAny([request.auth.uid])
+        && chatUserActive(request.auth.uid)
+        && chatUserActive(chatOther(resource.data))
+        && (
+          // (A) Send: the preview and the other's counter move together.
+          (request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['lastMessage', 'lastMessageAt', 'unreadCount'])
+            && request.resource.data.lastMessage.text is string
+            && request.resource.data.lastMessage.text.size() > 0
+            && request.resource.data.lastMessage.text.size() <= 120
+            && request.resource.data.lastMessage.senderId == request.auth.uid
+            && request.resource.data.lastMessageAt is timestamp
+            && request.resource.data.unreadCount[request.auth.uid]
+                 == resource.data.unreadCount[request.auth.uid]
+            && request.resource.data.unreadCount[chatOther(resource.data)]
+                 == resource.data.unreadCount[chatOther(resource.data)] + 1)
+          // (B) Mark read: own counter to zero, own lastReadAt set.
+          || (request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['unreadCount', 'lastReadAt'])
+              && request.resource.data.unreadCount[request.auth.uid] == 0
+              && request.resource.data.unreadCount[chatOther(resource.data)]
+                   == resource.data.unreadCount[chatOther(resource.data)]
+              && request.resource.data.lastReadAt[request.auth.uid] is timestamp
+              && chatLastReadPinned(resource, chatOther(resource.data)))
+          // (C) Own profile entry only.
+          || (request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['profiles'])
+              && request.resource.data.profiles[chatOther(resource.data)]
+                   == resource.data.profiles[chatOther(resource.data)]
+              && request.resource.data.profiles[request.auth.uid].keys()
+                   .hasOnly(['displayName', 'avatarUrl']))
+        );
+
+      // No client delete.
+    }
+
+    // ── chat messages ───────────────────────────────────────────────────
+    match /chats/{chatId}/messages/{messageId} {
+      allow get, list: if isSignedIn()
+        && get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+             .hasAny([request.auth.uid]);
+
+      // The sender is a participant. getAfter() sees the chat document
+      // created in the same batch as the first message.
+      allow create: if isSignedIn()
+        && getAfter(/databases/$(database)/documents/chats/$(chatId)).data.participants
+             .hasAny([request.auth.uid])
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.keys().hasOnly(
+             ['senderId', 'text', 'createdAt'])
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 20000
+        && chatUserActive(request.auth.uid)
+        && chatUserActive(chatOther(
+             getAfter(/databases/$(database)/documents/chats/$(chatId)).data));
+
+      // The sender edits their own text within 24 hours.
+      allow update: if isSignedIn()
+        && resource.data.senderId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['text', 'editedAt'])
+        && request.resource.data.editedAt == request.time
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 20000
+        && request.time - resource.data.createdAt < duration.value(86400, 's')
+        && chatUserActive(request.auth.uid)
+        && chatUserActive(chatOther(
+             get(/databases/$(database)/documents/chats/$(chatId)).data));
+
+      // The sender deletes their own message within 24 hours.
+      allow delete: if isSignedIn()
+        && resource.data.senderId == request.auth.uid
+        && request.time - resource.data.createdAt < duration.value(86400, 's')
+        && chatUserActive(request.auth.uid)
+        && chatUserActive(chatOther(
+             get(/databases/$(database)/documents/chats/$(chatId)).data));
+    }
+
+    // ── chat typing ─────────────────────────────────────────────────────
+    match /chats/{chatId}/typing/{uid} {
+      allow get, list: if isSignedIn()
+        && get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+             .hasAny([request.auth.uid]);
+
+      // A participant writes only their own typing document.
+      allow create, update: if isSignedIn()
+        && uid == request.auth.uid
+        && get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+             .hasAny([request.auth.uid])
+        && request.resource.data.keys().hasOnly(['updatedAt'])
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if isSignedIn()
+        && uid == request.auth.uid
+        && get(/databases/$(database)/documents/chats/$(chatId)).data.participants
+             .hasAny([request.auth.uid]);
+    }
+
+    // ── chat reports ────────────────────────────────────────────────────
+    // Evidence of a message, created by a participant. The copied fields
+    // must match the real message, so the evidence cannot be forged.
+    match /reports/{reportId} {
+      allow get, list: if isAdmin()
+        || (isSignedIn() && resource.data.reporterId == request.auth.uid);
+
+      allow create: if isSignedIn()
+        && reportId == request.resource.data.reporterId
+             + '_' + request.resource.data.messageId
+        && request.resource.data.reporterId == request.auth.uid
+        && get(/databases/$(database)/documents/chats/$(request.resource.data.chatId))
+             .data.participants.hasAny([request.auth.uid])
+        && request.resource.data.reportedUserId
+             == chatOther(get(/databases/$(database)/documents/chats/$(request.resource.data.chatId)).data)
+        && get(/databases/$(database)/documents/chats/$(request.resource.data.chatId)/messages/$(request.resource.data.messageId))
+             .data.text == request.resource.data.text
+        && get(/databases/$(database)/documents/chats/$(request.resource.data.chatId)/messages/$(request.resource.data.messageId))
+             .data.senderId == request.resource.data.reportedUserId
+        && get(/databases/$(database)/documents/chats/$(request.resource.data.chatId)/messages/$(request.resource.data.messageId))
+             .data.createdAt == request.resource.data.messageCreatedAt
+        && request.resource.data.reasonCode
+             in ['spam', 'harassment', 'inappropriate_content', 'other']
+        && request.resource.data.note is string
+        && request.resource.data.note.size() <= 500
+        && request.resource.data.status == 'open'
+        && !('reviewerId' in request.resource.data)
+        && !('reviewNote' in request.resource.data);
+
+      // Only the admin reviews a report.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'reviewerId', 'reviewNote'])
+        && request.resource.data.status
+             in ['open', 'resolved', 'dismissed'];
+
+      allow delete: if isAdmin();
+    }
+  }
+}

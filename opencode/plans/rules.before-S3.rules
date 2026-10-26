@@ -1,0 +1,304 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── helpers ─────────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // The role lives in the user's own document, never in client input.
+    //
+    // `.get('role', '')` with a default: dot-access on a missing field
+    // ERRORS, and that error denies the whole rule — so a user without a
+    // document would be locked out instead of simply not being an admin.
+    function userRole() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '')
+        : '';
+    }
+
+    function isAdmin() {
+      return isSignedIn() && userRole() == 'admin';
+    }
+
+    // True while the project has no admin yet: the very first account may
+    // claim the admin role itself. Once the bootstrap marker exists, only
+    // a real admin can hand the role out.
+    function noAdminExists() {
+      return !exists(/databases/$(database)/documents/appSettings/_bootstrap);
+    }
+
+    // ── users ───────────────────────────────────────────────────────────
+    // One profile per account. The owner edits their own profile but can
+    // never change their own role — that stays an admin decision.
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      // Listing exposes phone + email, so it is admin-only.
+      allow list: if isAdmin();
+
+      allow create: if isOwner(userId)
+        && (
+          // A tourist or a guide claims their own role.
+          (request.resource.data.role in ['tourist', 'guide']
+            && (!('isActive' in request.resource.data)
+                || request.resource.data.isActive == true))
+          // The first account of the project may claim the admin role.
+          || (request.resource.data.role == 'admin' && noAdminExists())
+        );
+
+      allow update: if isAdmin()
+        || (isOwner(userId)
+            // `.get(..., default)` on purpose: dot-access on a missing
+            // field ERRORS, and that error denies the whole rule — so a
+            // guide whose document has no `isActive` could never edit
+            // their own profile.
+            && request.resource.data.get('role', '') == resource.data.get('role', '')
+            && request.resource.data.get('isActive', false) == resource.data.get('isActive', false)
+            && request.resource.data.get('isApproved', false) == resource.data.get('isApproved', false));
+
+      allow delete: if isAdmin();
+    }
+
+    // ── guideVerifications ───────────────────────────────────────────────
+    // The documents a guide sends for the verification, and the admin's
+    // decision on them.
+    //
+    // The keys are allow-listed: the guide may only write their own
+    // submission and only as `pending`, so they can never approve
+    // themselves. Only the admin writes the decision.
+    match /guideVerifications/{verificationId} {
+      // The owner reads their own document. A missing document has to be
+      // readable too, so a guide who never submitted gets an empty
+      // snapshot instead of permission-denied.
+      allow get: if isSignedIn()
+        && (resource == null
+            || resource.data.guideId == request.auth.uid
+            || isAdmin());
+
+      allow list: if isAdmin();
+
+      allow create: if isSignedIn()
+        && request.resource.data.guideId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly([
+             'guideId',
+             'idDocumentUrl',
+             'licenseDocumentUrl',
+             'status',
+             'submittedAt',
+             'rejectionReason',
+           ]);
+
+      // The owner may submit again while it is pending or after a
+      // rejection — always as `pending`, same key allowlist.
+      allow update: if isSignedIn()
+        && resource.data.guideId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && resource.data.status in ['pending', 'rejected']
+        && request.resource.data.keys().hasOnly([
+             'guideId',
+             'idDocumentUrl',
+             'licenseDocumentUrl',
+             'status',
+             'submittedAt',
+             'rejectionReason',
+           ]);
+
+      // The decision is the admin's alone.
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── guides ─────────────────────────────────────────────────────────
+    // The public profile of a tour guide — what the tourists browse.
+    //
+    // The document id is the uid of the guide, the very same key the
+    // trip documents carry, so the trips of a guide are found without
+    // matching names.
+    //
+    // Only an approved guide is visible to the tourists; the guide
+    // themselves always sees their own profile.
+    match /guides/{guideId} {
+      // `.get('isApproved', false)` on purpose: dot-access on a missing
+      // field ERRORS, and that error denies the whole rule.
+      allow get: if resource.data.get('isApproved', false) == true
+        || isOwner(guideId)
+        || isAdmin();
+
+      allow list: if resource.data.get('isApproved', false) == true
+        || isAdmin();
+
+      // The guide publishes their own profile; the admin may create it
+      // too, when they approve a guide who did not publish one yet.
+      allow create: if isAdmin()
+        || (isOwner(guideId)
+            && request.resource.data.guideId == guideId);
+
+      // The guide refreshes the fields they own; the approval belongs to
+      // the admin, so it is pinned.
+      allow update: if isAdmin()
+        || (isOwner(guideId)
+            && request.resource.data.guideId == resource.data.guideId
+            && request.resource.data.get('isApproved', false)
+                == resource.data.get('isApproved', false));
+
+      allow delete: if isAdmin();
+    }
+
+    // ── appSettings ────────────────────────────────────────────────────
+    // Holds the project-wide settings, plus the `_bootstrap` marker that
+    // closes the "first account claims the admin role" window.
+    match /appSettings/{key} {
+      allow read: if isAdmin();
+      // The marker is written once, by the account that claims the first
+      // admin role. It can never be removed.
+      allow create: if isSignedIn() && key == '_bootstrap'
+        && !exists(/databases/$(database)/documents/appSettings/_bootstrap);
+      allow update, delete: if false;
+    }
+
+    // ── trips ───────────────────────────────────────────────────────────
+    // A trip belongs to the guide that published it.
+    //
+    // `approvalStatus` is the admin workflow:
+    //   pending  → published, waiting for review
+    //   approved → visible to tourists
+    //   rejected → sent back with a reason
+    //   cancelled→ withdrawn by the guide or the admin
+    //
+    // A guide may only ever publish a `pending` trip, so nobody can
+    // self-approve. The admin dashboard is what flips the status.
+    match /trips/{tripId} {
+      // Tourists see approved trips, the owner sees their own, admins see
+      // everything. Rules are evaluated per document, so a query has to
+      // constrain itself (approved trips / own trips).
+      allow get: if resource.data.approvalStatus == 'approved'
+        || (isSignedIn() && resource.data.guideId == request.auth.uid)
+        || isAdmin();
+
+      allow list: if resource.data.approvalStatus == 'approved'
+        || (isSignedIn() && resource.data.guideId == request.auth.uid)
+        || isAdmin();
+
+      allow create: if isSignedIn()
+        && request.resource.data.guideId == request.auth.uid
+        && request.resource.data.approvalStatus == 'pending'
+        && request.resource.data.title is string
+        && request.resource.data.priceEgp is number
+        && request.resource.data.capacity is int
+        && request.resource.data.capacity > 0
+        // The booked counter is owned by the booking flow, never by the
+        // publisher.
+        && request.resource.data.bookedSeats == 0;
+
+      // The owner edits the content but cannot touch the workflow fields.
+      allow update: if isAdmin()
+        || (isSignedIn()
+            && resource.data.guideId == request.auth.uid
+            && request.resource.data.guideId == resource.data.guideId
+            && request.resource.data.bookedSeats == resource.data.bookedSeats
+            // The owner may not approve their own trip, but they may send
+            // a rejected one back for review.
+            && (request.resource.data.approvalStatus
+                  == resource.data.approvalStatus
+                || (resource.data.approvalStatus == 'rejected'
+                    && request.resource.data.approvalStatus == 'pending')));
+
+      // Booking a trip bumps the booked counter; cancelling or expiring a
+      // booking releases it. Only that counter may change, and it must
+      // stay within [0, capacity] (it may grow or shrink).
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['bookedSeats', 'updatedAt'])
+        && request.resource.data.bookedSeats >= 0
+        && request.resource.data.bookedSeats <= request.resource.data.capacity;
+
+      allow delete: if isAdmin()
+        || (isSignedIn() && resource.data.guideId == request.auth.uid);
+    }
+
+    // ── bookings ────────────────────────────────────────────────────────
+    // A booking joins a tourist and a guide. Both sides can read it; the
+    // tourist creates it inside a transaction that also reserves the
+    // seats on the trip.
+    match /bookings/{bookingId} {
+      allow get: if isSignedIn()
+        && (resource.data.touristId == request.auth.uid
+            || resource.data.guideId == request.auth.uid
+            || isAdmin());
+
+      allow list: if isSignedIn()
+        && (resource.data.touristId == request.auth.uid
+            || resource.data.guideId == request.auth.uid
+            || isAdmin());
+
+      allow create: if isSignedIn()
+        && request.resource.data.touristId == request.auth.uid
+        && request.resource.data.tripId is string
+        && request.resource.data.guideId is string
+        && request.resource.data.seats is int
+        && request.resource.data.seats > 0
+        && request.resource.data.totalPrice is number;
+
+      // The tourist may withdraw their own unpaid booking, or cancel a
+      // paid one (cancel fields only). Everything else belongs to the
+      // guide or the admin; S3 narrows the permitted fields further.
+      allow update: if isAdmin()
+        || (isSignedIn() && resource.data.guideId == request.auth.uid)
+        || (isSignedIn() && resource.data.touristId == request.auth.uid
+            && (
+              resource.data.paymentStatus == 'pending'
+              || (request.resource.data.status == 'cancelled'
+                  && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['status', 'cancelledAt', 'cancelledBy', 'refundStatus', 'updatedAt']))
+            ));
+
+      allow delete: if isAdmin()
+        || (isSignedIn() && resource.data.touristId == request.auth.uid
+            && resource.data.paymentStatus == 'pending');
+    }
+
+    // ── notifications ───────────────────────────────────────────────────
+    // Written by whoever caused the event: the guide for their own
+    // reminders, the admin for the guide's trip decision, the tourist for
+    // a new booking. Read by the recipient only.
+    match /notifications/{notificationId} {
+      allow get: if isSignedIn()
+        && (resource.data.userId == request.auth.uid || isAdmin());
+
+      allow list: if isSignedIn()
+        && (resource.data.userId == request.auth.uid || isAdmin());
+
+      // A notification may be addressed to its own author (a personal
+      // reminder), to the guide of a booking the sender owns, or — for an
+      // admin — to anybody.
+      allow create: if isSignedIn()
+        && request.resource.data.title is string
+        && request.resource.data.message is string
+        && (
+          request.resource.data.userId == request.auth.uid
+          || (
+            request.resource.data.relatedCollection == 'bookings'
+            && get(/databases/$(database)/documents/bookings/$(request.resource.data.relatedEntityId)).data.touristId == request.auth.uid
+          )
+          || isAdmin()
+        );
+
+      // The recipient may only flip the read flag; every other field is
+      // pinned to its current value.
+      allow update: if isSignedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['isRead']);
+
+      allow delete: if isAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+  }
+}

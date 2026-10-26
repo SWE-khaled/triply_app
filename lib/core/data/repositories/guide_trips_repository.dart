@@ -254,6 +254,9 @@ class GuideTripsRepository {
       'startAt': trip.startAt == null
           ? null
           : Timestamp.fromDate(trip.startAt!),
+      'endAt': trip.endAt == null
+          ? null
+          : Timestamp.fromDate(trip.endAt!),
       'duration': trip.duration,
       'priceEgp': trip.priceEgp,
       'capacity': trip.capacity,

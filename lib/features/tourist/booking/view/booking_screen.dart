@@ -827,10 +827,71 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   void _openCheckout(BuildContext context) {
-    final guide = _controller.guide;
+    final guideId = _controller.guideId;
+    final guideName = _controller.guide.name;
+    final guideImage = _controller.guide.coverUrl.isNotEmpty
+        ? _controller.guide.coverUrl
+        : _controller.guide.avatarUrl;
     // Captured before the async gap (avoids BuildContext across awaits).
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
+
+    _createPrivateThenPay(
+      guideId,
+      guideName,
+      guideImage,
+      navigator,
+      messenger,
+    );
+  }
+
+  Future<void> _createPrivateThenPay(
+    String guideId,
+    String guideName,
+    String guideImage,
+    NavigatorState navigator,
+    ScaffoldMessengerState messenger,
+  ) async {
+    final startAt = _controller.startAt;
+    final endAt = _controller.endAt;
+    if (startAt == null) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Pick a date and time before paying.')),
+      );
+      return;
+    }
+
+    // Create the booking as pending/pending *before* payment, so an
+    // abandoned payment releases it via the lazy expiry after 30 min.
+    BookingReceipt? receipt;
+    try {
+      receipt = await BookingRepository().createPrivateBooking(
+        guideId: guideId,
+        guideName: guideName,
+        title: 'Private tour with $guideName',
+        travelers: _controller.travelers,
+        totalPrice: _controller.total,
+        paymentMethod: 'card',
+        startAt: startAt,
+        endAt: endAt,
+        meetingPoint: _controller.meetingPoint,
+      );
+    } on BookingException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+      return;
+    }
+    final bookingId = receipt.bookingId;
+
+    // Session record so My Trips shows the booking (pending until paid).
+    MyBookingsPublic.recordPrivate(
+      guideId: guideId,
+      guideName: guideName,
+      title: 'Private tour with $guideName',
+      imageUrl: guideImage,
+      dateLabel: _controller.dateLabel,
+      travelers: _controller.travelers,
+      totalPaid: _controller.total,
+    );
 
     navigator.push(
       MaterialPageRoute(
@@ -838,39 +899,14 @@ class _BookingScreenState extends State<BookingScreen> {
           price: _controller.total,
           onPaymentSuccess: () async {
             if (!mounted) return;
-            final booking = _controller.confirm();
-            // Recorded only after successful payment: appears in
-            // My Trips (Upcoming) with pending approval status.
-            MyBookingsPublic.recordPrivate(
-              guideId: _controller.guideId,
-              guideName: guide.name,
-              title: 'Private tour with ${guide.name}',
-              imageUrl: guide.coverUrl.isNotEmpty
-                  ? guide.coverUrl
-                  : guide.avatarUrl,
-              dateLabel: _controller.timeSlot == null
-                  ? _controller.dateLabel
-                  : '${_controller.dateLabel} · ${_controller.timeSlot}',
-              travelers: booking.travelers,
-              totalPaid: booking.total,
+            await BookingRepository().confirmPayment(
+              bookingId: bookingId,
+              // The PaymentView success callback does not expose the
+              // Paymob transaction id, so the booking id is recorded as
+              // the payment id (test-only demo; no real money moves).
+              paymentId: bookingId,
             );
-            // Persist it, so the guide sees the booking on their
-            // dashboard.
-            try {
-              await BookingRepository().createPrivateBooking(
-                guideId: _controller.guideId,
-                guideName: guide.name,
-                title: 'Private tour with ${guide.name}',
-                travelers: booking.travelers,
-                totalPrice: booking.total,
-                meetingPoint: _controller.meetingPoint,
-              );
-            } on BookingException catch (e) {
-              messenger.showSnackBar(SnackBar(content: Text(e.message)));
-            }
-            // Same destination as AppRoutes.goToMyTrips, but through the
-            // navigator we already captured (no BuildContext across the
-            // async gap above).
+            if (!mounted) return;
             navigator.popUntil((route) => route.isFirst);
             navigator.push(AppRoutes.myTrips());
           },

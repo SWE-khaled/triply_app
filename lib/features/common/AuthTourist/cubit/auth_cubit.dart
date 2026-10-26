@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/auth_repository.dart';
 import '../../../tourist/checkout/paymob_settings.dart';
+import '../../../../core/services/profile_self_heal_service.dart';
 
 part 'auth_state.dart';
 
@@ -17,11 +18,15 @@ part 'auth_state.dart';
 /// through [AuthLoading] first, and a failure becomes [AuthError].
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
+  final ProfileSelfHealService _profileHeal;
   StreamSubscription<User?>? _authSubscription;
 
-  AuthCubit({AuthRepository? authRepository})
-    : _authRepository = authRepository ?? AuthRepository(),
-      super(const AuthInitial()) {
+  AuthCubit({
+    AuthRepository? authRepository,
+    ProfileSelfHealService? profileHeal,
+  }) : _authRepository = authRepository ?? AuthRepository(),
+       _profileHeal = profileHeal ?? ProfileSelfHealService(),
+       super(const AuthInitial()) {
     _authSubscription = _authRepository.authStateChanges.listen(
       _onAuthState,
       onError: (Object error) => emit(AuthError(error: error.toString())),
@@ -30,6 +35,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   void _onAuthState(User? user) {
     emit(user == null ? const AuthUnauthenticated() : AuthSuccess(user: user));
+    // Self-heal the profile from Firebase Auth after sign-in and when an
+    // existing session is restored. Silent and never blocks login.
+    if (user != null) {
+      _profileHeal.healAfterSignIn();
+    } else {
+      _profileHeal.resetSession();
+    }
   }
 
   /// The signed-in user, or null when signed out.

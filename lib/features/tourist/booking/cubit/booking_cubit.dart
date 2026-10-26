@@ -66,6 +66,31 @@ class BookingCubit extends Cubit<BookingState> {
   int get durationHours =>
       PriceCalculator.durationHoursFor(state.durationLabel);
 
+  /// The start moment of the private booking, parsed from the picked date
+  /// and time slot.
+  DateTime? get startAt {
+    final d = state.date;
+    if (d == null) return null;
+    final slot = state.timeSlot;
+    if (slot == null) return null;
+    final match = RegExp(
+      r'^(\d{1,2}):(\d{2})\s*(AM|PM|ص|م)$',
+      caseSensitive: false,
+    ).firstMatch(slot);
+    if (match == null) return null;
+    var hour = int.parse(match.group(1)!);
+    final minute = int.parse(match.group(2)!);
+    final marker = match.group(3)!.toUpperCase();
+    final isPm = marker == 'PM' || marker == 'م';
+    if (isPm && hour != 12) hour += 12;
+    if (!isPm && hour == 12) hour = 0;
+    return DateTime(d.year, d.month, d.day, hour, minute);
+  }
+
+  /// The end moment of the private booking (start + selected duration).
+  DateTime? get endAt =>
+      startAt?.add(Duration(hours: durationHours));
+
   double get subtotal => PriceCalculator.subtotal(
     guide.pricePerHour,
     durationHours,

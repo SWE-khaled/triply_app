@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -104,6 +105,12 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
       await user.updateDisplayName(newName);
       if (newPhotoUrl != null) await user.updatePhotoURL(newPhotoUrl);
+      // Persist the name and avatar on the Firestore users document so
+      // screens that read users/{uid}.displayName / .avatarUrl see them.
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'displayName': newName,
+        'avatarUrl': newPhotoUrl ?? user.photoURL ?? '',
+      }, SetOptions(merge: true));
       await auth.refreshUser();
 
       if (mounted) Navigator.pop(context, true);

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
-import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
@@ -53,10 +52,9 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete trip'),
+        title: const Text('Cancel booking'),
         content: const Text(
-          'Are you sure you want to delete this trip? '
-          'The paid amount will be refunded to your visa.',
+          'booking cancelled; the team will handle the refund (test payment)',
         ),
         actions: [
           TextButton(
@@ -66,7 +64,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             child: const Text(
-              'Delete',
+              'Cancel booking',
               style: TextStyle(color: AppColors.accentOrange),
             ),
           ),
@@ -74,16 +72,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
       ),
     );
     if (confirmed != true || !context.mounted) return;
-    final isPrivate = MyBookingsPublic.isPrivate(trip.id);
-    final refunded = MyBookingsPublic.cancelBooking(trip.id);
-    if (!context.mounted) return;
     context.read<MyTripsCubit>().refresh();
-    final amount = isPrivate
-        ? '\$${refunded.toStringAsFixed(0)}'
-        : 'EGP ${formatEgp(refunded)}';
+    if (!context.mounted) return;
     showAppSnackBar(
       context,
-      'Trip deleted. $amount has been refunded to your visa.',
+      'booking cancelled; the team will handle the refund (test payment)',
       icon: Icons.check_circle,
       duration: const Duration(seconds: 5),
     );

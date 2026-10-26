@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../../core/services/profile_self_heal_service.dart';
+
 /// Model for a Tour Guide user profile stored in Firestore.
 class TourGuideProfile {
   final String uid;
@@ -36,6 +38,7 @@ class TourGuideProfile {
   Map<String, dynamic> toMap() => {
     'uid': uid,
     'name': name,
+    'displayName': name,
     'email': email,
     'phone': phone,
     'role': role,
@@ -43,6 +46,7 @@ class TourGuideProfile {
     'languages': languages,
     'isApproved': isApproved,
     'pricePerHour': pricePerHour,
+    'avatarUrl': '',
     'createdAt': FieldValue.serverTimestamp(),
   };
 
@@ -81,8 +85,17 @@ class TourGuideProfile {
 /// Handles all Firebase Auth + Firestore operations for Tour Guides.
 /// Kept separate from the tourist AuthRepository to avoid coupling.
 class TourGuideAuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _db;
+  final ProfileSelfHealService _profileHeal;
+
+  TourGuideAuthService({
+    FirebaseAuth? auth,
+    FirebaseFirestore? db,
+    ProfileSelfHealService? profileHeal,
+  }) : _auth = auth ?? FirebaseAuth.instance,
+       _db = db ?? FirebaseFirestore.instance,
+       _profileHeal = profileHeal ?? ProfileSelfHealService();
 
   // ──────────────── Registration ────────────────
 
@@ -225,6 +238,8 @@ class TourGuideAuthService {
         'This account is not a guide account — please use the tourist app to sign in.',
       );
     }
+    // Self-heal the profile from Firebase Auth (silent, never blocks login).
+    _profileHeal.healAfterSignIn();
     return (credential: credential, role: role);
   }
 
@@ -278,8 +293,7 @@ class TourGuideAuthService {
       yield '';
       return;
     }
-    await for (final snapshot
-        in _db.collection('users').doc(uid).snapshots()) {
+    await for (final snapshot in _db.collection('users').doc(uid).snapshots()) {
       yield (((snapshot.data()?['name'] as String?) ?? '')).trim();
     }
   }
@@ -369,6 +383,7 @@ class TourGuideAuthService {
   /// (profile, verification) stays in Firestore — relogin restores it.
   Future<void> signOut() async {
     await _auth.signOut();
+    _profileHeal.resetSession();
   }
 
   /// Fetches the role of the currently signed-in user.

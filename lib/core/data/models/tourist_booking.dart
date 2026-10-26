@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// A booking the signed-in tourist made.
 ///
 /// The booking carries the trip it belongs to, the seats that were taken
@@ -20,6 +22,16 @@ class TouristBooking {
   /// The workflow state of the booking, e.g. `pending` or `confirmed`.
   final String status;
 
+  /// `pending` or `paid` — whether payment has been confirmed.
+  final String paymentStatus;
+
+  /// When an unpaid `pending` booking expires (now + 30 min at creation).
+  final DateTime? expiresAt;
+
+  /// The booked moment's end (private trips); `null` for public trips until
+  /// trips require an end date (see S2).
+  final DateTime? endAt;
+
   const TouristBooking({
     required this.id,
     required this.tripId,
@@ -27,6 +39,9 @@ class TouristBooking {
     required this.seats,
     required this.totalPrice,
     required this.status,
+    this.paymentStatus = '',
+    this.expiresAt,
+    this.endAt,
   });
 
   /// Reads a booking document, tolerating every missing field.
@@ -39,6 +54,7 @@ class TouristBooking {
       'traveler_count': 0,
       'totalPrice': 0,
       'status': '',
+      'paymentStatus': '',
       ...?data,
     };
     merged['id'] = id;
@@ -53,6 +69,13 @@ class TouristBooking {
       seats: seats.toInt(),
       totalPrice: ((merged['totalPrice'] as num?) ?? 0).toDouble(),
       status: (merged['status'] as String?) ?? '',
+      paymentStatus: (merged['paymentStatus'] as String?) ?? '',
+      expiresAt: merged['expiresAt'] is Timestamp
+          ? (merged['expiresAt'] as Timestamp).toDate()
+          : null,
+      endAt: merged['endAt'] is Timestamp
+          ? (merged['endAt'] as Timestamp).toDate()
+          : null,
     );
   }
 }
