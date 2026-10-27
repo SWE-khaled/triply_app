@@ -56,9 +56,9 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  /// Real markers driven by controller state (lat/lng from Place model).
-  List<fmap.Marker> get _markers {
-    return controller.visiblePlaces.map((place) {
+  /// Real markers driven by cubit state (lat/lng from Place model).
+  List<fmap.Marker> _markersFor(List<Place> places) {
+    return places.map((place) {
       return fmap.Marker(
         point: latlng.LatLng(place.latitude, place.longitude),
         width: 40,
@@ -70,18 +70,6 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
     }).toList();
-  }
-
-  latlng.LatLng get _initialCenter {
-    final selected = controller.selectedPlace;
-    if (selected != null) {
-      return latlng.LatLng(selected.latitude, selected.longitude);
-    }
-    return _egyptCenter;
-  }
-
-  double get _initialZoom {
-    return controller.selectedPlace != null ? _focusedZoom : _egyptZoom;
   }
 
   /// Moves the camera to the currently selected place (or Egypt overview).
@@ -123,78 +111,12 @@ class _MapScreenState extends State<MapScreen> {
           bottom: false, // <-- let the map reach the bottom of the screen
           child: BlocBuilder<MapCubit, MapState>(
             builder: (context, state) {
-              // Read from the fresh state, not from build()'s scope:
-              // the outer variable went stale on cubit-driven rebuilds
-              // (e.g. the Firestore catalog swap) and kept the old
-              // preview card on screen.
-              final selected = state.selectedPlace;
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                    child: MapSearchField(
-                      controller: searchController,
-                      searchQuery: controller.searchQuery,
-                      onChanged: _onSearchChanged,
-                      onSubmitted: _onSearchSubmitted,
-                      onClear: () {
-                        searchController.clear();
-                        controller.clearSearch();
-                        _focusSelected();
-                      },
-                    ),
-                  ),
-                  MapFilterChips(
-                    selectedFilter: controller.selectedFilter,
-                    onFilterSelected: _onFilterSelected,
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        fmap.FlutterMap(
-                          mapController: _mapController,
-                          options: fmap.MapOptions(
-                            initialCenter: _initialCenter,
-                            initialZoom: _initialZoom,
-                          ),
-                          children: [
-                            fmap.TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName: 'com.example.triply_app',
-                            ),
-                            fmap.MarkerLayer(markers: _markers),
-                          ],
-                        ),
-                        if (selected != null)
-                          Positioned(
-                            left: 16,
-                            right: 16,
-                            bottom: 100, // keeps the card above the nav
-                            child: PlacePreviewCard(
-                              place: selected,
-                              onTap: () => _openPlaceDetail(selected),
-                              onViewDetails: () => _openPlaceDetail(selected),
-                            ),
-                          ),
-                        if (controller.visiblePlaces.isEmpty)
-                          const Positioned(
-                            left: 16,
-                            right: 16,
-                            bottom: 100,
-                            child: Card(
-                              child: Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Text('No places found in Egypt.'),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
+              // Sealed states: only a ready catalog renders the map UI.
+              return switch (state) {
+                MapSuccessState() => _buildContent(state),
+                MapErrorState(:final message) => _buildError(message),
+                _ => const Center(child: CircularProgressIndicator()),
+              };
             },
           ),
         ),
@@ -220,6 +142,108 @@ class _MapScreenState extends State<MapScreen> {
               );
             }
           },
+        ),
+      ),
+    );
+  }
+
+  /// The existing dashboard content, unchanged — now fed from the
+  /// success state fields instead of cubit getters.
+  Widget _buildContent(MapSuccessState state) {
+    final selected = state.selectedPlace;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: MapSearchField(
+            controller: searchController,
+            searchQuery: state.searchQuery,
+            onChanged: _onSearchChanged,
+            onSubmitted: _onSearchSubmitted,
+            onClear: () {
+              searchController.clear();
+              controller.clearSearch();
+              _focusSelected();
+            },
+          ),
+        ),
+        MapFilterChips(
+          selectedFilter: state.selectedFilter,
+          onFilterSelected: _onFilterSelected,
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: Stack(
+            children: [
+              fmap.FlutterMap(
+                mapController: _mapController,
+                options: fmap.MapOptions(
+                  initialCenter: selected != null
+                      ? latlng.LatLng(selected.latitude, selected.longitude)
+                      : _egyptCenter,
+                  initialZoom: selected != null ? _focusedZoom : _egyptZoom,
+                ),
+                children: [
+                  fmap.TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.example.triply_app',
+                  ),
+                  fmap.MarkerLayer(markers: _markersFor(state.visiblePlaces)),
+                ],
+              ),
+              if (selected != null)
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 100, // keeps the card above the nav
+                  child: PlacePreviewCard(
+                    place: selected,
+                    onTap: () => _openPlaceDetail(selected),
+                    onViewDetails: () => _openPlaceDetail(selected),
+                  ),
+                ),
+              if (state.visiblePlaces.isEmpty)
+                const Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 100,
+                  child: Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text('No places found in Egypt.'),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Catalog empty on both sources; [controller.retry] restarts the load.
+  Widget _buildError(String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.wifi_off_outlined, size: 48, color: Colors.grey),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: controller.retry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try again'),
+            ),
+          ],
         ),
       ),
     );
