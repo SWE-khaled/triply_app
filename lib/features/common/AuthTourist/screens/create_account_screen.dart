@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import '../constants/auth_colors.dart';
 import '../cubit/auth_cubit.dart';
-import '../widgets/auth_button.dart';
-import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
-import 'package:flutter/services.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -25,13 +23,35 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  late final List<TextEditingController> _controllers;
+
+  @override
+  void initState() {
+    super.initState();
+    _controllers = [
+      _nameController,
+      _emailController,
+      _phoneController,
+      _passwordController,
+      _confirmPasswordController,
+    ];
+    for (final c in _controllers) {
+      c.addListener(_onFieldChanged);
+    }
+  }
+
+  void _onFieldChanged() => setState(() {});
+
+  /// الزرار يبقى Disabled (رمادي) لحد ما كل الحقول تتملي
+  bool get _isFormFilled =>
+      _controllers.every((c) => c.text.trim().isNotEmpty);
+
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    for (final c in _controllers) {
+      c.removeListener(_onFieldChanged);
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -79,33 +99,142 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     }
   }
 
+  // ───────────── Header ─────────────
+  Widget _buildHeader() {
+    return Container(
+      height: 248,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [Color(0xFF0E5566), Color(0xFF020B0D)],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(48),
+          bottomRight: Radius.circular(48),
+        ),
+      ),
+      child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 78),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/edits/Frame 1.png',
+                      width: 40,
+                      height: 62,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Image.asset(
+                    'assets/images/edits/Frame 2.png',
+                    height: 38,
+                    width: 93,
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: EdgeInsets.only(top: 168),
+              child: Text(
+                'Discover Egypt with expert guides',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _label(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF1F3238),
+      ),
+    );
+  }
+
+  // ───────────── Create Account button (Disabled / Enabled) ─────────────
+  Widget _buildCreateButton(AuthCubit authCubit) {
+    final enabled = _isFormFilled && !authCubit.isLoading;
+
+    return SizedBox(
+      height: 56,
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: enabled ? () => _handleCreateAccount(authCubit) : null,
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: AuthColors.darkTeal,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFFE8ECEC),
+          disabledForegroundColor: const Color(0xFF7A8B8F),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        child: authCubit.isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.white,
+                ),
+              )
+            : const Text(
+                'Create Account',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authCubit = context.watch<AuthCubit>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // الـ Header الأخضر ثابت فوق
-          const AuthHeader(
-            title: 'Create Account',
-            subtitle: 'Join Triply and explore Egypt',
-          ),
-          // باقي الصفحة بس هو اللي بيعمل Scroll
+          _buildHeader(),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Full Name',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                      'Create Account',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1F3238),
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 24),
+                    _label('Full Name'),
+                    const SizedBox(height: 10),
                     AuthTextField(
                       controller: _nameController,
                       hintText: 'Ahmed Mohamed',
@@ -115,12 +244,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           ? 'Enter your full name'
                           : null,
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Email',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 22),
+                    _label('Email'),
+                    const SizedBox(height: 10),
                     AuthTextField(
                       controller: _emailController,
                       hintText: 'your@email.com',
@@ -131,23 +257,18 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           ? 'Enter a valid email'
                           : null,
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Phone Number',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 22),
+                    _label('Phone Number'),
+                    const SizedBox(height: 10),
                     AuthTextField(
                       controller: _phoneController,
                       hintText: '1012345678',
                       icon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
-
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(10),
                       ],
-
                       prefix: const Padding(
                         padding: EdgeInsets.only(right: 2),
                         child: Text(
@@ -158,15 +279,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           ),
                         ),
                       ),
-
                       validator: validateEgyptianPhone,
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Password',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 22),
+                    _label('Password'),
+                    const SizedBox(height: 10),
                     AuthTextField(
                       controller: _passwordController,
                       hintText: '••••••••',
@@ -176,12 +293,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           ? 'Minimum 6 characters'
                           : null,
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Confirm Password',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 22),
+                    _label('Confirm Password'),
+                    const SizedBox(height: 10),
                     AuthTextField(
                       controller: _confirmPasswordController,
                       hintText: '••••••••',
@@ -191,47 +305,41 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           ? 'Passwords do not match'
                           : null,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     RichText(
                       text: const TextSpan(
                         style: TextStyle(
                           color: AuthColors.textGrey,
-                          fontSize: 13,
+                          fontSize: 16,
+                          height: 1.5,
                         ),
                         children: [
                           TextSpan(text: 'By signing up, you agree to our '),
                           TextSpan(
                             text: 'Terms of Service',
-                            style: TextStyle(
-                              color: AuthColors.signInDark,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(color: AuthColors.signInDark),
                           ),
                           TextSpan(text: ' and '),
                           TextSpan(
                             text: 'Privacy Policy',
-                            style: TextStyle(
-                              color: AuthColors.signInDark,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(color: AuthColors.signInDark),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    AuthButton(
-                      label: 'Create Account',
-                      backgroundColor: AuthColors.darkTeal,
-                      isLoading: authCubit.isLoading,
-                      onPressed: () => _handleCreateAccount(authCubit),
-                    ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 28),
+                    _buildCreateButton(authCubit),
+                    const SizedBox(height: 28),
                     Center(
                       child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Text(
                             'Already have an account? ',
-                            style: TextStyle(color: AuthColors.textGrey),
+                            style: TextStyle(
+                              color: AuthColors.textGrey,
+                              fontSize: 16,
+                            ),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.push(
@@ -244,7 +352,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                               'Sign in',
                               style: TextStyle(
                                 color: AuthColors.signInDark,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),

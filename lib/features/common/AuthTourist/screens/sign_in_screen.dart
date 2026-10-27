@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../constants/auth_colors.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
-import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
 import 'create_account_screen.dart';
 import 'forgot_password_screen.dart';
@@ -44,22 +43,120 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
+  // ───────────── Header ─────────────
+  Widget _buildHeader() {
+    return Container(
+      height: 248,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [Color(0xFF0E5566), Color(0xFF020B0D)],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(48),
+          bottomRight: Radius.circular(48),
+        ),
+      ),
+      child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 78),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/edits/Frame 1.png',
+                      width: 40,
+                      height: 62,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Image.asset(
+                    'assets/images/edits/Frame 2.png',
+                    height: 38,
+                    width: 93,
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: EdgeInsets.only(top: 168),
+              child: Text(
+                'Discover Egypt with expert guides',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ───────────── Google / Apple button (logo + text) ─────────────
+  Widget _socialButton({
+    required String label,
+    required String assetPath,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      height: 56,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AuthColors.textGrey, width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              assetPath,
+              width: 24,
+              height: 24,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AuthColors.signInDark,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authCubit = context.watch<AuthCubit>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const AuthHeader(
-            title: 'Triply',
-            subtitle: 'Discover Egypt with expert guides',
-          ),
+          _buildHeader(),
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -68,8 +165,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       const Text(
                         'Welcome back',
                         style: TextStyle(
-                          fontSize: 26,
+                          fontSize: 30,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFF1F3238),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -77,15 +175,19 @@ class _SignInScreenState extends State<SignInScreen> {
                         'Sign in to continue your journey',
                         style: TextStyle(
                           color: AuthColors.textGrey,
-                          fontSize: 15,
+                          fontSize: 16,
                         ),
                       ),
                       const SizedBox(height: 28),
                       const Text(
                         'Email',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1F3238),
+                        ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       AuthTextField(
                         controller: _emailController,
                         hintText: 'your@email.com',
@@ -96,12 +198,16 @@ class _SignInScreenState extends State<SignInScreen> {
                             ? 'Enter a valid email'
                             : null,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 22),
                       const Text(
                         'Password',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1F3238),
+                        ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       AuthTextField(
                         controller: _passwordController,
                         hintText: '••••••••',
@@ -112,41 +218,55 @@ class _SignInScreenState extends State<SignInScreen> {
                             ? 'Minimum 6 characters'
                             : null,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(0, 40),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           onPressed: () => Navigator.of(
                             context,
                           ).pushNamed(ForgotPasswordScreen.routeName),
-                          child: const Text('Forgot password?'),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      AuthButton(
-                        label: 'Sign In',
-                        isLoading: authCubit.isLoading,
-                        onPressed: () => _handleSignIn(authCubit),
-                      ),
-                      const SizedBox(height: 24),
-                      const Row(
-                        children: [
-                          Expanded(child: Divider()),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              'or continue with',
-                              style: TextStyle(color: AuthColors.textGrey),
+                          child: const Text(
+                            'Forgot password?',
+                            style: TextStyle(
+                              color: AuthColors.signInDark,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          Expanded(child: Divider()),
-                        ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 56,
+                        width: double.infinity,
+                        child: AuthButton(
+                          label: 'Sign In',
+                          isLoading: authCubit.isLoading,
+                          onPressed: () => _handleSignIn(authCubit),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      const Center(
+                        child: Text(
+                          'or continue with',
+                          style: TextStyle(
+                            color: AuthColors.textGrey,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       Row(
                         children: [
                           Expanded(
-                            child: OutlinedButton(
+                            child: _socialButton(
+                              label: 'Google',
+                              assetPath: 'assets/images/icon/google_logo.png',
                               onPressed: () async {
                                 final success = await authCubit
                                     .signInWithGoogle();
@@ -156,75 +276,31 @@ class _SignInScreenState extends State<SignInScreen> {
                                   ).pushReplacementNamed('/home');
                                 }
                               },
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 12,
-                                    backgroundColor: Colors.transparent,
-                                    backgroundImage: NetworkImage(
-                                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy4zFEszrwjQU1F97cIIJ6nZXSnsVSYorM81q05EqFvA&s=10',
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Google',
-                                    style: TextStyle(color: Colors.black),
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: OutlinedButton(
+                            child: _socialButton(
+                              label: 'Apple',
+                              assetPath: 'assets/images/icon/apple_logo.png',
                               onPressed: () {
                                 // TODO: implement Apple sign-in
                               },
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 12,
-                                    backgroundColor: Colors.transparent,
-                                    backgroundImage: NetworkImage(
-                                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSv_-CwxoQcTdL_h0fGDNwtqfo9y18Fu7cE-p9pvCJ23w&s',
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Apple',
-                                    style: TextStyle(color: Colors.black),
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                       Center(
                         child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             const Text(
                               "Don't have an account? ",
-                              style: TextStyle(color: AuthColors.textGrey),
+                              style: TextStyle(
+                                color: AuthColors.textGrey,
+                                fontSize: 16,
+                              ),
                             ),
                             GestureDetector(
                               onTap: () => Navigator.of(
@@ -234,7 +310,8 @@ class _SignInScreenState extends State<SignInScreen> {
                                 'Sign up',
                                 style: TextStyle(
                                   color: AuthColors.signInDark,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),

@@ -370,13 +370,25 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
   Widget _header(BuildContext context, String avatarUrl) {
     return Row(
       children: [
-        const Text(
-          'Triply',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            color: AppColors.title,
-          ),
+        Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/images/edits/Frame 1.png',
+                width: 27,
+                height: 44,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Image.asset(
+              'assets/images/edits/Frame 2.png',
+              height: 28,
+              width: 64,
+              fit: BoxFit.contain,
+            ),
+          ],
         ),
         const Spacer(),
         StreamBuilder<List<GuideNotification>>(

@@ -322,8 +322,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage(
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBQ8iDG5Hk8guqcSGPtMI6kq6YchZ67Ig8j5hvwBSiHA&s=10',
+          image: AssetImage(
+            'assets/images/edits/home_image.png',
           ),
           fit: BoxFit.cover,
         ),
@@ -346,16 +346,23 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                const Expanded(
-                  child: Text(
-                    'Triply',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/edits/Frame 1.png',
+                      width: 27,
+                      height: 44,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
+                  const SizedBox(width: 6),
+                  Image.asset(
+                    'assets/images/edits/Frame 2.png',
+                    height: 28,
+                    width: 64,
+                    fit: BoxFit.contain,
+                  ),
+                  Spacer(),
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -411,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             const Text(
               'DISCOVER EGYPT YOUR WAY',
               style: AppTextStyles.heroSubtitle,

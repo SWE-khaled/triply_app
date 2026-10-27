@@ -1,26 +1,37 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../theme/app_colors.dart';
 
-/// Tourist bottom nav: detached floating glass pill (Instagram-like).
-/// Very translucent with blur, plus a soft shadow and a thin border so it
-/// stays visible even over a plain white background.
+/// Tourist bottom navigation.
 /// Screens set `extendBody: true`. Same tab order everywhere:
-/// Home / My Trip / Places / Community / Profile.
+/// Home / Trips / Map / Community / Profile.
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int>? onTap;
 
   const AppBottomNav({super.key, required this.currentIndex, this.onTap});
 
-  static const _icons = [
-    LucideIcons.house,
-    LucideIcons.route,
-    LucideIcons.mapPin,
-    LucideIcons.messageCircle,
-    LucideIcons.user,
+  static const _items = [
+    (
+      label: 'Home',
+      selected: Icons.home_rounded,
+      unselected: Icons.home_outlined,
+    ),
+    (
+      label: 'Trips',
+      selected: Icons.luggage,
+      unselected: Icons.luggage_outlined,
+    ),
+    (label: 'Map', selected: Icons.map, unselected: Icons.map_outlined),
+    (
+      label: 'Community',
+      selected: Icons.groups,
+      unselected: Icons.groups_outlined,
+    ),
+    (
+      label: 'Profile',
+      selected: Icons.person,
+      unselected: Icons.person_outline,
+    ),
   ];
 
   @override
@@ -28,72 +39,60 @@ class AppBottomNav extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        child: DecoratedBox(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: AppColors.cardBorder, width: 1),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9EDF0).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(32),
-                  border: Border.all(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    width: 0.8,
+          child: Row(
+            children: List.generate(_items.length, (i) {
+              final item = _items[i];
+              final selected = i == currentIndex;
+              final color = selected
+                  ? AppColors.bottomNavSelected
+                  : AppColors.subtitle;
+              return Expanded(
+                child: Semantics(
+                  button: true,
+                  selected: selected,
+                  label: item.label,
+                  child: InkWell(
+                    onTap: onTap == null ? null : () => onTap!(i),
+                    borderRadius: BorderRadius.circular(18),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            selected ? item.selected : item.unselected,
+                            size: 27,
+                            color: color,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            item.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: color,
+                              fontSize: 13,
+                              height: 1.2,
+                              fontWeight: selected
+                                  ? FontWeight.w500
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: List.generate(_icons.length, (i) {
-                    final selected = i == currentIndex;
-                    final color = selected
-                        ? AppColors.bottomNavSelected
-                        : const Color.fromARGB(255, 171, 182, 187);
-                    return GestureDetector(
-                      onTap: onTap == null ? null : () => onTap!(i),
-                      behavior: HitTestBehavior.opaque,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        curve: Curves.easeOut,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: selected
-                              ? AppColors.bottomNavSelected.withValues(
-                                  alpha: 0.16,
-                                )
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: AnimatedScale(
-                          scale: selected ? 1.1 : 1.0,
-                          duration: const Duration(milliseconds: 180),
-                          curve: Curves.easeOut,
-                          child: Icon(_icons[i], size: 25, color: color),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
+              );
+            }),
           ),
         ),
       ),

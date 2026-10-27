@@ -73,3 +73,17 @@ flutter:
     - assets/images/icon/
     - assets/images/svg/ankh_logo.svg
     - assets/images/svg/riply_text.svg
+    - assets/images/edits/Frame 1.png
+    - assets/images/edits/Frame 2.png
+    - assets/images/edits/role1p.jpg
+    - assets/images/edits/role2p.jpg
+    - assets/images/choice_role/onboardingTour1.png
+    - assets/images/choice_role/onboardingTour2.jpg
+    - assets/images/choice_role/onboardingTour3.jpg
+    - assets/images/choice_role/onboardingTourist1.jpg
+    - assets/images/choice_role/onboardingTourist2.jpg
+    - assets/images/choice_role/onboardingTourist3.jpg
+    - assets/images/icon/google_logo.png
+    - assets/images/icon/apple_logo.png
+    - assets/images/edits/home_image.png
+

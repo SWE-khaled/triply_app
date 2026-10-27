@@ -23,11 +23,10 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   static const Color _bg = Color(0xFFF8F4E9);
   static const Color _holeColor = Color(0xFFF1D6C3);
-  static const Color _textTop = Color(0xFFDDAE6A);
-  static const Color _textBottom = Color(0xFFD4724A);
 
   static const double _peakScale = 1.35;
-  static const String _word = 'riply';
+  static const String _word = 'Triply';
+  static const double _wordmarkAspectRatio = 463 / 192;
 
   late final AnimationController _controller;
   late final Animation<double> _holeIn;
@@ -107,16 +106,8 @@ class _SplashScreenState extends State<SplashScreen>
           final ankhWidth = ankhHeight * 0.62;
           final fontSize = ankhHeight * 0.62;
           final gap = ankhHeight * 0.04;
-
-          final textStyle = TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w500,
-            letterSpacing: -fontSize * 0.02,
-            height: 1.0,
-            color: Colors.white,
-          );
-          final textWidth = _measure(_word, textStyle);
           final textHeight = fontSize;
+          final textWidth = textHeight * _wordmarkAspectRatio;
 
           final centerX = width / 2;
           final centerY = height * 0.48;
@@ -193,19 +184,12 @@ class _SplashScreenState extends State<SplashScreen>
                         clipper: _RevealClipper(textProgress),
                         child: Transform.translate(
                           offset: Offset(textSlide, 0),
-                          child: ShaderMask(
-                            shaderCallback: (bounds) => const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [_textTop, _textBottom],
-                            ).createShader(bounds),
-                            blendMode: BlendMode.srcIn,
-                            child: Text(
-                              _word,
-                              maxLines: 1,
-                              softWrap: false,
-                              style: textStyle,
-                            ),
+                          child: Image.asset(
+                            'assets/images/edits/Frame 2.png',
+                            width: textWidth,
+                            height: textHeight,
+                            fit: BoxFit.contain,
+                            semanticLabel: _word,
                           ),
                         ),
                       ),
@@ -241,15 +225,6 @@ class _SplashScreenState extends State<SplashScreen>
         },
       ),
     );
-  }
-
-  double _measure(String text, TextStyle style) {
-    final textPainter = TextPainter(
-      text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    )..layout();
-    return textPainter.width;
   }
 }
 

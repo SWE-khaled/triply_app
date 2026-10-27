@@ -25,31 +25,21 @@ class RoleSelectionScreen extends StatelessWidget {
               // Logo Header
               Row(
                 children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: TourGuideColors.deepNile,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'T',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/edits/Frame 1.png',
+                      width: 27,
+                      height: 44,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Triply',
-                    style: TextStyle(
-                      color: TourGuideColors.deepNile,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  const SizedBox(width: 6),
+                  Image.asset(
+                    'assets/images/edits/Frame 2.png',
+                    height: 28,
+                    width: 64,
+                    fit: BoxFit.contain,
                   ),
                 ],
               ),
@@ -57,7 +47,7 @@ class RoleSelectionScreen extends StatelessWidget {
               const Text(
                 'How will you\nuse Triply?',
                 style: TextStyle(
-                  fontSize: 38,
+                  fontSize: 34,
                   fontWeight: FontWeight.w900,
                   color: TourGuideColors.deepNile,
                 ),
@@ -80,8 +70,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     );
                   },
                   child: _RoleCard(
-                    imageUrl:
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAdcrwTr2CrRciLN6MEUMeNq3SrUVXpase7qfhxKdcbQ&s=10',
+                    imagePath: 'assets/images/edits/role1p.jpg',
                     title: 'Tourist',
                     description:
                         'Discover Egypt, explore places, find local guides and join unforgettable trips.',
@@ -102,8 +91,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     );
                   },
                   child: _RoleCard(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1553913861-c0fddf2619ee?auto=format&fit=crop&w=800&q=80', // Sphinx and Pyramids
+                    imagePath: 'assets/images/edits/role2p.jpg',
                     title: 'Tour Guide',
                     description:
                         'Share your knowledge, host experiences, connect with travelers and grow your bookings.',
@@ -138,13 +126,13 @@ class RoleSelectionScreen extends StatelessWidget {
 }
 
 class _RoleCard extends StatelessWidget {
-  final String imageUrl;
+  final String imagePath;
   final String title;
   final String description;
   final String buttonText;
 
   const _RoleCard({
-    required this.imageUrl,
+    required this.imagePath,
     required this.title,
     required this.description,
     required this.buttonText,
@@ -157,16 +145,11 @@ class _RoleCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // ── Background image ──────────────────────────────────────────
-          Image.network(
-            imageUrl,
+          // ── Background image (local asset) ────────────────────────────
+          Image.asset(
+            imagePath,
             fit: BoxFit.cover,
-            // Show a colored placeholder while loading
-            loadingBuilder: (_, child, progress) {
-              if (progress == null) return child;
-              return Container(color: TourGuideColors.deepNile);
-            },
-            // Show colored fallback on error
+            // Colored fallback if the asset is missing or invalid
             errorBuilder: (_, __, ___) =>
                 Container(color: TourGuideColors.deepNile),
           ),

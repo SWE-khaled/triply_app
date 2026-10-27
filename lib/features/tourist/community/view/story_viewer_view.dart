@@ -185,8 +185,24 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                   },
                   child: Center(
                     child: item.isLocalFile
-                        ? Image.file(File(item.imageUrl), fit: BoxFit.contain)
-                        : Image.network(item.imageUrl, fit: BoxFit.contain),
+                        ? Image.file(
+                            File(item.imageUrl),
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white54,
+                              size: 48,
+                            ),
+                          )
+                        : Image.network(
+                            item.imageUrl,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white54,
+                              size: 48,
+                            ),
+                          ),
                   ),
                 );
               },
