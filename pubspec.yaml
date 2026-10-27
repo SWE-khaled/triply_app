@@ -1,5 +1,5 @@
 name: triply
-description: "A new Flutter project."
+description: "Triply travel planning and guide discovery."
 
 publish_to: 'none'
 
@@ -56,6 +56,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon/Icon_app.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
 
 flutter:
   uses-material-design: true
@@ -63,3 +70,4 @@ flutter:
   assets:
     - .env
     - assets/images/svg/
+    - assets/images/icon/

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:triply/core/constants/app_routes.dart';
 import 'package:triply/core/data/models/chat.dart';
 import 'package:triply/core/data/repositories/chat_repository.dart';
@@ -100,7 +99,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
         );
         return;
       }
-      Navigator.of(context).push(AppRoutes.guideProfile(uid));
+      Navigator.of(context).pushAndRemoveUntil(
+        AppRoutes.guideProfile(uid),
+        (route) => route.isFirst,
+      );
     }
   }
 
@@ -146,27 +148,32 @@ class _ChatListScreenState extends State<ChatListScreen> {
         Text(
           widget.audience.listTitle,
           style: const TextStyle(
-            fontSize: 28,
+            fontSize: 30,
             fontWeight: FontWeight.w800,
+            letterSpacing: -0.6,
             color: AppColors.title,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           widget.audience.listSubtitle,
-          style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          style: const TextStyle(
+            fontSize: 13.5,
+            height: 1.3,
+            color: AppColors.subtitle,
+          ),
         ),
       ],
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
       child: widget.showGuideNav
           ? title
           : Row(
               children: [
                 CircleBackButton(onTap: () => Navigator.maybePop(context)),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(child: title),
               ],
             ),
@@ -176,27 +183,28 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget _search(ChatListState state) {
     final query = state is ChatListSuccess ? state.searchQuery : '';
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
       child: TextField(
         key: const Key('chat-list-search'),
         controller: _searchController,
         onChanged: _cubit.setSearchQuery,
         textInputAction: TextInputAction.search,
+        // style: const TextStyle(fontSize: 14, color: AppColors.title),
         decoration: InputDecoration(
           hintText: 'Search by name or message...',
-          hintStyle: const TextStyle(fontSize: 13, color: AppColors.hint),
+          hintStyle: const TextStyle(fontSize: 13.5, color: AppColors.hint),
           prefixIcon: const Icon(
-            Icons.search,
+            Icons.search_rounded,
             color: AppColors.guideLabel,
-            size: 21,
+            size: 22,
           ),
           suffixIcon: query.trim().isEmpty
               ? null
               : IconButton(
                   tooltip: 'Clear search',
                   icon: const Icon(
-                    Icons.close,
-                    size: 18,
+                    Icons.close_rounded,
+                    size: 19,
                     color: AppColors.guideLabel,
                   ),
                   onPressed: () {
@@ -206,14 +214,19 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 ),
           filled: true,
           fillColor: AppColors.searchBg,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 12,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             borderSide: BorderSide.none,
           ),
+          // enabledBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(18),
+          //   borderSide: BorderSide.none,
+          // ),
+          // focusedBorder: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(18),
+          //   borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+          // ),
         ),
       ),
     );
@@ -224,7 +237,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final unreadOnly = success?.unreadOnly ?? false;
     final unread = success?.totalUnread ?? 0;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
       child: Row(
         children: [
           _filterChip(
@@ -236,7 +249,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
           const SizedBox(width: 8),
           _filterChip(
             key: const Key('chat-filter-unread'),
-            label: unread > 0 ? 'Unread ($unread)' : 'Unread',
+            label: 'Unread',
+            count: unread,
             selected: unreadOnly,
             onTap: () => _cubit.setUnreadOnly(true),
           ),
@@ -250,28 +264,57 @@ class _ChatListScreenState extends State<ChatListScreen> {
     required String label,
     required bool selected,
     required VoidCallback onTap,
+    int count = 0,
   }) {
     return InkWell(
       key: key,
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(22),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? AppColors.tabSelectedBg : AppColors.tabUnselected,
-          borderRadius: BorderRadius.circular(20),
+          color: selected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: selected ? AppColors.tabSelectedBg : AppColors.cardBorder,
+            color: selected ? AppColors.primary : AppColors.cardBorder,
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.primary,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: selected ? Colors.white : AppColors.primary,
+              ),
+            ),
+            if (count > 0) ...[
+              const SizedBox(width: 7),
+              Container(
+                constraints: const BoxConstraints(minWidth: 18),
+                height: 18,
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: selected ? Colors.white : AppColors.accentOrange,
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Text(
+                  count > 99 ? '99+' : '$count',
+                  style: TextStyle(
+                    fontSize: 10,
+                    height: 1,
+                    fontWeight: FontWeight.w800,
+                    color: selected ? AppColors.primary : Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
@@ -334,9 +377,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
     if (chats.isEmpty) return _empty(state);
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 20),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       itemCount: chats.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 4),
+      separatorBuilder: (_, _) => const SizedBox(height:5),
       itemBuilder: (context, index) {
         final chat = chats[index];
         return _ChatTile(
@@ -369,34 +412,43 @@ class _ChatListScreenState extends State<ChatListScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 92,
-              height: 92,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryLight,
+              width: 128,
+              height: 128,
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.forum_outlined,
-                size: 40,
-                color: AppColors.primary,
+              alignment: Alignment.center,
+              child: Container(
+                width: 92,
+                height: 92,
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryLight,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.forum_outlined,
+                  size: 40,
+                  color: AppColors.primary,
+                ),
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 22),
             const Text(
               'No conversations found',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 19,
                 fontWeight: FontWeight.w800,
                 color: AppColors.title,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               subtitle,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 13,
+                fontSize: 13.5,
                 height: 1.5,
                 color: AppColors.subtitle,
               ),
@@ -430,6 +482,7 @@ class _ChatTile extends StatelessWidget {
         ? audience.otherFallbackName
         : profile.displayName.trim();
     final unread = chat.unreadFor(myUserId);
+    final hasUnread = unread > 0;
     final last = chat.lastMessage;
     final preview = last == null
         ? 'No messages yet'
@@ -438,99 +491,132 @@ class _ChatTile extends StatelessWidget {
         : last.text;
     final at = chat.lastMessageAt ?? last?.createdAt;
 
-    return Material(
-      color: unread > 0 ? AppColors.primaryLight.withValues(alpha: 0.45) : null,
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
-          child: Row(
-            children: [
-              ChatAvatar(name: name, avatarUrl: profile.avatarUrl, size: 54),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: unread > 0
-                                  ? FontWeight.w800
-                                  : FontWeight.w700,
-                              color: AppColors.title,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          chatTimeLabel(at),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: unread > 0
-                                ? FontWeight.w700
-                                : FontWeight.w400,
-                            color: unread > 0
-                                ? AppColors.primary
-                                : AppColors.guideLabel,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            preview,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: unread > 0
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                              color: unread > 0
-                                  ? AppColors.textDark
-                                  : AppColors.subtitle,
-                            ),
-                          ),
-                        ),
-                        if (unread > 0) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            constraints: const BoxConstraints(minWidth: 20),
-                            height: 20,
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
-                            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: 
+            Colors.white,
+            // : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color:   AppColors.cardBorder
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(2.5),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    
+                  ),
+                  child: ChatAvatar(
+                    name: name,
+                    avatarUrl: profile.avatarUrl,
+                    size: 52,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
                             child: Text(
-                              unread > 99 ? '99+' : '$unread',
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                              name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 15.5,
+                                fontWeight: hasUnread
+                                    ? FontWeight.w800
+                                    : FontWeight.w700,
+                                color: AppColors.title,
                               ),
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          Text(
+                            chatTimeLabel(at),
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: hasUnread
+                                  ? FontWeight.w700
+                                  : FontWeight.w400,
+                              color: hasUnread
+                                  ? AppColors.accentOrange
+                                  : AppColors.guideLabel,
+                            ),
+                          ),
                         ],
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              preview,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: hasUnread
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: hasUnread
+                                    ? AppColors.textDark
+                                    : AppColors.subtitle,
+                              ),
+                            ),
+                          ),
+                          if (hasUnread) ...[
+                            const SizedBox(width: 10),
+                            Container(
+                              constraints: const BoxConstraints(
+                                minWidth: 22,
+                                minHeight: 22,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                              ),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: AppColors.accentOrange,
+                                borderRadius: BorderRadius.circular(11),
+                              ),
+                              child: Text(
+                                unread > 99 ? '99+' : '$unread',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  height: 1,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

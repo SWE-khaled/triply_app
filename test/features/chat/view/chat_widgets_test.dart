@@ -146,6 +146,16 @@ void main() {
       expect(find.text('My Trips'), findsOneWidget);
       expect(find.text('Profile'), findsOneWidget);
       expect(find.byKey(const Key('guide-nav-chat-badge')), findsOneWidget);
+
+      final chatIcon = tester.getRect(find.byIcon(Icons.chat_bubble_outline));
+      final navItem = tester.getRect(
+        find.ancestor(
+          of: find.byIcon(Icons.chat_bubble_outline),
+          matching: find.byType(AnimatedContainer),
+        ),
+      );
+      expect(chatIcon.center.dx, closeTo(navItem.center.dx, 0.1));
+      expect(chatIcon.center.dy, closeTo(navItem.center.dy, 0.1));
     });
 
     testWidgets('searching without a match shows the no-result copy', (

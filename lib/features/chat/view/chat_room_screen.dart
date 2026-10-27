@@ -212,37 +212,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Future<void> _editMessage(ChatMessage message) async {
-    final controller = TextEditingController(text: message.text);
+    // The dialog owns (and disposes) its own controller, so it is never
+    // disposed while the closing animation still uses it.
     final result = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Edit message'),
-        content: TextField(
-          key: const Key('chat-edit-input'),
-          controller: controller,
-          autofocus: true,
-          minLines: 1,
-          maxLines: 4,
-          maxLength: ChatText.maxMessageLength,
-          decoration: const InputDecoration(
-            hintText: 'Message',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            key: const Key('chat-edit-save'),
-            onPressed: () => Navigator.of(dialogContext).pop(controller.text),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+      builder: (_) => _EditMessageDialog(initialText: message.text),
     );
-    controller.dispose();
     if (!mounted || result == null) return;
     if (result.trim().isEmpty) {
       showAppSnackBar(
@@ -291,86 +266,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     }
   }
 
-  Future<({String reasonCode, String note})?> _askReport(
-    ChatMessage message,
-  ) async {
-    final note = TextEditingController();
-    String? reasonCode;
-    final result = await showDialog<({String reasonCode, String note})>(
+  Future<({String reasonCode, String note})?> _askReport(ChatMessage message) {
+    return showDialog<({String reasonCode, String note})>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) {
-          return AlertDialog(
-            title: const Text('Report message'),
-            content: SizedBox(
-              width: 380,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Why are you reporting this message?',
-                      style: TextStyle(fontSize: 13, color: AppColors.subtitle),
-                    ),
-                    const SizedBox(height: 8),
-                    RadioGroup<String>(
-                      groupValue: reasonCode,
-                      onChanged: (value) =>
-                          setDialogState(() => reasonCode = value),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          for (final entry in _reportReasons.entries)
-                            RadioListTile<String>(
-                              value: entry.key,
-                              title: Text(
-                                entry.value,
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              dense: true,
-                              contentPadding: EdgeInsets.zero,
-                              activeColor: AppColors.primary,
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    TextField(
-                      key: const Key('chat-report-note'),
-                      controller: note,
-                      maxLines: 3,
-                      maxLength: ChatText.maxReportNoteLength,
-                      decoration: const InputDecoration(
-                        hintText: 'Add a note (optional)',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                key: const Key('chat-report-submit'),
-                onPressed: reasonCode == null
-                    ? null
-                    : () => Navigator.of(
-                        dialogContext,
-                      ).pop((reasonCode: reasonCode!, note: note.text)),
-                child: const Text('Submit'),
-              ),
-            ],
-          );
-        },
-      ),
+      builder: (_) => const _ReportDialog(reasons: _reportReasons),
     );
-    note.dispose();
-    return result;
   }
 
   static const Map<String, String> _reportReasons = <String, String>{
@@ -888,6 +788,153 @@ class _TypingDot extends StatelessWidget {
         color: AppColors.guideLabel.withValues(alpha: opacity),
         shape: BoxShape.circle,
       ),
+    );
+  }
+}
+
+/// Edit dialog that owns its [TextEditingController], so the controller is
+/// disposed only after the dialog has left the widget tree.
+class _EditMessageDialog extends StatefulWidget {
+  final String initialText;
+
+  const _EditMessageDialog({required this.initialText});
+
+  @override
+  State<_EditMessageDialog> createState() => _EditMessageDialogState();
+}
+
+class _EditMessageDialogState extends State<_EditMessageDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialText);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Edit message'),
+      content: TextField(
+        key: const Key('chat-edit-input'),
+        controller: _controller,
+        autofocus: true,
+        minLines: 1,
+        maxLines: 4,
+        maxLength: ChatText.maxMessageLength,
+        decoration: const InputDecoration(
+          hintText: 'Message',
+          border: OutlineInputBorder(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          key: const Key('chat-edit-save'),
+          onPressed: () => Navigator.of(context).pop(_controller.text),
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
+}
+
+/// Report dialog that owns its note controller (same reason as above).
+class _ReportDialog extends StatefulWidget {
+  final Map<String, String> reasons;
+
+  const _ReportDialog({required this.reasons});
+
+  @override
+  State<_ReportDialog> createState() => _ReportDialogState();
+}
+
+class _ReportDialogState extends State<_ReportDialog> {
+  final TextEditingController _note = TextEditingController();
+  String? _reasonCode;
+
+  @override
+  void dispose() {
+    _note.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Report message'),
+      content: SizedBox(
+        width: 380,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Why are you reporting this message?',
+                style: TextStyle(fontSize: 13, color: AppColors.subtitle),
+              ),
+              const SizedBox(height: 8),
+              RadioGroup<String>(
+                groupValue: _reasonCode,
+                onChanged: (value) => setState(() => _reasonCode = value),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final entry in widget.reasons.entries)
+                      RadioListTile<String>(
+                        value: entry.key,
+                        title: Text(
+                          entry.value,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                        activeColor: AppColors.primary,
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 4),
+              TextField(
+                key: const Key('chat-report-note'),
+                controller: _note,
+                maxLines: 3,
+                maxLength: ChatText.maxReportNoteLength,
+                decoration: const InputDecoration(
+                  hintText: 'Add a note (optional)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          key: const Key('chat-report-submit'),
+          onPressed: _reasonCode == null
+              ? null
+              : () => Navigator.of(
+                  context,
+                ).pop((reasonCode: _reasonCode!, note: _note.text)),
+          child: const Text('Submit'),
+        ),
+      ],
     );
   }
 }

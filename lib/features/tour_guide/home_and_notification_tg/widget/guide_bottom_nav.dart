@@ -44,6 +44,7 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
     final icon = Icon(_items[index].$1, size: 22, color: color);
     if (index != 2 || widget.chatUnread <= 0) return icon;
     return Stack(
+      alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
         icon,

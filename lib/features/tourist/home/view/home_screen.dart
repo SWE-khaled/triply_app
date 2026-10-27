@@ -210,43 +210,60 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         floatingActionButton: ChatUnreadBuilder(
-          builder: (context, unread) => FloatingActionButton(
-            key: const Key('home-chat-button'),
-            tooltip: 'Messages',
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            onPressed: () => Navigator.of(context).push(AppRoutes.chatList()),
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                const Icon(Icons.chat_bubble_outline, size: 23),
-                if (unread > 0)
-                  Positioned(
-                    top: -7,
-                    right: -8,
+          builder: (context, unread) => Stack(
+            clipBehavior: Clip.none,
+            children: [
+              SizedBox(
+                width: 60,
+                height: 60,
+                child: FloatingActionButton(
+                  key: const Key('home-chat-button'),
+                  tooltip: 'Messages',
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 8,
+                  shape: const CircleBorder(),
+                  onPressed: () =>
+                      Navigator.of(context).push(AppRoutes.chatList()),
+                  child: const Icon(Icons.chat_bubble_outline, size: 25),
+                ),
+              ),
+              if (unread > 0)
+                Positioned(
+                  top: -6,
+                  right: -6,
+                  child: IgnorePointer(
                     child: Container(
                       key: const Key('home-chat-badge'),
-                      constraints: const BoxConstraints(minWidth: 17),
-                      height: 17,
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      constraints: const BoxConstraints(
+                        minWidth: 26,
+                        minHeight: 26,
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.accentOrange,
-                        shape: BoxShape.circle,
+                        shape: unread > 99
+                            ? BoxShape.rectangle
+                            : BoxShape.circle,
+                        borderRadius: unread > 99
+                            ? BorderRadius.circular(13)
+                            : null,
+                        border: Border.all(color: Colors.white, width: 3),
                       ),
                       child: Text(
                         unread > 99 ? '99+' : '$unread',
                         style: const TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
                           color: Colors.white,
+                          height: 1,
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
         bottomNavigationBar: BlocBuilder<HomeCubit, HomeState>(
