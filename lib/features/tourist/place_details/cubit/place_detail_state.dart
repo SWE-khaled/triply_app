@@ -9,11 +9,11 @@ final class PlaceDetailInitial extends PlaceDetailState {
   const PlaceDetailInitial();
 }
 
-final class PlaceDetailLoading extends PlaceDetailState {
-  const PlaceDetailLoading();
+final class PlaceDetailLoadingState extends PlaceDetailState {
+  const PlaceDetailLoadingState();
 }
 
-final class PlaceDetailSuccess extends PlaceDetailState {
+final class PlaceDetailSuccessState extends PlaceDetailState {
   /// The place the screen shows.
   final Place place;
 
@@ -29,7 +29,7 @@ final class PlaceDetailSuccess extends PlaceDetailState {
   /// The tab that is open.
   final int selectedTabIndex;
 
-  const PlaceDetailSuccess({
+  const PlaceDetailSuccessState({
     required this.place,
     required this.guides,
     required this.trips,
@@ -38,8 +38,8 @@ final class PlaceDetailSuccess extends PlaceDetailState {
   });
 }
 
-final class PlaceDetailError extends PlaceDetailState {
+final class PlaceDetailErrorState extends PlaceDetailState {
   final String error;
 
-  const PlaceDetailError({required this.error});
+  const PlaceDetailErrorState({required this.error});
 }

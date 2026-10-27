@@ -59,7 +59,7 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
 
   /// Reads the place and everything it shows.
   Future<void> load() async {
-    safeEmit(const PlaceDetailLoading());
+    safeEmit(const PlaceDetailLoadingState());
     try {
       _place = await _fetchPlace() ?? _mockPlace();
 
@@ -80,7 +80,7 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
           : _tripsOfPlace(remote).map(_toCard).toList();
 
       safeEmit(
-        PlaceDetailSuccess(
+        PlaceDetailSuccessState(
           place: place,
           guides: _guides,
           trips: _trips,
@@ -89,16 +89,19 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
         ),
       );
     } catch (e) {
-      safeEmit(PlaceDetailError(error: e.toString()));
+      safeEmit(PlaceDetailErrorState(error: e.toString()));
     }
   }
+
+  /// Manual re-entry after [PlaceDetailErrorState].
+  void retry() => load();
 
   void selectTab(int index) {
     _selectedTabIndex = index;
     final current = state;
-    if (current is! PlaceDetailSuccess) return;
+    if (current is! PlaceDetailSuccessState) return;
     safeEmit(
-      PlaceDetailSuccess(
+      PlaceDetailSuccessState(
         place: current.place,
         guides: current.guides,
         trips: current.trips,
@@ -113,9 +116,9 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
     if (current == null) return;
     current.isFavorite = !current.isFavorite;
     final state = this.state;
-    if (state is! PlaceDetailSuccess) return;
+    if (state is! PlaceDetailSuccessState) return;
     safeEmit(
-      PlaceDetailSuccess(
+      PlaceDetailSuccessState(
         place: current,
         guides: state.guides,
         trips: state.trips,
