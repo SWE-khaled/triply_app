@@ -114,8 +114,6 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selected = controller.selectedPlace;
-
     return BlocProvider.value(
       value: controller,
       child: Scaffold(
@@ -124,73 +122,80 @@ class _MapScreenState extends State<MapScreen> {
         body: SafeArea(
           bottom: false, // <-- let the map reach the bottom of the screen
           child: BlocBuilder<MapCubit, MapState>(
-            builder: (context, _) => Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                  child: MapSearchField(
-                    controller: searchController,
-                    searchQuery: controller.searchQuery,
-                    onChanged: _onSearchChanged,
-                    onSubmitted: _onSearchSubmitted,
-                    onClear: () {
-                      searchController.clear();
-                      controller.clearSearch();
-                      _focusSelected();
-                    },
+            builder: (context, state) {
+              // Read from the fresh state, not from build()'s scope:
+              // the outer variable went stale on cubit-driven rebuilds
+              // (e.g. the Firestore catalog swap) and kept the old
+              // preview card on screen.
+              final selected = state.selectedPlace;
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                    child: MapSearchField(
+                      controller: searchController,
+                      searchQuery: controller.searchQuery,
+                      onChanged: _onSearchChanged,
+                      onSubmitted: _onSearchSubmitted,
+                      onClear: () {
+                        searchController.clear();
+                        controller.clearSearch();
+                        _focusSelected();
+                      },
+                    ),
                   ),
-                ),
-                MapFilterChips(
-                  selectedFilter: controller.selectedFilter,
-                  onFilterSelected: _onFilterSelected,
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      fmap.FlutterMap(
-                        mapController: _mapController,
-                        options: fmap.MapOptions(
-                          initialCenter: _initialCenter,
-                          initialZoom: _initialZoom,
-                        ),
-                        children: [
-                          fmap.TileLayer(
-                            urlTemplate:
-                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            userAgentPackageName: 'com.example.triply_app',
+                  MapFilterChips(
+                    selectedFilter: controller.selectedFilter,
+                    onFilterSelected: _onFilterSelected,
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        fmap.FlutterMap(
+                          mapController: _mapController,
+                          options: fmap.MapOptions(
+                            initialCenter: _initialCenter,
+                            initialZoom: _initialZoom,
                           ),
-                          fmap.MarkerLayer(markers: _markers),
-                        ],
-                      ),
-                      if (selected != null)
-                        Positioned(
-                          left: 16,
-                          right: 16,
-                          bottom: 100, // keeps the card above the nav
-                          child: PlacePreviewCard(
-                            place: selected,
-                            onTap: () => _openPlaceDetail(selected),
-                            onViewDetails: () => _openPlaceDetail(selected),
-                          ),
+                          children: [
+                            fmap.TileLayer(
+                              urlTemplate:
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              userAgentPackageName: 'com.example.triply_app',
+                            ),
+                            fmap.MarkerLayer(markers: _markers),
+                          ],
                         ),
-                      if (controller.visiblePlaces.isEmpty)
-                        const Positioned(
-                          left: 16,
-                          right: 16,
-                          bottom: 100,
-                          child: Card(
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Text('No places found in Egypt.'),
+                        if (selected != null)
+                          Positioned(
+                            left: 16,
+                            right: 16,
+                            bottom: 100, // keeps the card above the nav
+                            child: PlacePreviewCard(
+                              place: selected,
+                              onTap: () => _openPlaceDetail(selected),
+                              onViewDetails: () => _openPlaceDetail(selected),
                             ),
                           ),
-                        ),
-                    ],
+                        if (controller.visiblePlaces.isEmpty)
+                          const Positioned(
+                            left: 16,
+                            right: 16,
+                            bottom: 100,
+                            child: Card(
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text('No places found in Egypt.'),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           ),
         ),
         bottomNavigationBar: AppBottomNav(

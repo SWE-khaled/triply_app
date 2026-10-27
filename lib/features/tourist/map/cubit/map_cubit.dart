@@ -1,16 +1,26 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/mock/tourist/mock_places.dart';
 import '../model/place.dart';
 import 'map_state.dart';
 
+/// Place catalog: Firestore `places` collection (66 docs, publicly
+/// readable) with the local mock as fallback so the map never goes
+/// blank offline / on rules errors.
 class MapCubit extends Cubit<MapState> {
-  final List<Place> allPlaces;
+  /// Replaced by the Firestore copy once loaded; mock until then.
+  List<Place> allPlaces;
+  bool _firestoreLoaded = false;
 
   MapCubit()
-    // Current: local mock. Future: Google Places API response -> Place.fromJson.
+    // Source shape unchanged: snake_case docs -> Place.fromJson
+    // (Firestore docs were uploaded from the same mock source).
     : allPlaces = mockPlaces.map((e) => Place.fromJson(e)).toList(),
       super(const MapState(visiblePlaces: [])) {
+    // Instant first paint from the mock, then the Firestore swap
+    // re-emits and BlocBuilder rebuilds with the remote catalog.
     _applyFilters();
+    loadFromFirestore();
   }
 
   String get searchQuery => state.searchQuery;
@@ -40,6 +50,26 @@ class MapCubit extends Cubit<MapState> {
   void clearSearch() {
     emit(state.copyWith(searchQuery: ''));
     _applyFilters();
+  }
+
+  /// One-time eager load. Best effort only: any failure keeps the mock
+  /// catalog silently (the UI stays functional offline).
+  Future<void> loadFromFirestore() async {
+    if (_firestoreLoaded) return;
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('places')
+          .get();
+      final remote = snapshot.docs
+          .map((doc) => Place.fromJson(doc.data()))
+          .toList();
+      if (remote.isEmpty) return; // keep the mock fallback
+      allPlaces = remote;
+      _firestoreLoaded = true;
+      _applyFilters();
+    } catch (_) {
+      // Offline / permission-denied / unexpected doc — keep the mock.
+    }
   }
 
   void _applyFilters() {
