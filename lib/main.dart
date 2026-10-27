@@ -41,18 +41,22 @@ class MyApp extends StatelessWidget {
         title: 'Triply',
         debugShowCheckedModeBanner: false,
         theme: buildAppTheme(),
-        home: BlocBuilder<AuthCubit, AuthState>(
-          builder: (context, state) {
-            switch (state) {
-              case AuthInitial():
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              default:
-                return const RoleSelectionScreen();
-            }
-          },
-        ),
+        onGenerateInitialRoutes: (_) => [
+          AppRoutes.splash(
+            nextPageBuilder: (_) => BlocBuilder<AuthCubit, AuthState>(
+              builder: (context, state) {
+                switch (state) {
+                  case AuthInitial():
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  default:
+                    return const RoleSelectionScreen();
+                }
+              },
+            ),
+          ),
+        ],
         routes: {
           AppRoutes.home: (context) => const HomeScreen(),
           AppRoutes.search: (context) => const SearchScreen(),

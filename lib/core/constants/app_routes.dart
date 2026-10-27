@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/chat/model/chat_audience.dart';
 import '../../features/chat/view/chat_list_screen.dart';
 import '../../features/chat/view/chat_room_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import '../../core/data/repositories/chat_repository.dart';
 import '../../features/tour_guide/create_trip_tg/view/create_trip_screen.dart';
 import '../../features/tour_guide/earnings_tg/view/earnings_screen.dart';
@@ -49,6 +50,12 @@ class AppRoutes {
   static const String emergency = '/emergency';
 
   // ---- Route builders ----
+  static Route<void> splash({required WidgetBuilder nextPageBuilder}) {
+    return MaterialPageRoute(
+      builder: (_) => SplashScreen(nextPageBuilder: nextPageBuilder),
+    );
+  }
+
   static Route<void> trips() {
     return MaterialPageRoute(
       builder: (_) =>

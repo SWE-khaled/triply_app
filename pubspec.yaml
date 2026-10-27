@@ -71,3 +71,5 @@ flutter:
     - .env
     - assets/images/svg/
     - assets/images/icon/
+    - assets/images/svg/ankh_logo.svg
+    - assets/images/svg/riply_text.svg
