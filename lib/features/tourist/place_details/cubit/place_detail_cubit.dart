@@ -26,10 +26,9 @@ part 'place_detail_state.dart';
 /// catalog the map reads, with the bundled mock as offline fallback).
 /// The guides come from Firestore (the approved profiles of `guides`,
 /// filtered by the guide's profile location) — same fallback chain.
-/// The trips come from Firestore — the approved ones. A trip document
-/// stores the location as free text, so the place is matched by its name
-/// and its city; when nothing matches, every approved trip is offered —
-/// an empty screen would be worse.
+/// The trips come from Firestore — the approved ones, and only those
+/// whose location matches the place's Firestore `name`. The bundled
+/// mock trips rescue the offline case with their own place_id match.
 class PlaceDetailCubit extends Cubit<PlaceDetailState>
     with SafeEmitMixin<PlaceDetailState> {
   PlaceDetailCubit({
@@ -198,20 +197,22 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
     );
   }
 
-  /// The approved trips of this place.
+  /// The approved trips of this place: shown only when the trip's
+  /// location (free text in the Firestore trip document) matches the
+  /// place's Firestore `name` — a substring in either direction, the
+  /// same tolerance the guides use. Strict on purpose, like the guides:
+  /// a trip unrelated to the place is never shown beside it, trips
+  /// without a location never match, and when nothing matches the tabs
+  /// are simply empty (the earlier "show everything" fallback is gone
+  /// by request).
   List<PublicTrip> _tripsOfPlace(List<PublicTrip> trips) {
-    final current = place;
-    final needles = [
-      current.name.trim().toLowerCase(),
-      current.city.trim().toLowerCase(),
-    ].where((e) => e.isNotEmpty).toList();
-    final matching = trips.where((trip) {
-      final location = trip.location.toLowerCase();
-      return needles.any(
-        (needle) => location.contains(needle) || needle.contains(location),
-      );
+    final name = place.name.trim().toLowerCase();
+    if (name.isEmpty) return const <PublicTrip>[];
+    return trips.where((trip) {
+      final location = trip.location.trim().toLowerCase();
+      if (location.isEmpty) return false;
+      return location.contains(name) || name.contains(location);
     }).toList();
-    return matching.isEmpty ? trips : matching;
   }
 
   /// The card of a trip, in the shape the place screen shows.
