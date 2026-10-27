@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/data/mock/tourist/mock_guides.dart' as guides_src;
@@ -6,7 +7,9 @@ import 'package:triply/core/data/mock/tourist/mock_place_trips.dart';
 import 'package:triply/core/data/mock/tourist/mock_places.dart';
 import 'package:triply/core/data/mock/tourist/mock_stories.dart';
 import 'package:triply/core/data/mock/tourist/mock_trips_public.dart';
+import 'package:triply/core/data/models/public_guide.dart';
 import 'package:triply/core/data/models/public_trip.dart';
+import 'package:triply/core/data/repositories/public_guides_repository.dart';
 import 'package:triply/core/data/repositories/public_trips_repository.dart';
 import 'package:triply/core/utils/safe_emit_mixin.dart';
 import '../../map/model/place.dart';
@@ -19,20 +22,29 @@ part 'place_detail_state.dart';
 
 /// The place screen: the place itself, its guides, its trips and stories.
 ///
+/// The place doc comes from Firestore (`places/{placeId}`, the same
+/// catalog the map reads, with the bundled mock as offline fallback).
+/// The guides come from Firestore (the approved profiles of `guides`,
+/// filtered by the guide's profile location) — same fallback chain.
 /// The trips come from Firestore — the approved ones. A trip document
 /// stores the location as free text, so the place is matched by its name
 /// and its city; when nothing matches, every approved trip is offered —
 /// an empty screen would be worse.
 class PlaceDetailCubit extends Cubit<PlaceDetailState>
     with SafeEmitMixin<PlaceDetailState> {
-  PlaceDetailCubit({required this.placeId, PublicTripsRepository? repository})
-    : _repository = repository ?? PublicTripsRepository(),
-      super(const PlaceDetailInitial()) {
+  PlaceDetailCubit({
+    required this.placeId,
+    PublicTripsRepository? repository,
+    PublicGuidesRepository? guidesRepository,
+  }) : _repository = repository ?? PublicTripsRepository(),
+       _guidesRepository = guidesRepository ?? PublicGuidesRepository(),
+       super(const PlaceDetailInitial()) {
     load();
   }
 
   final String placeId;
   final PublicTripsRepository _repository;
+  final PublicGuidesRepository _guidesRepository;
 
   Place? _place;
   List<Guide> _guides = const [];
@@ -50,8 +62,14 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
   Future<void> load() async {
     safeEmit(const PlaceDetailLoading());
     try {
-      _place = _mockPlace();
-      _guides = mockGuides1.map((e) => Guide.fromJson(e)).toList();
+      _place = await _fetchPlace() ?? _mockPlace();
+
+      // Firestore guides (approved only), filtered to this place's
+      // location; the bundled mock rescues the screen offline.
+      final remoteGuides = await _guidesRepository.fetchApprovedGuides();
+      _guides = remoteGuides == null
+          ? mockGuides1.map((e) => Guide.fromJson(e)).toList()
+          : _guidesOfPlace(remoteGuides).map(_toGuide).toList();
       _stories = mockStories
           .where((e) => e['place_id'] == place.id)
           .map((e) => Story.fromJson(e))
@@ -142,6 +160,44 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
     );
   }
 
+  /// The approved guides whose profile location matches this place's
+  /// city (or name) as stored in Firestore — the two are free text, so
+  /// the match follows the trips' tolerance (`_tripsOfPlace`): substring
+  /// in either direction. Strict on purpose: a guide with an empty or
+  /// unrelated location is never shown for this place, and when nothing
+  /// matches the tabs are simply empty — the mall-fallback behavior
+  /// ("show everything") was removed by request.
+  List<PublicGuide> _guidesOfPlace(List<PublicGuide> guides) {
+    final current = place;
+    final needles = [
+      current.city.trim().toLowerCase(),
+      current.name.trim().toLowerCase(),
+    ].where((e) => e.isNotEmpty).toList();
+    return guides.where((guide) {
+      final location = guide.location.trim().toLowerCase();
+      if (location.isEmpty) return false;
+      return needles.any(
+        (needle) => location.contains(needle) || needle.contains(location),
+      );
+    }).toList();
+  }
+
+  /// The card of a guide, in the shape the place screen shows. The id is
+  /// the guide's auth uid (the Firestore document id), not the mock id.
+  Guide _toGuide(PublicGuide guide) {
+    return Guide(
+      id: guide.id,
+      name: guide.name,
+      specialty: guide.specialty,
+      rating: guide.rating,
+      reviewsCount: guide.reviewCount,
+      pricePerHour: guide.pricePerHour,
+      avatarUrl: guide.avatarUrl,
+      // The query only returns approved guides.
+      verified: guide.isApproved,
+    );
+  }
+
   /// The approved trips of this place.
   List<PublicTrip> _tripsOfPlace(List<PublicTrip> trips) {
     final current = place;
@@ -173,7 +229,24 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
     );
   }
 
-  /// The bundled place — the places are still the bundled dataset.
+  /// The place document of Firestore `places/{placeId}` — the document
+  /// ids match the uploaded catalog (doc id == the 'id' field), so the
+  /// lookup is exact. Null when offline / denied / unknown id, and the
+  /// bundled mock rescues the screen (same fallback chain as the map).
+  Future<Place?> _fetchPlace() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('places')
+          .doc(placeId)
+          .get();
+      if (!doc.exists) return null;
+      return Place.fromJson(doc.data()!);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The bundled place — used when Firestore cannot be reached.
   Place _mockPlace() {
     final placeJson = mockPlaces.firstWhere(
       (e) => e['id'] == placeId,
