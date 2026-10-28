@@ -57,7 +57,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     }
   }
 
-  // ───────────── Brand pieces ─────────────
+
   BoxDecoration _gradient({BorderRadius? radius}) => BoxDecoration(
     gradient: const LinearGradient(
       begin: Alignment.topRight,
@@ -91,7 +91,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     );
   }
 
-  /// Header للموبايل (فوق الفورم)
+
   Widget _buildMobileHeader() {
     return Container(
       height: 248,
@@ -140,7 +140,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     );
   }
 
-  /// بانل الـ Brand على اليسار في الويب
+ 
   Widget _buildWebBrandPanel() {
     return Container(
       decoration: _gradient(),
@@ -180,7 +180,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     );
   }
 
-  // ───────────── Form (مشترك بين الموبايل والويب) ─────────────
+
   Widget _buildForm(AdminAuthCubit cubit, AdminAuthState state) {
     return Form(
       key: _formKey,
@@ -205,7 +205,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
           const SizedBox(height: 10),
           AuthTextField(
             controller: _emailController,
-            hintText: 'khaled@gmail.com',
+            hintText: 'admin@gmail.com',
             icon: Icons.mail_outline,
             keyboardType: TextInputType.emailAddress,
             validator: (value) => (value == null || !value.contains('@'))
@@ -267,7 +267,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     );
   }
 
-  /// Scroll + توسيط الفورم بعرض أقصى
+
   Widget _buildScrollableForm(
     AdminAuthCubit cubit,
     AdminAuthState state, {
@@ -298,7 +298,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
               builder: (context, constraints) {
                 final isWeb = constraints.maxWidth >= _webBreakpoint;
 
-                // ───── Web: بانل Brand يسار + فورم يمين ─────
+      
                 if (isWeb) {
                   return Row(
                     children: [
@@ -320,7 +320,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                   );
                 }
 
-                // ───── Mobile: Header فوق + فورم تحته ─────
+     
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

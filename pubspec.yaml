@@ -63,6 +63,11 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/images/icon/Icon_app.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/images/icon/Icon_app.png"
+    background_color: "#F8F4E9"
+    theme_color: "#0E5261"
 
 flutter:
   uses-material-design: true
@@ -86,4 +91,3 @@ flutter:
     - assets/images/icon/google_logo.png
     - assets/images/icon/apple_logo.png
     - assets/images/edits/home_image.png
-

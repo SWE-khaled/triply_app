@@ -43,7 +43,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
 
   void _onFieldChanged() => setState(() {});
 
-  /// الزرار يبقى Disabled (رمادي) لحد ما كل الحقول تتملي
+
   bool get _isFormFilled => _controllers.every((c) => c.text.trim().isNotEmpty);
 
   @override
@@ -81,7 +81,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
     }
   }
 
-  // ───────────── Brand pieces ─────────────
+
   BoxDecoration _gradient({BorderRadius? radius}) => BoxDecoration(
     gradient: const LinearGradient(
       begin: Alignment.topRight,
@@ -115,7 +115,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
     );
   }
 
-  /// Header للموبايل (فوق الفورم)
+
   Widget _buildMobileHeader() {
     return Container(
       height: 248,
@@ -164,7 +164,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
     );
   }
 
-  /// بانل الـ Brand على اليسار في الويب
+
   Widget _buildWebBrandPanel() {
     return Container(
       decoration: _gradient(),
@@ -204,7 +204,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
     );
   }
 
-  // ───────────── Create Account button (Disabled / Enabled) ─────────────
+  
   Widget _buildCreateButton(AdminAuthCubit cubit, bool isLoading) {
     final enabled = _isFormFilled && !isLoading;
 
@@ -240,7 +240,6 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
     );
   }
 
-  // ───────────── Form (مشترك بين الموبايل والويب) ─────────────
   Widget _buildForm(AdminAuthCubit cubit, AdminAuthState state) {
     final isLoading = state is AdminAuthLoading;
 
@@ -262,7 +261,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
           const SizedBox(height: 10),
           AuthTextField(
             controller: _nameController,
-            hintText: 'Ahmed Mohamed',
+            hintText: 'admin',
             icon: Icons.person_outline,
             validator: (value) => (value == null || value.trim().isEmpty)
                 ? 'Enter your full name'
@@ -273,7 +272,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
           const SizedBox(height: 10),
           AuthTextField(
             controller: _emailController,
-            hintText: 'khaled@gmail.com',
+            hintText: 'admin@gmail.com',
             icon: Icons.mail_outline,
             keyboardType: TextInputType.emailAddress,
             validator: (value) => (value == null || !value.contains('@'))
@@ -335,7 +334,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
     );
   }
 
-  /// Scroll + توسيط الفورم بعرض أقصى
+
   Widget _buildScrollableForm(
     AdminAuthCubit cubit,
     AdminAuthState state, {
@@ -366,7 +365,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
               builder: (context, constraints) {
                 final isWeb = constraints.maxWidth >= _webBreakpoint;
 
-                // ───── Web: بانل Brand يسار + فورم يمين ─────
+          
                 if (isWeb) {
                   return Row(
                     children: [
@@ -388,7 +387,7 @@ class _AdminCreateAccountViewState extends State<AdminCreateAccountView> {
                   );
                 }
 
-                // ───── Mobile: Header فوق + فورم تحته ─────
+             
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
