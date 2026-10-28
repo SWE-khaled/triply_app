@@ -1,4 +1,6 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/constants/egypt_cities.dart';
 import 'guide_form_field.dart';
 
 /// Static form sections. Controllers stay in the screen State;
@@ -41,9 +43,63 @@ class BasicsSection extends StatelessWidget {
         const SizedBox(height: 12),
         GuideTwoCol(
           leftLabel: 'Location',
-          leftField: GuideFormField(
-            controller: locationCtrl,
-            hint: 'Giza Plateau',
+          leftField: DropdownSearch<String>(
+            items: (filter, loadProps) => EgyptCities.tripEgyptLocations,
+            selectedItem: EgyptCities.tripEgyptLocations.contains(locationCtrl.text)
+                ? locationCtrl.text
+                : null,
+            popupProps: PopupProps.menu(
+              showSearchBox: true,
+              fit: FlexFit.loose,
+              constraints: const BoxConstraints(maxHeight: 300),
+              menuProps: MenuProps(
+                backgroundColor: Colors.white,
+                surfaceTintColor: Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+                elevation: 4,
+              ),
+              searchFieldProps: TextFieldProps(
+                decoration: InputDecoration(
+                  hintText: 'Search city',
+                  hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFB8B2A5)),
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  filled: true,
+                  fillColor: const Color(0xFFFBF6EA),
+                  isDense: true,
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            decoratorProps: DropDownDecoratorProps(
+              baseStyle: const TextStyle(fontSize: 13),
+              decoration: InputDecoration(
+                hintText: 'Select city',
+                hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFB8B2A5)),
+                filled: true,
+                fillColor: const Color(0xFFFBF6EA),
+                isDense: true,
+                contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            onChanged: (value) => locationCtrl.text = value ?? '',
           ),
           rightLabel: 'Experience Label',
           rightField: GuideFormField(

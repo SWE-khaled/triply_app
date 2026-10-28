@@ -47,6 +47,7 @@ dependencies:
   # third_party/ injects a mobile viewport into Paymob's hosted pages
   # so the wallet / card checkout renders correctly on small screens.
   pay_with_paymob: ^1.4.0
+  dropdown_search: 6.0.2
 
 
 
