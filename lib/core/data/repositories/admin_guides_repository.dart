@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../remote/firestore_service.dart';
@@ -105,7 +106,15 @@ class AdminGuidesRepository {
       final verificationByGuide = <String, Map<String, dynamic>>{};
       for (final doc in verifications.docs) {
         final data = doc.data();
-        final guideId = (data['guideId'] as String?) ?? doc.id;
+        final rawGuideId = data['guideId'] as String?;
+        final guideId = (rawGuideId != null && rawGuideId.isNotEmpty)
+            ? rawGuideId
+            : doc.id;
+        final existing = verificationByGuide[guideId];
+        // If an approved verification doc already exists, never overwrite it with a pending doc
+        if (existing != null && existing['status'] == 'approved' && data['status'] != 'approved') {
+          continue;
+        }
         verificationByGuide[guideId] = data;
       }
       return users.docs
@@ -124,39 +133,105 @@ class AdminGuidesRepository {
 
   /// Real-time view of every guide account and its verification state.
   ///
-  /// Re-emits the full guide list whenever the verification collection
-  /// changes, so the admin dashboard stays in sync without a refresh.
+  /// Re-emits the full guide list whenever the verifications OR users
+  /// collection changes, so the admin dashboard stays in sync without a refresh.
   Stream<List<AdminGuide>> watchGuides() async* {
-    await for (final _ in _firestore
-        .collection(verificationsCollection)
-        .snapshots()) {
-      yield await fetchGuides();
+    final controller = StreamController<List<AdminGuide>>();
+
+    void refresh() async {
+      try {
+        final guides = await fetchGuides();
+        if (!controller.isClosed) {
+          controller.add(guides);
+        }
+      } catch (_) {}
     }
+
+    final subVerifications = _firestore
+        .collection(verificationsCollection)
+        .snapshots()
+        .listen((_) => refresh());
+
+    final subUsers = _firestore
+        .collection(usersCollection)
+        .where('role', isEqualTo: 'guide')
+        .snapshots()
+        .listen((_) => refresh());
+
+    refresh();
+
+    controller.onCancel = () {
+      subVerifications.cancel();
+      subUsers.cancel();
+      controller.close();
+    };
+
+    yield* controller.stream;
   }
 
   /// Approves or rejects a guide's verification documents.
   ///
   /// Writes the decision on the submission and the `isApproved` flag on
   /// the guide's profile, so the guide's dashboard and profile always
-  /// agree.
+  /// agree and remain permanently in sync.
   Future<bool> decideVerification({
     required String guideId,
     required bool approve,
     String rejectionReason = '',
   }) async {
     try {
-      await _firestore.writeDoc(verificationsCollection, guideId, {
-        'status': approve ? 'approved' : 'rejected',
-        'rejectionReason': approve ? '' : rejectionReason,
-        'reviewedAt': FieldValue.serverTimestamp(),
-      });
+      final statusStr = approve ? 'approved' : 'rejected';
+
+      // 1. Primary write: Update the user account in users/{guideId}
+      // This is the persistent source of truth for auth, role, and approval.
       await _firestore.writeDoc(usersCollection, guideId, {
         'isApproved': approve,
+        'status': statusStr,
+        'isActive': approve,
+        'verification': {
+          'reviewStatus': statusStr,
+        },
       });
-      // The public profile is what the tourists browse.
-      await _firestore.writeDoc(guidesCollection, guideId, {
-        'isApproved': approve,
-      });
+
+      // 2. Update the public profile in guides/{guideId}
+      try {
+        await _firestore.writeDoc(guidesCollection, guideId, {
+          'isApproved': approve,
+          'status': statusStr,
+          'isActive': approve,
+        });
+      } catch (_) {}
+
+      // 3. Update the verification submission in guideVerifications/{guideId}
+      try {
+        await _firestore.writeDoc(verificationsCollection, guideId, {
+          'guideId': guideId,
+          'status': statusStr,
+          'rejectionReason': approve ? '' : rejectionReason,
+          'reviewedAt': FieldValue.serverTimestamp(),
+        });
+      } catch (_) {
+        // Non-fatal if guideVerifications document does not exist yet
+        // or has restricted creation rules for non-guide actors.
+      }
+
+      // 4. Update any other submission docs matching this guideId
+      try {
+        final otherDocs = await _firestore
+            .collection(verificationsCollection)
+            .where('guideId', isEqualTo: guideId)
+            .get();
+        for (final doc in otherDocs.docs) {
+          if (doc.id != guideId) {
+            await _firestore.writeDoc(verificationsCollection, doc.id, {
+              'status': statusStr,
+              'rejectionReason': approve ? '' : rejectionReason,
+              'reviewedAt': FieldValue.serverTimestamp(),
+            });
+          }
+        }
+      } catch (_) {}
+
       return true;
     } catch (_) {
       return false;
@@ -169,10 +244,29 @@ class AdminGuidesRepository {
       await _firestore.writeDoc(usersCollection, guideId, {
         'isApproved': false,
         'isActive': false,
+        'status': 'suspended',
+        'verification': {
+          'reviewStatus': 'rejected',
+        },
       });
-      await _firestore.writeDoc(guidesCollection, guideId, {
-        'isApproved': false,
-      });
+
+      try {
+        await _firestore.writeDoc(guidesCollection, guideId, {
+          'isApproved': false,
+          'isActive': false,
+          'status': 'suspended',
+        });
+      } catch (_) {}
+
+      try {
+        await _firestore.writeDoc(verificationsCollection, guideId, {
+          'guideId': guideId,
+          'status': 'rejected',
+          'rejectionReason': 'Account suspended by admin',
+          'reviewedAt': FieldValue.serverTimestamp(),
+        });
+      } catch (_) {}
+
       return true;
     } catch (_) {
       return false;
@@ -185,7 +279,25 @@ class AdminGuidesRepository {
     List<AdminGuideTrip> trips,
   ) {
     final data = doc.data() ?? const <String, dynamic>{};
-    final status = (verification['status'] as String?) ?? 'pending';
+    final userIsApproved = (data['isApproved'] as bool?) == true ||
+        (data['status'] as String?) == 'approved' ||
+        (data['verification'] is Map &&
+            data['verification']['reviewStatus'] == 'approved');
+
+    final verStatus = (verification['status'] as String?)?.toLowerCase();
+
+    // If either users collection or verification says approved, guide is permanently approved!
+    final String status;
+    if (userIsApproved || verStatus == 'approved') {
+      status = 'approved';
+    } else if (verStatus == 'rejected' ||
+        (data['status'] as String?) == 'rejected' ||
+        (data['status'] as String?) == 'suspended') {
+      status = 'suspended';
+    } else {
+      status = 'pending';
+    }
+
     final idUrl = (verification['idDocumentUrl'] as String?) ?? '';
     final licenseUrl = (verification['licenseDocumentUrl'] as String?) ?? '';
 
@@ -210,6 +322,7 @@ class AdminGuidesRepository {
       case 'approved':
         return 'approved';
       case 'rejected':
+      case 'suspended':
         return 'suspended';
       default:
         return 'pending';

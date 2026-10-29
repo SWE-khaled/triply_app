@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../core/data/repositories/admin_tourists_repository.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../core/data/mock/dashboard/d_mock_search.dart';
 import '../../d_home/view/d_home_view.dart';
 
-/// Users management screen.
+/// Tourists management screen (for Tourists only, connected to Firestore database).
 class UsersView extends StatefulWidget {
   const UsersView({super.key});
 
@@ -15,48 +16,66 @@ class UsersView extends StatefulWidget {
 
 class _UsersViewState extends State<UsersView> {
   final TextEditingController _search = TextEditingController();
-  late List<MockUser> _users;
+  final AdminTouristsRepository _repository = AdminTouristsRepository();
+
+  List<AdminTourist> _tourists = const [];
+  StreamSubscription<List<AdminTourist>>? _subscription;
   String _query = '';
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _users = List.from(mockUsers);
-  }
-
-  List<MockUser> get _filtered {
-    final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return _users;
-    return _users.where((u) {
-      return u.name.toLowerCase().contains(q) ||
-          u.email.toLowerCase().contains(q) ||
-          u.phone.toLowerCase().contains(q) ||
-          u.type.toLowerCase().contains(q);
-    }).toList();
-  }
-
-  void _showViewDialog(MockUser user) {
-    showDialog(
-      context: context,
-      builder: (_) => _ViewUserDialog(user: user),
+    _subscription = _repository.watchTourists().listen(
+      (tourists) {
+        if (!mounted) return;
+        setState(() {
+          _tourists = tourists;
+          _loading = false;
+        });
+      },
+      onError: (_) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+        });
+      },
     );
   }
 
-  void _toggleUserStatus(MockUser user) {
-    setState(() {
-      final index = _users.indexOf(user);
-      if (index != -1) {
-        final newStatus = user.status == 'active' ? 'suspended' : 'active';
-        _users[index] = MockUser(
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          type: user.type,
-          activity: user.activity,
-          status: newStatus,
-        );
-      }
-    });
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _search.dispose();
+    super.dispose();
+  }
+
+  List<AdminTourist> get _filtered {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return _tourists;
+    return _tourists.where((u) {
+      return u.name.toLowerCase().contains(q) ||
+          u.email.toLowerCase().contains(q) ||
+          u.phone.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  void _showViewDialog(AdminTourist tourist) {
+    showDialog(
+      context: context,
+      builder: (_) => _ViewUserDialog(tourist: tourist),
+    );
+  }
+
+  Future<void> _toggleUserStatus(AdminTourist tourist) async {
+    final newStatus = tourist.status == 'active' ? 'suspended' : 'active';
+    final ok = await _repository.updateStatus(tourist.uid, newStatus);
+    if (!mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update tourist status.')),
+      );
+    }
   }
 
   @override
@@ -70,8 +89,8 @@ class _UsersViewState extends State<UsersView> {
               children: [
                 Expanded(
                   child: CardSectionHeader(
-                    title: 'Manage Users',
-                    subtitle: 'Search, review, edit and control all users.',
+                    title: 'Manage Tourists',
+                    subtitle: 'Search, review and control all tourist accounts.',
                   ),
                 ),
               ],
@@ -79,7 +98,7 @@ class _UsersViewState extends State<UsersView> {
             const SizedBox(height: 20),
 
             SearchFilterRow(
-              hintText: 'Search users...',
+              hintText: 'Search tourists...',
               controller: _search,
               onChanged: (v) => setState(() => _query = v),
             ),
@@ -102,18 +121,25 @@ class _UsersViewState extends State<UsersView> {
             ),
             const Divider(color: AppColors.divider, height: 1),
 
-            ..._filtered.map(
-              (u) => _UserRow(
-                user: u,
-                onView: () => _showViewDialog(u),
-                onToggleStatus: () => _toggleUserStatus(u),
-              ),
-            ),
-            if (_filtered.isEmpty)
+            if (_loading)
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: Text('No users found.')),
+                padding: EdgeInsets.symmetric(vertical: 32),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else ...[
+              ..._filtered.map(
+                (u) => _UserRow(
+                  tourist: u,
+                  onView: () => _showViewDialog(u),
+                  onToggleStatus: () => _toggleUserStatus(u),
+                ),
               ),
+              if (_filtered.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(child: Text('No tourists found.')),
+                ),
+            ],
           ],
         ),
       ),
@@ -126,24 +152,26 @@ class _UsersViewState extends State<UsersView> {
       label,
       style: AppTextStyles.tableHeader,
       textAlign: end ? TextAlign.end : TextAlign.start,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
     ),
   );
 }
 
 class _UserRow extends StatelessWidget {
-  final MockUser user;
+  final AdminTourist tourist;
   final VoidCallback onView;
   final VoidCallback onToggleStatus;
 
   const _UserRow({
-    required this.user,
+    required this.tourist,
     required this.onView,
     required this.onToggleStatus,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isSuspended = user.status == 'suspended';
+    final isSuspended = tourist.status == 'suspended';
     return Column(
       children: [
         const Divider(color: AppColors.divider, height: 1),
@@ -154,7 +182,7 @@ class _UserRow extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Text(
-                  user.name,
+                  tourist.name,
                   style: AppTextStyles.tableCell,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -163,7 +191,7 @@ class _UserRow extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Text(
-                  user.email,
+                  tourist.email,
                   style: AppTextStyles.tableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -172,7 +200,7 @@ class _UserRow extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Text(
-                  user.phone,
+                  tourist.phone.isNotEmpty ? tourist.phone : '—',
                   style: AppTextStyles.tableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -181,7 +209,7 @@ class _UserRow extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Text(
-                  user.type,
+                  tourist.type,
                   style: AppTextStyles.tableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -190,30 +218,42 @@ class _UserRow extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Text(
-                  user.activity,
+                  tourist.activity,
                   style: AppTextStyles.tableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
               ),
-              Expanded(flex: 2, child: StatusChip(status: user.status)),
+              Expanded(flex: 2, child: StatusChip(status: tourist.status)),
               Expanded(
                 flex: 2,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    OutlineActionButton(label: 'View', onTap: onView),
-                    const SizedBox(width: 6),
-                    isSuspended
-                        ? OutlineActionButton(
-                            label: 'Activate',
-                            onTap: onToggleStatus,
-                          )
-                        : DangerActionButton(
-                            label: 'Suspend',
-                            onTap: onToggleStatus,
-                          ),
-                  ],
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: constraints.maxWidth,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            OutlineActionButton(label: 'View', onTap: onView),
+                            const SizedBox(width: 6),
+                            isSuspended
+                                ? OutlineActionButton(
+                                    label: 'Activate',
+                                    onTap: onToggleStatus,
+                                  )
+                                : DangerActionButton(
+                                    label: 'Suspend',
+                                    onTap: onToggleStatus,
+                                  ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -224,10 +264,10 @@ class _UserRow extends StatelessWidget {
   }
 }
 
-/// View User Details Dialog
+/// View Tourist Details Dialog
 class _ViewUserDialog extends StatelessWidget {
-  final MockUser user;
-  const _ViewUserDialog({required this.user});
+  final AdminTourist tourist;
+  const _ViewUserDialog({required this.tourist});
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +285,7 @@ class _ViewUserDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'User Details',
+                      'Tourist Details',
                       style: AppTextStyles.dialogTitle,
                     ),
                   ),
@@ -270,12 +310,12 @@ class _ViewUserDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              _buildDetailRow('Name:', user.name),
-              _buildDetailRow('Email:', user.email),
-              _buildDetailRow('Phone:', user.phone),
-              _buildDetailRow('Type:', user.type),
-              _buildDetailRow('Activity:', user.activity),
-              _buildDetailRow('Status:', user.status.toUpperCase()),
+              _buildDetailRow('Name:', tourist.name),
+              _buildDetailRow('Email:', tourist.email),
+              _buildDetailRow('Phone:', tourist.phone.isNotEmpty ? tourist.phone : 'Not provided'),
+              _buildDetailRow('Type:', tourist.type),
+              _buildDetailRow('Activity:', tourist.activity),
+              _buildDetailRow('Status:', tourist.status.toUpperCase()),
             ],
           ),
         ),

@@ -1,10 +1,12 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/data/repositories/admin_guides_repository.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
-import '../../../../core/data/mock/dashboard/d_mock_guides.dart';
 import '../../d_home/view/d_home_view.dart';
 
-/// Overview / Dashboard page.
+/// Overview / Dashboard page (all stats and lists stream live from Firestore).
 class OverviewView extends StatefulWidget {
   const OverviewView({super.key});
 
@@ -13,49 +15,186 @@ class OverviewView extends StatefulWidget {
 }
 
 class _OverviewViewState extends State<OverviewView> {
-  late List<MockGuide> _guides;
+  List<AdminGuide> _guides = const [];
+  final AdminGuidesRepository _guidesRepo = AdminGuidesRepository();
+
+  StreamSubscription? _usersSub;
+  StreamSubscription? _guidesSub;
+  StreamSubscription? _tripsSub;
+  StreamSubscription? _bookingsSub;
+  StreamSubscription<List<AdminGuide>>? _guidesListSub;
+
+  int _totalUsersCount = 0;
+  int _tourGuidesCount = 0;
+  int _totalTripsCount = 0;
+  int _totalBookingsCount = 0;
+  double _totalEarnings = 0;
+  int _pendingTripsCount = 0;
+
+  int get _pendingGuidesCount =>
+      _guides.where((g) => g.status == 'pending').length;
+
+  int get _totalPending => _pendingGuidesCount + _pendingTripsCount;
 
   @override
   void initState() {
     super.initState();
-    _guides = List.from(mockGuides);
+    _initKpiStreams();
   }
 
-  void _updateGuideStatus(MockGuide guide, String status) {
+  void _initKpiStreams() {
+    try {
+      // 1. Total Users (real-time from Firestore)
+      _usersSub = FirebaseFirestore.instance
+          .collection('users')
+          .snapshots()
+          .listen((snap) {
+        if (!mounted) return;
+        setState(() {
+          _totalUsersCount = snap.docs.length;
+        });
+      }, onError: (_) {});
+
+      // 2. Tour Guides (users with role 'guide')
+      _guidesSub = FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'guide')
+          .snapshots()
+          .listen((snap) {
+        if (!mounted) return;
+        setState(() {
+          _tourGuidesCount = snap.docs.length;
+        });
+      }, onError: (_) {});
+
+      // 3. Total Trips and Pending Trips
+      _tripsSub = FirebaseFirestore.instance
+          .collection('trips')
+          .snapshots()
+          .listen((snap) {
+        if (!mounted) return;
+        int pending = 0;
+        for (final doc in snap.docs) {
+          final data = doc.data();
+          final status = (data['approvalStatus'] as String?) ??
+              (data['status'] as String?) ??
+              'pending';
+          if (status == 'pending' || status == 'pending_review') pending++;
+        }
+        setState(() {
+          _totalTripsCount = snap.docs.length;
+          _pendingTripsCount = pending;
+        });
+      }, onError: (_) {});
+
+      // 4. Total Bookings and Earnings from database
+      _bookingsSub = FirebaseFirestore.instance
+          .collection('bookings')
+          .snapshots()
+          .listen((snap) {
+        if (!mounted) return;
+        double earnings = 0;
+        for (final doc in snap.docs) {
+          final data = doc.data();
+          final price = (data['totalPrice'] as num?) ??
+              (data['price'] as num?) ??
+              (data['amount'] as num?) ??
+              0;
+          earnings += (price * 0.1); // 10% commission
+        }
+        setState(() {
+          _totalBookingsCount = snap.docs.length;
+          _totalEarnings = earnings;
+        });
+      }, onError: (_) {});
+
+      // 5. Watch Guides from Firestore
+      _guidesListSub = _guidesRepo.watchGuides().listen((guides) {
+        if (!mounted) return;
+        setState(() {
+          _guides = guides;
+        });
+      }, onError: (_) {});
+    } catch (_) {}
+  }
+
+  @override
+  void dispose() {
+    _usersSub?.cancel();
+    _guidesSub?.cancel();
+    _tripsSub?.cancel();
+    _bookingsSub?.cancel();
+    _guidesListSub?.cancel();
+    super.dispose();
+  }
+
+  String _formatNumber(int n) {
+    if (n <= 0) return '0';
+    final s = n.toString();
+    final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+    return s.replaceAllMapped(reg, (Match m) => '${m[1]},');
+  }
+
+  String get _earningsLabel {
+    if (_totalEarnings <= 0) return 'EGP 0';
+    final s = _totalEarnings.toStringAsFixed(0);
+    final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+    return 'EGP ${s.replaceAllMapped(reg, (Match m) => '${m[1]},')}';
+  }
+
+  Future<void> _updateGuideStatus(AdminGuide guide, String status) async {
+    if (guide.uid.isEmpty) return;
+
+    final previousGuides = _guides;
     setState(() {
-      final i = _guides.indexOf(guide);
-      if (i != -1) {
-        _guides[i] = MockGuide(
-          name: guide.name,
-          email: guide.email,
-          document: guide.document,
-          city: guide.city,
-          status: status,
-          phone: guide.phone,
-          submitted: guide.submitted,
-          docFileName: guide.docFileName,
-          uploadedTrips: guide.uploadedTrips,
-        );
-      }
+      _guides = _guides.map((g) {
+        if (g.uid == guide.uid) {
+          return AdminGuide(
+            uid: g.uid,
+            name: g.name,
+            email: g.email,
+            document: g.document,
+            city: g.city,
+            status: status,
+            phone: g.phone,
+            submitted: g.submitted,
+            docFileName: g.docFileName,
+            uploadedTrips: g.uploadedTrips,
+          );
+        }
+        return g;
+      }).toList();
     });
+
+    final ok = await _guidesRepo.decideVerification(
+      guideId: guide.uid,
+      approve: status == 'approved',
+    );
+
+    if (!mounted) return;
+
+    if (!ok) {
+      setState(() {
+        _guides = previousGuides;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update status for ${guide.name}.'),
+          backgroundColor: AppColors.danger,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final pendingGuidesCount = _guides
-        .where((g) => g.status == 'pending')
-        .length;
-    // Trip applications hardcoded to 3 for now, since this view only edits guides
-    final pendingTripsCount = 3;
-    final totalPending = pendingGuidesCount + pendingTripsCount;
-
     return SingleChildScrollView(
       child: AdminCard(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── 6-stat grid ─────────────────────────────
+            // ── 6-stat dynamic KPI grid ─────────────────────────────
             LayoutBuilder(
               builder: (context, constraints) {
                 final w = (constraints.maxWidth - 32) / 3;
@@ -65,49 +204,53 @@ class _OverviewViewState extends State<OverviewView> {
                   children: [
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 1,
-                        value: '12,480',
+                        value: _formatNumber(_totalUsersCount),
                         label: 'Total Users',
-                        badge: '+4.2%',
+                        badge: _totalUsersCount > 0 ? '+$_totalUsersCount' : '0',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 2,
-                        value: '326',
+                        value: _formatNumber(_tourGuidesCount),
                         label: 'Tour Guides',
-                        badge: '+1.8%',
+                        badge: _tourGuidesCount > 0 ? '+$_tourGuidesCount' : '0',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 3,
-                        value: '1,204',
+                        value: _formatNumber(_totalTripsCount),
                         label: 'Total Trips',
-                        badge: '+3.1%',
+                        badge: _totalTripsCount > 0 ? '+$_totalTripsCount' : '0',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 4,
-                        value: '8,930',
+                        value: _formatNumber(_totalBookingsCount),
                         label: 'Total Bookings',
-                        badge: '+6.5%',
+                        badge: _totalBookingsCount > 0 ? '+$_totalBookingsCount' : '0',
                         badgeDanger: false,
+                        badgeIsText: true,
                       ),
                     ),
                     SizedBox(
                       width: w,
-                      child: const _StatCard(
+                      child: _StatCard(
                         index: 5,
-                        value: 'EGP 2,838',
+                        value: _earningsLabel,
                         label: 'Our Earnings',
                         badge: 'from commissions',
                         badgeDanger: false,
@@ -118,10 +261,10 @@ class _OverviewViewState extends State<OverviewView> {
                       width: w,
                       child: _StatCard(
                         index: 6,
-                        value: '$totalPending',
+                        value: '$_totalPending',
                         label: 'Pending Requests',
-                        badge: 'Needs review',
-                        badgeDanger: true,
+                        badge: _totalPending > 0 ? 'Needs review' : 'All clear',
+                        badgeDanger: _totalPending > 0,
                         badgeIsText: true,
                       ),
                     ),
@@ -140,8 +283,8 @@ class _OverviewViewState extends State<OverviewView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _PendingActionsCard(
-                        guidesCount: pendingGuidesCount,
-                        tripsCount: pendingTripsCount,
+                        guidesCount: _pendingGuidesCount,
+                        tripsCount: _pendingTripsCount,
                       ),
                       const SizedBox(height: 16),
                       _GuideApplicationsCard(
@@ -159,8 +302,8 @@ class _OverviewViewState extends State<OverviewView> {
                     SizedBox(
                       width: leftW,
                       child: _PendingActionsCard(
-                        guidesCount: pendingGuidesCount,
-                        tripsCount: pendingTripsCount,
+                        guidesCount: _pendingGuidesCount,
+                        tripsCount: _pendingTripsCount,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -240,7 +383,7 @@ class _StatCard extends StatelessWidget {
                     ? AppTextStyles.statPercentDanger
                     : (badgeIsText
                           ? AppTextStyles.sectionSubtitle.copyWith(
-                              color: AppColors.positiveGreen,
+                              color: badgeDanger ? AppColors.danger : AppColors.positiveGreen,
                             )
                           : AppTextStyles.statPercent),
               ),
@@ -291,14 +434,6 @@ class _PendingActionsCard extends StatelessWidget {
           Row(
             children: [
               Text('Pending Actions', style: AppTextStyles.sectionTitle),
-              const Spacer(),
-              Text(
-                'Manage all',
-                style: AppTextStyles.linkText.copyWith(
-                  color: AppColors.danger,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -359,8 +494,8 @@ class _PendingActionItem extends StatelessWidget {
 
 // ── Guide Applications Card (mini table) ─────────────────────
 class _GuideApplicationsCard extends StatelessWidget {
-  final List<MockGuide> guides;
-  final void Function(MockGuide, String) onUpdateStatus;
+  final List<AdminGuide> guides;
+  final Future<void> Function(AdminGuide, String) onUpdateStatus;
 
   const _GuideApplicationsCard({
     required this.guides,
@@ -417,15 +552,21 @@ class _GuideApplicationsCard extends StatelessWidget {
           const SizedBox(height: 16),
           _MiniGuideTableHeader(),
           const Divider(color: AppColors.divider, height: 1),
-          ...guides.map(
-            (g) => _MiniGuideRow(
-              guide: g,
-              onApprove: () => onUpdateStatus(g, 'approved'),
-              onReject: () => onUpdateStatus(g, 'suspended'),
-              onSuspend: () => onUpdateStatus(g, 'suspended'),
-              onActivate: () => onUpdateStatus(g, 'approved'),
+          if (guides.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: Text('No guide applications found.')),
+            )
+          else
+            ...guides.map(
+              (g) => _MiniGuideRow(
+                guide: g,
+                onApprove: () => onUpdateStatus(g, 'approved'),
+                onReject: () => onUpdateStatus(g, 'suspended'),
+                onSuspend: () => onUpdateStatus(g, 'suspended'),
+                onActivate: () => onUpdateStatus(g, 'approved'),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -470,7 +611,7 @@ class _MiniGuideTableHeader extends StatelessWidget {
 }
 
 class _MiniGuideRow extends StatelessWidget {
-  final MockGuide guide;
+  final AdminGuide guide;
   final VoidCallback onApprove;
   final VoidCallback onReject;
   final VoidCallback onSuspend;
@@ -519,7 +660,7 @@ class _MiniGuideRow extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        guide.document,
+                        guide.document.isNotEmpty ? guide.document : 'National ID',
                         style: AppTextStyles.tableCellMuted,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -533,7 +674,7 @@ class _MiniGuideRow extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Text(
-                  guide.city,
+                  guide.city.isNotEmpty ? guide.city : 'Egypt',
                   style: AppTextStyles.tableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -582,7 +723,7 @@ class _MiniGuideRow extends StatelessWidget {
     );
   }
 
-  Widget _buildActions(MockGuide guide, BuildContext context) {
+  Widget _buildActions(AdminGuide guide, BuildContext context) {
     if (guide.status == 'pending') {
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,

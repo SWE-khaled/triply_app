@@ -333,7 +333,7 @@ class AddNewButton extends StatelessWidget {
   }
 }
 
-/// Search bar + Filter button row used on multiple screens.
+/// Search bar without filter button used on multiple screens.
 class SearchFilterRow extends StatelessWidget {
   final String hintText;
   final TextEditingController? controller;
@@ -350,38 +350,18 @@ class SearchFilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: controller,
-            onChanged: onChanged,
-            style: AppTextStyles.tableCell,
-            decoration: InputDecoration(
-              hintText: hintText,
-              prefixIcon: const Icon(
-                Icons.search,
-                size: 18,
-                color: AppColors.textMuted,
-              ),
-            ),
-          ),
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      style: AppTextStyles.tableCell,
+      decoration: InputDecoration(
+        hintText: hintText,
+        prefixIcon: const Icon(
+          Icons.search,
+          size: 18,
+          color: AppColors.textMuted,
         ),
-        const SizedBox(width: 12),
-        InkWell(
-          onTap: onFilterTap,
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.divider),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text('Filter', style: AppTextStyles.buttonOutline),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
