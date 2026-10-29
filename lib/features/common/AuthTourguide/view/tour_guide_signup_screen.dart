@@ -231,8 +231,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                             controller: _nameController,
                             hintText: 'Your full legal name',
                             icon: Icons.person_outline,
-                            validator: (v) =>
-                                (v == null || v.trim().length < 3)
+                            validator: (v) => (v == null || v.trim().length < 3)
                                 ? 'Enter your full name (min 3 characters)'
                                 : null,
                           ),

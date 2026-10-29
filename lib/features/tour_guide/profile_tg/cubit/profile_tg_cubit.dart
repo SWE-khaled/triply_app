@@ -32,15 +32,18 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
     // dashboard writes, so the screen always agrees with it.
     _verificationSubscription = TourGuideAuthService()
         .watchVerificationSubmission()
-        .listen((data) {
-      // No submission yet: the profile value decides (never hide an
-      // approved badge because the guide has no document).
-      if (data == null) return;
-      _liveVerified = (data['status'] as String?) == 'approved';
-      _refreshVerificationOnly();
-    }, onError: (_) {
-      // Offline or no access: keep the loaded value, never crash.
-    });
+        .listen(
+          (data) {
+            // No submission yet: the profile value decides (never hide an
+            // approved badge because the guide has no document).
+            if (data == null) return;
+            _liveVerified = (data['status'] as String?) == 'approved';
+            _refreshVerificationOnly();
+          },
+          onError: (_) {
+            // Offline or no access: keep the loaded value, never crash.
+          },
+        );
   }
 
   /// Subscription to the guide's live verification status.
@@ -105,7 +108,7 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
   /// Reads phone/about/location from Firestore. Safe to call repeatedly;
   /// failures leave the previous values in place.
   Future<void> loadRemoteProfile() async {
-    if (state is ProfileTgInitial) safeEmit(const ProfileTgLoading());
+    safeEmit(const ProfileTgLoading());
     try {
       final service = TourGuideAuthService();
       final profile = await service.fetchMyProfile();

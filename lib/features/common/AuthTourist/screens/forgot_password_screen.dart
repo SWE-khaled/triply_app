@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_step_icon.dart';
@@ -82,7 +82,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const SizedBox(height: 28),
                   AuthButton(
                     label: 'Send ',
-                    backgroundColor: AuthColors.signInDark,
+                    backgroundColor: AppColors.signInDark,
                     isLoading: authCubit.isLoading,
                     onPressed: () => _handleSendCode(authCubit),
                   ),
@@ -92,14 +92,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       children: [
                         const Text(
                           'Remember it? ',
-                          style: TextStyle(color: AuthColors.textGrey),
+                          style: TextStyle(color: AppColors.textGrey),
                         ),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
                           child: const Text(
                             'Sign in',
                             style: TextStyle(
-                              color: AuthColors.signInDark,
+                              color: AppColors.signInDark,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

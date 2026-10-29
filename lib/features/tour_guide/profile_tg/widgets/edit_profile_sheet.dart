@@ -7,10 +7,12 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/constants/app_colors.dart';
+import 'package:triply/core/constants/egypt_cities.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/widgets/profile_avatar.dart';
 import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../../common/AuthTourist/cubit/auth_cubit.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;
@@ -39,9 +41,9 @@ class EditProfileSheet extends StatefulWidget {
 class _EditProfileSheetState extends State<EditProfileSheet> {
   late final TextEditingController _nameController;
   late final TextEditingController _aboutController;
-  late final TextEditingController _locationController;
   late final TextEditingController _phoneController;
   late final TextEditingController _priceController;
+  String? _selectedLocation;
   File? _pickedImage;
   bool _loading = false;
 
@@ -50,8 +52,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     super.initState();
     _nameController = TextEditingController(text: widget.name);
     _aboutController = TextEditingController(text: widget.about);
-    _locationController = TextEditingController(text: widget.location);
     _phoneController = TextEditingController(text: widget.phone);
+    _selectedLocation =
+        EgyptCities.profileEgyptLocations.contains(widget.location)
+        ? widget.location
+        : null;
     _priceController = TextEditingController(
       text: widget.pricePerHour > 0
           ? widget.pricePerHour.toStringAsFixed(0)
@@ -63,7 +68,6 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   void dispose() {
     _nameController.dispose();
     _aboutController.dispose();
-    _locationController.dispose();
     _phoneController.dispose();
     _priceController.dispose();
     super.dispose();
@@ -141,8 +145,9 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
       await TourGuideAuthService().updateProfileFields(
         name: newName,
         about: _aboutController.text.trim(),
-        location: _locationController.text.trim(),
+        location: _selectedLocation ?? '',
         phone: _phoneController.text.trim(),
+        photoUrl: newPhotoUrl,
         pricePerHour: double.tryParse(_priceController.text.trim()) ?? 0,
       );
       // Persist the name and avatar on the Firestore users document so
@@ -242,12 +247,30 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               ),
             ),
             const SizedBox(height: 12),
-            TextField(
-              controller: _locationController,
-              decoration: const InputDecoration(
-                labelText: 'Location',
-                border: OutlineInputBorder(),
+            DropdownSearch<String>(
+              items: (filter, infiniteScrollProps) =>
+                  EgyptCities.profileEgyptLocations,
+              selectedItem: _selectedLocation,
+              enabled: !_loading,
+              popupProps: const PopupProps.menu(
+                showSearchBox: true,
+                fit: FlexFit.loose,
+                constraints: BoxConstraints(maxHeight: 300),
+                searchFieldProps: TextFieldProps(
+                  decoration: InputDecoration(
+                    hintText: 'Search city...',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
+              decoratorProps: const DropDownDecoratorProps(
+                decoration: InputDecoration(
+                  labelText: 'Location',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              onChanged: (value) => setState(() => _selectedLocation = value),
             ),
             const SizedBox(height: 12),
             TextField(

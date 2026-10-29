@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
-import '../constants/auth_colors.dart';
+import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/auth_text_field.dart';
 
@@ -43,8 +44,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   void _onFieldChanged() => setState(() {});
 
   /// الزرار يبقى Disabled (رمادي) لحد ما كل الحقول تتملي
-  bool get _isFormFilled =>
-      _controllers.every((c) => c.text.trim().isNotEmpty);
+  bool get _isFormFilled => _controllers.every((c) => c.text.trim().isNotEmpty);
 
   @override
   void dispose() {
@@ -274,7 +274,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         child: Text(
                           '🇪🇬 +20',
                           style: TextStyle(
-                            color: AuthColors.textDark,
+                            color: AppColors.textDark,
                             fontSize: 15,
                           ),
                         ),

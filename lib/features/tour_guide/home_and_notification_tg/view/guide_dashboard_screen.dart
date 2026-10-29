@@ -104,10 +104,22 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
   void initState() {
     super.initState();
     _notificationsStream = _notifications.watchNotifications();
-    _nameSubscription = TourGuideAuthService().watchMyName().listen((name) {
-      if (!mounted) return;
-      setState(() => _firestoreName = name);
-    });
+    _nameSubscription = TourGuideAuthService().watchMyName().listen(
+      (name) {
+        if (!mounted) return;
+        setState(() => _firestoreName = name);
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'guide dashboard',
+            context: ErrorDescription('while watching the guide profile name'),
+          ),
+        );
+      },
+    );
   }
 
   @override

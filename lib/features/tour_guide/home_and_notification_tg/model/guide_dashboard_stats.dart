@@ -5,6 +5,7 @@ class GuideDashboardStats {
   final int upcomingTrips;
   final int activeTrips;
   final int completedTrips;
+  final int rejectedTrips;
   final String earningsLabel;
   final int pendingRequests;
 
@@ -15,6 +16,7 @@ class GuideDashboardStats {
     required this.upcomingTrips,
     required this.activeTrips,
     required this.completedTrips,
+    required this.rejectedTrips,
     required this.earningsLabel,
     required this.pendingRequests,
   });
@@ -27,6 +29,7 @@ class GuideDashboardStats {
       upcomingTrips: (json['upcoming_trips'] as num? ?? 0).toInt(),
       activeTrips: (json['active_trips'] as num? ?? 0).toInt(),
       completedTrips: (json['completed_trips'] as num? ?? 0).toInt(),
+      rejectedTrips: (json['rejected_trips'] as num? ?? 0).toInt(),
       earningsLabel: json['earnings_label'] as String? ?? '',
       pendingRequests: (json['pending_requests'] as num? ?? 0).toInt(),
     );
@@ -39,6 +42,7 @@ class GuideDashboardStats {
       'total_bookings': totalBookings,
       'upcoming_trips': upcomingTrips,
       'completed_trips': completedTrips,
+      'rejected_trips': rejectedTrips,
       'active_trips': activeTrips,
       'earnings_label': earningsLabel,
       'pending_requests': pendingRequests,

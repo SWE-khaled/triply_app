@@ -18,6 +18,9 @@ class TourGuideProfile {
   final String about;
   final String location;
 
+  /// The guide's profile photo — shown on the public guide card seen by tourists.
+  final String photoUrl;
+
   /// The guide's hourly rate in EGP — what a private booking costs.
   final double pricePerHour;
 
@@ -32,6 +35,7 @@ class TourGuideProfile {
     this.isApproved = false,
     this.about = '',
     this.location = '',
+    this.photoUrl = '',
     this.pricePerHour = 0,
   });
 
@@ -64,6 +68,7 @@ class TourGuideProfile {
       isApproved: _isApproved(map),
       about: (map['about'] as String?) ?? '',
       location: (map['location'] as String?) ?? '',
+      photoUrl: (map['photoUrl'] as String?) ?? '',
       pricePerHour: (map['pricePerHour'] as num?)?.toDouble() ?? 0,
     );
   }
@@ -77,7 +82,8 @@ class TourGuideProfile {
     if (map['isApproved'] == true) return true;
     final verification = map['verification'];
     if (verification is Map) {
-      if (verification['reviewStatus'] == 'approved' || verification['status'] == 'approved') {
+      if (verification['reviewStatus'] == 'approved' ||
+          verification['status'] == 'approved') {
         return true;
       }
     }
@@ -131,6 +137,7 @@ class TourGuideAuthService {
       phone: phone,
       licenseNumber: licenseNumber,
       languages: languages,
+      photoUrl: _auth.currentUser?.photoURL ?? '',
       pricePerHour: pricePerHour,
     );
 
@@ -142,7 +149,7 @@ class TourGuideAuthService {
       'guideId': uid,
       'name': name,
       'specialty': '',
-      'avatarUrl': '',
+      'avatarUrl': profile.photoUrl,
       'coverUrl': '',
       'location': '',
       'about': '',
@@ -186,6 +193,9 @@ class TourGuideAuthService {
           'about': profile.about,
           'languages': profile.languages,
           'pricePerHour': profile.pricePerHour,
+          'avatarUrl': profile.photoUrl.isNotEmpty
+              ? profile.photoUrl
+              : (_auth.currentUser?.photoURL ?? ''),
         }, SetOptions(merge: true));
         return;
       }
@@ -193,7 +203,7 @@ class TourGuideAuthService {
         'guideId': uid,
         'name': profile.name,
         'specialty': '',
-        'avatarUrl': '',
+        'avatarUrl': profile.photoUrl,
         'coverUrl': '',
         'location': profile.location,
         'about': profile.about,
@@ -296,8 +306,20 @@ class TourGuideAuthService {
       yield '';
       return;
     }
-    await for (final snapshot in _db.collection('users').doc(uid).snapshots()) {
-      yield (((snapshot.data()?['name'] as String?) ?? '')).trim();
+    try {
+      await for (final snapshot
+          in _db.collection('users').doc(uid).snapshots()) {
+        yield (((snapshot.data()?['name'] as String?) ?? '')).trim();
+      }
+    } on FirebaseException catch (error) {
+      // Signing out revokes access before the dashboard route has finished
+      // disposing its listener. Ignore only that expected shutdown race.
+      if (error.code == 'permission-denied' &&
+          _auth.currentUser?.uid != uid) {
+        yield '';
+        return;
+      }
+      rethrow;
     }
   }
 
@@ -308,6 +330,7 @@ class TourGuideAuthService {
     String? about,
     String? location,
     String? phone,
+    String? photoUrl,
     double? pricePerHour,
   }) async {
     final uid = _auth.currentUser?.uid;
@@ -319,6 +342,7 @@ class TourGuideAuthService {
       'about': ?about,
       'location': ?location,
       'phone': ?phone,
+      'photoUrl': ?photoUrl,
       'pricePerHour': ?pricePerHour,
     };
     if (data.isEmpty) return;
@@ -341,7 +365,9 @@ class TourGuideAuthService {
       // Check users/{uid} as well so approval is permanently honored
       final userDoc = await _db.collection('users').doc(uid).get();
       final userData = userDoc.data();
-      if (userData != null && (userData['isApproved'] == true || userData['status'] == 'approved')) {
+      if (userData != null &&
+          (userData['isApproved'] == true ||
+              userData['status'] == 'approved')) {
         return true;
       }
       return false;
@@ -370,7 +396,8 @@ class TourGuideAuthService {
         final userDoc = await _db.collection('users').doc(uid).get();
         final userData = userDoc.data();
         yield userData != null &&
-            (userData['isApproved'] == true || userData['status'] == 'approved');
+            (userData['isApproved'] == true ||
+                userData['status'] == 'approved');
       }
     }
   }
@@ -397,7 +424,8 @@ class TourGuideAuthService {
         final userDoc = await _db.collection('users').doc(uid).get();
         final userData = userDoc.data();
         if (userData != null &&
-            (userData['isApproved'] == true || userData['status'] == 'approved')) {
+            (userData['isApproved'] == true ||
+                userData['status'] == 'approved')) {
           final merged = Map<String, dynamic>.of(data ?? {});
           merged['status'] = 'approved';
           yield merged;

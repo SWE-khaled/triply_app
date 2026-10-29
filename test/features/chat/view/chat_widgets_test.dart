@@ -124,8 +124,21 @@ void main() {
       );
       expect(find.text('Omar Guide'), findsOneWidget);
       expect(find.text('Welcome to Cairo'), findsOneWidget);
-      expect(find.text('Unread (2)'), findsOneWidget);
-      expect(find.text('2'), findsOneWidget);
+      expect(find.text('Unread'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('chat-filter-unread')),
+          matching: find.text('2'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(ValueKey<String>('chat-tile-${_chat().id}')),
+          matching: find.text('2'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('guide list keeps its four tabs and unread badge', (

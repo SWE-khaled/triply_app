@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -17,9 +18,27 @@ class RoleMismatchException implements Exception {
 }
 
 /// Talks to Firebase directly. No UI logic here.
+/// A cross-role sign-in attempt: the account belongs to the other app.
+///
+/// Thrown when the signed-in account is recorded in Firestore as a
+/// `guide` — the session is signed out immediately so nothing of it
+/// survives. `AuthCubit` shows [message] through `getErrorMessage`.
+
+/// Talks to Firebase directly. No UI logic here.
+
+/// A cross-role sign-in attempt: the account belongs to the other app.
+///
+/// Thrown when the signed-in account is recorded in Firestore as a
+/// `guide` — the session is signed out immediately so nothing of it
+/// survives. `AuthCubit` shows [message] through `getErrorMessage`.
+
+/// Talks to Firebase directly. No UI logic here.
 class AuthRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  /// How long a profile read may take before it is given up.
+  static const Duration _readTimeout = Duration(seconds: 4);
 
   User? get currentUser => _firebaseAuth.currentUser;
 
@@ -36,25 +55,30 @@ class AuthRepository {
       password: password,
     );
     await credential.user?.updateDisplayName(fullName);
-    // Best-effort user profile save (never fails sign-up when offline
-    // or when Firestore rules/connection are unavailable).
-    try {
-      final uid = credential.user?.uid;
-      if (uid != null) {
-        await FirebaseFirestore.instance.collection('users').doc(uid).set({
-          'fullName': fullName,
-          'displayName': fullName,
-          'email': email,
-          // The rules read the role with a dot-access, so the field has
-          // to be there — without it the whole document is refused and
-          // the profile never exists.
-          'role': 'tourist',
-          'avatarUrl': '',
-          if (phone != null && phone.isNotEmpty) 'phone': phone,
-          'createdAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
-      }
-    } catch (_) {}
+    // Best-effort user profile save, in the background: sign-up never
+    // waits for Firestore and never fails when it is offline or the
+    // rules/connection are unavailable.
+    final uid = credential.user?.uid;
+    if (uid != null) {
+      unawaited(
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .set({
+              'fullName': fullName,
+              'displayName': fullName,
+              'email': email,
+              // The rules read the role with a dot-access, so the field
+              // has to be there — without it the whole document is
+              // refused and the profile never exists.
+              'role': 'tourist',
+              'avatarUrl': '',
+              if (phone != null && phone.isNotEmpty) 'phone': phone,
+              'createdAt': FieldValue.serverTimestamp(),
+            }, SetOptions(merge: true))
+            .catchError((_) {}),
+      );
+    }
     return credential;
   }
 
@@ -64,7 +88,8 @@ class AuthRepository {
       final doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .get();
+          .get()
+          .timeout(_readTimeout);
       final phone = doc.data()?['phone'];
       if (phone is String && phone.trim().isNotEmpty) return phone.trim();
     } catch (_) {}
@@ -131,7 +156,30 @@ class AuthRepository {
     );
     final result = await _firebaseAuth.signInWithCredential(credential);
     await _ensureTouristRole(result.user?.uid);
+    // In the background: the sign-in never waits for the profile save.
+    unawaited(_saveGoogleProfile(result.user));
     return result;
+  }
+
+  /// Best-effort: keeps the tourist's Google name and photo on
+  /// `users/{uid}` so the guide's booking card can show them. Never
+  /// fails the sign-in.
+  Future<void> _saveGoogleProfile(User? user) async {
+    final uid = user?.uid;
+    if (uid == null) return;
+    try {
+      final ref = FirebaseFirestore.instance.collection('users').doc(uid);
+      final exists = (await ref.get().timeout(_readTimeout)).exists;
+      await ref.set({
+        'fullName': user?.displayName ?? '',
+        'email': user?.email ?? '',
+        'photoUrl': user?.photoURL ?? '',
+        // Only for a brand-new document; an existing role is never
+        // touched.
+        if (!exists) 'role': 'tourist',
+        if (!exists) 'createdAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (_) {}
   }
 
   /// Blocks every non-tourist account out of the tourist app.
@@ -162,10 +210,12 @@ class AuthRepository {
       final doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .get();
+          .get()
+          .timeout(_readTimeout);
       return doc.data()?['role'] as String?;
     } catch (_) {
-      // Offline or rules refused the read: cannot tell, treat as tourist.
+      // Offline, slow or rules refused the read: cannot tell, treat as
+      // tourist.
       return null;
     }
   }

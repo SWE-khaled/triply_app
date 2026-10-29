@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
+import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
@@ -37,6 +37,69 @@ class _ProfileTourGuideView extends StatelessWidget {
 
   static const int bottomIndex = 3; // Profile
 
+  /// Shows while the guide's profile is being read from Firestore —
+  /// prevents the flash of empty data (0 reviews, empty About…) before
+  /// the real values arrive.
+  Widget _buildLoadingView(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 12),
+              Text(
+                'Loading profile…',
+                style: TextStyle(fontSize: 14, color: AppColors.subtitle),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Error view shown when the profile read fails — with a retry button.
+  Widget _buildErrorView(BuildContext context, String error) {
+    return SafeArea(
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.accentOrange,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Failed to load profile',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.title,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: TextStyle(fontSize: 13, color: AppColors.subtitle),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () =>
+                  context.read<ProfileTgCubit>().loadRemoteProfile(),
+              child: const Text('Try again'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _confirmLogout(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -60,7 +123,7 @@ class _ProfileTourGuideView extends StatelessWidget {
     );
     if (confirmed != true || !context.mounted) return;
     try {
-      await TourGuideAuthService().signOut();
+      await context.read<AuthCubit>().signOut();
       if (!context.mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
@@ -97,57 +160,64 @@ class _ProfileTourGuideView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: BlocBuilder<ProfileTgCubit, ProfileTgState>(
-          builder: (context, state) {
-            final cubit = context.read<ProfileTgCubit>();
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  ProfileHeader(
-                    displayName: cubit.displayName,
-                    displayAvatar: cubit.displayAvatar,
-                    displayLocation: cubit.displayLocation,
-                    displayPhone: cubit.displayPhone,
-                    isVerified: cubit.isVerified,
-                    specialty: cubit.specialty,
-                    rating: cubit.rating,
-                    reviewCount: cubit.reviewCount,
-                    onEdit: () => _editName(context),
-                  ),
-                  const SizedBox(height: 30),
-                  ProfileStatsCard(
-                    reviews: cubit.reviewCount.toString(),
-                    languages: cubit.languages.length.toString(),
-                    price: cubit.pricePerHourLabel,
-                  ),
-                  ProfileMenuSection(
-                    languages: cubit.languages,
-                    about: cubit.displayAbout,
-                    onAvailability: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const GuideAvailabilityScreen(),
-                      ),
+      body: BlocBuilder<ProfileTgCubit, ProfileTgState>(
+        builder: (context, state) {
+          // While the profile is loading (initial or refresh) show a
+          // loading view instead of empty data.
+          if (state is ProfileTgLoading || state is ProfileTgInitial) {
+            return _buildLoadingView(context);
+          }
+          if (state is ProfileTgError) {
+            return _buildErrorView(context, state.error);
+          }
+          // state is ProfileTgSuccess
+          final cubit = context.read<ProfileTgCubit>();
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                ProfileHeader(
+                  displayName: cubit.displayName,
+                  displayAvatar: cubit.displayAvatar,
+                  displayLocation: cubit.displayLocation,
+                  displayPhone: cubit.displayPhone,
+                  isVerified: cubit.isVerified,
+                  specialty: cubit.specialty,
+                  rating: cubit.rating,
+                  reviewCount: cubit.reviewCount,
+                  onEdit: () => _editName(context),
+                ),
+                const SizedBox(height: 30),
+                ProfileStatsCard(
+                  reviews: cubit.reviewCount.toString(),
+                  languages: cubit.languages.length.toString(),
+                  price: cubit.pricePerHourLabel,
+                ),
+                ProfileMenuSection(
+                  languages: cubit.languages,
+                  about: cubit.displayAbout,
+                  onAvailability: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const GuideAvailabilityScreen(),
                     ),
-                    onNotifications: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const GuideNotificationsScreen(),
-                      ),
-                    ),
-                    onEarnings: () =>
-                        Navigator.of(context).push(AppRoutes.earnings()),
-                    onSettings: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const GuideSettingsScreen(),
-                      ),
-                    ),
-                    onLogout: () => _confirmLogout(context),
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                  onNotifications: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const GuideNotificationsScreen(),
+                    ),
+                  ),
+                  onEarnings: () =>
+                      Navigator.of(context).push(AppRoutes.earnings()),
+                  onSettings: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const GuideSettingsScreen(),
+                    ),
+                  ),
+                  onLogout: () => _confirmLogout(context),
+                ),
+              ],
+            ),
+          );
+        },
       ),
       bottomNavigationBar: ChatUnreadBuilder(
         builder: (context, unread) => GuideBottomNav(

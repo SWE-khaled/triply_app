@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pay_with_paymob/pay_with_paymob.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/data/trip_details_source.dart';
+import '../../checkout/view/payment_view.dart';
 import '../../trip_details/model/trip_details.dart';
 import '../../trips/models/trip.dart';
 import '../cubit/booking_public_cubit.dart';
@@ -82,9 +82,7 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
     if (bookingId == null) {
       messenger.showSnackBar(
         const SnackBar(
-          content: Text(
-            'This trip just filled up. Please pick another one.',
-          ),
+          content: Text('This trip just filled up. Please pick another one.'),
         ),
       );
       return;

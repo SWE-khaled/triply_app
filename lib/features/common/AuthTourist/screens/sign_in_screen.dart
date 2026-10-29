@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../constants/auth_colors.dart';
+import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_text_field.dart';
@@ -122,12 +122,7 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              assetPath,
-              width: 24,
-              height: 24,
-              fit: BoxFit.contain,
-            ),
+            Image.asset(assetPath, width: 24, height: 24, fit: BoxFit.contain),
             const SizedBox(width: 10),
             Text(
               label,

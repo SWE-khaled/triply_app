@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/features/tourist/checkout/view/payment_view.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../cubit/booking_cubit.dart';
 import '../cubit/booking_state.dart';
 import 'package:triply/features/tourist/booking/widgets/booking_widgets.dart';
-import 'package:pay_with_paymob/pay_with_paymob.dart';
-
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/data/repositories/booking_repository.dart';
 
@@ -836,13 +835,7 @@ class _BookingScreenState extends State<BookingScreen> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
-    _createPrivateThenPay(
-      guideId,
-      guideName,
-      guideImage,
-      navigator,
-      messenger,
-    );
+    _createPrivateThenPay(guideId, guideName, guideImage, navigator, messenger);
   }
 
   Future<void> _createPrivateThenPay(

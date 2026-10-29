@@ -71,6 +71,12 @@ class BookingRepository {
   /// Reserves the seats inside a transaction and tells the guide about
   /// it. Throws a [BookingException] when the trip is full, not approved
   /// or gone.
+  String _avatarFor(Map<String, dynamic>? guest) {
+    final saved = guest?['photoUrl'];
+    if (saved is String && saved.trim().isNotEmpty) return saved.trim();
+    return _firebaseAuth.currentUser?.photoURL ?? '';
+  }
+
   Future<BookingReceipt> createPublicBooking({
     required String tripId,
     required int seats,
@@ -143,7 +149,7 @@ class BookingRepository {
         'country': '',
         'traveler_count': seats,
         'seats': seats,
-        'avatar_url': guest?['photoUrl'] ?? '',
+        'avatar_url': _avatarFor(guest),
         'is_private': false,
         'unitPrice': unitPrice,
         'serviceFee': serviceFee,
@@ -254,7 +260,10 @@ class BookingRepository {
       'country': '',
       'traveler_count': travelers,
       'seats': travelers,
-      'avatar_url': guest?['photoUrl'] ?? '',
+      'avatar_url':
+          guest?['photoUrl'] ??
+          FirebaseAuth.instance.currentUser?.photoURL ??
+          '',
       'is_private': true,
       'totalPrice': totalPrice,
       'price_label': 'EGP ${totalPrice.toStringAsFixed(0)}',

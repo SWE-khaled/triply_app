@@ -106,10 +106,11 @@ class GuideDashboardRepository {
       yield _mockMetrics();
       return;
     }
-    await for (final _ in _firestore
-        .collection(bookingsCollection)
-        .where('guideId', isEqualTo: uid)
-        .snapshots()) {
+    await for (final _
+        in _firestore
+            .collection(bookingsCollection)
+            .where('guideId', isEqualTo: uid)
+            .snapshots()) {
       yield await fetchMetrics();
     }
   }
@@ -130,6 +131,7 @@ class GuideDashboardRepository {
           count(GuideTripStatus.active) + count(GuideTripStatus.pending),
       activeTrips: count(GuideTripStatus.active),
       completedTrips: count(GuideTripStatus.completed),
+      rejectedTrips: count(GuideTripStatus.rejected),
       earningsLabel: _formatAmount(metrics.totalEarnings),
       pendingRequests: count(GuideTripStatus.pending),
     );
