@@ -1,51 +1,90 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/mock/tourist/mock_places.dart';
 import '../model/place.dart';
 import 'map_state.dart';
 
 class MapCubit extends Cubit<MapState> {
-  final List<Place> allPlaces;
-
-  MapCubit()
-    // Current: local mock. Future: Google Places API response -> Place.fromJson.
-    : allPlaces = mockPlaces.map((e) => Place.fromJson(e)).toList(),
-      super(const MapState(visiblePlaces: [])) {
-    _applyFilters();
+  MapCubit() : super(const MapInitial()) {
+    _loadFromFirestore();
   }
 
-  String get searchQuery => state.searchQuery;
-  MapFilter get selectedFilter => state.selectedFilter;
-  List<Place> get visiblePlaces => state.visiblePlaces;
-  Place? get selectedPlace => state.selectedPlace;
+  /// Firestore copy once loaded; the const mock stays as the base and
+  /// the offline fallback.
+  List<Place> _allPlaces = mockPlaces.map((e) => Place.fromJson(e)).toList();
+  String _searchQuery = '';
+  MapFilter _selectedFilter = MapFilter.all;
+  Place? _selectedPlace;
+
+  /// Camera focus in the view reads this.
+  Place? get selectedPlace => _selectedPlace;
+
+  /// Manual re-entry after [MapErrorState].
+  void retry() => _loadFromFirestore();
+
+  Future<void> _loadFromFirestore() async {
+    emit(const MapLoadingState());
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('places')
+          .get();
+      final remote = snapshot.docs
+          .map((doc) => Place.fromJson(doc.data()))
+          .toList();
+      if (isClosed) return;
+      // A fresh/empty Firestore project keeps the local mock as base.
+      if (remote.isNotEmpty) _allPlaces = remote;
+      _emitFiltered();
+    } catch (e) {
+      debugPrint('MapCubit: Firestore load failed → mock fallback: $e');
+      if (isClosed) return;
+      // Offline / rules error: the const mock rescues the map, so the
+      // error state is reserved for "nothing to show at all" — that one
+      // offers [retry] from the view.
+      if (_allPlaces.isEmpty) {
+        emit(
+          const MapErrorState(
+            'Could not load places. Check your connection and try again.',
+          ),
+        );
+      } else {
+        _emitFiltered();
+      }
+    }
+  }
 
   void setSearchQuery(String query) {
-    emit(state.copyWith(searchQuery: query));
-    _applyFilters();
+    _searchQuery = query;
+    _emitFiltered();
   }
 
   void submitSearch(String query) {
-    emit(state.copyWith(searchQuery: query));
-    _applyFilters();
+    _searchQuery = query;
+    _emitFiltered();
   }
 
   void selectFilter(MapFilter filter) {
-    emit(state.copyWith(selectedFilter: filter));
-    _applyFilters();
+    _selectedFilter = filter;
+    _emitFiltered();
   }
 
   void selectPlace(Place place) {
-    emit(state.copyWith(selectedPlace: place));
+    _selectedPlace = place;
+    _emitFiltered();
   }
 
   void clearSearch() {
-    emit(state.copyWith(searchQuery: ''));
-    _applyFilters();
+    _searchQuery = '';
+    _emitFiltered();
   }
 
-  void _applyFilters() {
-    final q = state.searchQuery.trim().toLowerCase();
-    final visible = allPlaces.where((p) {
-      final matchesFilter = state.selectedFilter.matches(p);
+  /// Recomputes the visible list from the plain fields and emits a fresh
+  /// [MapSuccessState] (no copyWith — whole-state style).
+  void _emitFiltered() {
+    final q = _searchQuery.trim().toLowerCase();
+    final visible = _allPlaces.where((p) {
+      final matchesFilter = _selectedFilter.matches(p);
       final matchesQuery =
           q.isEmpty ||
           p.name.toLowerCase().contains(q) ||
@@ -54,21 +93,19 @@ class MapCubit extends Cubit<MapState> {
       return matchesFilter && matchesQuery;
     }).toList();
 
-    Place? selected;
     if (visible.isEmpty) {
-      selected = null;
-    } else if (state.selectedPlace == null ||
-        !visible.any((p) => p.id == state.selectedPlace!.id)) {
-      selected = visible.first;
-    } else {
-      selected = state.selectedPlace;
+      _selectedPlace = null;
+    } else if (_selectedPlace == null ||
+        !visible.any((p) => p.id == _selectedPlace!.id)) {
+      _selectedPlace = visible.first;
     }
+
     emit(
-      MapState(
-        searchQuery: state.searchQuery,
-        selectedFilter: state.selectedFilter,
+      MapSuccessState(
+        searchQuery: _searchQuery,
+        selectedFilter: _selectedFilter,
         visiblePlaces: visible,
-        selectedPlace: selected,
+        selectedPlace: _selectedPlace,
       ),
     );
   }
