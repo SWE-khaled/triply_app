@@ -71,6 +71,15 @@ class AuthRepository {
     return null;
   }
 
+  /// Saved Tourist profile fields for the signed-in user's Firestore document.
+  Future<Map<String, dynamic>?> getUserProfile(String uid) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    return doc.data();
+  }
+
   /// Phone of a registered guide matched by display name (same name
   /// matching the trip screens already use), or null when no registered
   /// guide with a saved phone exists. Never invents a number.

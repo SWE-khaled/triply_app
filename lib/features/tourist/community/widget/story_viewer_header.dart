@@ -5,7 +5,7 @@ import '../../../../core/constants/app_colors.dart';
 /// Header extracted from `story_viewer_view.dart:289`.
 class StoryViewerHeader extends StatelessWidget {
   final String userName;
-  final String imageUrl;
+  final String avatarUrl;
   final bool isMine;
   final VoidCallback onDelete;
   final VoidCallback onClose;
@@ -13,23 +13,35 @@ class StoryViewerHeader extends StatelessWidget {
   const StoryViewerHeader({
     super.key,
     required this.userName,
-    required this.imageUrl,
+    required this.avatarUrl,
     required this.isMine,
     required this.onDelete,
     required this.onClose,
   });
 
+  static ImageProvider? _avatarImage(String value) {
+    final url = value.trim();
+    final uri = Uri.tryParse(url);
+    if (uri == null ||
+        (uri.scheme != 'https' && uri.scheme != 'http') ||
+        uri.host.isEmpty) {
+      return null;
+    }
+    return NetworkImage(url);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final avatar = _avatarImage(avatarUrl);
+
     return Row(
       children: [
         CircleAvatar(
           radius: 16,
           backgroundColor: AppColors.chipGrey,
-          backgroundImage: isMine ? null : NetworkImage(imageUrl),
-          child: isMine
-              ? const Icon(Icons.person, size: 18, color: AppColors.textGrey)
-              : null,
+          foregroundImage: avatar,
+          onForegroundImageError: avatar == null ? null : (_, _) {},
+          child: const Icon(Icons.person, size: 18, color: AppColors.textGrey),
         ),
         const SizedBox(width: 8),
         Expanded(

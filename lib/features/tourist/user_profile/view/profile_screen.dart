@@ -1,273 +1,250 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/tourist/user_profile/widget/edit_profile_sheet.dart';
-import 'package:triply/features/tourist/community/view/community_view.dart';
-import 'package:triply/features/tourist/home/view/home_screen.dart';
-import 'package:triply/features/tourist/map/view/map_view.dart';
 import '../../../../core/constants/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../../../core/widgets/profile_avatar.dart';
 import '../../../common/AuthTourist/cubit/auth_cubit.dart';
 import '../../../common/AuthTourist/data/auth_repository.dart';
-import '../../../tour_guide/role_selection/view/role_selection_screen.dart';
+import '../../community/view/community_view.dart';
+import '../../home/view/home_screen.dart';
+import '../../map/view/map_view.dart';
+import '../../../tourist/community/data/community_posts_repository.dart';
+import '../../../tourist/community/model/community_post.dart';
+import '../../../tourist/community/widget/post_images.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
-import '../widget/account_option_tile.dart';
-import '../widget/profile_header.dart';
+import '../widget/edit_profile_sheet.dart';
+import 'my_posts_screen.dart';
+import 'settings_screen.dart';
+
+const _ink = Color(0xFF263A40);
+const _teal = Color(0xFF0E5865);
+const _muted = Color(0xFF62777D);
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ProfileCubit(),
-      child: const _ProfileBody(),
-    );
-  }
+  Widget build(BuildContext context) => BlocProvider(
+    create: (context) {
+      final uid =
+          context.read<AuthCubit>().user?.uid ??
+          AuthRepository().currentUser?.uid;
+      return ProfileCubit(userId: uid);
+    },
+    child: const _ProfileBody(),
+  );
 }
 
-class _ProfileBody extends StatelessWidget {
+class _ProfileBody extends StatefulWidget {
   const _ProfileBody();
+  @override
+  State<_ProfileBody> createState() => _ProfileBodyState();
+}
+
+class _ProfileBodyState extends State<_ProfileBody> {
+  late final Stream<List<CommunityPost>> _posts =
+      FirestoreCommunityPostsRepository().watchMyPosts();
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<ProfileCubit>();
-    final firebaseUser = context.watch<AuthCubit>().user;
-    final name = (firebaseUser?.displayName?.trim().isNotEmpty ?? false)
-        ? firebaseUser!.displayName!.trim()
-        : 'Traveler';
-    final email = (firebaseUser?.email?.trim().isNotEmpty ?? false)
-        ? firebaseUser!.email!.trim()
-        : 'No email linked';
-    final photoUrl = firebaseUser?.photoURL;
-    final phoneFuture = firebaseUser == null
-        ? Future<String?>.value()
-        : AuthRepository().getUserPhone(firebaseUser.uid);
-
-    return BlocBuilder<ProfileCubit, ProfileState>(
-      builder: (context, _) {
+    final user = context.watch<AuthCubit>().user;
+    return BlocConsumer<ProfileCubit, ProfileState>(
+      listenWhen: (a, b) => a.profileError != b.profileError,
+      listener: (context, state) {
+        if (state.profileError != null) _message(state.profileError!);
+      },
+      builder: (context, state) {
+        final cubit = context.read<ProfileCubit>();
+        final name = state.profileName?.trim().isNotEmpty == true
+            ? state.profileName!
+            : (user?.displayName?.trim().isNotEmpty == true
+                  ? user!.displayName!
+                  : 'Traveler');
+        final photo = state.profilePhotoUrl?.trim().isNotEmpty == true
+            ? state.profilePhotoUrl
+            : user?.photoURL;
+        final location = [state.city, state.country]
+            .whereType<String>()
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .join(', ');
+        final bio = state.bio?.trim() ?? '';
         return Scaffold(
           extendBody: true,
-          backgroundColor: const Color.fromARGB(255, 252, 248, 241),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      ProfileHeader(
-                        name: name,
-                        photoUrl: photoUrl,
-                        onEdit: () => showModalBottomSheet<bool>(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(20),
-                            ),
-                          ),
-                          builder: (_) => EditProfileSheet(
-                            name: firebaseUser?.displayName ?? '',
-                            photoUrl: photoUrl,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 13),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: AppColors.cardShadow,
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        _stat('${controller.stats['trips'] ?? 0}', 'Trips'),
-                        _stat('${controller.stats['places'] ?? 0}', 'Places'),
-                        _stat('${controller.stats['photos'] ?? 0}', 'Photos'),
-                        _stat(
-                          '${controller.stats['reviews'] ?? 0}',
-                          'Reviews',
-                          last: true,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'Account',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.guidesName,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    children: [
-                      AccountOptionTile(
-                        icon: Icons.notifications_outlined,
-                        title: 'Notifications',
-                        switchValue: controller.state.notificationsEnabled,
-                        onSwitchChanged: controller.toggleNotifications,
-                      ),
-                      AccountOptionTile(
-                        icon: Icons.language_outlined,
-                        title: 'Language',
-                        trailingText: controller.state.selectedLanguage,
-                        onTap: () => _showLanguageSheet(context, controller),
-                      ),
-                      AccountOptionTile(
-                        icon: Icons.shield_outlined,
-                        title: 'Privacy & security',
-                        onTap: () => Navigator.of(
-                          context,
-                        ).pushNamed(AppRoutes.privacySecurity),
-                      ),
-                      AccountOptionTile(
-                        icon: Icons.sos_outlined,
-                        title: 'SOS / Emergency',
-                        onTap: () => Navigator.of(
-                          context,
-                        ).pushNamed(AppRoutes.emergency),
-                      ),
-                      AccountOptionTile(
-                        icon: Icons.help_outline,
-                        title: 'Help & support',
-                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Help & support is not available yet',
-                            ),
-                          ),
-                        ),
-                      ),
-                      AccountOptionTile(
-                        icon: Icons.info_outline,
-                        title: 'About Triply',
-                        showDivider: false,
-                        onTap: () => showDialog<void>(
-                          context: context,
-                          builder: (dialogContext) => AlertDialog(
-                            title: const Text('About Triply'),
-                            content: const Text(
-                              'Triply\nExplore. Experience. Egypt.\nVersion 1.0.0',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(dialogContext).pop(),
-                                child: const Text('Close'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Center(
-                  child: TextButton.icon(
-                    onPressed: () => _confirmLogout(context),
-                    icon: const Icon(
-                      Icons.logout_outlined,
-                      color: AppColors.accentOrange,
-                    ),
-                    label: const Text(
-                      'Log out',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.accentOrange,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Center(
-                  child: Text(
-                    'Triply',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textGrey,
-                    ),
-                  ),
-                ),
-                const Center(
-                  child: Text(
-                    'Explore. Experience. Egypt.',
-                    style: TextStyle(fontSize: 13, color: AppColors.textGrey),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Center(
-                    child: Text(
-                      email,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textGrey,
-                      ),
-                    ),
-                  ),
-                ),
-                FutureBuilder<String?>(
-                  future: phoneFuture,
-                  builder: (context, snapshot) {
-                    final phone = snapshot.data;
-                    if (phone == null || phone.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                        top: 4,
-                        left: 16,
-                        right: 16,
-                      ),
-                      child: Center(
-                        child: Text(
-                          phone,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textGrey,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-              ],
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              onPressed: () {
+                if (Navigator.canPop(context)) Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                size: 19,
+                color: _teal,
+              ),
             ),
+            title: const Text(
+              'My profile',
+              style: TextStyle(fontWeight: FontWeight.w700, color: _ink),
+            ),
+            actions: [
+              IconButton(
+                tooltip: 'Edit profile',
+                onPressed: () => _edit(context, state, name, photo),
+                icon: const Icon(Icons.edit_outlined, color: _teal),
+              ),
+              IconButton(
+                tooltip: 'Settings',
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: cubit,
+                      child: const SettingsScreen(),
+                    ),
+                  ),
+                ),
+                icon: const Icon(Icons.settings_outlined, color: _teal),
+              ),
+              const SizedBox(width: 4),
+            ],
+          ),
+          body: StreamBuilder<List<CommunityPost>>(
+            stream: _posts,
+            builder: (context, postsSnapshot) {
+              final posts = postsSnapshot.data ?? const <CommunityPost>[];
+              final mine = user == null
+                  ? <CommunityPost>[]
+                  : posts
+                        .where(
+                          (post) =>
+                              post.authorId.isNotEmpty &&
+                              post.authorId == user.uid,
+                        )
+                        .toList();
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                children: [
+                  Row(
+                    children: [
+                      ClipOval(child: ProfileAvatar(imageUrl: photo, size: 66)),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: _ink,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              location.isEmpty
+                                  ? 'Location not added'
+                                  : location,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: _muted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _stats(
+                    cubit.stats,
+                    postCount: postsSnapshot.hasData && !postsSnapshot.hasError
+                        ? mine.length
+                        : null,
+                  ),
+                  const SizedBox(height: 18),
+                  const Text(
+                    'Bio',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: _ink,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    state.isLoadingProfile
+                        ? 'Loading bio…'
+                        : bio.isEmpty
+                        ? 'No bio added yet.'
+                        : bio,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: _muted,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Published posts',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: _ink,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MyPostsScreen(),
+                          ),
+                        ),
+                        child: const Row(
+                          children: [
+                            Text(
+                              'View all',
+                              style: TextStyle(color: _teal, fontSize: 12),
+                            ),
+                            SizedBox(width: 5),
+                            Icon(Icons.arrow_forward, color: _teal, size: 16),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (postsSnapshot.hasError)
+                    _info('Could not load published posts.')
+                  else if (!postsSnapshot.hasData)
+                    const Padding(
+                      padding: EdgeInsets.all(22),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  else if (mine.isEmpty)
+                    _info('You have no published posts yet.')
+                  else
+                    ProfilePostCard(
+                      post: mine.first,
+                      compact: true,
+                      authorAvatarUrl: photo ?? '',
+                      onDelete: null,
+                      onShare: () => shareProfilePost(context, mine.first),
+                    ),
+                ],
+              );
+            },
           ),
           bottomNavigationBar: AppBottomNav(
             currentIndex: 4,
@@ -275,20 +252,20 @@ class _ProfileBody extends StatelessWidget {
               if (index == 0) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: ((context) => HomeScreen())),
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
                 );
               } else if (index == 1) {
                 Navigator.of(context).push(AppRoutes.myTrips());
               } else if (index == 2) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: ((context) => MapScreen())),
+                  MaterialPageRoute(builder: (_) => MapScreen()),
                 );
               } else if (index == 3) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: ((context) => CommunityScreen())),
-                ); //community
+                  MaterialPageRoute(builder: (_) => const CommunityScreen()),
+                );
               }
             },
           ),
@@ -297,117 +274,275 @@ class _ProfileBody extends StatelessWidget {
     );
   }
 
-  Widget _stat(String value, String label, {bool last = false}) {
-    return Expanded(
-      child: Container(
-        decoration: last
-            ? null
-            : const BoxDecoration(
-                border: Border(right: BorderSide(color: Color(0xFFEEEEEE))),
-              ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.guidesName,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 13, color: AppColors.textGrey),
-            ),
-          ],
+  Future<void> _edit(
+    BuildContext context,
+    ProfileState state,
+    String name,
+    String? photo,
+  ) async {
+    final profileCubit = context.read<ProfileCubit>();
+    final userId = context.read<AuthCubit>().user?.uid;
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditProfileSheet(
+          name: name,
+          photoUrl: photo,
+          city: state.city ?? '',
+          country: state.country ?? '',
+          bio: state.bio ?? '',
         ),
       ),
     );
+    if (saved == true && mounted) {
+      if (userId != null) profileCubit.loadUserProfile(userId);
+    }
   }
 
-  void _showLanguageSheet(BuildContext context, ProfileCubit controller) {
-    showModalBottomSheet<void>(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  Widget _stats(Map<String, int> stats, {required int? postCount}) => Container(
+    padding: const EdgeInsets.symmetric(vertical: 14),
+    decoration: BoxDecoration(
+      color: const Color(0xFFFAF9F6),
+      borderRadius: BorderRadius.circular(16),
+    ),
+    child: Row(
+      children: [
+        for (final entry in [
+          ('Trips', MyBookingsPublic.count),
+          ('Places', stats['places'] ?? 0),
+          ('Posts', postCount),
+          ('Reviews', stats['reviews'] ?? 0),
+        ])
+          Expanded(
+            child: Column(
+              children: [
+                Text(
+                  entry.$2 == null ? '—' : '${entry.$2}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: _ink,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  entry.$1,
+                  style: const TextStyle(fontSize: 10, color: _muted),
+                ),
+              ],
+            ),
+          ),
+      ],
+    ),
+  );
+  Widget _info(String text) => Container(
+    padding: const EdgeInsets.all(28),
+    decoration: BoxDecoration(
+      border: Border.all(color: const Color(0xFFE5EAEB)),
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Center(
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: _muted, fontSize: 13),
       ),
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
+    ),
+  );
+  void _message(String text) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+}
+
+class ProfilePostCard extends StatelessWidget {
+  const ProfilePostCard({
+    super.key,
+    required this.post,
+    required this.compact,
+    this.authorAvatarUrl,
+    required this.onDelete,
+    required this.onShare,
+  });
+  final CommunityPost post;
+  final bool compact;
+  final String? authorAvatarUrl;
+  final VoidCallback? onDelete;
+  final VoidCallback onShare;
+  @override
+  Widget build(BuildContext context) {
+    final lines = post.text.split('\n');
+    final title = lines.first.trim();
+    final description = lines.skip(1).join('\n').trim();
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFE5EAEB)),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (post.imageUrls.isNotEmpty)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                height: compact ? 120 : 170,
+                width: double.infinity,
+                child: PostImages(post: post),
+              ),
+            )
+          else
+            Container(
+              height: compact ? 120 : 150,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F6F2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: Icon(Icons.image_outlined, color: _teal),
+              ),
+            ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              ClipOval(
+                child: ProfileAvatar(
+                  imageUrl: authorAvatarUrl ?? post.authorAvatarUrl,
+                  size: 36,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      post.authorName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                        color: _ink,
+                      ),
+                    ),
+                    Text(
+                      post.createdAt == null
+                          ? 'Published post'
+                          : 'Published ${_date(post.createdAt!)} · Public',
+                      style: const TextStyle(fontSize: 10, color: _muted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (title.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
               child: Text(
-                'Language',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.guidesName,
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: _ink,
                 ),
               ),
             ),
-            RadioGroup<String>(
-              groupValue: controller.state.selectedLanguage,
-              onChanged: (value) {
-                if (value == null) return;
-                controller.setLanguage(value);
-                Navigator.of(sheetContext).pop();
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (final language in controller.languages)
-                    RadioListTile<String>(
-                      title: Text(language),
-                      value: language,
-                      activeColor: AppColors.guidesName,
-                    ),
-                ],
+          if (description.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: Text(
+                description,
+                maxLines: compact ? 3 : 4,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  height: 1.5,
+                  color: _muted,
+                ),
               ),
             ),
-            const SizedBox(height: 12),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _confirmLogout(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Log out'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
-              'Logout',
-              style: TextStyle(color: AppColors.accentOrange),
-            ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Icon(Icons.favorite_border, size: 20, color: _teal),
+              const SizedBox(width: 4),
+              Text(
+                '${post.likesCount}',
+                style: const TextStyle(fontSize: 11, color: _muted),
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: onShare,
+                icon: const Icon(Icons.share_outlined, size: 16, color: _teal),
+                label: const Text(
+                  'Share',
+                  style: TextStyle(fontSize: 11, color: _muted),
+                ),
+              ),
+              if (onDelete != null && compact)
+                TextButton(
+                  onPressed: onDelete,
+                  child: const Text(
+                    'Delete',
+                    style: TextStyle(color: Color(0xFFC33B25), fontSize: 11),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
     );
-    if (confirmed != true || !context.mounted) return;
-    try {
-      await context.read<AuthCubit>().signOut();
-      if (!context.mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
-        (_) => false,
-      );
-    } catch (e) {
-      if (!context.mounted) return;
+  }
+
+  static String _date(DateTime date) =>
+      '${date.day} ${_months[date.month - 1]} ${date.year}';
+  static const _months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+}
+
+Future<void> shareProfilePost(BuildContext context, CommunityPost post) async {
+  await Clipboard.setData(
+    ClipboardData(text: '${post.text}\n${post.location}'.trim()),
+  );
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Post details copied to clipboard.')),
+    );
+  }
+}
+
+Future<void> deleteCommunityPost(
+  BuildContext context,
+  CommunityPost post,
+) async {
+  if (!await ConfirmDeleteDialog.show(context)) {
+    return;
+  }
+  try {
+    await FirestoreCommunityPostsRepository().deletePost(post);
+    if (context.mounted) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Logout failed: $e')));
+      ).showSnackBar(const SnackBar(content: Text('Post deleted.')));
+    }
+  } catch (error) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 }

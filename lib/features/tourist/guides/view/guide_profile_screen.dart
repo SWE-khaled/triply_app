@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/constants/app_routes.dart';
-import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/tourist/guides/cubit/guide_profile_cubit.dart';
 
 import 'package:triply/features/tourist/guides/model/trip.dart' as guide_trip;
@@ -43,16 +42,27 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0.0,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+        ),
+        title: const Text(
+          'Guide profile',
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+        ),
+      ),
       body: BlocProvider.value(
         value: _controller,
         child: BlocBuilder<GuideProfileCubit, GuideProfileState>(
           builder: (context, _) {
-            final guide = _controller.guide;
             final trips = _controller.trips;
             return CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(child: _buildCover(guide.coverUrl)),
-                // SliverToBoxAdapter(child: _buildIdentity()),
+                SliverToBoxAdapter(child: _buildIdentity()),
                 SliverToBoxAdapter(child: _buildStats()),
                 SliverToBoxAdapter(child: _buildLanguages()),
                 SliverToBoxAdapter(child: _buildAbout()),
@@ -67,178 +77,99 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  Widget _buildCover(String coverUrl) {
-    return SizedBox(
-      height: 320,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned.fill(
-            child: ColorFiltered(
-              colorFilter: ColorFilter.mode(
-                Color(
-                  0xFF0E5261,
-                ).withValues(alpha: 0.3), // Adjust color and opacity
-                BlendMode.srcATop, // Or BlendMode.darken / BlendMode.multiply
-              ),
-              child: Image.network(
-                coverUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                  color: Color(0xFF3E5A5E),
-                  alignment: Alignment.center,
-                  child: Icon(Icons.landscape, color: Colors.white54, size: 48),
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Container(color: Colors.black.withValues(alpha: 0.15)),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            left: 16,
-            child: CircleBackButton(
-              icon: Icons.chevron_left,
-              iconColor: Colors.white,
-              backgroundColor: Colors.white.withValues(alpha: 0.4),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-          // Positioned(
-          //   top: MediaQuery.of(context).padding.top + 8,
-          //   right: 16,
-          //   child: ListenableBuilder(
-          //     listenable: _controller,
-          //     builder: (context, _) => _CircleIconButton(
-          //       icon: _controller.isBookmarked
-          //           ? Icons.bookmark
-          //           : Icons.bookmark_border,
-          //       onPressed: () {
-          //         _controller.toggleBookmark();
-          //         AppSnackBar.showAdded(
-          //           context: context,
-          //           isAdded: _controller.isBookmarked,
-          //         );
-          //       },
-          //     ),
-          //   ),
-          // ),
-          Positioned(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: .center,
-                mainAxisSize: .min,
-                crossAxisAlignment: .center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: ClipOval(
-                      child: Image.network(
-                        _controller.guide.avatarUrl,
-                        width: 85,
-                        height: 85,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Container(
-                          width: 84,
-                          height: 84,
-                          color: AppColors.primaryLight,
-                          alignment: Alignment.center,
-                          child: Text(
-                            _controller.guide.name.isNotEmpty
-                                ? _controller.guide.name[0]
-                                : '?',
-                            style: const TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  _buildIdentity(),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 24, // ارتفاع الانحناء فوق الصورة
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildIdentity() {
     final guide = _controller.guide;
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 13, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(
-                child: Text(
-                  guide.name,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+              ClipOval(
+                child: Image.network(
+                  guide.avatarUrl,
+                  width: 66,
+                  height: 66,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    width: 66,
+                    height: 66,
+                    color: AppColors.primaryLight,
+                    alignment: Alignment.center,
+                    child: Text(
+                      guide.name.isNotEmpty ? guide.name[0] : '?',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              if (guide.isVerified) ...[
-                SizedBox(width: 4),
-                Icon(Icons.verified, size: 16, color: Color(0xFF4DA7A0)),
-              ],
-            ],
-          ),
-          SizedBox(height: 2),
-          Text(
-            guide.specialty,
-            style: TextStyle(fontSize: 13, color: Colors.white),
-          ),
-          SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              RatingRow(
-                rating: guide.rating,
-                reviewCount: guide.reviewCount,
-                ratingColor: Colors.white,
-                reviewCountColor: Colors.white.withValues(alpha: .8),
-              ),
-              if (guide.location.isNotEmpty) ...[
-                SizedBox(width: 8),
-                Icon(Icons.location_on, size: 14, color: Color(0xFFD8B66A)),
-                SizedBox(width: 2),
-                Flexible(
-                  child: Text(
-                    guide.location,
-                    style: const TextStyle(fontSize: 13, color: Colors.white),
-                  ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            guide.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF263A40),
+                            ),
+                          ),
+                        ),
+                        if (guide.isVerified) ...[
+                          const SizedBox(width: 5),
+                          const Icon(
+                            Icons.verified,
+                            size: 17,
+                            color: Color(0xFF4DA7A0),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      guide.specialty,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF526B72),
+                      ),
+                    ),
+                    if (guide.location.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        guide.location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF71868B),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-              ],
+              ),
             ],
+          ),
+          const SizedBox(height: 14),
+          RatingRow(
+            rating: guide.rating,
+            reviewCount: guide.reviewCount,
+            ratingColor: const Color(0xFF263A40),
+            reviewCountColor: const Color(0xFF71868B),
           ),
         ],
       ),

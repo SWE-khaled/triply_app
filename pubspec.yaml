@@ -26,6 +26,7 @@ dependencies:
 
   # State management & networking
   flutter_bloc: ^9.1.1
+  http: ^1.6.0
 
   # Utilities
   flutter_dotenv: ^6.0.1
