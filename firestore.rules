@@ -162,6 +162,98 @@ service cloud.firestore {
         && !exists(/databases/$(database)/documents/appSettings/_bootstrap);
       allow update, delete: if false;
     }
+        // ── community posts ───────────────────────────────────────────────
+        match /communityPosts/{postId} {
+          allow read: if isSignedIn();
+
+          allow create: if isSignedIn()
+            && request.resource.data.authorId == request.auth.uid
+            && request.resource.data.authorName is string
+            && request.resource.data.authorAvatarUrl is string
+            && request.resource.data.location is string
+            && request.resource.data.imageUrls is list
+            && request.resource.data.storagePaths == []
+            && request.resource.data.text is string
+            && request.resource.data.likesCount == 0
+            && request.resource.data.commentsCount == 0
+            && request.resource.data.createdAt == request.time
+            && request.resource.data.keys().hasOnly([
+              'authorId',
+              'authorName',
+              'authorAvatarUrl',
+              'location',
+              'imageUrls',
+              'storagePaths',
+              'text',
+              'likesCount',
+              'commentsCount',
+              'createdAt'
+            ]);
+
+
+            allow update: if isSignedIn()
+              && request.resource.data.diff(resource.data)
+                   .affectedKeys()
+                   .hasOnly(['likesCount', 'likedBy'])
+              && request.resource.data.likesCount is int
+              && request.resource.data.likesCount >= 0
+              && request.resource.data.get('likedBy', {}) is map
+              && request.resource.data.get('likedBy', {})
+                   .diff(resource.data.get('likedBy', {}))
+                   .affectedKeys()
+                   .hasOnly([request.auth.uid])
+              && request.resource.data.likesCount
+                   == resource.data.likesCount
+                   + (
+                     request.resource.data.get('likedBy', {})
+                         .keys().hasAny([request.auth.uid])
+                     ? (
+                         resource.data.get('likedBy', {})
+                             .keys().hasAny([request.auth.uid])
+                         ? 0 : 1
+                       )
+                     : (
+                         resource.data.get('likedBy', {})
+                             .keys().hasAny([request.auth.uid])
+                         ? -1 : 0
+                       )
+                   );
+
+
+          allow delete: if isOwner(resource.data.authorId);
+        }
+
+
+match /communityStories/{storyId} {
+  allow read: if isSignedIn();
+
+  allow create: if isSignedIn()
+    && request.resource.data.authorId == request.auth.uid
+    && request.resource.data.authorName is string
+    && request.resource.data.authorName.size() > 0
+    && request.resource.data.authorAvatarUrl is string
+    && request.resource.data.imageUrl is string
+    && request.resource.data.imageUrl.matches(
+         '^https://res[.]cloudinary[.]com/.+$')
+    && request.resource.data.createdAt == request.time
+    && request.resource.data.expiresAt is timestamp
+    && request.resource.data.expiresAt > request.time
+    && request.resource.data.expiresAt
+         <= request.time + duration.value(90000, 's')
+    && request.resource.data.keys().hasOnly([
+         'authorId',
+         'authorName',
+         'authorAvatarUrl',
+         'imageUrl',
+         'createdAt',
+         'expiresAt'
+       ]);
+
+  allow update: if false;
+
+  allow delete: if isOwner(resource.data.authorId);
+}
+
 
     // ── trips ───────────────────────────────────────────────────────────
     // A trip belongs to the guide that published it.

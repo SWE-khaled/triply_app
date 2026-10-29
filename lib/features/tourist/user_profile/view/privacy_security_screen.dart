@@ -10,7 +10,7 @@ class PrivacySecurityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.inputFill,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -30,7 +30,7 @@ class PrivacySecurityScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey.withOpacity(.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -49,7 +49,7 @@ class PrivacySecurityScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.grey.withOpacity(.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Column(
@@ -61,20 +61,6 @@ class PrivacySecurityScreen extends StatelessWidget {
                       showDivider: false,
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'Your account is secured with Firebase Authentication. '
-                  'Trip and preference data on this device is local mock data only '
-                  'and is not uploaded to any server.',
-                  style: TextStyle(fontSize: 13, color: AppColors.textGrey),
                 ),
               ),
             ],

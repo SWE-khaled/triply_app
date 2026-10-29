@@ -32,7 +32,7 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUser = context.watch<AuthCubit>().user;
     final avatarUrl = post.isMine
-        ? (currentUser?.photoURL ?? post.authorAvatarUrl)
+        ? (currentUser?.photoURL ?? '')
         : post.authorAvatarUrl;
     final hasAvatar = avatarUrl.isNotEmpty;
 
