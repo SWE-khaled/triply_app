@@ -17,6 +17,7 @@ class GuidesView extends StatefulWidget {
 class _GuidesViewState extends State<GuidesView> {
   final AdminGuidesRepository _repository = AdminGuidesRepository();
 
+  final Set<String> _approvedGuideIdentifiers = {};
   List<AdminGuide> _guides = const [];
   bool _loading = true;
   StreamSubscription<List<AdminGuide>>? _guidesSubscription;
@@ -27,7 +28,25 @@ class _GuidesViewState extends State<GuidesView> {
     _guidesSubscription = _repository.watchGuides().listen((guides) {
       if (!mounted) return;
       setState(() {
-        _guides = guides;
+        _guides = guides.map((g) {
+          final isMarkedApproved = _approvedGuideIdentifiers.contains(g.uid) ||
+              (g.email.isNotEmpty && _approvedGuideIdentifiers.contains(g.email));
+          if (isMarkedApproved) {
+            return AdminGuide(
+              uid: g.uid,
+              name: g.name,
+              email: g.email,
+              phone: g.phone,
+              city: g.city,
+              document: g.document,
+              status: 'approved',
+              submitted: g.submitted,
+              docFileName: g.docFileName,
+              uploadedTrips: g.uploadedTrips,
+            );
+          }
+          return g;
+        }).toList();
         _loading = false;
       });
     });
@@ -49,6 +68,33 @@ class _GuidesViewState extends State<GuidesView> {
 
   /// Approves the guide's documents and writes the decision back.
   Future<void> _approve(AdminGuide guide) async {
+    if (guide.uid.isNotEmpty) _approvedGuideIdentifiers.add(guide.uid);
+    if (guide.email.isNotEmpty) _approvedGuideIdentifiers.add(guide.email);
+
+    setState(() {
+      final i = _guides.indexWhere((g) => g.uid == guide.uid);
+      if (i != -1) {
+        _guides = [
+          for (int idx = 0; idx < _guides.length; idx++)
+            if (idx == i)
+              AdminGuide(
+                uid: _guides[i].uid,
+                name: _guides[i].name,
+                email: _guides[i].email,
+                phone: _guides[i].phone,
+                city: _guides[i].city,
+                document: _guides[i].document,
+                status: 'approved',
+                submitted: _guides[i].submitted,
+                docFileName: _guides[i].docFileName,
+                uploadedTrips: _guides[i].uploadedTrips,
+              )
+            else
+              _guides[idx],
+        ];
+      }
+    });
+
     final ok = await _repository.decideVerification(
       guideId: guide.uid,
       approve: true,

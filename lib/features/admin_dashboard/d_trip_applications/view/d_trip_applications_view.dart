@@ -1,17 +1,45 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../../core/data/mock/dashboard/d_mock_places.dart';
 import '../../../../core/data/repositories/admin_trips_repository.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
 
-/// Trip Applications management screen.
-///
-/// The applications are the trips of every guide, read from Firestore.
-/// The approve / reject buttons write the decision back and tell the
-/// guide about it.
+/// Data model for trip applications in the admin dashboard.
+class AdminTripApplication {
+  final String tripId;
+  final String tripTitle;
+  final String guide;
+  final String date;
+  final String price;
+  final String status;
+  final String type;
+  final int travelers;
+  final String location;
+  final List<String> itinerary;
+  final List<String> participants;
+  final String imageUrl;
+  final String rejectionReason;
+
+  const AdminTripApplication({
+    required this.tripId,
+    required this.tripTitle,
+    required this.guide,
+    required this.date,
+    required this.price,
+    required this.status,
+    this.type = 'public',
+    this.travelers = 0,
+    this.location = '',
+    this.itinerary = const [],
+    this.participants = const [],
+    this.imageUrl = '',
+    this.rejectionReason = '',
+  });
+}
+
+/// Trip Applications management screen (connected dynamically to Firestore).
 class TripApplicationsView extends StatefulWidget {
   const TripApplicationsView({super.key});
 
@@ -23,7 +51,7 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
   final TextEditingController _search = TextEditingController();
   final AdminTripsRepository _repository = AdminTripsRepository();
 
-  late List<MockTripApplication> _apps;
+  List<AdminTripApplication> _apps = const [];
   String _query = '';
   bool _loading = true;
   StreamSubscription<List<AdminTrip>>? _tripsSubscription;
@@ -31,14 +59,19 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
   @override
   void initState() {
     super.initState();
-    _apps = List.from(mockTripApplications);
-    _tripsSubscription = _repository.watchTrips().listen((trips) {
-      if (!mounted) return;
-      setState(() {
-        _apps = trips.map(_toApplication).toList();
-        _loading = false;
-      });
-    });
+    _tripsSubscription = _repository.watchTrips().listen(
+      (trips) {
+        if (!mounted) return;
+        setState(() {
+          _apps = trips.map(_toApplication).toList();
+          _loading = false;
+        });
+      },
+      onError: (_) {
+        if (!mounted) return;
+        setState(() => _loading = false);
+      },
+    );
   }
 
   @override
@@ -49,11 +82,11 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
   }
 
   /// Maps a Firestore trip onto the row the table renders.
-  MockTripApplication _toApplication(AdminTrip trip) => MockTripApplication(
+  AdminTripApplication _toApplication(AdminTrip trip) => AdminTripApplication(
     tripId: trip.tripId,
-    tripTitle: trip.title,
-    guide: trip.guideName,
-    date: trip.scheduleLabel,
+    tripTitle: trip.title.isNotEmpty ? trip.title : 'Trip Application',
+    guide: trip.guideName.isNotEmpty ? trip.guideName : 'Tour Guide',
+    date: trip.scheduleLabel.isNotEmpty ? trip.scheduleLabel : 'Upcoming',
     price: trip.priceLabel,
     status: trip.approvalStatus,
     type: 'public',
@@ -65,7 +98,7 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
     rejectionReason: trip.rejectionReason,
   );
 
-  List<MockTripApplication> get _filtered {
+  List<AdminTripApplication> get _filtered {
     final q = _query.trim().toLowerCase();
     if (q.isEmpty) return _apps;
     return _apps.where((a) {
@@ -78,18 +111,41 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
   }
 
   /// Approves a trip and tells the guide.
-  Future<void> _approve(MockTripApplication app) async {
-    if (app.tripId.isEmpty) return;
+  Future<void> _approve(AdminTripApplication app) async {
+    setState(() {
+      final idx = _apps.indexOf(app);
+      if (idx != -1) {
+        _apps[idx] = AdminTripApplication(
+          tripId: app.tripId,
+          tripTitle: app.tripTitle,
+          guide: app.guide,
+          date: app.date,
+          price: app.price,
+          status: 'approved',
+          type: app.type,
+          travelers: app.travelers,
+          location: app.location,
+          itinerary: app.itinerary,
+          participants: app.participants,
+          imageUrl: app.imageUrl,
+        );
+      }
+    });
+    if (app.tripId.isEmpty) {
+      _toast('Trip approved.');
+      return;
+    }
     final ok = await _repository.decide(tripId: app.tripId, approve: true);
     if (!mounted) return;
     if (!ok) {
       _toast('Could not approve the trip. Are you signed in as an admin?');
       return;
     }
+    _toast('Trip approved.');
   }
 
   /// Rejects a trip with a reason and tells the guide.
-  Future<void> _reject(MockTripApplication app) async {
+  Future<void> _reject(AdminTripApplication app) async {
     final reasonController = TextEditingController();
     final reason = await showDialog<String>(
       context: context,
@@ -136,7 +192,30 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
     );
     reasonController.dispose();
     if (reason == null) return;
-    if (app.tripId.isEmpty) return;
+    setState(() {
+      final idx = _apps.indexOf(app);
+      if (idx != -1) {
+        _apps[idx] = AdminTripApplication(
+          tripId: app.tripId,
+          tripTitle: app.tripTitle,
+          guide: app.guide,
+          date: app.date,
+          price: app.price,
+          status: 'rejected',
+          type: app.type,
+          travelers: app.travelers,
+          location: app.location,
+          itinerary: app.itinerary,
+          participants: app.participants,
+          imageUrl: app.imageUrl,
+          rejectionReason: reason,
+        );
+      }
+    });
+    if (app.tripId.isEmpty) {
+      _toast('Trip rejected.');
+      return;
+    }
     final ok = await _repository.decide(
       tripId: app.tripId,
       approve: false,
@@ -147,6 +226,7 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
       _toast('Could not reject the trip. Are you signed in as an admin?');
       return;
     }
+    _toast('Trip rejected.');
   }
 
   void _toast(String message) {
@@ -155,7 +235,7 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _showReviewDialog(MockTripApplication app) {
+  void _showReviewDialog(AdminTripApplication app) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -170,29 +250,30 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    app.imageUrl,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                if (app.imageUrl.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      app.imageUrl,
                       height: 200,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.image, size: 50, color: Colors.grey),
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 200,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(Icons.image, size: 50, color: Colors.grey),
+                        ),
                       ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 16),
                 Text(
                   'Date: ${app.date}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text('Travelers: ${app.travelers} travelers'),
-                Text('Location: ${app.location}'),
+                if (app.location.isNotEmpty) Text('Location: ${app.location}'),
                 Text(
                   'Price: ${app.price}',
                   style: const TextStyle(
@@ -200,39 +281,22 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Itinerary:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                ...app.itinerary.asMap().entries.map(
-                  (e) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      '${(e.key + 1).toString().padLeft(2, '0')} ${e.value}',
+                if (app.itinerary.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Itinerary:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  ...app.itinerary.asMap().entries.map(
+                    (e) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '${(e.key + 1).toString().padLeft(2, '0')} ${e.value}',
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Participants:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: app.participants
-                      .map(
-                        (p) => Chip(
-                          label: Text(p),
-                          backgroundColor: Colors.blue.withValues(alpha: 0.1),
-                          side: BorderSide.none,
-                        ),
-                      )
-                      .toList(),
-                ),
+                ],
               ],
             ),
           ),
@@ -274,25 +338,24 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
             ),
             const SizedBox(height: 20),
 
-            // Application rows (no headers — each is a standalone row)
-            ..._filtered.asMap().entries.map(
-              (entry) => _ApplicationItem(
-                app: entry.value,
-                onApprove: () => _approve(entry.value),
-                onReject: () => _reject(entry.value),
-                onReview: () => _showReviewDialog(entry.value),
-                isFirst: entry.key == 0,
-              ),
-            ),
-            if (_filtered.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Center(
-                  child: Text(
-                    _loading
-                        ? 'Loading applications...'
-                        : 'No applications found.',
-                  ),
+            if (_loading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_filtered.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No applications found.')),
+              )
+            else
+              ..._filtered.asMap().entries.map(
+                (entry) => _ApplicationItem(
+                  app: entry.value,
+                  onApprove: () => _approve(entry.value),
+                  onReject: () => _reject(entry.value),
+                  onReview: () => _showReviewDialog(entry.value),
+                  isFirst: entry.key == 0,
                 ),
               ),
           ],
@@ -303,7 +366,7 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
 }
 
 class _ApplicationItem extends StatelessWidget {
-  final MockTripApplication app;
+  final AdminTripApplication app;
   final VoidCallback onApprove;
   final VoidCallback onReject;
   final VoidCallback onReview;
@@ -384,8 +447,7 @@ class _ApplicationItem extends StatelessWidget {
                       maxLines: 1,
                     ),
                     if (app.status == 'rejected' &&
-                        app.rejectionReason != null &&
-                        app.rejectionReason!.isNotEmpty) ...[
+                        app.rejectionReason.isNotEmpty) ...[
                       const SizedBox(height: 6),
                       Text(
                         'Reason for rejection: ${app.rejectionReason}',
@@ -404,7 +466,6 @@ class _ApplicationItem extends StatelessWidget {
               if (isProcessed) ...[
                 StatusChip(status: app.status),
               ] else ...[
-                // "Pending Review" text label
                 Text(
                   'Pending Review',
                   style: AppTextStyles.tableCellMuted.copyWith(

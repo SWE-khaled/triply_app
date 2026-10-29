@@ -70,11 +70,14 @@ class TourGuideProfile {
   /// writes the decision there. The `isApproved` flag is only a fallback
   /// for accounts that were approved before the map existed.
   static bool _isApproved(Map<String, dynamic> map) {
+    if (map['isApproved'] == true) return true;
     final verification = map['verification'];
     if (verification is Map) {
-      return verification['reviewStatus'] == 'approved';
+      if (verification['reviewStatus'] == 'approved' || verification['status'] == 'approved') {
+        return true;
+      }
     }
-    return map['isApproved'] as bool? ?? false;
+    return (map['status'] as String?) == 'approved';
   }
 }
 
@@ -319,8 +322,15 @@ class TourGuideAuthService {
     try {
       final doc = await _db.collection('guideVerifications').doc(uid).get();
       final data = doc.data();
-      if (data == null) return false;
-      return data['status'] == 'approved';
+      if (data != null && data['status'] == 'approved') return true;
+
+      // Check users/{uid} as well so approval is permanently honored
+      final userDoc = await _db.collection('users').doc(uid).get();
+      final userData = userDoc.data();
+      if (userData != null && (userData['isApproved'] == true || userData['status'] == 'approved')) {
+        return true;
+      }
+      return false;
     } catch (_) {
       // Offline or no access — treat it as not approved.
       return false;
@@ -329,10 +339,8 @@ class TourGuideAuthService {
 
   /// Watches the signed-in guide's verification status in real time.
   ///
-  /// Emits `true` when `guideVerifications/{uid}.status == 'approved'`,
-  /// `false` otherwise (pending, rejected, missing doc, offline). The
-  /// dashboard listéne to this so the verification banner disappears the
-  /// moment the admin approves — no tab switch or reload needed.
+  /// Emits `true` when approved in either `guideVerifications/{uid}` or `users/{uid}`,
+  /// `false` otherwise.
   Stream<bool> watchVerificationStatus() async* {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
@@ -342,7 +350,14 @@ class TourGuideAuthService {
     await for (final snapshot
         in _db.collection('guideVerifications').doc(uid).snapshots()) {
       final data = snapshot.data();
-      yield data != null && data['status'] == 'approved';
+      if (data != null && data['status'] == 'approved') {
+        yield true;
+      } else {
+        final userDoc = await _db.collection('users').doc(uid).get();
+        final userData = userDoc.data();
+        yield userData != null &&
+            (userData['isApproved'] == true || userData['status'] == 'approved');
+      }
     }
   }
 
@@ -361,7 +376,21 @@ class TourGuideAuthService {
     }
     await for (final snapshot
         in _db.collection('guideVerifications').doc(uid).snapshots()) {
-      yield snapshot.data();
+      final data = snapshot.data();
+      if (data != null && data['status'] == 'approved') {
+        yield data;
+      } else {
+        final userDoc = await _db.collection('users').doc(uid).get();
+        final userData = userDoc.data();
+        if (userData != null &&
+            (userData['isApproved'] == true || userData['status'] == 'approved')) {
+          final merged = Map<String, dynamic>.of(data ?? {});
+          merged['status'] = 'approved';
+          yield merged;
+        } else {
+          yield data;
+        }
+      }
     }
   }
 

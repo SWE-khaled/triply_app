@@ -1,16 +1,44 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/data/repositories/admin_trips_repository.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../core/data/mock/dashboard/d_mock_trips.dart';
 import '../../d_home/view/d_home_view.dart';
 
-/// Trips management screen.
-///
-/// The trips are read from Firestore — the same documents the guides
-/// publish and the tourists book.
+/// Row data model for trips in the admin dashboard.
+class TripRowData {
+  final String tripId;
+  final String title;
+  final String guide;
+  final String date;
+  final int travelers;
+  final String price;
+  final String status;
+  final String location;
+  final String about;
+  final List<String> itinerary;
+  final String imageUrl;
+  final String rejectionReason;
+
+  const TripRowData({
+    required this.tripId,
+    required this.title,
+    required this.guide,
+    required this.date,
+    required this.travelers,
+    required this.price,
+    required this.status,
+    this.location = '',
+    this.about = '',
+    this.itinerary = const [],
+    this.imageUrl = '',
+    this.rejectionReason = '',
+  });
+}
+
+/// Trips management screen (connected dynamically to Firestore).
 class TripsView extends StatefulWidget {
   const TripsView({super.key});
 
@@ -22,45 +50,53 @@ class _TripsViewState extends State<TripsView> {
   final TextEditingController _search = TextEditingController();
   final AdminTripsRepository _repository = AdminTripsRepository();
 
-  late List<MockTrip> _trips;
+  List<TripRowData> _trips = const [];
+  StreamSubscription<List<AdminTrip>>? _subscription;
   String _query = '';
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _trips = List.from(mockTrips);
-    _load();
+    _subscription = _repository.watchTrips().listen(
+      (trips) {
+        if (!mounted) return;
+        setState(() {
+          _trips = trips.map(_toTrip).toList();
+          _loading = false;
+        });
+      },
+      onError: (_) {
+        if (!mounted) return;
+        setState(() => _loading = false);
+      },
+    );
   }
 
   @override
   void dispose() {
+    _subscription?.cancel();
     _search.dispose();
     super.dispose();
   }
 
-  /// Reads every guide's trips from Firestore.
-  Future<void> _load() async {
-    final trips = await _repository.fetchTrips();
-    if (!mounted) return;
-    setState(() {
-      _trips = trips.map(_toTrip).toList();
-      _loading = false;
-    });
-  }
-
   /// Maps a Firestore trip onto the row the table renders.
-  MockTrip _toTrip(AdminTrip trip) => MockTrip(
+  TripRowData _toTrip(AdminTrip trip) => TripRowData(
     tripId: trip.tripId,
     title: trip.title,
-    guide: trip.guideName,
-    date: trip.scheduleLabel,
+    guide: trip.guideName.isNotEmpty ? trip.guideName : 'Tour Guide',
+    date: trip.scheduleLabel.isNotEmpty ? trip.scheduleLabel : 'Scheduled',
     travelers: trip.travelers,
     price: trip.priceLabel,
     status: trip.approvalStatus,
+    location: trip.location,
+    about: trip.about,
+    itinerary: trip.itinerary,
+    imageUrl: trip.imageUrl,
+    rejectionReason: trip.rejectionReason,
   );
 
-  List<MockTrip> get _filtered {
+  List<TripRowData> get _filtered {
     final q = _query.trim().toLowerCase();
     if (q.isEmpty) return _trips;
     return _trips.where((t) {
@@ -71,7 +107,7 @@ class _TripsViewState extends State<TripsView> {
     }).toList();
   }
 
-  void _showViewDialog(MockTrip trip) {
+  void _showViewDialog(TripRowData trip) {
     showDialog(
       context: context,
       builder: (_) => _ViewTripDialog(trip: trip),
@@ -79,7 +115,7 @@ class _TripsViewState extends State<TripsView> {
   }
 
   /// Rejects a trip and tells the guide why.
-  Future<void> _cancelTrip(MockTrip trip) async {
+  Future<void> _cancelTrip(TripRowData trip) async {
     if (trip.tripId.isEmpty) return;
     final reason = await _askRejectionReason();
     if (reason == null || !mounted) return;
@@ -93,9 +129,11 @@ class _TripsViewState extends State<TripsView> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not reject the trip.')),
       );
-      return;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Trip rejected successfully.')),
+      );
     }
-    await _load();
   }
 
   /// Asks the admin why the trip was rejected — the guide sees it.
@@ -169,7 +207,7 @@ class _TripsViewState extends State<TripsView> {
             ),
             const SizedBox(height: 20),
 
-            // Search + Filter
+            // Search
             SearchFilterRow(
               hintText: 'Search trips...',
               controller: _search,
@@ -194,21 +232,22 @@ class _TripsViewState extends State<TripsView> {
             ),
             const Divider(color: AppColors.divider, height: 1),
 
-            // Table rows
-            ..._filtered.map(
-              (t) => _TripRow(
-                trip: t,
-                onView: () => _showViewDialog(t),
-                onCancel: () => _cancelTrip(t),
-              ),
-            ),
-            if (_filtered.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                child: Center(
-                  child: Text(
-                    _loading ? 'Loading trips...' : 'No trips found.',
-                  ),
+            if (_loading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (_filtered.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: Text('No trips found.')),
+              )
+            else
+              ..._filtered.map(
+                (t) => _TripRow(
+                  trip: t,
+                  onView: () => _showViewDialog(t),
+                  onCancel: () => _cancelTrip(t),
                 ),
               ),
           ],
@@ -228,7 +267,7 @@ class _TripsViewState extends State<TripsView> {
 }
 
 class _TripRow extends StatelessWidget {
-  final MockTrip trip;
+  final TripRowData trip;
   final VoidCallback onView;
   final VoidCallback onCancel;
   const _TripRow({
@@ -292,15 +331,13 @@ class _TripRow extends StatelessWidget {
                   children: [
                     OutlineActionButton(label: 'View', onTap: onView),
                     const SizedBox(width: 8),
-                    if (trip.status != 'cancelled')
+                    if (trip.status != 'cancelled' && trip.status != 'rejected')
                       DangerActionButton(
                         label: 'Cancel & Refund',
                         onTap: onCancel,
                       )
                     else
-                      const SizedBox(
-                        width: 110,
-                      ), // Placeholder to maintain alignment
+                      const SizedBox(width: 110),
                   ],
                 ),
               ),
@@ -314,7 +351,7 @@ class _TripRow extends StatelessWidget {
 
 /// View Trip Details Dialog
 class _ViewTripDialog extends StatelessWidget {
-  final MockTrip trip;
+  final TripRowData trip;
   const _ViewTripDialog({required this.trip});
 
   @override
@@ -360,10 +397,20 @@ class _ViewTripDialog extends StatelessWidget {
               const SizedBox(height: 24),
               _buildDetailRow('Title:', trip.title),
               _buildDetailRow('Guide:', trip.guide),
+              if (trip.location.isNotEmpty)
+                _buildDetailRow('Location:', trip.location),
               _buildDetailRow('Date:', trip.date),
               _buildDetailRow('Travelers:', '${trip.travelers}'),
               _buildDetailRow('Price:', trip.price),
               _buildDetailRow('Status:', trip.status.toUpperCase()),
+              if (trip.about.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _buildDetailRow('About:', trip.about),
+              ],
+              if (trip.rejectionReason.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                _buildDetailRow('Rejection Reason:', trip.rejectionReason),
+              ],
             ],
           ),
         ),
@@ -378,7 +425,7 @@ class _ViewTripDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 110,
             child: Text(label, style: AppTextStyles.fieldLabel),
           ),
           Expanded(child: Text(value, style: AppTextStyles.tableCell)),

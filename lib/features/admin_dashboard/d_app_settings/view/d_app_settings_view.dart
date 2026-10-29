@@ -1,9 +1,11 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/d_app_colors.dart';
 import '../../../../core/theme/d_app_text_styles.dart';
 import '../../d_home/view/d_home_view.dart';
 
-/// App Settings screen.
+/// App Settings screen (connected dynamically to Firestore).
 class AppSettingsView extends StatefulWidget {
   const AppSettingsView({super.key});
 
@@ -13,15 +15,78 @@ class AppSettingsView extends StatefulWidget {
 
 class _AppSettingsViewState extends State<AppSettingsView> {
   final TextEditingController _commissionCtrl = TextEditingController(
-    text: '12',
+    text: '10',
   );
   String _approvalMode = 'Manual admin approval';
+  bool _saving = false;
+  StreamSubscription? _sub;
 
   final List<String> _approvalOptions = [
     'Manual admin approval',
     'Automatic approval',
     'Semi-automatic review',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  void _loadSettings() {
+    _sub = FirebaseFirestore.instance
+        .collection('appSettings')
+        .doc('general')
+        .snapshots()
+        .listen((doc) {
+      if (!mounted) return;
+      if (doc.exists) {
+        final data = doc.data();
+        if (data != null) {
+          final commission = data['commission']?.toString() ?? '10';
+          final mode = (data['approvalMode'] as String?) ?? 'Manual admin approval';
+          if (_commissionCtrl.text != commission) {
+            _commissionCtrl.text = commission;
+          }
+          if (_approvalOptions.contains(mode)) {
+            setState(() {
+              _approvalMode = mode;
+            });
+          }
+        }
+      }
+    }, onError: (_) {});
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    _commissionCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveSettings() async {
+    setState(() => _saving = true);
+    try {
+      final commission = double.tryParse(_commissionCtrl.text.trim()) ?? 10.0;
+      await FirebaseFirestore.instance.collection('appSettings').doc('general').set({
+        'commission': commission,
+        'approvalMode': _approvalMode,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Settings saved successfully!')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save settings: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +113,12 @@ class _AppSettingsViewState extends State<AppSettingsView> {
             const SizedBox(height: 24),
 
             // Settings fields row
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Platform commission
-                Expanded(
-                  child: Container(
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isStacked = constraints.maxWidth < 600;
+                final fields = [
+                  // Platform commission
+                  Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -82,12 +147,8 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-
-                // Guide approval mode
-                Expanded(
-                  child: Container(
+                  // Guide approval mode
+                  Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -127,18 +188,33 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                       ],
                     ),
                   ),
-                ),
-              ],
+                ];
+
+                if (isStacked) {
+                  return Column(
+                    children: [
+                      fields[0],
+                      const SizedBox(height: 16),
+                      fields[1],
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: fields[0]),
+                    const SizedBox(width: 16),
+                    Expanded(child: fields[1]),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // Save Settings button
             ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Settings saved!')),
-                );
-              },
+              onPressed: _saving ? null : _saveSettings,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(
@@ -149,7 +225,16 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: Text('Save Settings', style: AppTextStyles.buttonPrimary),
+              child: _saving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Text('Save Settings', style: AppTextStyles.buttonPrimary),
             ),
           ],
         ),
