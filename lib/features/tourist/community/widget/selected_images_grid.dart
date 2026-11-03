@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Multi-photo grid extracted from `_SelectedImagesGrid`.
 class SelectedImagesGrid extends StatelessWidget {

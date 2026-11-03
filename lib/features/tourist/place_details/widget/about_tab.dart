@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../map/model/place.dart';
 
 class AboutTab extends StatelessWidget {

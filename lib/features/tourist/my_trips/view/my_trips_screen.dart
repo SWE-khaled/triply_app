@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/constants/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
@@ -15,7 +15,6 @@ import '../../trips/models/trip.dart';
 import '../../trips/widgets/empty_trips.dart';
 import '../../trips/widgets/trip_card.dart';
 import '../cubit/my_trips_cubit.dart';
-
 import '../widgets/booking_badges.dart';
 
 /// Booked trips only. Opened after booking_public and from the bottom nav.

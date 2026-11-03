@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/core/constants/app_routes.dart';
 import 'package:triply/core/data/models/chat.dart';
 import 'package:triply/core/data/repositories/chat_repository.dart';
 import 'package:triply/core/data/repositories/firestore_chat_repository.dart';
@@ -9,23 +8,18 @@ import 'package:triply/core/widgets/app_snackbar.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/widget/guide_bottom_nav.dart';
-
+import '../../../core/routing/app_routes.dart';
 import '../cubit/chat_list_cubit.dart';
 import '../cubit/chat_list_state.dart';
 import '../model/chat_audience.dart';
 import '../util/chat_time.dart';
 import '../widgets/chat_avatar.dart';
 
-/// The conversation list of both roles.
-///
-/// A tourist opens it from the messages button on Home; a guide opens it
-/// from the Chats tab. The list is live, searchable and filterable, and it
-/// never creates a chat — only the room's first message does that.
+
 class ChatListScreen extends StatefulWidget {
   final ChatRepository? repository;
   final ChatAudience audience;
 
-  /// Shows the four-tab guide navigation (the guide list is a tab).
   final bool showGuideNav;
 
   const ChatListScreen({

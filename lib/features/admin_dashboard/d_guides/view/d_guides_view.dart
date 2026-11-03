@@ -1,7 +1,7 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../../../core/data/repositories/admin_guides_repository.dart';
 import '../../d_home/view/d_home_view.dart';
@@ -160,7 +160,7 @@ class _GuidesViewState extends State<GuidesView> {
           ElevatedButton(
             onPressed: () =>
                 Navigator.pop(dialogContext, controller.text.trim()),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
             child: const Text(
               'Confirm Reject',
               style: TextStyle(color: Colors.white),
@@ -173,7 +173,7 @@ class _GuidesViewState extends State<GuidesView> {
     return reason;
   }
 
-  /// Suspends the guide — they can no longer publish or be booked.
+  /// Suspends the guide â€” they can no longer publish or be booked.
   Future<void> _suspend(AdminGuide guide) async {
     final ok = await _repository.suspendGuide(guide.uid);
     if (!mounted) return;
@@ -214,13 +214,13 @@ class _GuidesViewState extends State<GuidesView> {
                       vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.statusPendingBg,
+                      color: AppColors.adminStatusPendingBg,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '$_pendingCount pending',
-                      style: AppTextStyles.tableCellMuted.copyWith(
-                        color: AppColors.statusPendingText,
+                      style: AppTextStyles.adminTableCellMuted.copyWith(
+                        color: AppColors.adminStatusPendingText,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -242,7 +242,7 @@ class _GuidesViewState extends State<GuidesView> {
                 ],
               ),
             ),
-            const Divider(color: AppColors.divider, height: 1),
+            const Divider(color: AppColors.adminDivider, height: 1),
 
             ..._guides.map(
               (g) => _GuideRow(
@@ -273,7 +273,7 @@ class _GuidesViewState extends State<GuidesView> {
     flex: flex,
     child: Text(
       label,
-      style: AppTextStyles.tableHeader,
+      style: AppTextStyles.adminTableHeader,
       textAlign: end ? TextAlign.end : TextAlign.start,
     ),
   );
@@ -300,7 +300,7 @@ class _GuideRow extends StatelessWidget {
 
     return Column(
       children: [
-        const Divider(color: AppColors.divider, height: 1),
+        const Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(
@@ -313,13 +313,13 @@ class _GuideRow extends StatelessWidget {
                   children: [
                     Text(
                       guide.name,
-                      style: AppTextStyles.tableCell,
+                      style: AppTextStyles.adminTableCell,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
                     Text(
                       guide.email,
-                      style: AppTextStyles.tableCellMuted,
+                      style: AppTextStyles.adminTableCellMuted,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
@@ -334,7 +334,7 @@ class _GuideRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         guide.document,
-                        style: AppTextStyles.tableCellMuted,
+                        style: AppTextStyles.adminTableCellMuted,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -342,7 +342,7 @@ class _GuideRow extends StatelessWidget {
                     const SizedBox(width: 6),
                     InkWell(
                       onTap: () => _showDetails(context),
-                      child: Text('View file', style: AppTextStyles.linkText),
+                      child: Text('View file', style: AppTextStyles.adminLinkText),
                     ),
                   ],
                 ),
@@ -352,7 +352,7 @@ class _GuideRow extends StatelessWidget {
                 flex: 2,
                 child: Text(
                   guide.city,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -394,7 +394,7 @@ class _GuideRow extends StatelessWidget {
   }
 }
 
-/// Guide details modal — shown on "Details" / "View file" tap.
+/// Guide details modal â€” shown on "Details" / "View file" tap.
 class _GuideDetailsDialog extends StatelessWidget {
   final AdminGuide guide;
   const _GuideDetailsDialog({required this.guide});
@@ -437,11 +437,11 @@ class _GuideDetailsDialog extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(guide.name, style: AppTextStyles.dialogTitle),
+                        Text(guide.name, style: AppTextStyles.adminDialogTitle),
                         const SizedBox(height: 3),
                         Text(
                           'Complete guide application',
-                          style: AppTextStyles.dialogSubtitle,
+                          style: AppTextStyles.adminDialogSubtitle,
                         ),
                       ],
                     ),
@@ -455,12 +455,12 @@ class _GuideDetailsDialog extends StatelessWidget {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.divider),
+                        border: Border.all(color: AppColors.adminDivider),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Close',
-                        style: AppTextStyles.buttonSecondary,
+                        style: AppTextStyles.adminButtonSecondary,
                       ),
                     ),
                   ),
@@ -502,7 +502,7 @@ class _GuideDetailsDialog extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  border: Border.all(color: AppColors.divider),
+                  border: Border.all(color: AppColors.adminDivider),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -516,13 +516,13 @@ class _GuideDetailsDialog extends StatelessWidget {
                             children: [
                               Text(
                                 guide.document,
-                                style: AppTextStyles.sectionTitle.copyWith(
+                                style: AppTextStyles.adminSectionTitle.copyWith(
                                   fontSize: 15,
                                 ),
                               ),
                               Text(
                                 guide.docFileName,
-                                style: AppTextStyles.tableCellMuted,
+                                style: AppTextStyles.adminTableCellMuted,
                               ),
                             ],
                           ),
@@ -536,7 +536,7 @@ class _GuideDetailsDialog extends StatelessWidget {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
+                            backgroundColor: AppColors.adminPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -547,7 +547,7 @@ class _GuideDetailsDialog extends StatelessWidget {
                           ),
                           child: Text(
                             'Download',
-                            style: AppTextStyles.buttonPrimary,
+                            style: AppTextStyles.adminButtonPrimary,
                           ),
                         ),
                       ],
@@ -558,7 +558,7 @@ class _GuideDetailsDialog extends StatelessWidget {
                       height: 160,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: AppColors.documentPreviewBg,
+                        color: AppColors.adminDocumentPreviewBg,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -567,12 +567,12 @@ class _GuideDetailsDialog extends StatelessWidget {
                           const Icon(
                             Icons.article_outlined,
                             size: 40,
-                            color: AppColors.textMuted,
+                            color: AppColors.adminTextMuted,
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Document preview',
-                            style: AppTextStyles.tableCellMuted,
+                            style: AppTextStyles.adminTableCellMuted,
                           ),
                         ],
                       ),
@@ -584,7 +584,7 @@ class _GuideDetailsDialog extends StatelessWidget {
 
               // Uploaded trips
               if (guide.uploadedTrips.isNotEmpty) ...[
-                Text('Uploaded trips', style: AppTextStyles.sectionTitle),
+                Text('Uploaded trips', style: AppTextStyles.adminSectionTitle),
                 const SizedBox(height: 12),
                 Row(
                   children: guide.uploadedTrips
@@ -594,7 +594,7 @@ class _GuideDetailsDialog extends StatelessWidget {
                             margin: const EdgeInsets.only(right: 10),
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.divider),
+                              border: Border.all(color: AppColors.adminDivider),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Column(
@@ -602,20 +602,20 @@ class _GuideDetailsDialog extends StatelessWidget {
                               children: [
                                 Text(
                                   t.title,
-                                  style: AppTextStyles.tableCell,
+                                  style: AppTextStyles.adminTableCell,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 2,
                                 ),
                                 Text(
                                   t.status,
-                                  style: AppTextStyles.tableCellMuted,
+                                  style: AppTextStyles.adminTableCellMuted,
                                 ),
                                 const SizedBox(height: 8),
                                 InkWell(
                                   onTap: () => _showTripDialog(context, t),
                                   child: Text(
                                     'View full trip',
-                                    style: AppTextStyles.linkText,
+                                    style: AppTextStyles.adminLinkText,
                                   ),
                                 ),
                               ],
@@ -644,17 +644,17 @@ class _InfoField extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.inputBg,
+        color: AppColors.adminInputBg,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: AppTextStyles.tableCellMuted),
+          Text(label, style: AppTextStyles.adminTableCellMuted),
           const SizedBox(height: 4),
           Text(
             value,
-            style: AppTextStyles.fieldValue,
+            style: AppTextStyles.adminFieldValue,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
           ),
@@ -663,3 +663,4 @@ class _InfoField extends StatelessWidget {
     );
   }
 }
+

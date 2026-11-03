@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/location_tag_chip.dart';
 import '../../../common/AuthTourist/cubit/auth_cubit.dart';

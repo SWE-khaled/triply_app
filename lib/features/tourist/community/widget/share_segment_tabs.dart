@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Story/Post segment control extracted from `share_composer_view.dart:189`.
 class ShareSegmentTabs extends StatelessWidget {

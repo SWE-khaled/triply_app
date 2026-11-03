@@ -1,8 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/data/repositories/admin_tourists_repository.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
 
@@ -119,7 +119,7 @@ class _UsersViewState extends State<UsersView> {
                 ],
               ),
             ),
-            const Divider(color: AppColors.divider, height: 1),
+            const Divider(color: AppColors.adminDivider, height: 1),
 
             if (_loading)
               const Padding(
@@ -150,7 +150,7 @@ class _UsersViewState extends State<UsersView> {
     flex: flex,
     child: Text(
       label,
-      style: AppTextStyles.tableHeader,
+      style: AppTextStyles.adminTableHeader,
       textAlign: end ? TextAlign.end : TextAlign.start,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
@@ -174,7 +174,7 @@ class _UserRow extends StatelessWidget {
     final isSuspended = tourist.status == 'suspended';
     return Column(
       children: [
-        const Divider(color: AppColors.divider, height: 1),
+        const Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(
@@ -183,7 +183,7 @@ class _UserRow extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   tourist.name,
-                  style: AppTextStyles.tableCell,
+                  style: AppTextStyles.adminTableCell,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -192,7 +192,7 @@ class _UserRow extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   tourist.email,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -200,8 +200,8 @@ class _UserRow extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Text(
-                  tourist.phone.isNotEmpty ? tourist.phone : '—',
-                  style: AppTextStyles.tableCellMuted,
+                  tourist.phone.isNotEmpty ? tourist.phone : 'â€”',
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -210,7 +210,7 @@ class _UserRow extends StatelessWidget {
                 flex: 2,
                 child: Text(
                   tourist.type,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -219,7 +219,7 @@ class _UserRow extends StatelessWidget {
                 flex: 2,
                 child: Text(
                   tourist.activity,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -286,7 +286,7 @@ class _ViewUserDialog extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Tourist Details',
-                      style: AppTextStyles.dialogTitle,
+                      style: AppTextStyles.adminDialogTitle,
                     ),
                   ),
                   InkWell(
@@ -298,12 +298,12 @@ class _ViewUserDialog extends StatelessWidget {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.divider),
+                        border: Border.all(color: AppColors.adminDivider),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Close',
-                        style: AppTextStyles.buttonSecondary,
+                        style: AppTextStyles.adminButtonSecondary,
                       ),
                     ),
                   ),
@@ -331,11 +331,12 @@ class _ViewUserDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: 100,
-            child: Text(label, style: AppTextStyles.fieldLabel),
+            child: Text(label, style: AppTextStyles.adminFieldLabel),
           ),
-          Expanded(child: Text(value, style: AppTextStyles.tableCell)),
+          Expanded(child: Text(value, style: AppTextStyles.adminTableCell)),
         ],
       ),
     );
   }
 }
+

@@ -1,9 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/core/constants/app_routes.dart';
 import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../../common/AuthTourguide/view/tour_guide_verification_screen.dart';
 import '../../../../../core/theme/app_colors.dart';

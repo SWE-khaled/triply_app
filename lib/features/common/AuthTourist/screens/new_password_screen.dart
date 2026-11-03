@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_step_icon.dart';
 import '../widgets/auth_text_field.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Cream location chip (`community_screen.dart:574`, composer `new_share_screen.dart:292`).
 class LocationTagChip extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'circle_icon_button.dart';
 
 /// Centered-title header row: back circle + title + trailing spacer.

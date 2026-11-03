@@ -1,9 +1,9 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/data/repositories/admin_trips_repository.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
 
@@ -136,7 +136,7 @@ class _TripsViewState extends State<TripsView> {
     }
   }
 
-  /// Asks the admin why the trip was rejected — the guide sees it.
+  /// Asks the admin why the trip was rejected â€” the guide sees it.
   Future<String?> _askRejectionReason() async {
     final controller = TextEditingController();
     final reason = await showDialog<String>(
@@ -174,7 +174,7 @@ class _TripsViewState extends State<TripsView> {
           ElevatedButton(
             onPressed: () =>
                 Navigator.pop(dialogContext, controller.text.trim()),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
             child: const Text(
               'Confirm Reject',
               style: TextStyle(color: Colors.white),
@@ -230,7 +230,7 @@ class _TripsViewState extends State<TripsView> {
                 ],
               ),
             ),
-            const Divider(color: AppColors.divider, height: 1),
+            const Divider(color: AppColors.adminDivider, height: 1),
 
             if (_loading)
               const Padding(
@@ -260,7 +260,7 @@ class _TripsViewState extends State<TripsView> {
     flex: flex,
     child: Text(
       label,
-      style: AppTextStyles.tableHeader,
+      style: AppTextStyles.adminTableHeader,
       textAlign: end ? TextAlign.end : TextAlign.start,
     ),
   );
@@ -280,7 +280,7 @@ class _TripRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(color: AppColors.divider, height: 1),
+        const Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(
@@ -289,7 +289,7 @@ class _TripRow extends StatelessWidget {
                 flex: 4,
                 child: Text(
                   trip.title,
-                  style: AppTextStyles.tableCell,
+                  style: AppTextStyles.adminTableCell,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -298,7 +298,7 @@ class _TripRow extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   trip.guide,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -307,7 +307,7 @@ class _TripRow extends StatelessWidget {
                 flex: 2,
                 child: Text(
                   trip.date,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -316,12 +316,12 @@ class _TripRow extends StatelessWidget {
                 flex: 2,
                 child: Text(
                   '${trip.travelers}',
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                 ),
               ),
               Expanded(
                 flex: 2,
-                child: Text(trip.price, style: AppTextStyles.tableCellMuted),
+                child: Text(trip.price, style: AppTextStyles.adminTableCellMuted),
               ),
               Expanded(flex: 2, child: StatusChip(status: trip.status)),
               Expanded(
@@ -371,7 +371,7 @@ class _ViewTripDialog extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Trip Details',
-                      style: AppTextStyles.dialogTitle,
+                      style: AppTextStyles.adminDialogTitle,
                     ),
                   ),
                   InkWell(
@@ -383,12 +383,12 @@ class _ViewTripDialog extends StatelessWidget {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.divider),
+                        border: Border.all(color: AppColors.adminDivider),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Close',
-                        style: AppTextStyles.buttonSecondary,
+                        style: AppTextStyles.adminButtonSecondary,
                       ),
                     ),
                   ),
@@ -426,11 +426,12 @@ class _ViewTripDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: 110,
-            child: Text(label, style: AppTextStyles.fieldLabel),
+            child: Text(label, style: AppTextStyles.adminFieldLabel),
           ),
-          Expanded(child: Text(value, style: AppTextStyles.tableCell)),
+          Expanded(child: Text(value, style: AppTextStyles.adminTableCell)),
         ],
       ),
     );
   }
 }
+

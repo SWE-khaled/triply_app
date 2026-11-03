@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
-import '../../../../core/constants/app_routes.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../home_and_notification_tg/view/guide_notifications_screen.dart';

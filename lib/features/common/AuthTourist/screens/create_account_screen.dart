@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../cubit/auth_cubit.dart';
 import '../widgets/auth_text_field.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:triply/core/constants/app_routes.dart';
+import 'package:triply/core/routing/app_routes.dart';
 import 'package:triply/core/theme/app_colors.dart';
 
 import '../data/chat_roles.dart';

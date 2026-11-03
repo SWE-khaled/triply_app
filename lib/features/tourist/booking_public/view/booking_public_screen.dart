@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/constants/app_routes.dart';
+import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';

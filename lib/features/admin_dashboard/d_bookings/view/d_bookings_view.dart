@@ -1,8 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/data/repositories/admin_bookings_repository.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
 
@@ -107,11 +107,11 @@ class _BookingsViewState extends State<BookingsView> {
             // "Recent Bookings" section
             Row(
               children: [
-                Text('Recent Bookings', style: AppTextStyles.sectionTitle),
+                Text('Recent Bookings', style: AppTextStyles.adminSectionTitle),
                 const Spacer(),
                 Text(
                   '${_bookings.length} Total',
-                  style: AppTextStyles.linkText.copyWith(
+                  style: AppTextStyles.adminLinkText.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -135,7 +135,7 @@ class _BookingsViewState extends State<BookingsView> {
                 ],
               ),
             ),
-            const Divider(color: AppColors.divider, height: 1),
+            const Divider(color: AppColors.adminDivider, height: 1),
 
             if (_loading)
               const Padding(
@@ -161,7 +161,7 @@ class _BookingsViewState extends State<BookingsView> {
     flex: flex,
     child: Text(
       label,
-      style: AppTextStyles.tableHeader,
+      style: AppTextStyles.adminTableHeader,
       textAlign: end ? TextAlign.end : TextAlign.start,
     ),
   );
@@ -176,7 +176,7 @@ class _BookingRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(color: AppColors.divider, height: 1),
+        const Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(
@@ -185,7 +185,7 @@ class _BookingRow extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   booking.user,
-                  style: AppTextStyles.tableCell,
+                  style: AppTextStyles.adminTableCell,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -194,7 +194,7 @@ class _BookingRow extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   booking.trip,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -203,7 +203,7 @@ class _BookingRow extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   booking.guide,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -212,7 +212,7 @@ class _BookingRow extends StatelessWidget {
                 flex: 2,
                 child: Text(
                   booking.date,
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -220,11 +220,11 @@ class _BookingRow extends StatelessWidget {
               Expanded(flex: 2, child: StatusChip(status: booking.status)),
               Expanded(
                 flex: 2,
-                child: Text(booking.price, style: AppTextStyles.tableCellMuted),
+                child: Text(booking.price, style: AppTextStyles.adminTableCellMuted),
               ),
               Expanded(
                 flex: 2,
-                child: Text(booking.type, style: AppTextStyles.linkText),
+                child: Text(booking.type, style: AppTextStyles.adminLinkText),
               ),
               Expanded(
                 flex: 2,
@@ -268,7 +268,7 @@ class _ViewBookingDialog extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Booking Details',
-                      style: AppTextStyles.dialogTitle,
+                      style: AppTextStyles.adminDialogTitle,
                     ),
                   ),
                   InkWell(
@@ -280,12 +280,12 @@ class _ViewBookingDialog extends StatelessWidget {
                         vertical: 7,
                       ),
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.divider),
+                        border: Border.all(color: AppColors.adminDivider),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Close',
-                        style: AppTextStyles.buttonSecondary,
+                        style: AppTextStyles.adminButtonSecondary,
                       ),
                     ),
                   ),
@@ -304,7 +304,7 @@ class _ViewBookingDialog extends StatelessWidget {
               _row('Status:', booking.status.toUpperCase()),
               _row('Type:', booking.type),
               const SizedBox(height: 16),
-              const Divider(color: AppColors.divider),
+              const Divider(color: AppColors.adminDivider),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -316,7 +316,7 @@ class _ViewBookingDialog extends StatelessWidget {
                         onStatusChange?.call('confirmed');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: AppColors.adminPrimary,
                       ),
                       child: const Text('Confirm', style: TextStyle(color: Colors.white)),
                     ),
@@ -328,8 +328,8 @@ class _ViewBookingDialog extends StatelessWidget {
                         onStatusChange?.call('cancelled');
                       },
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.danger,
-                        side: const BorderSide(color: AppColors.danger),
+                        foregroundColor: AppColors.adminDanger,
+                        side: const BorderSide(color: AppColors.adminDanger),
                       ),
                       child: const Text('Cancel Booking'),
                     ),
@@ -350,11 +350,12 @@ class _ViewBookingDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: 110,
-            child: Text(label, style: AppTextStyles.fieldLabel),
+            child: Text(label, style: AppTextStyles.adminFieldLabel),
           ),
-          Expanded(child: Text(value, style: AppTextStyles.tableCell)),
+          Expanded(child: Text(value, style: AppTextStyles.adminTableCell)),
         ],
       ),
     );
   }
 }
+

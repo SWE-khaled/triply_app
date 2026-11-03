@@ -7,7 +7,7 @@ import 'package:triply/features/tourist/home/view/home_screen.dart';
 import '../../user_profile/view/profile_screen.dart';
 import '../cubit/map_cubit.dart';
 import '../cubit/map_state.dart';
-import '../../../../core/constants/app_routes.dart';
+import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../model/place.dart';
 import '../../community/view/community_view.dart';

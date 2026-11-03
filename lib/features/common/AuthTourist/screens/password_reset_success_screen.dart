@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../widgets/auth_button.dart';
 import 'sign_in_screen.dart';
 

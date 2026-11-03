@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Place row extracted from `location_picker_view.dart:181`.
 class LocationPlaceRow extends StatelessWidget {

@@ -1,8 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// App Settings screen (connected dynamically to Firestore).
@@ -122,7 +122,7 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: AppColors.divider),
+                      border: Border.all(color: AppColors.adminDivider),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -130,17 +130,17 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                       children: [
                         Text(
                           'Platform commission',
-                          style: AppTextStyles.fieldLabel,
+                          style: AppTextStyles.adminFieldLabel,
                         ),
                         const SizedBox(height: 10),
                         TextField(
                           controller: _commissionCtrl,
                           keyboardType: TextInputType.number,
-                          style: AppTextStyles.tableCell,
+                          style: AppTextStyles.adminTableCell,
                           decoration: InputDecoration(
                             suffixText: '%',
-                            suffixStyle: AppTextStyles.tableCell.copyWith(
-                              color: AppColors.textSecondary,
+                            suffixStyle: AppTextStyles.adminTableCell.copyWith(
+                              color: AppColors.adminTextSecondary,
                             ),
                           ),
                         ),
@@ -152,21 +152,21 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: AppColors.divider),
+                      border: Border.all(color: AppColors.adminDivider),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Guide approval', style: AppTextStyles.fieldLabel),
+                        Text('Guide approval', style: AppTextStyles.adminFieldLabel),
                         const SizedBox(height: 10),
                         DropdownButtonFormField<String>(
                           initialValue: _approvalMode,
-                          style: AppTextStyles.tableCell,
+                          style: AppTextStyles.adminTableCell,
                           decoration: const InputDecoration(),
                           icon: const Icon(
                             Icons.keyboard_arrow_down_rounded,
-                            color: AppColors.textMuted,
+                            color: AppColors.adminTextMuted,
                           ),
                           items: _approvalOptions
                               .map(
@@ -174,7 +174,7 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                                   value: opt,
                                   child: Text(
                                     opt,
-                                    style: AppTextStyles.tableCell,
+                                    style: AppTextStyles.adminTableCell,
                                   ),
                                 ),
                               )
@@ -216,7 +216,7 @@ class _AppSettingsViewState extends State<AppSettingsView> {
             ElevatedButton(
               onPressed: _saving ? null : _saveSettings,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.adminPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 14,
@@ -234,7 +234,7 @@ class _AppSettingsViewState extends State<AppSettingsView> {
                         strokeWidth: 2,
                       ),
                     )
-                  : Text('Save Settings', style: AppTextStyles.buttonPrimary),
+                  : Text('Save Settings', style: AppTextStyles.adminButtonPrimary),
             ),
           ],
         ),
@@ -242,3 +242,4 @@ class _AppSettingsViewState extends State<AppSettingsView> {
     );
   }
 }
+

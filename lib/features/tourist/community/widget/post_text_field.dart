@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Composer text field extracted from `share_composer_view.dart:236`.
 class PostTextField extends StatelessWidget {

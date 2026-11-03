@@ -26,7 +26,6 @@ dependencies:
 
   # State management & networking
   flutter_bloc: ^9.1.1
-  http: ^1.6.0
 
   # Utilities
   flutter_dotenv: ^6.0.1
@@ -36,18 +35,17 @@ dependencies:
   file_picker: ^13.1.0
 
   # UI
-  cupertino_icons: ^1.0.8
   google_fonts: ^6.3.2
   flutter_svg: ^2.3.0
   lucide_icons_flutter: ^3.0.0
   iconsax_flutter: ^1.0.0
   pdf: ^3.13.1
+  dropdown_search: 6.0.2
 
   # Payments
   dio: ^5.11.1
   webview_flutter: ^4.14.1
   pay_with_paymob: ^1.4.0
-  dropdown_search: 6.0.2
 
 
 
@@ -73,20 +71,10 @@ flutter:
 
   assets:
     - .env
-    - assets/images/svg/
+    - assets/images/choice_role/
+    - assets/images/edits/
     - assets/images/icon/
-    - assets/images/svg/ankh_logo.svg
-    - assets/images/svg/riply_text.svg
-    - assets/images/edits/Frame 1.png
-    - assets/images/edits/Frame 2.png
-    - assets/images/edits/role1p.jpg
-    - assets/images/edits/role2p.jpg
-    - assets/images/choice_role/onboardingTour1.png
-    - assets/images/choice_role/onboardingTour2.jpg
-    - assets/images/choice_role/onboardingTour3.jpg
-    - assets/images/choice_role/onboardingTourist1.jpg
-    - assets/images/choice_role/onboardingTourist2.jpg
-    - assets/images/choice_role/onboardingTourist3.jpg
-    - assets/images/icon/google_logo.png
-    - assets/images/icon/apple_logo.png
-    - assets/images/edits/home_image.png
+    - assets/images/nav_bar_icons/Bold/
+    - assets/images/nav_bar_icons/Linear/
+    - assets/images/svg/
+

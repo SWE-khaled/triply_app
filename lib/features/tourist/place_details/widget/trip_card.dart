@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../model/trip.dart';
 
@@ -86,7 +86,7 @@ class TripCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${trip.dateTime}',
+                        trip.dateTime,
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
@@ -108,7 +108,7 @@ class TripCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${trip.guideName}',
+                        trip.guideName,
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 12,

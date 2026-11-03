@@ -1,9 +1,9 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/data/repositories/admin_guides_repository.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../d_home/view/d_home_view.dart';
 
 /// Overview / Dashboard page (all stats and lists stream live from Firestore).
@@ -180,7 +180,7 @@ class _OverviewViewState extends State<OverviewView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to update status for ${guide.name}.'),
-          backgroundColor: AppColors.danger,
+          backgroundColor: AppColors.adminDanger,
         ),
       );
     }
@@ -194,7 +194,7 @@ class _OverviewViewState extends State<OverviewView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── 6-stat dynamic KPI grid ─────────────────────────────
+            // â”€â”€ 6-stat dynamic KPI grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             LayoutBuilder(
               builder: (context, constraints) {
                 final w = (constraints.maxWidth - 32) / 3;
@@ -275,7 +275,7 @@ class _OverviewViewState extends State<OverviewView> {
 
             const SizedBox(height: 24),
 
-            // ── Bottom row: Pending Actions + Guide Applications ──
+            // â”€â”€ Bottom row: Pending Actions + Guide Applications â”€â”€
             LayoutBuilder(
               builder: (context, constraints) {
                 if (constraints.maxWidth < 700) {
@@ -325,7 +325,7 @@ class _OverviewViewState extends State<OverviewView> {
   }
 }
 
-// ── Stat Card ────────────────────────────────────────────────
+// â”€â”€ Stat Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _StatCard extends StatelessWidget {
   final int index;
   final String value;
@@ -350,7 +350,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.adminBorderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,7 +362,7 @@ class _StatCard extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: AppColors.statBadgeBg,
+                  color: AppColors.adminStatBadgeBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -371,7 +371,7 @@ class _StatCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.statBadgeText,
+                      color: AppColors.adminStatBadgeText,
                     ),
                   ),
                 ),
@@ -380,26 +380,26 @@ class _StatCard extends StatelessWidget {
               Text(
                 badge,
                 style: badgeDanger
-                    ? AppTextStyles.statPercentDanger
+                    ? AppTextStyles.adminStatPercentDanger
                     : (badgeIsText
-                          ? AppTextStyles.sectionSubtitle.copyWith(
-                              color: badgeDanger ? AppColors.danger : AppColors.positiveGreen,
+                          ? AppTextStyles.adminSectionSubtitle.copyWith(
+                              color: badgeDanger ? AppColors.adminDanger : AppColors.adminPositiveGreen,
                             )
-                          : AppTextStyles.statPercent),
+                          : AppTextStyles.adminStatPercent),
               ),
             ],
           ),
           const SizedBox(height: 14),
           Text(
             value,
-            style: AppTextStyles.statValue,
+            style: AppTextStyles.adminStatValue,
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: AppTextStyles.statLabel,
+            style: AppTextStyles.adminStatLabel,
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
@@ -409,7 +409,7 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-// ── Pending Actions Card ─────────────────────────────────────
+// â”€â”€ Pending Actions Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _PendingActionsCard extends StatelessWidget {
   final int guidesCount;
   final int tripsCount;
@@ -426,14 +426,14 @@ class _PendingActionsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.adminBorderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text('Pending Actions', style: AppTextStyles.sectionTitle),
+              Text('Pending Actions', style: AppTextStyles.adminSectionTitle),
             ],
           ),
           const SizedBox(height: 16),
@@ -470,7 +470,7 @@ class _PendingActionItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: AppColors.adminBackground,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -479,20 +479,20 @@ class _PendingActionItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTextStyles.tableCell),
+                Text(title, style: AppTextStyles.adminTableCell),
                 const SizedBox(height: 2),
-                Text(subtitle, style: AppTextStyles.tableCellMuted),
+                Text(subtitle, style: AppTextStyles.adminTableCellMuted),
               ],
             ),
           ),
-          Text(count, style: AppTextStyles.pendingActionsCount),
+          Text(count, style: AppTextStyles.adminPendingActionsCount),
         ],
       ),
     );
   }
 }
 
-// ── Guide Applications Card (mini table) ─────────────────────
+// â”€â”€ Guide Applications Card (mini table) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 class _GuideApplicationsCard extends StatelessWidget {
   final List<AdminGuide> guides;
   final Future<void> Function(AdminGuide, String) onUpdateStatus;
@@ -511,7 +511,7 @@ class _GuideApplicationsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.adminBorderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,11 +521,11 @@ class _GuideApplicationsCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Guide Applications', style: AppTextStyles.sectionTitle),
+                  Text('Guide Applications', style: AppTextStyles.adminSectionTitle),
                   const SizedBox(height: 2),
                   Text(
                     'Review documents, guide activity and uploaded content',
-                    style: AppTextStyles.sectionSubtitle,
+                    style: AppTextStyles.adminSectionSubtitle,
                   ),
                 ],
               ),
@@ -536,13 +536,13 @@ class _GuideApplicationsCard extends StatelessWidget {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.statusPendingBg,
+                  color: AppColors.adminStatusPendingBg,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '${pendingGuides.length} pending',
-                  style: AppTextStyles.tableCellMuted.copyWith(
-                    color: AppColors.statusPendingText,
+                  style: AppTextStyles.adminTableCellMuted.copyWith(
+                    color: AppColors.adminStatusPendingText,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -551,7 +551,7 @@ class _GuideApplicationsCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _MiniGuideTableHeader(),
-          const Divider(color: AppColors.divider, height: 1),
+          const Divider(color: AppColors.adminDivider, height: 1),
           if (guides.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
@@ -582,25 +582,25 @@ class _MiniGuideTableHeader extends StatelessWidget {
         children: [
           Expanded(
             flex: 3,
-            child: Text('Guide', style: AppTextStyles.tableHeader),
+            child: Text('Guide', style: AppTextStyles.adminTableHeader),
           ),
           Expanded(
             flex: 3,
-            child: Text('Document', style: AppTextStyles.tableHeader),
+            child: Text('Document', style: AppTextStyles.adminTableHeader),
           ),
           Expanded(
             flex: 2,
-            child: Text('City', style: AppTextStyles.tableHeader),
+            child: Text('City', style: AppTextStyles.adminTableHeader),
           ),
           Expanded(
             flex: 2,
-            child: Text('Status', style: AppTextStyles.tableHeader),
+            child: Text('Status', style: AppTextStyles.adminTableHeader),
           ),
           Expanded(
             flex: 3,
             child: Text(
               'Actions',
-              style: AppTextStyles.tableHeader,
+              style: AppTextStyles.adminTableHeader,
               textAlign: TextAlign.end,
             ),
           ),
@@ -629,7 +629,7 @@ class _MiniGuideRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(color: AppColors.divider, height: 1),
+        const Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(
@@ -641,13 +641,13 @@ class _MiniGuideRow extends StatelessWidget {
                   children: [
                     Text(
                       guide.name,
-                      style: AppTextStyles.tableCell,
+                      style: AppTextStyles.adminTableCell,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
                     Text(
                       guide.email,
-                      style: AppTextStyles.tableCellMuted,
+                      style: AppTextStyles.adminTableCellMuted,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
@@ -661,13 +661,13 @@ class _MiniGuideRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         guide.document.isNotEmpty ? guide.document : 'National ID',
-                        style: AppTextStyles.tableCellMuted,
+                        style: AppTextStyles.adminTableCellMuted,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Text('View file', style: AppTextStyles.linkText),
+                    Text('View file', style: AppTextStyles.adminLinkText),
                   ],
                 ),
               ),
@@ -675,7 +675,7 @@ class _MiniGuideRow extends StatelessWidget {
                 flex: 2,
                 child: Text(
                   guide.city.isNotEmpty ? guide.city : 'Egypt',
-                  style: AppTextStyles.tableCellMuted,
+                  style: AppTextStyles.adminTableCellMuted,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -694,16 +694,16 @@ class _MiniGuideRow extends StatelessWidget {
     Color textColor;
     String label;
     if (status == 'pending') {
-      bg = AppColors.statusPendingBg;
-      textColor = AppColors.statusPendingText;
+      bg = AppColors.adminStatusPendingBg;
+      textColor = AppColors.adminStatusPendingText;
       label = 'Pending';
     } else if (status == 'approved') {
-      bg = AppColors.statusActiveBg;
-      textColor = AppColors.statusActiveText;
+      bg = AppColors.adminStatusActiveBg;
+      textColor = AppColors.adminStatusActiveText;
       label = 'Approved';
     } else {
-      bg = AppColors.statusSuspendedBg;
-      textColor = AppColors.statusSuspendedText;
+      bg = AppColors.adminStatusSuspendedBg;
+      textColor = AppColors.adminStatusSuspendedText;
       label = 'Suspended';
     }
     return Container(
@@ -772,8 +772,8 @@ class _SmallBtn extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: danger ? AppColors.dangerLight : Colors.white,
-        border: danger ? null : Border.all(color: AppColors.divider),
+        color: danger ? AppColors.adminDangerLight : Colors.white,
+        border: danger ? null : Border.all(color: AppColors.adminDivider),
         borderRadius: BorderRadius.circular(7),
       ),
       child: Text(
@@ -781,7 +781,7 @@ class _SmallBtn extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: danger ? AppColors.danger : AppColors.textPrimary,
+          color: danger ? AppColors.adminDanger : AppColors.adminTextPrimary,
         ),
       ),
     );
@@ -797,7 +797,7 @@ class _SmallFilledBtn extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.adminPrimary,
         borderRadius: BorderRadius.circular(7),
       ),
       child: Text(
@@ -811,3 +811,4 @@ class _SmallFilledBtn extends StatelessWidget {
     );
   }
 }
+

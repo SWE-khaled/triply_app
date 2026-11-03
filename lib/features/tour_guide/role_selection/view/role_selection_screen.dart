@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:triply/features/admin_dashboard/d_auth/view/admin_login_view.dart';
-import '../../../../core/constants/tour_guide_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../common/AuthTourist/screens/onboarding_screen.dart';
 import '../../onboarding/view/tour_guide_onboarding_screen.dart';
 
@@ -49,7 +49,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w900,
-                  color: TourGuideColors.deepNile,
+                  color: AppColors.deepNile,
                 ),
               ),
               const SizedBox(height: 10),
@@ -151,7 +151,7 @@ class _RoleCard extends StatelessWidget {
             fit: BoxFit.cover,
             // Colored fallback if the asset is missing or invalid
             errorBuilder: (_, __, ___) =>
-                Container(color: TourGuideColors.deepNile),
+                Container(color: AppColors.deepNile),
           ),
 
           // ── Gradient overlay ──────────────────────────────────────────
@@ -162,8 +162,8 @@ class _RoleCard extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  TourGuideColors.deepNile.withValues(alpha: 0.70),
-                  TourGuideColors.deepNile.withValues(alpha: 0.95),
+                  AppColors.deepNile.withValues(alpha: 0.70),
+                  AppColors.deepNile.withValues(alpha: 0.95),
                 ],
                 stops: const [0.25, 0.65, 1.0],
               ),

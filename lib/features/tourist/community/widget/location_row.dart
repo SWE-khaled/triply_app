@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/widgets/location_tag_chip.dart';
 
 /// Location row extracted from `share_composer_view.dart:264`.

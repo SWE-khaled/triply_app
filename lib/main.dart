@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/core/network/dio_helper.dart';
 import 'package:triply/features/common/AuthTourist/screens/create_account_screen.dart';
 import 'package:triply/features/common/AuthTourist/screens/forgot_password_screen.dart';
 import 'package:triply/features/common/AuthTourist/screens/onboarding_screen.dart';
 import 'package:triply/features/common/AuthTourist/screens/password_reset_success_screen.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
+import 'core/routing/app_routes.dart';
 import 'features/tourist/user_profile/view/emergency_screen.dart';
 import 'features/tourist/checkout/paymob_settings.dart';
 import 'features/tourist/user_profile/view/privacy_security_screen.dart';
 import 'features/tourist/user_profile/view/profile_screen.dart';
 import 'firebase_options.dart';
 import 'features/tour_guide/role_selection/view/role_selection_screen.dart';
-import 'core/constants/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'features/common/AuthTourist/cubit/auth_cubit.dart';
 import 'features/tourist/home/view/home_screen.dart';
@@ -27,6 +28,7 @@ Future<void> main() async {
     await dotenv.load(fileName: '.env');
   } catch (_) {}
   PaymobSettings.initialize();
+  DioHelper().initialization();
   runApp(const MyApp());
 }
 

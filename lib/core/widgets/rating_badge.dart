@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../constants/app_colors.dart';
+import '../theme/app_colors.dart';
 
 /// Star + rating pill (`map_view.dart:336` preview card, place-detail rating row).
 class RatingBadge extends StatelessWidget {

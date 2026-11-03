@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../model/community_story.dart';
 
 /// Story ring extracted from `_StoryRing` in `community_view.dart`.

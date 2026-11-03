@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/tour_guide/role_selection/view/role_selection_screen.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_app_bottom_nav.dart';
 import '../../d_auth/cubit/admin_auth_cubit.dart';
 import '../../d_overview/view/d_overview_view.dart';
@@ -16,7 +16,7 @@ import '../../d_app_settings/view/d_app_settings_view.dart';
 
 // ignore_for_file: unused_import
 
-/// Root admin shell — sidebar + indexed page body.
+/// Root admin shell â€” sidebar + indexed page body.
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -85,7 +85,7 @@ class _HomeViewState extends State<HomeView> {
     // Desktop layout: permanent sidebar on the left.
     if (isDesktop) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.adminBackground,
         body: Row(
           children: [
             AdminSidebar(
@@ -114,7 +114,7 @@ class _HomeViewState extends State<HomeView> {
 
     // Mobile layout: hamburger menu + Drawer.
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.adminBackground,
       drawer: Drawer(
         width: 240,
         child: AdminSidebar(
@@ -174,7 +174,7 @@ class _PageHeader extends StatelessWidget {
           if (!isDesktop) ...[
             Builder(
               builder: (ctx) => IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.primary),
+                icon: const Icon(Icons.menu, color: AppColors.adminPrimary),
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -190,12 +190,12 @@ class _PageHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTextStyles.pageTitle.copyWith(
+                  style: AppTextStyles.adminPageTitle.copyWith(
                     fontSize: isDesktop ? 28 : 22,
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: AppTextStyles.pageSubtitle),
+                Text(subtitle, style: AppTextStyles.adminPageSubtitle),
               ],
             ),
           ),
@@ -226,7 +226,7 @@ class _PageHeader extends StatelessWidget {
                   width: 30,
                   height: 30,
                   decoration: const BoxDecoration(
-                    color: AppColors.primary,
+                    color: AppColors.adminPrimary,
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
@@ -266,7 +266,7 @@ class AdminCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.fromLTRB(narrow ? 16 : 32, 0, narrow ? 16 : 32, 32),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: AppColors.adminCardBg,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: padding ?? const EdgeInsets.all(24),
@@ -296,10 +296,10 @@ class CardSectionHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: AppTextStyles.sectionTitle),
+              Text(title, style: AppTextStyles.adminSectionTitle),
               if (subtitle != null) ...[
                 const SizedBox(height: 3),
-                Text(subtitle!, style: AppTextStyles.sectionSubtitle),
+                Text(subtitle!, style: AppTextStyles.adminSectionSubtitle),
               ],
             ],
           ),
@@ -324,10 +324,10 @@ class AddNewButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: AppColors.adminPrimary,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Text('+ Add New', style: AppTextStyles.buttonPrimary),
+        child: Text('+ Add New', style: AppTextStyles.adminButtonPrimary),
       ),
     );
   }
@@ -353,13 +353,13 @@ class SearchFilterRow extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
-      style: AppTextStyles.tableCell,
+      style: AppTextStyles.adminTableCell,
       decoration: InputDecoration(
         hintText: hintText,
         prefixIcon: const Icon(
           Icons.search,
           size: 18,
-          color: AppColors.textMuted,
+          color: AppColors.adminTextMuted,
         ),
       ),
     );
@@ -377,7 +377,7 @@ Widget buildTableHeader(List<Map<String, dynamic>> columns) {
               flex: col['flex'] as int? ?? 1,
               child: Text(
                 col['label'] as String,
-                style: AppTextStyles.tableHeader,
+                style: AppTextStyles.adminTableHeader,
                 textAlign: col['align'] as TextAlign? ?? TextAlign.start,
               ),
             ),
@@ -386,3 +386,4 @@ Widget buildTableHeader(List<Map<String, dynamic>> columns) {
     ),
   );
 }
+

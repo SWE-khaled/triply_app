@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Dashed media picker box extracted from `_MediaPickerBox`.
 class MediaPickerBox extends StatelessWidget {

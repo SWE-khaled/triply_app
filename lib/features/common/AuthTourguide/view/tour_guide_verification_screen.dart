@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/common/AuthTourguide/view/tour_guide_login_screen.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
-import '../../../../core/constants/tour_guide_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/services/cloudinary_service.dart';
 
 class TourGuideVerificationScreen extends StatefulWidget {
@@ -158,7 +158,7 @@ class _TourGuideVerificationScreenState
                       ),
                       child: const Icon(
                         Icons.arrow_back,
-                        color: TourGuideColors.deepNile,
+                        color: AppColors.deepNile,
                         size: 20,
                       ),
                     ),
@@ -189,7 +189,7 @@ class _TourGuideVerificationScreenState
                     child: const Text(
                       'Skip for now',
                       style: TextStyle(
-                        color: TourGuideColors.deepNile,
+                        color: AppColors.deepNile,
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
                       ),
@@ -226,7 +226,7 @@ class _TourGuideVerificationScreenState
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
-                        color: TourGuideColors.deepNile,
+                        color: AppColors.deepNile,
                         height: 1.2,
                       ),
                     ),
@@ -263,7 +263,7 @@ class _TourGuideVerificationScreenState
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: TourGuideColors.deepNile,
+                              color: AppColors.deepNile,
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -299,7 +299,7 @@ class _TourGuideVerificationScreenState
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: TourGuideColors.deepNile,
+                              color: AppColors.deepNile,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -307,7 +307,7 @@ class _TourGuideVerificationScreenState
                             'You can use your dashboard while your documents are being reviewed, but you can\'t publish trips yet.',
                             style: TextStyle(
                               fontSize: 13,
-                              color: TourGuideColors.deepNile.withValues(
+                              color: AppColors.deepNile.withValues(
                                 alpha: 0.70,
                               ),
                               height: 1.4,
@@ -418,7 +418,7 @@ class _TourGuideVerificationScreenState
                           return ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: canSubmitNow
-                                  ? TourGuideColors.deepNile
+                                  ? AppColors.deepNile
                                   : const Color(0xFF7A9B9F),
                               padding: const EdgeInsets.symmetric(
                                 vertical: 18,
@@ -473,13 +473,13 @@ class _TourGuideVerificationScreenState
       children: [
         const Text(
           '• ',
-          style: TextStyle(color: TourGuideColors.deepNile, fontSize: 13),
+          style: TextStyle(color: AppColors.deepNile, fontSize: 13),
         ),
         Expanded(
           child: Text(
             text,
             style: const TextStyle(
-              color: TourGuideColors.deepNile,
+              color: AppColors.deepNile,
               fontSize: 13,
               height: 1.3,
             ),
@@ -568,7 +568,7 @@ class _TourGuideVerificationScreenState
               size: 32,
               color: hasFile
                   ? Colors.green
-                  : TourGuideColors.deepNile.withValues(alpha: 0.70),
+                  : AppColors.deepNile.withValues(alpha: 0.70),
             ),
             const SizedBox(height: 12),
             Text(
@@ -579,7 +579,7 @@ class _TourGuideVerificationScreenState
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: hasFile ? Colors.green[800] : TourGuideColors.deepNile,
+                color: hasFile ? Colors.green[800] : AppColors.deepNile,
               ),
             ),
             if (!hasFile) ...[

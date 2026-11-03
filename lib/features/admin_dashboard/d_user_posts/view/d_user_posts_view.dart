@@ -1,10 +1,10 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/data/repositories/admin_posts_repository.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../d_home/view/d_home_view.dart';
 
 class UserPostsView extends StatefulWidget {
@@ -74,7 +74,7 @@ class _UserPostsViewState extends State<UserPostsView> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -129,7 +129,7 @@ class _UserPostsViewState extends State<UserPostsView> {
               ],
               Row(
                 children: [
-                  const Icon(Icons.person, size: 18, color: AppColors.primary),
+                  const Icon(Icons.person, size: 18, color: AppColors.adminPrimary),
                   const SizedBox(width: 6),
                   Text(
                     'Author: ${post.author}',
@@ -141,11 +141,11 @@ class _UserPostsViewState extends State<UserPostsView> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.location_on, size: 16, color: AppColors.textMuted),
+                    const Icon(Icons.location_on, size: 16, color: AppColors.adminTextMuted),
                     const SizedBox(width: 6),
                     Text(
                       post.location,
-                      style: AppTextStyles.tableCellMuted,
+                      style: AppTextStyles.adminTableCellMuted,
                     ),
                   ],
                 ),
@@ -154,15 +154,15 @@ class _UserPostsViewState extends State<UserPostsView> {
                 const SizedBox(height: 4),
                 Text(
                   'Posted: ${post.createdAt!.day}/${post.createdAt!.month}/${post.createdAt!.year}',
-                  style: AppTextStyles.tableCellMuted.copyWith(fontSize: 12),
+                  style: AppTextStyles.adminTableCellMuted.copyWith(fontSize: 12),
                 ),
               ],
               const SizedBox(height: 14),
-              const Divider(color: AppColors.divider),
+              const Divider(color: AppColors.adminDivider),
               const SizedBox(height: 8),
               Text(
                 post.text.isNotEmpty ? post.text : 'No text content in this post.',
-                style: AppTextStyles.tableCell.copyWith(fontSize: 14, height: 1.4),
+                style: AppTextStyles.adminTableCell.copyWith(fontSize: 14, height: 1.4),
               ),
             ],
           ),
@@ -179,7 +179,7 @@ class _UserPostsViewState extends State<UserPostsView> {
             },
             icon: const Icon(Icons.delete, size: 16, color: Colors.white),
             label: const Text('Delete Post', style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
           ),
         ],
       ),
@@ -214,9 +214,9 @@ class _UserPostsViewState extends State<UserPostsView> {
   Widget _imagePlaceholder(double height) {
     return Container(
       height: height,
-      color: AppColors.statBadgeBg,
+      color: AppColors.adminStatBadgeBg,
       child: const Center(
-        child: Icon(Icons.image_outlined, size: 48, color: AppColors.textMuted),
+        child: Icon(Icons.image_outlined, size: 48, color: AppColors.adminTextMuted),
       ),
     );
   }
@@ -309,7 +309,7 @@ class _PostCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.adminBorderLight),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -335,14 +335,14 @@ class _PostCard extends StatelessWidget {
               children: [
                 Text(
                   post.title,
-                  style: AppTextStyles.postCardTitle,
+                  style: AppTextStyles.adminPostCardTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'By ${post.author}',
-                  style: AppTextStyles.postCardAuthor,
+                  style: AppTextStyles.adminPostCardAuthor,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -357,13 +357,13 @@ class _PostCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            border: Border.all(color: AppColors.divider),
+                            border: Border.all(color: AppColors.adminDivider),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             'View',
                             textAlign: TextAlign.center,
-                            style: AppTextStyles.buttonSecondary,
+                            style: AppTextStyles.adminButtonSecondary,
                           ),
                         ),
                       ),
@@ -376,13 +376,13 @@ class _PostCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: AppColors.dangerLight,
+                            color: AppColors.adminDangerLight,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             'Remove',
                             textAlign: TextAlign.center,
-                            style: AppTextStyles.buttonDanger,
+                            style: AppTextStyles.adminButtonDanger,
                           ),
                         ),
                       ),
@@ -397,3 +397,4 @@ class _PostCard extends StatelessWidget {
     );
   }
 }
+

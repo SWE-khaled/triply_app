@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Marker child extracted from `map_view.dart:54-63`.
 class MapPlaceMarker extends StatelessWidget {

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../theme/d_app_colors.dart';
-import '../theme/d_app_text_styles.dart';
+﻿import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 
 /// Navigation item data
 class _NavItem {
@@ -43,24 +43,24 @@ class AdminSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 240,
-      color: AppColors.sidebarBg,
+      color: AppColors.adminSidebarBg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Logo ──────────────────────────────────────
+          // â”€â”€ Logo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Triply', style: AppTextStyles.logoTitle),
+                Text('Triply', style: AppTextStyles.adminLogoTitle),
                 const SizedBox(height: 2),
-                Text('ADMIN CONSOLE', style: AppTextStyles.logoSubtitle),
+                Text('ADMIN CONSOLE', style: AppTextStyles.adminLogoSubtitle),
               ],
             ),
           ),
 
-          // ── Nav items ─────────────────────────────────
+          // â”€â”€ Nav items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -82,7 +82,7 @@ class AdminSidebar extends StatelessWidget {
             ),
           ),
 
-          // ── Bottom: admin profile + log out ───────────
+          // â”€â”€ Bottom: admin profile + log out â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
           _SidebarFooter(onLogout: onLogout, adminName: adminName),
         ],
       ),
@@ -112,7 +112,7 @@ class _NavTile extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.sidebarActiveBg : Colors.transparent,
+          color: isActive ? AppColors.adminSidebarActiveBg : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
@@ -120,14 +120,14 @@ class _NavTile extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isActive ? Colors.white : AppColors.sidebarInactiveText,
+              color: isActive ? Colors.white : AppColors.adminSidebarInactiveText,
             ),
             const SizedBox(width: 10),
             Text(
               label,
               style: isActive
-                  ? AppTextStyles.navItemActive
-                  : AppTextStyles.navItemInactive,
+                  ? AppTextStyles.adminNavItemActive
+                  : AppTextStyles.adminNavItemInactive,
             ),
           ],
         ),
@@ -160,7 +160,7 @@ class _SidebarFooter extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                  color: AppColors.adminPrimary,
                   shape: BoxShape.circle,
                 ),
                 child: const Center(
@@ -178,8 +178,8 @@ class _SidebarFooter extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(adminName, style: AppTextStyles.sidebarUserName),
-                  Text('Super Admin', style: AppTextStyles.sidebarUserRole),
+                  Text(adminName, style: AppTextStyles.adminSidebarUserName),
+                  Text('Super Admin', style: AppTextStyles.adminSidebarUserRole),
                 ],
               ),
             ],
@@ -187,10 +187,11 @@ class _SidebarFooter extends StatelessWidget {
           const SizedBox(height: 10),
           InkWell(
             onTap: onLogout,
-            child: Text('Log out', style: AppTextStyles.logoutText),
+            child: Text('Log out', style: AppTextStyles.adminLogoutText),
           ),
         ],
       ),
     );
   }
 }
+

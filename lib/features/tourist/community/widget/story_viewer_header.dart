@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Header extracted from `story_viewer_view.dart:289`.
 class StoryViewerHeader extends StatelessWidget {

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../theme/d_app_colors.dart';
-import '../theme/d_app_text_styles.dart';
+﻿import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 
 /// Shared status badge chip used across all admin tables.
 /// [status] can be: 'active', 'approved', 'confirmed', 'pending',
@@ -19,43 +19,43 @@ class StatusChip extends StatelessWidget {
 
     switch (s) {
       case 'active':
-        bg = AppColors.statusActiveBg;
-        textColor = AppColors.statusActiveText;
+        bg = AppColors.adminStatusActiveBg;
+        textColor = AppColors.adminStatusActiveText;
         label = 'Active';
         break;
       case 'approved':
-        bg = AppColors.statusActiveBg;
-        textColor = AppColors.statusActiveText;
+        bg = AppColors.adminStatusActiveBg;
+        textColor = AppColors.adminStatusActiveText;
         label = 'Approved';
         break;
       case 'confirmed':
-        bg = AppColors.statusActiveBg;
-        textColor = AppColors.statusActiveText;
+        bg = AppColors.adminStatusActiveBg;
+        textColor = AppColors.adminStatusActiveText;
         label = 'Confirmed';
         break;
       case 'pending':
-        bg = AppColors.statusPendingBg;
-        textColor = AppColors.statusPendingText;
+        bg = AppColors.adminStatusPendingBg;
+        textColor = AppColors.adminStatusPendingText;
         label = 'Pending';
         break;
       case 'pending_review':
-        bg = AppColors.statusPendingBg;
-        textColor = AppColors.statusPendingText;
+        bg = AppColors.adminStatusPendingBg;
+        textColor = AppColors.adminStatusPendingText;
         label = 'Pending Review';
         break;
       case 'suspended':
-        bg = AppColors.statusSuspendedBg;
-        textColor = AppColors.statusSuspendedText;
+        bg = AppColors.adminStatusSuspendedBg;
+        textColor = AppColors.adminStatusSuspendedText;
         label = 'Suspended';
         break;
       case 'cancelled':
-        bg = AppColors.statusCancelledBg;
-        textColor = AppColors.statusCancelledText;
+        bg = AppColors.adminStatusCancelledBg;
+        textColor = AppColors.adminStatusCancelledText;
         label = 'Cancelled';
         break;
       default:
-        bg = AppColors.statusSuspendedBg;
-        textColor = AppColors.statusSuspendedText;
+        bg = AppColors.adminStatusSuspendedBg;
+        textColor = AppColors.adminStatusSuspendedText;
         label = status;
     }
 
@@ -67,7 +67,7 @@ class StatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppTextStyles.tableCell.copyWith(
+        style: AppTextStyles.adminTableCell.copyWith(
           color: textColor,
           fontSize: 12,
           fontWeight: FontWeight.w500,
@@ -92,11 +92,11 @@ class OutlineActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.divider, width: 1),
+          border: Border.all(color: AppColors.adminDivider, width: 1),
           borderRadius: BorderRadius.circular(8),
           color: Colors.white,
         ),
-        child: Text(label, style: AppTextStyles.buttonSecondary),
+        child: Text(label, style: AppTextStyles.adminButtonSecondary),
       ),
     );
   }
@@ -117,10 +117,10 @@ class DangerActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: AppColors.dangerLight,
+          color: AppColors.adminDangerLight,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(label, style: AppTextStyles.buttonDanger),
+        child: Text(label, style: AppTextStyles.adminButtonDanger),
       ),
     );
   }
@@ -141,11 +141,12 @@ class PrimaryActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: AppColors.adminPrimary,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Text(label, style: AppTextStyles.buttonPrimary),
+        child: Text(label, style: AppTextStyles.adminButtonPrimary),
       ),
     );
   }
 }
+

@@ -1,8 +1,8 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/data/repositories/admin_trips_repository.dart';
-import '../../../../core/theme/d_app_colors.dart';
-import '../../../../core/theme/d_app_text_styles.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
 
@@ -181,7 +181,7 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, reasonController.text.trim()),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
             child: const Text(
               'Confirm Reject',
               style: TextStyle(color: Colors.white),
@@ -386,7 +386,7 @@ class _ApplicationItem extends StatelessWidget {
 
     return Column(
       children: [
-        if (!isFirst) const Divider(color: AppColors.divider, height: 1),
+        if (!isFirst) const Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 18),
           child: Row(
@@ -401,7 +401,7 @@ class _ApplicationItem extends StatelessWidget {
                         Expanded(
                           child: Text(
                             app.tripTitle,
-                            style: AppTextStyles.tableCell.copyWith(
+                            style: AppTextStyles.adminTableCell.copyWith(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -441,8 +441,8 @@ class _ApplicationItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'By ${app.guide} · ${app.date} · ${app.price}',
-                      style: AppTextStyles.tableCellMuted,
+                      'By ${app.guide} آ· ${app.date} آ· ${app.price}',
+                      style: AppTextStyles.adminTableCellMuted,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
@@ -452,7 +452,7 @@ class _ApplicationItem extends StatelessWidget {
                       Text(
                         'Reason for rejection: ${app.rejectionReason}',
                         style: const TextStyle(
-                          color: AppColors.danger,
+                          color: AppColors.adminDanger,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
@@ -468,9 +468,9 @@ class _ApplicationItem extends StatelessWidget {
               ] else ...[
                 Text(
                   'Pending Review',
-                  style: AppTextStyles.tableCellMuted.copyWith(
+                  style: AppTextStyles.adminTableCellMuted.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
+                    color: AppColors.adminTextSecondary,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -487,3 +487,4 @@ class _ApplicationItem extends StatelessWidget {
     );
   }
 }
+

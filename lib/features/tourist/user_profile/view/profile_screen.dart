@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/constants/app_routes.dart';
+import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';

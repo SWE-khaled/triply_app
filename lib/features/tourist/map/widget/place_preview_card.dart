@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../../../../core/widgets/rating_badge.dart';
 import '../model/place.dart';

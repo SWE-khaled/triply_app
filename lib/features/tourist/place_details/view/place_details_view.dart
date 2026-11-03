@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/place_detail_cubit.dart';
 
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_routes.dart';
+import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../../guides/view/guide_profile_screen.dart';

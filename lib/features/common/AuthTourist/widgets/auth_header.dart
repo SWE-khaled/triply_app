@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Teal gradient header used on the Sign In and Create Account screens.
 class AuthHeader extends StatelessWidget {

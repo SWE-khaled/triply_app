@@ -254,3 +254,21 @@ class AppRoutes {
     Navigator.of(context).push(tripDetails(trip));
   }
 }
+
+// =========================================================================
+// Admin Dashboard routes (formerly d_app_routes.dart)
+// =========================================================================
+class AdminRoutes {
+  AdminRoutes._();
+
+  static const String home = '/admin';
+  static const String overview = '/admin/overview';
+  static const String trips = '/admin/trips';
+  static const String users = '/admin/users';
+  static const String bookings = '/admin/bookings';
+  static const String userPosts = '/admin/user-posts';
+  static const String guides = '/admin/guides';
+  static const String tripApplications = '/admin/trip-applications';
+  static const String appSettings = '/admin/app-settings';
+  static const String login = '/admin/login';
+}

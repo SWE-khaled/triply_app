@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Teal pill button replacing composer Share button (`new_share_screen.dart:319`).
 class PrimaryButton extends StatelessWidget {

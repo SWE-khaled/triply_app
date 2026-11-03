@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../cubit/map_state.dart';
 
 /// Filter chips row extracted from `map_view.dart:157-190`.

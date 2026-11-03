@@ -20,6 +20,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+
 // Public web config, already committed in lib/firebase_options.dart.
 const String _projectId = 'triply-f9b82';
 const String _webApiKey = 'AIzaSyBSqfGq2OZsZwM9OSgkUYsoVuYltzzeOmc';
@@ -278,7 +280,7 @@ Future<Map<String, dynamic>?> _fsGet(String path, String idToken) async {
     diagnosticPath: path,
   );
   if (!r.ok) {
-    print('  [request-error] GET ${r.diagnostic}');
+    debugPrint('  [request-error] GET ${r.diagnostic}');
     return null;
   }
   return (r.body as Map)['fields'] as Map<String, dynamic>?;
@@ -403,13 +405,13 @@ void _record(_Check c, _Resp r) {
   } else {
     c.isError = true;
     c.detail = 'HTTP ${r.status} ${r.firestoreCode ?? 'UNEXPECTED'}';
-    print('  [request-error] ${c.name}: ${r.diagnostic}');
+    debugPrint('  [request-error] ${c.name}: ${r.diagnostic}');
     return;
   }
   // A genuine denial on a check that expected success is a FAIL, but still
   // worth a sanitized diagnostic (e.g. a missing report prerequisite).
   if (c.expectedAllowed) {
-    print('  [unexpected-denial] ${c.name}: ${r.diagnostic}');
+    debugPrint('  [unexpected-denial] ${c.name}: ${r.diagnostic}');
   }
 }
 
@@ -470,11 +472,11 @@ String? _encodingProblem() {
 Future<void> main() async {
   final encodingProblem = _encodingProblem();
   if (encodingProblem != null) {
-    print(
+    debugPrint(
       'chat_rules_check: request encoder self-test failed: '
       '$encodingProblem',
     );
-    print('No live checks were run.');
+    debugPrint('No live checks were run.');
     exit(1);
   }
 
@@ -490,13 +492,13 @@ Future<void> main() async {
       .map((e) => e.key)
       .toList();
   if (missing.isNotEmpty) {
-    print('chat_rules_check: test account credentials are not configured.');
-    print('Missing environment variables: ${missing.join(', ')}');
-    print('Set them (tourist + guide) and re-run. No live checks were run.');
+    debugPrint('chat_rules_check: test account credentials are not configured.');
+    debugPrint('Missing environment variables: ${missing.join(', ')}');
+    debugPrint('Set them (tourist + guide) and re-run. No live checks were run.');
     exit(0);
   }
 
-  print('chat_rules_check: project=$_projectId');
+  debugPrint('chat_rules_check: project=$_projectId');
   final tourist = await _signIn(
     required['CHAT_TEST_TOURIST_EMAIL']!,
     required['CHAT_TEST_TOURIST_PASSWORD']!,
@@ -505,10 +507,10 @@ Future<void> main() async {
     required['CHAT_TEST_GUIDE_EMAIL']!,
     required['CHAT_TEST_GUIDE_PASSWORD']!,
   );
-  print('chat_rules_check: tourist sign-in ${tourist.diagnostic}');
-  print('chat_rules_check: guide sign-in ${guide.diagnostic}');
+  debugPrint('chat_rules_check: tourist sign-in ${tourist.diagnostic}');
+  debugPrint('chat_rules_check: guide sign-in ${guide.diagnostic}');
   if (!tourist.ok || !guide.ok) {
-    print(
+    debugPrint(
       'chat_rules_check: sign-in failed or the Auth response had no usable '
       'localId (tourist=${tourist.ok}, guide=${guide.ok}). No checks run.',
     );
@@ -519,9 +521,9 @@ Future<void> main() async {
   final guideToken = guide.idToken!;
   final tUid = tourist.localId!;
   final gUid = guide.localId!;
-  print('chat_rules_check: both test accounts resolved a uid.');
+  debugPrint('chat_rules_check: both test accounts resolved a uid.');
   if (tUid == gUid) {
-    print(
+    debugPrint(
       'chat_rules_check: the two test accounts resolved to the same uid. '
       'No checks were run.',
     );
@@ -533,7 +535,7 @@ Future<void> main() async {
   // matches the rules before any live call is made.
   if (_canonicalChatId('aaa', 'zzz') != 'aaa_zzz' ||
       _canonicalChatId('zzz', 'aaa') != 'aaa_zzz') {
-    print(
+    debugPrint(
       'chat_rules_check: canonical chat id self-test failed. No live '
       'checks were run.',
     );
@@ -545,7 +547,7 @@ Future<void> main() async {
   final otherOrderingId = touristFirstId == chatId
       ? '${gUid}_$tUid'
       : touristFirstId;
-  print(
+  debugPrint(
     'chat_rules_check: canonical chat id=$chatId '
     '(non-canonical order: $otherOrderingId)',
   );
@@ -894,8 +896,8 @@ Future<void> main() async {
   }
 
   // ---- report ----
-  print('');
-  print('=== chat rules check results ===');
+  debugPrint('');
+  debugPrint('=== chat rules check results ===');
   var failures = 0;
   for (final c in checks) {
     final status = c.isError
@@ -908,27 +910,27 @@ Future<void> main() async {
         : (c.pass ? 'PASS' : 'FAIL');
     if (status == 'FAIL' || status == 'ERROR') failures++;
     final expect = c.expectedAllowed ? 'allowed' : 'denied';
-    print(
+    debugPrint(
       '[$status] ${c.name} (expected: $expect) — ${c.detail.isEmpty ? (c.actualAllowed ? "allowed" : "denied") : c.detail}',
     );
   }
-  print('');
-  print('failures: $failures');
+  debugPrint('');
+  debugPrint('failures: $failures');
 
   // ---- cleanup (client API only; the rules allow deleting own messages) ----
-  print('');
-  print('=== cleanup ===');
+  debugPrint('');
+  debugPrint('=== cleanup ===');
   final remaining = <String>[];
   // Delete the message the tourist created (sender may delete within 24h).
   if (messageReady) {
     final delMsg = await _fsDelete(msgPath, touristToken);
-    print(
+    debugPrint(
       'delete message $msgId: '
       '${delMsg.ok ? "ok" : "denied (will remain)"}',
     );
     if (!delMsg.ok) remaining.add(msgPath);
   } else {
-    print('delete message $msgId: skipped (no message was created)');
+    debugPrint('delete message $msgId: skipped (no message was created)');
   }
   // The chat and the report have no client delete; list them for Khaled.
   // Any chat document that unexpectedly succeeded is listed too, including
@@ -941,13 +943,13 @@ Future<void> main() async {
   remaining.add(chatPath);
   remaining.add('reports/${gUid}_$msgId');
   if (remaining.isNotEmpty) {
-    print(
+    debugPrint(
       'The following documents cannot be deleted by the client (no client '
       'delete rule) and no Admin SDK credentials are in the environment.',
     );
-    print('Delete them in the Firebase Console (project $_projectId):');
+    debugPrint('Delete them in the Firebase Console (project $_projectId):');
     for (final p in remaining.toSet()) {
-      print('  - $p');
+      debugPrint('  - $p');
     }
   }
 

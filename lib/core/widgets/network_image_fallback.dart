@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Network image with grey + icon fallback. Replaces every
 /// `Image.network/errorBuilder` block (map preview, place-detail hero,

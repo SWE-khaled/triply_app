@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Search field extracted from `map_view.dart:119-155`.
 class MapSearchField extends StatelessWidget {

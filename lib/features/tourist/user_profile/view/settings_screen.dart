@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/constants/app_routes.dart';
+import 'package:triply/core/routing/app_routes.dart';
 import '../../../common/AuthTourist/cubit/auth_cubit.dart';
 import '../../../tour_guide/role_selection/view/role_selection_screen.dart';
 import '../cubit/profile_cubit.dart';
