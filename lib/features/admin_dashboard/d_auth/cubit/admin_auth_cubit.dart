@@ -118,64 +118,6 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
     }
   }
 
-  Future<bool> createAccount({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    emit(const AdminAuthLoading());
-    try {
-      if (name.trim().isEmpty) {
-        emit(AdminAuthError(error: 'Please enter your full name.'));
-        return false;
-      }
-      if (password.length < 6) {
-        emit(AdminAuthError(error: 'Password must be at least 6 characters.'));
-        return false;
-      }
-      if (!isAllowedAdminEmail(email)) {
-        emit(AdminAuthError(error: emailNotAllowedMessage));
-        return false;
-      }
-      final credential = await _auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password,
-      );
-      final uid = credential.user!.uid;
-      await credential.user!.updateDisplayName(name.trim());
-      // Claim the admin role - allowed while the project has no admin.
-      await _db.collection('users').doc(uid).set({
-        'uid': uid,
-        'name': name.trim(),
-        'email': email.trim(),
-        'role': 'admin',
-        'isActive': true,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      // Close the bootstrap window: from now on only an admin can hand
-      // the role out.
-      await _db.collection('appSettings').doc('_bootstrap').set({
-        'firstAdminUid': uid,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      emit(
-        AdminAuthSuccess(
-          session: AdminSession(name: name.trim(), email: email.trim()),
-        ),
-      );
-      return true;
-    } on FirebaseAuthException catch (e) {
-      emit(AdminAuthError(error: _authMessage(e)));
-      return false;
-    } on FirebaseException {
-      // The rules refused the admin role: somebody else already claimed it.
-      emit(AdminAuthError(error: alreadyAnAdminMessage));
-      return false;
-    } catch (e) {
-      emit(AdminAuthError(error: e.toString()));
-      return false;
-    }
-  }
 
   Future<void> logout() async {
     await _auth.signOut();

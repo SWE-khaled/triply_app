@@ -5,11 +5,8 @@ import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
 import 'package:triply/features/admin_dashboard/d_home/view/d_home_view.dart';
 import '../cubit/admin_auth_cubit.dart';
-import 'admin_create_account_view.dart';
 
-/// Admin Login — same visual design as the Tourist Login,
-/// responsive for mobile and web.
-/// Frontend-only rule: the identifier must contain 'triplykl'.
+
 class AdminLoginView extends StatefulWidget {
   const AdminLoginView({super.key});
 
@@ -235,33 +232,6 @@ class _AdminLoginViewState extends State<AdminLoginView> {
             ),
           ),
           const SizedBox(height: 28),
-          Center(
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                const Text(
-                  "Don't have an admin account? ",
-                  style: TextStyle(color: AuthColors.textGrey, fontSize: 16),
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const AdminCreateAccountView(),
-                    ),
-                  ),
-                  child: const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      color: AuthColors.signInDark,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
         ],
       ),
     );

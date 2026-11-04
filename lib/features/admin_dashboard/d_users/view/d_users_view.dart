@@ -1,81 +1,46 @@
-﻿import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/data/repositories/admin_tourists_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
+import '../cubit/users_cubit.dart';
 
-/// Tourists management screen (for Tourists only, connected to Firestore database).
-class UsersView extends StatefulWidget {
+/// Tourists management screen (connected to Firestore).
+class UsersView extends StatelessWidget {
   const UsersView({super.key});
 
   @override
-  State<UsersView> createState() => _UsersViewState();
-}
-
-class _UsersViewState extends State<UsersView> {
-  final TextEditingController _search = TextEditingController();
-  final AdminTouristsRepository _repository = AdminTouristsRepository();
-
-  List<AdminTourist> _tourists = const [];
-  StreamSubscription<List<AdminTourist>>? _subscription;
-  String _query = '';
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _subscription = _repository.watchTourists().listen(
-      (tourists) {
-        if (!mounted) return;
-        setState(() {
-          _tourists = tourists;
-          _loading = false;
-        });
-      },
-      onError: (_) {
-        if (!mounted) return;
-        setState(() {
-          _loading = false;
-        });
-      },
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => UsersCubit()..start(),
+      child: const _UsersBody(),
     );
   }
+}
 
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    _search.dispose();
-    super.dispose();
-  }
+class _UsersBody extends StatelessWidget {
+  const _UsersBody();
 
-  List<AdminTourist> get _filtered {
-    final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return _tourists;
-    return _tourists.where((u) {
-      return u.name.toLowerCase().contains(q) ||
-          u.email.toLowerCase().contains(q) ||
-          u.phone.toLowerCase().contains(q);
-    }).toList();
-  }
-
-  void _showViewDialog(AdminTourist tourist) {
+  void _showViewDialog(BuildContext context, AdminTourist tourist) {
     showDialog(
       context: context,
       builder: (_) => _ViewUserDialog(tourist: tourist),
     );
   }
 
-  Future<void> _toggleUserStatus(AdminTourist tourist) async {
-    final newStatus = tourist.status == 'active' ? 'suspended' : 'active';
-    final ok = await _repository.updateStatus(tourist.uid, newStatus);
-    if (!mounted) return;
-    if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update tourist status.')),
-      );
-    }
+  Future<void> _toggleUserStatus(
+    BuildContext context,
+    AdminTourist tourist,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await context.read<UsersCubit>().toggleStatus(tourist);
+    if (ok) return;
+    messenger.showSnackBar(
+      const SnackBar(content: Text('Failed to update tourist status.')),
+    );
   }
 
   @override
@@ -99,8 +64,7 @@ class _UsersViewState extends State<UsersView> {
 
             SearchFilterRow(
               hintText: 'Search tourists...',
-              controller: _search,
-              onChanged: (v) => setState(() => _query = v),
+              onChanged: context.read<UsersCubit>().search,
             ),
             const SizedBox(height: 20),
 
@@ -121,25 +85,43 @@ class _UsersViewState extends State<UsersView> {
             ),
             const Divider(color: AppColors.adminDivider, height: 1),
 
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else ...[
-              ..._filtered.map(
-                (u) => _UserRow(
-                  tourist: u,
-                  onView: () => _showViewDialog(u),
-                  onToggleStatus: () => _toggleUserStatus(u),
-                ),
-              ),
-              if (_filtered.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(child: Text('No tourists found.')),
-                ),
-            ],
+            BlocBuilder<UsersCubit, UsersState>(
+              builder: (context, state) {
+                if (state is UsersInitial || state is UsersLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (state is UsersError) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text(state.message)),
+                  );
+                }
+
+                final data = state as UsersSuccess;
+                final tourists = data.filtered;
+                if (tourists.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text('No tourists found.')),
+                  );
+                }
+
+                return Column(
+                  children: [
+                    for (final tourist in tourists)
+                      _UserRow(
+                        tourist: tourist,
+                        onView: () => _showViewDialog(context, tourist),
+                        onToggleStatus: () =>
+                            _toggleUserStatus(context, tourist),
+                      ),
+                  ],
+                );
+              },
+            ),
           ],
         ),
       ),

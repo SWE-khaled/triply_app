@@ -1,331 +1,255 @@
-﻿import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/data/repositories/admin_guides_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../d_home/view/d_home_view.dart';
+import '../cubit/admin_dashboard_cubit.dart';
 
 /// Overview / Dashboard page (all stats and lists stream live from Firestore).
-class OverviewView extends StatefulWidget {
+class OverviewView extends StatelessWidget {
   const OverviewView({super.key});
 
   @override
-  State<OverviewView> createState() => _OverviewViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => AdminDashboardCubit()..start(),
+      child: const _OverviewBody(),
+    );
+  }
 }
 
-class _OverviewViewState extends State<OverviewView> {
-  List<AdminGuide> _guides = const [];
-  final AdminGuidesRepository _guidesRepo = AdminGuidesRepository();
+class _OverviewBody extends StatelessWidget {
+  const _OverviewBody();
 
-  StreamSubscription? _usersSub;
-  StreamSubscription? _guidesSub;
-  StreamSubscription? _tripsSub;
-  StreamSubscription? _bookingsSub;
-  StreamSubscription<List<AdminGuide>>? _guidesListSub;
-
-  int _totalUsersCount = 0;
-  int _tourGuidesCount = 0;
-  int _totalTripsCount = 0;
-  int _totalBookingsCount = 0;
-  double _totalEarnings = 0;
-  int _pendingTripsCount = 0;
-
-  int get _pendingGuidesCount =>
-      _guides.where((g) => g.status == 'pending').length;
-
-  int get _totalPending => _pendingGuidesCount + _pendingTripsCount;
-
-  @override
-  void initState() {
-    super.initState();
-    _initKpiStreams();
-  }
-
-  void _initKpiStreams() {
-    try {
-      // 1. Total Users (real-time from Firestore)
-      _usersSub = FirebaseFirestore.instance
-          .collection('users')
-          .snapshots()
-          .listen((snap) {
-        if (!mounted) return;
-        setState(() {
-          _totalUsersCount = snap.docs.length;
-        });
-      }, onError: (_) {});
-
-      // 2. Tour Guides (users with role 'guide')
-      _guidesSub = FirebaseFirestore.instance
-          .collection('users')
-          .where('role', isEqualTo: 'guide')
-          .snapshots()
-          .listen((snap) {
-        if (!mounted) return;
-        setState(() {
-          _tourGuidesCount = snap.docs.length;
-        });
-      }, onError: (_) {});
-
-      // 3. Total Trips and Pending Trips
-      _tripsSub = FirebaseFirestore.instance
-          .collection('trips')
-          .snapshots()
-          .listen((snap) {
-        if (!mounted) return;
-        int pending = 0;
-        for (final doc in snap.docs) {
-          final data = doc.data();
-          final status = (data['approvalStatus'] as String?) ??
-              (data['status'] as String?) ??
-              'pending';
-          if (status == 'pending' || status == 'pending_review') pending++;
-        }
-        setState(() {
-          _totalTripsCount = snap.docs.length;
-          _pendingTripsCount = pending;
-        });
-      }, onError: (_) {});
-
-      // 4. Total Bookings and Earnings from database
-      _bookingsSub = FirebaseFirestore.instance
-          .collection('bookings')
-          .snapshots()
-          .listen((snap) {
-        if (!mounted) return;
-        double earnings = 0;
-        for (final doc in snap.docs) {
-          final data = doc.data();
-          final price = (data['totalPrice'] as num?) ??
-              (data['price'] as num?) ??
-              (data['amount'] as num?) ??
-              0;
-          earnings += (price * 0.1); // 10% commission
-        }
-        setState(() {
-          _totalBookingsCount = snap.docs.length;
-          _totalEarnings = earnings;
-        });
-      }, onError: (_) {});
-
-      // 5. Watch Guides from Firestore
-      _guidesListSub = _guidesRepo.watchGuides().listen((guides) {
-        if (!mounted) return;
-        setState(() {
-          _guides = guides;
-        });
-      }, onError: (_) {});
-    } catch (_) {}
-  }
-
-  @override
-  void dispose() {
-    _usersSub?.cancel();
-    _guidesSub?.cancel();
-    _tripsSub?.cancel();
-    _bookingsSub?.cancel();
-    _guidesListSub?.cancel();
-    super.dispose();
-  }
-
-  String _formatNumber(int n) {
-    if (n <= 0) return '0';
-    final s = n.toString();
-    final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-    return s.replaceAllMapped(reg, (Match m) => '${m[1]},');
-  }
-
-  String get _earningsLabel {
-    if (_totalEarnings <= 0) return 'EGP 0';
-    final s = _totalEarnings.toStringAsFixed(0);
-    final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-    return 'EGP ${s.replaceAllMapped(reg, (Match m) => '${m[1]},')}';
-  }
-
-  Future<void> _updateGuideStatus(AdminGuide guide, String status) async {
-    if (guide.uid.isEmpty) return;
-
-    final previousGuides = _guides;
-    setState(() {
-      _guides = _guides.map((g) {
-        if (g.uid == guide.uid) {
-          return AdminGuide(
-            uid: g.uid,
-            name: g.name,
-            email: g.email,
-            document: g.document,
-            city: g.city,
-            status: status,
-            phone: g.phone,
-            submitted: g.submitted,
-            docFileName: g.docFileName,
-            uploadedTrips: g.uploadedTrips,
-          );
-        }
-        return g;
-      }).toList();
-    });
-
-    final ok = await _guidesRepo.decideVerification(
-      guideId: guide.uid,
-      approve: status == 'approved',
+  Future<void> _updateGuideStatus(
+    BuildContext context,
+    AdminGuide guide,
+    String status,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await context.read<AdminDashboardCubit>().updateGuideStatus(
+      guide,
+      status,
     );
-
-    if (!mounted) return;
-
-    if (!ok) {
-      setState(() {
-        _guides = previousGuides;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update status for ${guide.name}.'),
-          backgroundColor: AppColors.adminDanger,
-        ),
-      );
-    }
+    if (ok) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('Failed to update status for ${guide.name}.'),
+        backgroundColor: AppColors.adminDanger,
+      ),
+    );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AdminDashboardCubit, AdminDashboardState>(
+      builder: (context, state) {
+        if (state is AdminDashboardInitial || state is AdminDashboardLoading) {
+          return const _OverviewStatus(child: CircularProgressIndicator());
+        }
+        if (state is AdminDashboardError) {
+          return _OverviewStatus(child: _buildError(context, state));
+        }
+
+        final data = state as AdminDashboardSuccess;
+        return SingleChildScrollView(
+          child: AdminCard(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── 6-stat dynamic KPI grid ───────────────────────────────
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final w = (constraints.maxWidth - 32) / 3;
+                    return Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        SizedBox(
+                          width: w,
+                          child: _StatCard(
+                            index: 1,
+                            value: _formatNumber(data.totalUsersCount),
+                            label: 'Total Users',
+                            badge: data.totalUsersCount > 0
+                                ? '+${data.totalUsersCount}'
+                                : '0',
+                            badgeDanger: false,
+                            badgeIsText: true,
+                          ),
+                        ),
+                        SizedBox(
+                          width: w,
+                          child: _StatCard(
+                            index: 2,
+                            value: _formatNumber(data.tourGuidesCount),
+                            label: 'Tour Guides',
+                            badge: data.tourGuidesCount > 0
+                                ? '+${data.tourGuidesCount}'
+                                : '0',
+                            badgeDanger: false,
+                            badgeIsText: true,
+                          ),
+                        ),
+                        SizedBox(
+                          width: w,
+                          child: _StatCard(
+                            index: 3,
+                            value: _formatNumber(data.totalTripsCount),
+                            label: 'Total Trips',
+                            badge: data.totalTripsCount > 0
+                                ? '+${data.totalTripsCount}'
+                                : '0',
+                            badgeDanger: false,
+                            badgeIsText: true,
+                          ),
+                        ),
+                        SizedBox(
+                          width: w,
+                          child: _StatCard(
+                            index: 4,
+                            value: _formatNumber(data.totalBookingsCount),
+                            label: 'Total Bookings',
+                            badge: data.totalBookingsCount > 0
+                                ? '+${data.totalBookingsCount}'
+                                : '0',
+                            badgeDanger: false,
+                            badgeIsText: true,
+                          ),
+                        ),
+                        SizedBox(
+                          width: w,
+                          child: _StatCard(
+                            index: 5,
+                            value: data.earningsLabel,
+                            label: 'Our Earnings',
+                            badge: 'from commissions',
+                            badgeDanger: false,
+                            badgeIsText: true,
+                          ),
+                        ),
+                        SizedBox(
+                          width: w,
+                          child: _StatCard(
+                            index: 6,
+                            value: '${data.totalPending}',
+                            label: 'Pending Requests',
+                            badge: data.totalPending > 0
+                                ? 'Needs review'
+                                : 'All clear',
+                            badgeDanger: data.totalPending > 0,
+                            badgeIsText: true,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // ── Bottom row: Pending Actions + Guide Applications ──────
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth < 700) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _PendingActionsCard(
+                            guidesCount: data.pendingGuidesCount,
+                            tripsCount: data.pendingTripsCount,
+                          ),
+                          const SizedBox(height: 16),
+                          _GuideApplicationsCard(
+                            guides: data.guides,
+                            onUpdateStatus: (guide, status) =>
+                                _updateGuideStatus(context, guide, status),
+                          ),
+                        ],
+                      );
+                    }
+                    final leftW = (constraints.maxWidth - 16) * 0.4;
+                    final rightW = (constraints.maxWidth - 16) * 0.6;
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: leftW,
+                          child: _PendingActionsCard(
+                            guidesCount: data.pendingGuidesCount,
+                            tripsCount: data.pendingTripsCount,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        SizedBox(
+                          width: rightW,
+                          child: _GuideApplicationsCard(
+                            guides: data.guides,
+                            onUpdateStatus: (guide, status) =>
+                                _updateGuideStatus(context, guide, status),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildError(BuildContext context, AdminDashboardError state) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          state.message,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.adminTableCellMuted,
+        ),
+        const SizedBox(height: 12),
+        ElevatedButton(
+          onPressed: () => context.read<AdminDashboardCubit>().retry(),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.adminPrimary,
+          ),
+          child: const Text('Retry', style: TextStyle(color: Colors.white)),
+        ),
+      ],
+    );
+  }
+}
+
+/// Centered white card used by the loading and error states.
+class _OverviewStatus extends StatelessWidget {
+  final Widget child;
+
+  const _OverviewStatus({required this.child});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: AdminCard(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // â”€â”€ 6-stat dynamic KPI grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final w = (constraints.maxWidth - 32) / 3;
-                return Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: [
-                    SizedBox(
-                      width: w,
-                      child: _StatCard(
-                        index: 1,
-                        value: _formatNumber(_totalUsersCount),
-                        label: 'Total Users',
-                        badge: _totalUsersCount > 0 ? '+$_totalUsersCount' : '0',
-                        badgeDanger: false,
-                        badgeIsText: true,
-                      ),
-                    ),
-                    SizedBox(
-                      width: w,
-                      child: _StatCard(
-                        index: 2,
-                        value: _formatNumber(_tourGuidesCount),
-                        label: 'Tour Guides',
-                        badge: _tourGuidesCount > 0 ? '+$_tourGuidesCount' : '0',
-                        badgeDanger: false,
-                        badgeIsText: true,
-                      ),
-                    ),
-                    SizedBox(
-                      width: w,
-                      child: _StatCard(
-                        index: 3,
-                        value: _formatNumber(_totalTripsCount),
-                        label: 'Total Trips',
-                        badge: _totalTripsCount > 0 ? '+$_totalTripsCount' : '0',
-                        badgeDanger: false,
-                        badgeIsText: true,
-                      ),
-                    ),
-                    SizedBox(
-                      width: w,
-                      child: _StatCard(
-                        index: 4,
-                        value: _formatNumber(_totalBookingsCount),
-                        label: 'Total Bookings',
-                        badge: _totalBookingsCount > 0 ? '+$_totalBookingsCount' : '0',
-                        badgeDanger: false,
-                        badgeIsText: true,
-                      ),
-                    ),
-                    SizedBox(
-                      width: w,
-                      child: _StatCard(
-                        index: 5,
-                        value: _earningsLabel,
-                        label: 'Our Earnings',
-                        badge: 'from commissions',
-                        badgeDanger: false,
-                        badgeIsText: true,
-                      ),
-                    ),
-                    SizedBox(
-                      width: w,
-                      child: _StatCard(
-                        index: 6,
-                        value: '$_totalPending',
-                        label: 'Pending Requests',
-                        badge: _totalPending > 0 ? 'Needs review' : 'All clear',
-                        badgeDanger: _totalPending > 0,
-                        badgeIsText: true,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 24),
-
-            // â”€â”€ Bottom row: Pending Actions + Guide Applications â”€â”€
-            LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth < 700) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _PendingActionsCard(
-                        guidesCount: _pendingGuidesCount,
-                        tripsCount: _pendingTripsCount,
-                      ),
-                      const SizedBox(height: 16),
-                      _GuideApplicationsCard(
-                        guides: _guides,
-                        onUpdateStatus: _updateGuideStatus,
-                      ),
-                    ],
-                  );
-                }
-                final leftW = (constraints.maxWidth - 16) * 0.4;
-                final rightW = (constraints.maxWidth - 16) * 0.6;
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: leftW,
-                      child: _PendingActionsCard(
-                        guidesCount: _pendingGuidesCount,
-                        tripsCount: _pendingTripsCount,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    SizedBox(
-                      width: rightW,
-                      child: _GuideApplicationsCard(
-                        guides: _guides,
-                        onUpdateStatus: _updateGuideStatus,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.all(48),
+        child: Center(child: child),
       ),
     );
   }
 }
 
-// â”€â”€ Stat Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+String _formatNumber(int n) {
+  if (n <= 0) return '0';
+  final s = n.toString();
+  final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
+  return s.replaceAllMapped(reg, (Match m) => '${m[1]},');
+}
+
 class _StatCard extends StatelessWidget {
   final int index;
   final String value;

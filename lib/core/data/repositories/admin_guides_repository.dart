@@ -31,6 +31,12 @@ class AdminGuide {
   /// The trips the guide published.
   final List<AdminGuideTrip> uploadedTrips;
 
+  /// URL of the uploaded National/Tour Guide ID document.
+  final String idDocumentUrl;
+
+  /// URL of the uploaded syndicate membership / professional license document.
+  final String licenseDocumentUrl;
+
   const AdminGuide({
     required this.uid,
     required this.name,
@@ -42,7 +48,43 @@ class AdminGuide {
     required this.submitted,
     required this.docFileName,
     required this.uploadedTrips,
+    this.idDocumentUrl = '',
+    this.licenseDocumentUrl = '',
   });
+
+  /// Primary document URL for download/preview.
+  String get documentUrl =>
+      idDocumentUrl.isNotEmpty ? idDocumentUrl : licenseDocumentUrl;
+
+  AdminGuide copyWith({
+    String? uid,
+    String? name,
+    String? email,
+    String? phone,
+    String? city,
+    String? document,
+    String? status,
+    String? submitted,
+    String? docFileName,
+    List<AdminGuideTrip>? uploadedTrips,
+    String? idDocumentUrl,
+    String? licenseDocumentUrl,
+  }) {
+    return AdminGuide(
+      uid: uid ?? this.uid,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      city: city ?? this.city,
+      document: document ?? this.document,
+      status: status ?? this.status,
+      submitted: submitted ?? this.submitted,
+      docFileName: docFileName ?? this.docFileName,
+      uploadedTrips: uploadedTrips ?? this.uploadedTrips,
+      idDocumentUrl: idDocumentUrl ?? this.idDocumentUrl,
+      licenseDocumentUrl: licenseDocumentUrl ?? this.licenseDocumentUrl,
+    );
+  }
 }
 
 /// One trip of a guide, as the admin dashboard lists it.
@@ -298,8 +340,24 @@ class AdminGuidesRepository {
       status = 'pending';
     }
 
-    final idUrl = (verification['idDocumentUrl'] as String?) ?? '';
-    final licenseUrl = (verification['licenseDocumentUrl'] as String?) ?? '';
+    final idUrl = (verification['idDocumentUrl'] as String?) ??
+        (data['idDocumentUrl'] as String?) ??
+        (data['verification'] is Map
+            ? (data['verification']['idDocumentUrl'] as String?)
+            : null) ??
+        '';
+    final licenseUrl = (verification['licenseDocumentUrl'] as String?) ??
+        (data['licenseDocumentUrl'] as String?) ??
+        (data['verification'] is Map
+            ? (data['verification']['licenseDocumentUrl'] as String?)
+            : null) ??
+        '';
+
+    final activeDocName = idUrl.isNotEmpty
+        ? 'Tour Guide ID'
+        : (licenseUrl.isNotEmpty ? 'Syndicate Membership' : 'Verification Document');
+
+    final primaryUrl = idUrl.isNotEmpty ? idUrl : licenseUrl;
 
     return AdminGuide(
       uid: doc.id,
@@ -307,11 +365,13 @@ class AdminGuidesRepository {
       email: (data['email'] as String?) ?? '',
       phone: (data['phone'] as String?) ?? '',
       city: (data['location'] as String?) ?? '',
-      document: idUrl.isNotEmpty ? 'Tour Guide ID' : 'Syndicate Membership',
+      document: activeDocName,
       status: _guideStatus(status, data['isActive'] as bool?),
       submitted: _submittedLabel(verification['submittedAt']),
-      docFileName: _fileName(idUrl.isNotEmpty ? idUrl : licenseUrl),
+      docFileName: _fileName(primaryUrl),
       uploadedTrips: trips,
+      idDocumentUrl: idUrl,
+      licenseDocumentUrl: licenseUrl,
     );
   }
 

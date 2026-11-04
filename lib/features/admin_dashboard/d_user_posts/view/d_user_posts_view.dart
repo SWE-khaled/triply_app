@@ -1,193 +1,99 @@
-﻿import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/data/repositories/admin_posts_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/features/tourist/community/model/community_post.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../d_home/view/d_home_view.dart';
+import '../cubit/user_posts_cubit.dart';
 
-class UserPostsView extends StatefulWidget {
+class UserPostsView extends StatelessWidget {
   const UserPostsView({super.key});
 
   @override
-  State<UserPostsView> createState() => _UserPostsViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => UserPostsCubit()..start(),
+      child: const _UserPostsBody(),
+    );
+  }
 }
 
-class _UserPostsViewState extends State<UserPostsView> {
-  final TextEditingController _search = TextEditingController();
-  final AdminPostsRepository _repository = AdminPostsRepository();
+class _UserPostsBody extends StatelessWidget {
+  const _UserPostsBody();
 
-  List<AdminPost> _posts = const [];
-  StreamSubscription<List<AdminPost>>? _subscription;
-  String _query = '';
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _repository.ensureInitialPostIfEmpty();
-    _subscription = _repository.watchPosts().listen(
-      (posts) {
-        if (!mounted) return;
-        setState(() {
-          _posts = posts;
-          _loading = false;
-        });
-      },
-      onError: (_) {
-        if (!mounted) return;
-        setState(() {
-          _loading = false;
-        });
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    _search.dispose();
-    super.dispose();
-  }
-
-  List<AdminPost> get _filtered {
-    final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return _posts;
-    return _posts.where((p) {
-      return p.title.toLowerCase().contains(q) ||
-          p.text.toLowerCase().contains(q) ||
-          p.author.toLowerCase().contains(q);
-    }).toList();
-  }
-
-  Future<void> _removePost(AdminPost post) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Post'),
-        content: Text('Are you sure you want to delete this post by ${post.author}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
+  Future<void> _removePost(
+    BuildContext context,
+    CommunityPost post, {
+    bool skipConfirmation = false,
+  }) async {
+    if (!skipConfirmation) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          scrollable: true,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Delete Post'),
+          content: Text(
+            'Are you sure you want to delete this post by ${post.authorName}?',
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true || !mounted) return;
-
-    final ok = await _repository.deletePost(post.id);
-    if (!mounted) return;
-    if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Post deleted successfully.')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not delete post.')),
-      );
-    }
-  }
-
-  void _viewPost(AdminPost post) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                post.title.isNotEmpty ? post.title : 'User Post',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
             ),
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => Navigator.pop(context),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.adminDanger,
+              ),
+              child: const Text('Delete', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (post.imageUrl.isNotEmpty) ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: _buildPostImage(post.imageUrl, height: 220),
-                ),
-                const SizedBox(height: 16),
-              ],
-              Row(
-                children: [
-                  const Icon(Icons.person, size: 18, color: AppColors.adminPrimary),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Author: ${post.author}',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                  ),
-                ],
-              ),
-              if (post.location.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, size: 16, color: AppColors.adminTextMuted),
-                    const SizedBox(width: 6),
-                    Text(
-                      post.location,
-                      style: AppTextStyles.adminTableCellMuted,
-                    ),
-                  ],
-                ),
-              ],
-              if (post.createdAt != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'Posted: ${post.createdAt!.day}/${post.createdAt!.month}/${post.createdAt!.year}',
-                  style: AppTextStyles.adminTableCellMuted.copyWith(fontSize: 12),
-                ),
-              ],
-              const SizedBox(height: 14),
-              const Divider(color: AppColors.adminDivider),
-              const SizedBox(height: 8),
-              Text(
-                post.text.isNotEmpty ? post.text : 'No text content in this post.',
-                style: AppTextStyles.adminTableCell.copyWith(fontSize: 14, height: 1.4),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pop(context);
-              _removePost(post);
-            },
-            icon: const Icon(Icons.delete, size: 16, color: Colors.white),
-            label: const Text('Delete Post', style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
-          ),
-        ],
-      ),
+      );
+
+      if (confirmed != true || !context.mounted) return;
+    }
+
+    // Capture the messenger before the await: the view can be rebuilt while
+    // the request is in flight.
+    final messenger = ScaffoldMessenger.of(context);
+    final error = await context.read<UserPostsCubit>().removePost(post);
+
+    messenger.showSnackBar(
+      error == null
+          ? const SnackBar(content: Text('Post deleted successfully.'))
+          : SnackBar(
+              content: Text(error),
+              backgroundColor: AppColors.adminDanger,
+            ),
     );
   }
 
+  /// Opens the details dialog and deletes the post when the dialog asks for
+  /// it. The deletion happens only after the dialog is fully dismissed, so the
+  /// parent never mutates the list while a route is still being disposed.
+  Future<void> _viewPost(BuildContext context, CommunityPost post) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (_) => _ViewUserPostDialog(
+        post: post,
+        imageBuilder: _buildPostImage,
+      ),
+    );
+    if (shouldDelete == true && context.mounted) {
+      await _removePost(context, post, skipConfirmation: true);
+    }
+  }
+
   Widget _buildPostImage(String url, {double height = 180}) {
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:')) {
+    if (url.startsWith('http://') ||
+        url.startsWith('https://') ||
+        url.startsWith('blob:')) {
       return Image.network(
         url,
         height: height,
@@ -203,7 +109,8 @@ class _UserPostsViewState extends State<UserPostsView> {
             height: height,
             width: double.infinity,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => _imagePlaceholder(height),
+            errorBuilder: (context, error, stackTrace) =>
+                _imagePlaceholder(height),
           );
         }
       } catch (_) {}
@@ -216,7 +123,11 @@ class _UserPostsViewState extends State<UserPostsView> {
       height: height,
       color: AppColors.adminStatBadgeBg,
       child: const Center(
-        child: Icon(Icons.image_outlined, size: 48, color: AppColors.adminTextMuted),
+        child: Icon(
+          Icons.image_outlined,
+          size: 48,
+          color: AppColors.adminTextMuted,
+        ),
       ),
     );
   }
@@ -233,7 +144,8 @@ class _UserPostsViewState extends State<UserPostsView> {
                 Expanded(
                   child: CardSectionHeader(
                     title: 'Manage User Posts',
-                    subtitle: 'Search, review and control all live user posts.',
+                    subtitle:
+                        'Search, review and control all live user posts from the community feed.',
                   ),
                 ),
               ],
@@ -242,48 +154,68 @@ class _UserPostsViewState extends State<UserPostsView> {
 
             SearchFilterRow(
               hintText: 'Search user posts...',
-              controller: _search,
-              onChanged: (v) => setState(() => _query = v),
+              onChanged: context.read<UserPostsCubit>().search,
             ),
             const SizedBox(height: 24),
 
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 40),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (_filtered.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Center(child: Text('No posts found.')),
-              )
-            else
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final isMobile = constraints.maxWidth < 600;
-                  final isTablet = constraints.maxWidth < 900;
-                  final columns = isMobile ? 1 : (isTablet ? 2 : 3);
-                  final cardW = (constraints.maxWidth - (16 * (columns - 1))) / columns;
+            BlocBuilder<UserPostsCubit, UserPostsState>(
+              builder: (context, state) {
+                if (state is UserPostsInitial || state is UserPostsLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (state is UserPostsError) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: Text(state.message)),
+                  );
+                }
 
-                  return Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children: _filtered
-                        .map(
-                          (p) => SizedBox(
-                            width: cardW,
+                final posts = state is UserPostsSuccess
+                    ? state.filtered
+                    : const <CommunityPost>[];
+                if (posts.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: Text('No posts found.')),
+                  );
+                }
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.maxWidth < 600;
+                    final isTablet = constraints.maxWidth < 900;
+                    final columns = isMobile ? 1 : (isTablet ? 2 : 3);
+                    final availableWidth = constraints.maxWidth.clamp(
+                      300.0,
+                      double.infinity,
+                    );
+                    final cardW =
+                        (availableWidth - (16 * (columns - 1))) / columns;
+                    final safeCardW = cardW.clamp(200.0, double.infinity);
+
+                    return Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        for (final post in posts)
+                          SizedBox(
+                            width: safeCardW,
                             child: _PostCard(
-                              post: p,
-                              onRemove: () => _removePost(p),
-                              onView: () => _viewPost(p),
+                              post: post,
+                              onRemove: () => _removePost(context, post),
+                              onView: () => _viewPost(context, post),
                               imageBuilder: _buildPostImage,
                             ),
                           ),
-                        )
-                        .toList(),
-                  );
-                },
-              ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -292,7 +224,7 @@ class _UserPostsViewState extends State<UserPostsView> {
 }
 
 class _PostCard extends StatelessWidget {
-  final AdminPost post;
+  final CommunityPost post;
   final VoidCallback onRemove;
   final VoidCallback onView;
   final Widget Function(String, {double height}) imageBuilder;
@@ -303,6 +235,14 @@ class _PostCard extends StatelessWidget {
     required this.onView,
     required this.imageBuilder,
   });
+
+  String get _title {
+    final text = post.text.trim();
+    if (text.isNotEmpty) {
+      return text.length > 40 ? '${text.substring(0, 37)}...' : text;
+    }
+    return 'Post by ${post.authorName}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -334,14 +274,14 @@ class _PostCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  post.title,
+                  _title,
                   style: AppTextStyles.adminPostCardTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'By ${post.author}',
+                  'By ${post.authorName}',
                   style: AppTextStyles.adminPostCardAuthor,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -392,6 +332,235 @@ class _PostCard extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Modal dialog for reviewing a community user post in full detail.
+class _ViewUserPostDialog extends StatelessWidget {
+  final CommunityPost post;
+  final Widget Function(String, {double height}) imageBuilder;
+
+  const _ViewUserPostDialog({
+    required this.post,
+    required this.imageBuilder,
+  });
+
+  String get _title {
+    final text = post.text.trim();
+    if (text.isNotEmpty) {
+      return text.length > 40 ? '${text.substring(0, 37)}...' : text;
+    }
+    return 'Post by ${post.authorName}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 540),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _title,
+                          style: AppTextStyles.adminDialogTitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Community User Post',
+                          style: AppTextStyles.adminDialogSubtitle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () => Navigator.of(context).pop(false),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.adminDivider),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Close',
+                        style: AppTextStyles.adminButtonSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Image preview if available
+              if (post.imageUrl.isNotEmpty) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: imageBuilder(post.imageUrl, height: 220),
+                ),
+                const SizedBox(height: 18),
+              ],
+
+              // Author & Post Metadata
+              _buildDetailRow('Author:', post.authorName),
+              if (post.location.isNotEmpty)
+                _buildDetailRow('Location:', post.location),
+              if (post.createdAt != null)
+                _buildDetailRow(
+                  'Posted:',
+                  '${post.createdAt!.day}/${post.createdAt!.month}/${post.createdAt!.year}',
+                ),
+              _buildDetailRow('Likes:', '${post.likesCount}'),
+              _buildDetailRow('Comments:', '${post.commentsCount}'),
+              const SizedBox(height: 6),
+              const Divider(color: AppColors.adminDivider),
+              const SizedBox(height: 10),
+
+              // Content text
+              Text('Content:', style: AppTextStyles.adminFieldLabel),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.adminStatBadgeBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.adminDivider),
+                ),
+                child: Text(
+                  post.text.isNotEmpty
+                      ? post.text
+                      : 'No text content in this post.',
+                  style: AppTextStyles.adminTableCell.copyWith(
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Actions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.of(context).pop(false),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 9,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.adminDivider),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Close',
+                        style: AppTextStyles.adminButtonSecondary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final confirmed = await showDialog<bool>(
+                        context: context,
+                        builder: (confirmCtx) => AlertDialog(
+                          scrollable: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          title: const Text('Delete Post'),
+                          content: const Text(
+                            'Are you sure you want to permanently delete this post?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(confirmCtx, false),
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(confirmCtx, true),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.adminDanger,
+                              ),
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      // Only close the details dialog here. The post itself is
+                      // deleted by the parent once this route has been popped.
+                      if (confirmed == true && context.mounted) {
+                        Navigator.of(context).pop(true);
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'Delete Post',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.adminDanger,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(label, style: AppTextStyles.adminFieldLabel),
+          ),
+          Expanded(child: Text(value, style: AppTextStyles.adminTableCell)),
         ],
       ),
     );

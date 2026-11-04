@@ -105,31 +105,35 @@ class _NavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
+    // The background is painted by the [Material] and flips in the same frame
+    // as the label/icon colors. Animating only the background used to leave
+    // the white active text invisible on the white sidebar for ~200ms.
+    return Material(
+      color: isActive ? AppColors.adminSidebarActiveBg : Colors.transparent,
       borderRadius: BorderRadius.circular(10),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.adminSidebarActiveBg : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isActive ? Colors.white : AppColors.adminSidebarInactiveText,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: isActive
-                  ? AppTextStyles.adminNavItemActive
-                  : AppTextStyles.adminNavItemInactive,
-            ),
-          ],
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: isActive
+                    ? Colors.white
+                    : AppColors.adminSidebarInactiveText,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: isActive
+                    ? AppTextStyles.adminNavItemActive
+                    : AppTextStyles.adminNavItemInactive,
+              ),
+            ],
+          ),
         ),
       ),
     );

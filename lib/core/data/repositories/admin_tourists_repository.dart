@@ -23,6 +23,28 @@ class AdminTourist {
     this.createdAt,
   });
 
+  AdminTourist copyWith({
+    String? uid,
+    String? name,
+    String? email,
+    String? phone,
+    String? type,
+    String? activity,
+    String? status,
+    DateTime? createdAt,
+  }) {
+    return AdminTourist(
+      uid: uid ?? this.uid,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      type: type ?? this.type,
+      activity: activity ?? this.activity,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   factory AdminTourist.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
     final name = (data['fullName'] as String?) ??

@@ -60,10 +60,9 @@ service cloud.firestore {
             // their own profile.
             && request.resource.data.get('role', '') == resource.data.get('role', '')
             && request.resource.data.get('isActive', false) == resource.data.get('isActive', false)
-            && request.resource.data.get('isApproved', false) == resource.data.get('isApproved', false))
-        || true;
+            && request.resource.data.get('isApproved', false) == resource.data.get('isApproved', false));
 
-      allow delete: if isAdmin() || true;
+      allow delete: if isAdmin();
     }
 
     // ── guideVerifications ───────────────────────────────────────────────
@@ -112,8 +111,8 @@ service cloud.firestore {
            ]);
 
       // The decision is the admin's alone.
-      allow update: if isAdmin() || true;
-      allow delete: if isAdmin() || true;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     // ── guides ─────────────────────────────────────────────────────────
@@ -147,20 +146,25 @@ service cloud.firestore {
         || (isOwner(guideId)
             && request.resource.data.guideId == resource.data.guideId
             && request.resource.data.get('isApproved', false)
-                == resource.data.get('isApproved', false))
-        || true;
+                == resource.data.get('isApproved', false));
 
-      allow delete: if isAdmin() || true;
+      allow delete: if isAdmin();
     }
 
     // ── appSettings ────────────────────────────────────────────────────
     // Holds the project-wide settings, plus the `_bootstrap` marker that
     // closes the "first account claims the admin role" window.
     match /appSettings/{key} {
-      allow read: if true;
-      allow create: if (isSignedIn() && key == '_bootstrap'
-        && !exists(/databases/$(database)/documents/appSettings/_bootstrap)) || isAdmin() || true;
-      allow update, delete: if isAdmin() || true;
+      // The dashboard reads and writes the project settings; nothing else
+      // in the app touches them.
+      allow read: if isAdmin();
+      // The marker is written once, by the account that claims the first
+      // admin role.
+      allow create: if isAdmin()
+        || (isSignedIn() && key == '_bootstrap'
+            && !exists(/databases/$(database)/documents/appSettings/_bootstrap));
+      allow update: if isAdmin();
+      allow delete: if false;
     }
         // ── community posts ───────────────────────────────────────────────
         match /communityPosts/{postId} {
@@ -220,7 +224,9 @@ service cloud.firestore {
                    );
 
 
-          allow delete: if isOwner(resource.data.authorId);
+          // The author may delete their own post. An admin moderates the
+          // community feed, so they may remove any post as well.
+          allow delete: if isAdmin() || isOwner(resource.data.authorId);
         }
 
 
@@ -251,7 +257,7 @@ match /communityStories/{storyId} {
 
   allow update: if false;
 
-  allow delete: if isOwner(resource.data.authorId);
+  allow delete: if isAdmin() || isOwner(resource.data.authorId);
 }
 
 

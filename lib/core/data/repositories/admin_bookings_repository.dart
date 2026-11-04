@@ -39,6 +39,44 @@ class AdminBooking {
     this.createdAt,
   });
 
+  AdminBooking copyWith({
+    String? id,
+    String? user,
+    String? touristId,
+    String? trip,
+    String? tripId,
+    String? guide,
+    String? guideId,
+    String? date,
+    String? status,
+    String? price,
+    double? totalPrice,
+    String? type,
+    String? location,
+    int? travelers,
+    String? bookingCode,
+    DateTime? createdAt,
+  }) {
+    return AdminBooking(
+      id: id ?? this.id,
+      user: user ?? this.user,
+      touristId: touristId ?? this.touristId,
+      trip: trip ?? this.trip,
+      tripId: tripId ?? this.tripId,
+      guide: guide ?? this.guide,
+      guideId: guideId ?? this.guideId,
+      date: date ?? this.date,
+      status: status ?? this.status,
+      price: price ?? this.price,
+      totalPrice: totalPrice ?? this.totalPrice,
+      type: type ?? this.type,
+      location: location ?? this.location,
+      travelers: travelers ?? this.travelers,
+      bookingCode: bookingCode ?? this.bookingCode,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   factory AdminBooking.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
     final user = (data['guest_name'] as String?) ??

@@ -1,79 +1,57 @@
-﻿import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/data/repositories/admin_bookings_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
+import '../cubit/bookings_cubit.dart';
 
 /// Bookings management screen (connected dynamically to Firestore).
-class BookingsView extends StatefulWidget {
+class BookingsView extends StatelessWidget {
   const BookingsView({super.key});
 
   @override
-  State<BookingsView> createState() => _BookingsViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => BookingsCubit()..start(),
+      child: const _BookingsBody(),
+    );
+  }
 }
 
-class _BookingsViewState extends State<BookingsView> {
-  final TextEditingController _search = TextEditingController();
-  final AdminBookingsRepository _repository = AdminBookingsRepository();
+class _BookingsBody extends StatelessWidget {
+  const _BookingsBody();
 
-  List<AdminBooking> _bookings = const [];
-  StreamSubscription<List<AdminBooking>>? _subscription;
-  String _query = '';
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _subscription = _repository.watchBookings().listen(
-      (bookings) {
-        if (!mounted) return;
-        setState(() {
-          _bookings = bookings;
-          _loading = false;
-        });
-      },
-      onError: (_) {
-        if (!mounted) return;
-        setState(() => _loading = false);
-      },
+  Future<void> _changeStatus(
+    BuildContext context,
+    AdminBooking booking,
+    String status,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await context.read<BookingsCubit>().updateStatus(
+      booking,
+      status,
+    );
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          ok
+              ? 'Booking marked as $status.'
+              : 'Could not update booking ${booking.bookingCode}.',
+        ),
+        backgroundColor: ok ? null : AppColors.adminDanger,
+      ),
     );
   }
 
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    _search.dispose();
-    super.dispose();
-  }
-
-  List<AdminBooking> get _filtered {
-    final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return _bookings;
-    return _bookings.where((b) {
-      return b.user.toLowerCase().contains(q) ||
-          b.trip.toLowerCase().contains(q) ||
-          b.guide.toLowerCase().contains(q) ||
-          b.date.toLowerCase().contains(q) ||
-          b.status.toLowerCase().contains(q) ||
-          b.type.toLowerCase().contains(q);
-    }).toList();
-  }
-
-  void _showDetails(AdminBooking booking) {
+  void _showDetails(BuildContext context, AdminBooking booking) {
     showDialog(
       context: context,
       builder: (_) => _ViewBookingDialog(
         booking: booking,
-        onStatusChange: (status) async {
-          final ok = await _repository.updateStatus(booking.id, status);
-          if (mounted && ok) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Booking marked as $status.')),
-            );
-          }
-        },
+        onStatusChange: (status) => _changeStatus(context, booking, status),
       ),
     );
   }
@@ -99,58 +77,84 @@ class _BookingsViewState extends State<BookingsView> {
 
             SearchFilterRow(
               hintText: 'Search bookings...',
-              controller: _search,
-              onChanged: (v) => setState(() => _query = v),
+              onChanged: context.read<BookingsCubit>().search,
             ),
             const SizedBox(height: 24),
 
-            // "Recent Bookings" section
-            Row(
-              children: [
-                Text('Recent Bookings', style: AppTextStyles.adminSectionTitle),
-                const Spacer(),
-                Text(
-                  '${_bookings.length} Total',
-                  style: AppTextStyles.adminLinkText.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
+            BlocBuilder<BookingsCubit, BookingsState>(
+              builder: (context, state) {
+                final total = state is BookingsSuccess
+                    ? state.bookings.length
+                    : 0;
+                final bookings = state is BookingsSuccess
+                    ? state.filtered
+                    : const <AdminBooking>[];
 
-            // Table header
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  _h('User', 3),
-                  _h('Trip', 3),
-                  _h('Guide', 3),
-                  _h('Date', 2),
-                  _h('Status', 2),
-                  _h('Price', 2),
-                  _h('Type', 2),
-                  _h('Actions', 2, end: true),
-                ],
-              ),
-            ),
-            const Divider(color: AppColors.adminDivider, height: 1),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // "Recent Bookings" section
+                    Row(
+                      children: [
+                        Text(
+                          'Recent Bookings',
+                          style: AppTextStyles.adminSectionTitle,
+                        ),
+                        const Spacer(),
+                        Text(
+                          '$total Total',
+                          style: AppTextStyles.adminLinkText.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
 
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (_filtered.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: Text('No bookings found.')),
-              )
-            else
-              ..._filtered.map(
-                (b) => _BookingRow(booking: b, onView: () => _showDetails(b)),
-              ),
+                    // Table header
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        children: [
+                          _h('User', 3),
+                          _h('Trip', 3),
+                          _h('Guide', 3),
+                          _h('Date', 2),
+                          _h('Status', 2),
+                          _h('Price', 2),
+                          _h('Type', 2),
+                          _h('Actions', 2, end: true),
+                        ],
+                      ),
+                    ),
+                    const Divider(color: AppColors.adminDivider, height: 1),
+
+                    if (state is BookingsInitial || state is BookingsLoading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (state is BookingsError)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: Text(state.message)),
+                      )
+                    else if (bookings.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: Text('No bookings found.')),
+                      )
+                    else
+                      ...bookings.map(
+                        (booking) => _BookingRow(
+                          booking: booking,
+                          onView: () => _showDetails(context, booking),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
           ],
         ),
       ),

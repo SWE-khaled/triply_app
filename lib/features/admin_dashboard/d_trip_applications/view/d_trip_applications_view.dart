@@ -1,187 +1,113 @@
-﻿import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../../core/data/repositories/admin_trips_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
 import '../../d_home/view/d_home_view.dart';
-
-/// Data model for trip applications in the admin dashboard.
-class AdminTripApplication {
-  final String tripId;
-  final String tripTitle;
-  final String guide;
-  final String date;
-  final String price;
-  final String status;
-  final String type;
-  final int travelers;
-  final String location;
-  final List<String> itinerary;
-  final List<String> participants;
-  final String imageUrl;
-  final String rejectionReason;
-
-  const AdminTripApplication({
-    required this.tripId,
-    required this.tripTitle,
-    required this.guide,
-    required this.date,
-    required this.price,
-    required this.status,
-    this.type = 'public',
-    this.travelers = 0,
-    this.location = '',
-    this.itinerary = const [],
-    this.participants = const [],
-    this.imageUrl = '',
-    this.rejectionReason = '',
-  });
-}
+import '../cubit/trip_applications_cubit.dart';
+import '../model/admin_trip_application.dart';
 
 /// Trip Applications management screen (connected dynamically to Firestore).
-class TripApplicationsView extends StatefulWidget {
+class TripApplicationsView extends StatelessWidget {
   const TripApplicationsView({super.key});
 
   @override
-  State<TripApplicationsView> createState() => _TripApplicationsViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => TripApplicationsCubit()..start(),
+      child: const _TripApplicationsBody(),
+    );
+  }
 }
 
-class _TripApplicationsViewState extends State<TripApplicationsView> {
-  final TextEditingController _search = TextEditingController();
-  final AdminTripsRepository _repository = AdminTripsRepository();
+class _TripApplicationsBody extends StatelessWidget {
+  const _TripApplicationsBody();
 
-  List<AdminTripApplication> _apps = const [];
-  String _query = '';
-  bool _loading = true;
-  StreamSubscription<List<AdminTrip>>? _tripsSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _tripsSubscription = _repository.watchTrips().listen(
-      (trips) {
-        if (!mounted) return;
-        setState(() {
-          _apps = trips.map(_toApplication).toList();
-          _loading = false;
-        });
-      },
-      onError: (_) {
-        if (!mounted) return;
-        setState(() => _loading = false);
-      },
+  /// Approves a trip and tells the guide.
+  Future<void> _approve(
+    BuildContext context,
+    AdminTripApplication application,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await context.read<TripApplicationsCubit>().approve(
+      application,
+    );
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          ok
+              ? 'Trip approved.'
+              : 'Could not approve the trip. Are you signed in as an admin?',
+        ),
+        backgroundColor: ok ? null : AppColors.adminDanger,
+      ),
     );
   }
 
-  @override
-  void dispose() {
-    _tripsSubscription?.cancel();
-    _search.dispose();
-    super.dispose();
-  }
-
-  /// Maps a Firestore trip onto the row the table renders.
-  AdminTripApplication _toApplication(AdminTrip trip) => AdminTripApplication(
-    tripId: trip.tripId,
-    tripTitle: trip.title.isNotEmpty ? trip.title : 'Trip Application',
-    guide: trip.guideName.isNotEmpty ? trip.guideName : 'Tour Guide',
-    date: trip.scheduleLabel.isNotEmpty ? trip.scheduleLabel : 'Upcoming',
-    price: trip.priceLabel,
-    status: trip.approvalStatus,
-    type: 'public',
-    travelers: trip.travelers,
-    location: trip.location,
-    itinerary: trip.itinerary,
-    participants: const [],
-    imageUrl: trip.imageUrl,
-    rejectionReason: trip.rejectionReason,
-  );
-
-  List<AdminTripApplication> get _filtered {
-    final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return _apps;
-    return _apps.where((a) {
-      return a.tripTitle.toLowerCase().contains(q) ||
-          a.guide.toLowerCase().contains(q) ||
-          a.location.toLowerCase().contains(q) ||
-          a.status.toLowerCase().contains(q) ||
-          a.type.toLowerCase().contains(q);
-    }).toList();
-  }
-
-  /// Approves a trip and tells the guide.
-  Future<void> _approve(AdminTripApplication app) async {
-    setState(() {
-      final idx = _apps.indexOf(app);
-      if (idx != -1) {
-        _apps[idx] = AdminTripApplication(
-          tripId: app.tripId,
-          tripTitle: app.tripTitle,
-          guide: app.guide,
-          date: app.date,
-          price: app.price,
-          status: 'approved',
-          type: app.type,
-          travelers: app.travelers,
-          location: app.location,
-          itinerary: app.itinerary,
-          participants: app.participants,
-          imageUrl: app.imageUrl,
-        );
-      }
-    });
-    if (app.tripId.isEmpty) {
-      _toast('Trip approved.');
-      return;
-    }
-    final ok = await _repository.decide(tripId: app.tripId, approve: true);
-    if (!mounted) return;
-    if (!ok) {
-      _toast('Could not approve the trip. Are you signed in as an admin?');
-      return;
-    }
-    _toast('Trip approved.');
-  }
-
   /// Rejects a trip with a reason and tells the guide.
-  Future<void> _reject(AdminTripApplication app) async {
-    final reasonController = TextEditingController();
+  Future<void> _reject(
+    BuildContext context,
+    AdminTripApplication application,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final reason = await _askRejectionReason(context);
+    if (reason == null || !context.mounted) return;
+
+    final ok = await context.read<TripApplicationsCubit>().reject(
+      application,
+      reason,
+    );
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          ok
+              ? 'Trip rejected.'
+              : 'Could not reject the trip. Are you signed in as an admin?',
+        ),
+        backgroundColor: ok ? null : AppColors.adminDanger,
+      ),
+    );
+  }
+
+  Future<String?> _askRejectionReason(BuildContext context) async {
+    final controller = TextEditingController();
     final reason = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
+        scrollable: true,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
           'Reject Application',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Please provide a reason for rejection:'),
-              const SizedBox(height: 12),
-              TextField(
-                controller: reasonController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: 'e.g., Incomplete details, invalid price...',
-                  border: OutlineInputBorder(),
-                ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Please provide a reason for rejection:'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'e.g., Incomplete details, invalid price...',
+                border: OutlineInputBorder(),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, reasonController.text.trim()),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.adminDanger,
+            ),
             child: const Text(
               'Confirm Reject',
               style: TextStyle(color: Colors.white),
@@ -190,116 +116,76 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
         ],
       ),
     );
-    reasonController.dispose();
-    if (reason == null) return;
-    setState(() {
-      final idx = _apps.indexOf(app);
-      if (idx != -1) {
-        _apps[idx] = AdminTripApplication(
-          tripId: app.tripId,
-          tripTitle: app.tripTitle,
-          guide: app.guide,
-          date: app.date,
-          price: app.price,
-          status: 'rejected',
-          type: app.type,
-          travelers: app.travelers,
-          location: app.location,
-          itinerary: app.itinerary,
-          participants: app.participants,
-          imageUrl: app.imageUrl,
-          rejectionReason: reason,
-        );
-      }
-    });
-    if (app.tripId.isEmpty) {
-      _toast('Trip rejected.');
-      return;
-    }
-    final ok = await _repository.decide(
-      tripId: app.tripId,
-      approve: false,
-      rejectionReason: reason,
-    );
-    if (!mounted) return;
-    if (!ok) {
-      _toast('Could not reject the trip. Are you signed in as an admin?');
-      return;
-    }
-    _toast('Trip rejected.');
+    controller.dispose();
+    return reason;
   }
 
-  void _toast(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  void _showReviewDialog(AdminTripApplication app) {
+  void _showReviewDialog(
+    BuildContext context,
+    AdminTripApplication application,
+  ) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        scrollable: true,
         title: Text(
-          '${app.tripTitle} - ${app.type.toUpperCase()}',
+          '${application.tripTitle} - ${application.type.toUpperCase()}',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: SizedBox(
-          width: 500,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (app.imageUrl.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      app.imageUrl,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (application.imageUrl.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    application.imageUrl,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
                       height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 200,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.image, size: 50, color: Colors.grey),
-                        ),
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: Icon(Icons.image, size: 50, color: Colors.grey),
                       ),
                     ),
                   ),
+                ),
+              const SizedBox(height: 16),
+              Text(
+                'Date: ${application.date}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text('Travelers: ${application.travelers} travelers'),
+              if (application.location.isNotEmpty)
+                Text('Location: ${application.location}'),
+              Text(
+                'Price: ${application.price}',
+                style: const TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (application.itinerary.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                Text(
-                  'Date: ${app.date}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                const Text(
+                  'Itinerary:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                Text('Travelers: ${app.travelers} travelers'),
-                if (app.location.isNotEmpty) Text('Location: ${app.location}'),
-                Text(
-                  'Price: ${app.price}',
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (app.itinerary.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Itinerary:',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  ...app.itinerary.asMap().entries.map(
-                    (e) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        '${(e.key + 1).toString().padLeft(2, '0')} ${e.value}',
-                      ),
+                const SizedBox(height: 8),
+                ...application.itinerary.asMap().entries.map(
+                  (entry) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      '${(entry.key + 1).toString().padLeft(2, '0')} '
+                      '${entry.value}',
                     ),
                   ),
-                ],
+                ),
               ],
-            ),
-          ),
+          ],
         ),
         actions: [
           TextButton(
@@ -333,31 +219,51 @@ class _TripApplicationsViewState extends State<TripApplicationsView> {
 
             SearchFilterRow(
               hintText: 'Search trip applications...',
-              controller: _search,
-              onChanged: (v) => setState(() => _query = v),
+              onChanged: context.read<TripApplicationsCubit>().search,
             ),
             const SizedBox(height: 20),
 
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (_filtered.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: Text('No applications found.')),
-              )
-            else
-              ..._filtered.asMap().entries.map(
-                (entry) => _ApplicationItem(
-                  app: entry.value,
-                  onApprove: () => _approve(entry.value),
-                  onReject: () => _reject(entry.value),
-                  onReview: () => _showReviewDialog(entry.value),
-                  isFirst: entry.key == 0,
-                ),
-              ),
+            BlocBuilder<TripApplicationsCubit, TripApplicationsState>(
+              builder: (context, state) {
+                if (state is TripApplicationsInitial ||
+                    state is TripApplicationsLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (state is TripApplicationsError) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text(state.message)),
+                  );
+                }
+
+                final applications = state is TripApplicationsSuccess
+                    ? state.filtered
+                    : const <AdminTripApplication>[];
+                if (applications.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text('No applications found.')),
+                  );
+                }
+
+                return Column(
+                  children: [
+                    for (final entry in applications.asMap().entries)
+                      _ApplicationItem(
+                        app: entry.value,
+                        onApprove: () => _approve(context, entry.value),
+                        onReject: () => _reject(context, entry.value),
+                        onReview: () =>
+                            _showReviewDialog(context, entry.value),
+                        isFirst: entry.key == 0,
+                      ),
+                  ],
+                );
+              },
+            ),
           ],
         ),
       ),

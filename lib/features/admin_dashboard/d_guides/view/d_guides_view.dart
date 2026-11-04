@@ -1,156 +1,99 @@
-﻿import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../core/data/repositories/admin_guides_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_circle_back_button.dart';
-import '../../../../core/data/repositories/admin_guides_repository.dart';
 import '../../d_home/view/d_home_view.dart';
+import '../cubit/guides_cubit.dart';
 
 /// Guides verification management screen.
-class GuidesView extends StatefulWidget {
+class GuidesView extends StatelessWidget {
   const GuidesView({super.key});
 
   @override
-  State<GuidesView> createState() => _GuidesViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => GuidesCubit()..start(),
+      child: const _GuidesBody(),
+    );
+  }
 }
 
-class _GuidesViewState extends State<GuidesView> {
-  final AdminGuidesRepository _repository = AdminGuidesRepository();
-
-  final Set<String> _approvedGuideIdentifiers = {};
-  List<AdminGuide> _guides = const [];
-  bool _loading = true;
-  StreamSubscription<List<AdminGuide>>? _guidesSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _guidesSubscription = _repository.watchGuides().listen((guides) {
-      if (!mounted) return;
-      setState(() {
-        _guides = guides.map((g) {
-          final isMarkedApproved = _approvedGuideIdentifiers.contains(g.uid) ||
-              (g.email.isNotEmpty && _approvedGuideIdentifiers.contains(g.email));
-          if (isMarkedApproved) {
-            return AdminGuide(
-              uid: g.uid,
-              name: g.name,
-              email: g.email,
-              phone: g.phone,
-              city: g.city,
-              document: g.document,
-              status: 'approved',
-              submitted: g.submitted,
-              docFileName: g.docFileName,
-              uploadedTrips: g.uploadedTrips,
-            );
-          }
-          return g;
-        }).toList();
-        _loading = false;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _guidesSubscription?.cancel();
-    super.dispose();
-  }
-
-  int get _pendingCount => _guides.where((g) => g.status == 'pending').length;
-
-  void _toast(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
+class _GuidesBody extends StatelessWidget {
+  const _GuidesBody();
 
   /// Approves the guide's documents and writes the decision back.
-  Future<void> _approve(AdminGuide guide) async {
-    if (guide.uid.isNotEmpty) _approvedGuideIdentifiers.add(guide.uid);
-    if (guide.email.isNotEmpty) _approvedGuideIdentifiers.add(guide.email);
-
-    setState(() {
-      final i = _guides.indexWhere((g) => g.uid == guide.uid);
-      if (i != -1) {
-        _guides = [
-          for (int idx = 0; idx < _guides.length; idx++)
-            if (idx == i)
-              AdminGuide(
-                uid: _guides[i].uid,
-                name: _guides[i].name,
-                email: _guides[i].email,
-                phone: _guides[i].phone,
-                city: _guides[i].city,
-                document: _guides[i].document,
-                status: 'approved',
-                submitted: _guides[i].submitted,
-                docFileName: _guides[i].docFileName,
-                uploadedTrips: _guides[i].uploadedTrips,
-              )
-            else
-              _guides[idx],
-        ];
-      }
-    });
-
-    final ok = await _repository.decideVerification(
-      guideId: guide.uid,
-      approve: true,
+  Future<void> _approve(BuildContext context, AdminGuide guide) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await context.read<GuidesCubit>().approve(guide);
+    if (ok) return;
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Could not approve the guide.'),
+        backgroundColor: AppColors.adminDanger,
+      ),
     );
-    if (!mounted) return;
-    if (!ok) {
-      _toast('Could not approve the guide.');
-      return;
-    }
   }
 
   /// Rejects the guide's documents and writes the decision back.
-  Future<void> _reject(AdminGuide guide) async {
-    final reason = await _askRejectionReason();
-    if (reason == null || !mounted) return;
-    final ok = await _repository.decideVerification(
-      guideId: guide.uid,
-      approve: false,
-      rejectionReason: reason,
+  Future<void> _reject(BuildContext context, AdminGuide guide) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final reason = await _askRejectionReason(context);
+    if (reason == null || !context.mounted) return;
+
+    final ok = await context.read<GuidesCubit>().reject(guide, reason);
+    if (ok) return;
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Could not reject the guide.'),
+        backgroundColor: AppColors.adminDanger,
+      ),
     );
-    if (!mounted) return;
-    if (!ok) {
-      _toast('Could not reject the guide.');
-      return;
-    }
+  }
+
+  /// Suspends the guide — they can no longer publish or be booked.
+  Future<void> _suspend(BuildContext context, AdminGuide guide) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await context.read<GuidesCubit>().suspend(guide);
+    if (ok) return;
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Could not suspend the guide.'),
+        backgroundColor: AppColors.adminDanger,
+      ),
+    );
   }
 
   /// Asks the admin why the documents were refused.
-  Future<String?> _askRejectionReason() async {
+  Future<String?> _askRejectionReason(BuildContext context) async {
     final controller = TextEditingController();
     final reason = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        scrollable: true,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text(
           'Reject application',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Please provide a reason for rejection:'),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: 'e.g., the license is not readable...',
-                  border: OutlineInputBorder(),
-                ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Please provide a reason for rejection:'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'e.g., the license is not readable...',
+                border: OutlineInputBorder(),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -160,7 +103,9 @@ class _GuidesViewState extends State<GuidesView> {
           ElevatedButton(
             onPressed: () =>
                 Navigator.pop(dialogContext, controller.text.trim()),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.adminDanger),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.adminDanger,
+            ),
             child: const Text(
               'Confirm Reject',
               style: TextStyle(color: Colors.white),
@@ -173,17 +118,7 @@ class _GuidesViewState extends State<GuidesView> {
     return reason;
   }
 
-  /// Suspends the guide â€” they can no longer publish or be booked.
-  Future<void> _suspend(AdminGuide guide) async {
-    final ok = await _repository.suspendGuide(guide.uid);
-    if (!mounted) return;
-    if (!ok) {
-      _toast('Could not suspend the guide.');
-      return;
-    }
-  }
-
-  void _showDetails(AdminGuide guide) {
+  void _showDetails(BuildContext context, AdminGuide guide) {
     showDialog(
       context: context,
       builder: (_) => _GuideDetailsDialog(guide: guide),
@@ -194,76 +129,93 @@ class _GuidesViewState extends State<GuidesView> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: AdminCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Section header
-            Row(
+        child: BlocBuilder<GuidesCubit, GuidesState>(
+          builder: (context, state) {
+            final guides = state is GuidesSuccess
+                ? state.guides
+                : const <AdminGuide>[];
+            final pendingCount = state is GuidesSuccess
+                ? state.pendingCount
+                : 0;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: CardSectionHeader(
-                    title: 'Tour Guide Verification',
-                    subtitle:
-                        'Review documents, guide activity and uploaded content',
+                // Section header
+                Row(
+                  children: [
+                    Expanded(
+                      child: CardSectionHeader(
+                        title: 'Tour Guide Verification',
+                        subtitle:
+                            'Review documents, guide activity and uploaded content',
+                      ),
+                    ),
+                    if (pendingCount > 0)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.adminStatusPendingBg,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '$pendingCount pending',
+                          style: AppTextStyles.adminTableCellMuted.copyWith(
+                            color: AppColors.adminStatusPendingText,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Table header
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      _h('Guide', 3),
+                      _h('Document', 4),
+                      _h('City', 2),
+                      _h('Status', 2),
+                      _h('Actions', 4, end: true),
+                    ],
                   ),
                 ),
-                if (_pendingCount > 0)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.adminStatusPendingBg,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '$_pendingCount pending',
-                      style: AppTextStyles.adminTableCellMuted.copyWith(
-                        color: AppColors.adminStatusPendingText,
-                        fontWeight: FontWeight.w600,
-                      ),
+                const Divider(color: AppColors.adminDivider, height: 1),
+
+                if (state is GuidesInitial || state is GuidesLoading)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (state is GuidesError)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text(state.message)),
+                  )
+                else if (guides.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text('No guide accounts yet.')),
+                  )
+                else
+                  ...guides.map(
+                    (guide) => _GuideRow(
+                      guide: guide,
+                      onApprove: () => _approve(context, guide),
+                      onReject: () => _reject(context, guide),
+                      onSuspend: () => _suspend(context, guide),
+                      onDetails: () => _showDetails(context, guide),
                     ),
                   ),
               ],
-            ),
-            const SizedBox(height: 20),
-
-            // Table header
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  _h('Guide', 3),
-                  _h('Document', 4),
-                  _h('City', 2),
-                  _h('Status', 2),
-                  _h('Actions', 4, end: true),
-                ],
-              ),
-            ),
-            const Divider(color: AppColors.adminDivider, height: 1),
-
-            ..._guides.map(
-              (g) => _GuideRow(
-                guide: g,
-                onApprove: () => _approve(g),
-                onReject: () => _reject(g),
-                onSuspend: () => _suspend(g),
-                onDetails: () => _showDetails(g),
-              ),
-            ),
-            if (_loading)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            if (!_loading && _guides.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: Text('No guide accounts yet.')),
-              ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -394,7 +346,7 @@ class _GuideRow extends StatelessWidget {
   }
 }
 
-/// Guide details modal â€” shown on "Details" / "View file" tap.
+/// Guide details modal — shown on "Details" / "View file" tap.
 class _GuideDetailsDialog extends StatelessWidget {
   final AdminGuide guide;
   const _GuideDetailsDialog({required this.guide});
@@ -416,6 +368,221 @@ class _GuideDetailsDialog extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _handleDownload(
+    BuildContext context,
+    String url,
+    String defaultName,
+  ) async {
+    final cleanUrl = url.trim();
+    if (cleanUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No file URL available for this document.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // If it's a Cloudinary URL, convert to direct attachment download
+      String downloadUrl = cleanUrl;
+      if (cleanUrl.contains('cloudinary.com') && cleanUrl.contains('/upload/')) {
+        if (!cleanUrl.contains('/upload/fl_attachment')) {
+          downloadUrl = cleanUrl.replaceFirst('/upload/', '/upload/fl_attachment/');
+        }
+      }
+
+      final uri = Uri.parse(downloadUrl);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        await launchUrl(
+          Uri.parse(cleanUrl),
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not download document: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleView(BuildContext context, String url) async {
+    final cleanUrl = url.trim();
+    if (cleanUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No file URL available for this document.'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final uri = Uri.parse(cleanUrl);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open document viewer.')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open document: $e')),
+        );
+      }
+    }
+  }
+
+  Widget _buildDocSection(
+    BuildContext context, {
+    required String title,
+    required String fileName,
+    required String url,
+  }) {
+    final hasUrl = url.trim().isNotEmpty;
+    final lower = url.toLowerCase();
+    final isImage = hasUrl &&
+        (lower.contains('.jpg') ||
+            lower.contains('.jpeg') ||
+            lower.contains('.png') ||
+            lower.contains('.webp') ||
+            (lower.contains('cloudinary.com') && !lower.contains('.pdf')));
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: AppColors.adminDivider),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTextStyles.adminSectionTitle.copyWith(
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      fileName.isNotEmpty
+                          ? fileName
+                          : (hasUrl ? 'Document uploaded' : 'No file uploaded'),
+                      style: AppTextStyles.adminTableCellMuted,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              if (hasUrl) ...[
+                OutlinedButton.icon(
+                  onPressed: () => _handleView(context, url),
+                  icon: const Icon(Icons.open_in_new, size: 14),
+                  label: const Text('View'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.adminPrimary,
+                    side: const BorderSide(color: AppColors.adminPrimary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 9,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              ElevatedButton.icon(
+                onPressed: () => _handleDownload(context, url, fileName),
+                icon: const Icon(Icons.download_rounded, size: 16, color: Colors.white),
+                label: const Text('Download', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.adminPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 9,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Document preview area
+          Container(
+            height: 180,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.adminDocumentPreviewBg,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: isImage
+                ? InkWell(
+                    onTap: () => _handleView(context, url),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                      errorBuilder: (context, error, stackTrace) =>
+                          _previewPlaceholder(hasUrl, fileName),
+                    ),
+                  )
+                : _previewPlaceholder(hasUrl, fileName),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _previewPlaceholder(bool hasUrl, String fileName) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          hasUrl ? Icons.description_outlined : Icons.article_outlined,
+          size: 44,
+          color: hasUrl ? AppColors.adminPrimary : AppColors.adminTextMuted,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          hasUrl
+              ? (fileName.toLowerCase().endsWith('.pdf')
+                  ? 'PDF Document (Click View to open)'
+                  : 'Document uploaded (Click View to open)')
+              : 'Document preview not available',
+          style: AppTextStyles.adminTableCellMuted,
+        ),
+      ],
     );
   }
 
@@ -495,92 +662,36 @@ class _GuideDetailsDialog extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
-
-              // Document preview box
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.adminDivider),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                guide.document,
-                                style: AppTextStyles.adminSectionTitle.copyWith(
-                                  fontSize: 15,
-                                ),
-                              ),
-                              Text(
-                                guide.docFileName,
-                                style: AppTextStyles.adminTableCellMuted,
-                              ),
-                            ],
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Downloading document...'),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.adminPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                          ),
-                          child: Text(
-                            'Download',
-                            style: AppTextStyles.adminButtonPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // Document preview area
-                    Container(
-                      height: 160,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors.adminDocumentPreviewBg,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.article_outlined,
-                            size: 40,
-                            color: AppColors.adminTextMuted,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Document preview',
-                            style: AppTextStyles.adminTableCellMuted,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 20),
+
+              // Verification Documents
+              Text('Verification Documents', style: AppTextStyles.adminSectionTitle),
+              const SizedBox(height: 12),
+
+              if (guide.idDocumentUrl.isNotEmpty || guide.licenseDocumentUrl.isNotEmpty) ...[
+                if (guide.idDocumentUrl.isNotEmpty)
+                  _buildDocSection(
+                    context,
+                    title: 'Tour Guide ID',
+                    fileName: guide.idDocumentUrl.split('/').last.split('?').first,
+                    url: guide.idDocumentUrl,
+                  ),
+                if (guide.licenseDocumentUrl.isNotEmpty)
+                  _buildDocSection(
+                    context,
+                    title: 'Syndicate Membership / License',
+                    fileName: guide.licenseDocumentUrl.split('/').last.split('?').first,
+                    url: guide.licenseDocumentUrl,
+                  ),
+              ] else
+                _buildDocSection(
+                  context,
+                  title: guide.document.isNotEmpty ? guide.document : 'Verification Document',
+                  fileName: guide.docFileName,
+                  url: guide.documentUrl,
+                ),
+
+              const SizedBox(height: 10),
 
               // Uploaded trips
               if (guide.uploadedTrips.isNotEmpty) ...[
@@ -663,4 +774,3 @@ class _InfoField extends StatelessWidget {
     );
   }
 }
-

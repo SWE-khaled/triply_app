@@ -366,6 +366,57 @@ class SearchFilterRow extends StatelessWidget {
   }
 }
 
+/// Keeps a dense admin table readable on narrow windows.
+///
+/// Admin tables use fixed-width action buttons (View / Reject / Approve ...).
+/// When the window gets narrow those buttons do not fit in their columns and
+/// the row throws a RenderFlex overflow, so below [minWidth] the header and
+/// the rows scroll horizontally together instead.
+class AdminTableArea extends StatefulWidget {
+  /// The narrowest width the table is laid out at before it starts scrolling.
+  final double minWidth;
+
+  final Widget child;
+
+  const AdminTableArea({
+    super.key,
+    required this.minWidth,
+    required this.child,
+  });
+
+  @override
+  State<AdminTableArea> createState() => _AdminTableAreaState();
+}
+
+class _AdminTableAreaState extends State<AdminTableArea> {
+  final ScrollController _controller = ScrollController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= widget.minWidth) return widget.child;
+        return Scrollbar(
+          controller: _controller,
+          thumbVisibility: true,
+          scrollbarOrientation: ScrollbarOrientation.bottom,
+          child: SingleChildScrollView(
+            controller: _controller,
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(width: widget.minWidth, child: widget.child),
+          ),
+        );
+      },
+    );
+  }
+}
+
 /// Reusable table column header row builder.
 Widget buildTableHeader(List<Map<String, dynamic>> columns) {
   return Padding(
