@@ -111,52 +111,88 @@ class _BookingsBody extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Table header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        children: [
-                          _h('User', 3),
-                          _h('Trip', 3),
-                          _h('Guide', 3),
-                          _h('Date', 2),
-                          _h('Status', 2),
-                          _h('Price', 2),
-                          _h('Type', 2),
-                          _h('Actions', 2, end: true),
-                        ],
-                      ),
-                    ),
-                    const Divider(color: AppColors.adminDivider, height: 1),
-
-                    if (state is BookingsInitial || state is BookingsLoading)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 32),
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (state is BookingsError)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Center(child: Text(state.message)),
-                      )
-                    else if (bookings.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24),
-                        child: Center(child: Text('No bookings found.')),
-                      )
-                    else
-                      ...bookings.map(
-                        (booking) => _BookingRow(
-                          booking: booking,
-                          onView: () => _showDetails(context, booking),
-                        ),
-                      ),
+                    _buildTable(context, state, bookings),
                   ],
                 );
               },
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTable(
+    BuildContext context,
+    BookingsState state,
+    List<AdminBooking> bookings,
+  ) {
+    final header = Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              _h('User', 3),
+              _h('Trip', 3),
+              _h('Guide', 3),
+              _h('Date', 2),
+              _h('Status', 2),
+              _h('Price', 2),
+              _h('Type', 2),
+              _h('Actions', 2, end: true),
+            ],
+          ),
+        ),
+        const Divider(color: AppColors.adminDivider, height: 1),
+      ],
+    );
+
+    if (state is BookingsInitial || state is BookingsLoading) {
+      return Column(
+        children: [
+          header,
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 32),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        ],
+      );
+    }
+    if (state is BookingsError) {
+      return Column(
+        children: [
+          header,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: Text(state.message)),
+          ),
+        ],
+      );
+    }
+    if (bookings.isEmpty) {
+      return Column(
+        children: [
+          header,
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: Text('No bookings found.')),
+          ),
+        ],
+      );
+    }
+
+    return AdminTableArea(
+      minWidth: 900,
+      child: Column(
+        children: [
+          header,
+          for (final booking in bookings)
+            _BookingRow(
+              booking: booking,
+              onView: () => _showDetails(context, booking),
+            ),
+        ],
       ),
     );
   }

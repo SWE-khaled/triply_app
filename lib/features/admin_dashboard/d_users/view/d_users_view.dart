@@ -68,57 +68,79 @@ class _UsersBody extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Table header
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  _h('Name', 3),
-                  _h('Email', 3),
-                  _h('Phone', 3),
-                  _h('Type', 2),
-                  _h('Activity', 2),
-                  _h('Status', 2),
-                  _h('Actions', 2, end: true),
-                ],
-              ),
-            ),
-            const Divider(color: AppColors.adminDivider, height: 1),
-
             BlocBuilder<UsersCubit, UsersState>(
               builder: (context, state) {
+                final header = Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        children: [
+                          _h('Name', 3),
+                          _h('Email', 3),
+                          _h('Phone', 3),
+                          _h('Type', 2),
+                          _h('Activity', 2),
+                          _h('Status', 2),
+                          _h('Actions', 4, end: true),
+                        ],
+                      ),
+                    ),
+                    const Divider(color: AppColors.adminDivider, height: 1),
+                  ],
+                );
+
                 if (state is UsersInitial || state is UsersLoading) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 32),
-                    child: Center(child: CircularProgressIndicator()),
+                  return Column(
+                    children: [
+                      header,
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    ],
                   );
                 }
                 if (state is UsersError) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text(state.message)),
+                  return Column(
+                    children: [
+                      header,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: Text(state.message)),
+                      ),
+                    ],
                   );
                 }
 
                 final data = state as UsersSuccess;
                 final tourists = data.filtered;
                 if (tourists.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('No tourists found.')),
+                  return Column(
+                    children: [
+                      header,
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: Text('No tourists found.')),
+                      ),
+                    ],
                   );
                 }
 
-                return Column(
-                  children: [
-                    for (final tourist in tourists)
-                      _UserRow(
-                        tourist: tourist,
-                        onView: () => _showViewDialog(context, tourist),
-                        onToggleStatus: () =>
-                            _toggleUserStatus(context, tourist),
-                      ),
-                  ],
+                return AdminTableArea(
+                  minWidth: 900,
+                  child: Column(
+                    children: [
+                      header,
+                      for (final tourist in tourists)
+                        _UserRow(
+                          tourist: tourist,
+                          onView: () => _showViewDialog(context, tourist),
+                          onToggleStatus: () =>
+                              _toggleUserStatus(context, tourist),
+                        ),
+                    ],
+                  ),
                 );
               },
             ),
@@ -208,34 +230,22 @@ class _UserRow extends StatelessWidget {
               ),
               Expanded(flex: 2, child: StatusChip(status: tourist.status)),
               Expanded(
-                flex: 2,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minWidth: constraints.maxWidth,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            OutlineActionButton(label: 'View', onTap: onView),
-                            const SizedBox(width: 6),
-                            isSuspended
-                                ? OutlineActionButton(
-                                    label: 'Activate',
-                                    onTap: onToggleStatus,
-                                  )
-                                : DangerActionButton(
-                                    label: 'Suspend',
-                                    onTap: onToggleStatus,
-                                  ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                flex: 4,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OutlineActionButton(label: 'View', onTap: onView),
+                    const SizedBox(width: 6),
+                    isSuspended
+                        ? OutlineActionButton(
+                            label: 'Activate',
+                            onTap: onToggleStatus,
+                          )
+                        : DangerActionButton(
+                            label: 'Suspend',
+                            onTap: onToggleStatus,
+                          ),
+                  ],
                 ),
               ),
             ],

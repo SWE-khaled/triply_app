@@ -133,11 +133,8 @@ class _TripsBody extends StatelessWidget {
                 final trips = state is TripsSuccess
                     ? state.filtered
                     : const <TripRowData>[];
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                final header = Column(
                   children: [
-                    // Table header
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Row(
@@ -148,36 +145,61 @@ class _TripsBody extends StatelessWidget {
                           _h('Travelers', 2),
                           _h('Price', 2),
                           _h('Status', 2),
-                          _h('Actions', 3, end: true),
+                          _h('Actions', 5, end: true),
                         ],
                       ),
                     ),
                     const Divider(color: AppColors.adminDivider, height: 1),
+                  ],
+                );
 
-                    if (state is TripsInitial || state is TripsLoading)
+                if (state is TripsInitial || state is TripsLoading) {
+                  return Column(
+                    children: [
+                      header,
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 32),
                         child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (state is TripsError)
+                      ),
+                    ],
+                  );
+                }
+                if (state is TripsError) {
+                  return Column(
+                    children: [
+                      header,
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Center(child: Text(state.message)),
-                      )
-                    else if (trips.isEmpty)
+                      ),
+                    ],
+                  );
+                }
+                if (trips.isEmpty) {
+                  return Column(
+                    children: [
+                      header,
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(child: Text('No trips found.')),
-                      )
-                    else
-                      ...trips.map(
-                        (trip) => _TripRow(
+                      ),
+                    ],
+                  );
+                }
+
+                return AdminTableArea(
+                  minWidth: 900,
+                  child: Column(
+                    children: [
+                      header,
+                      for (final trip in trips)
+                        _TripRow(
                           trip: trip,
                           onView: () => _showViewDialog(context, trip),
                           onCancel: () => _rejectTrip(context, trip),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),
@@ -256,7 +278,7 @@ class _TripRow extends StatelessWidget {
               ),
               Expanded(flex: 2, child: StatusChip(status: trip.status)),
               Expanded(
-                flex: 3,
+                flex: 5,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

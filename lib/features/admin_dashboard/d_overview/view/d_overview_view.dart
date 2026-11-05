@@ -63,7 +63,12 @@ class _OverviewBody extends StatelessWidget {
                 // ── 6-stat dynamic KPI grid ───────────────────────────────
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final w = (constraints.maxWidth - 32) / 3;
+                    // 3 cards on desktop, 2 on tablets, 1 on narrow windows.
+                    final columns = constraints.maxWidth >= 900
+                        ? 3
+                        : (constraints.maxWidth >= 560 ? 2 : 1);
+                    final w =
+                        (constraints.maxWidth - 16 * (columns - 1)) / columns;
                     return Wrap(
                       spacing: 16,
                       runSpacing: 16,
@@ -154,7 +159,7 @@ class _OverviewBody extends StatelessWidget {
                 // ── Bottom row: Pending Actions + Guide Applications ──────
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    if (constraints.maxWidth < 700) {
+                    if (constraints.maxWidth < 860) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -300,16 +305,23 @@ class _StatCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const Spacer(),
-              Text(
-                badge,
-                style: badgeDanger
-                    ? AppTextStyles.adminStatPercentDanger
-                    : (badgeIsText
-                          ? AppTextStyles.adminSectionSubtitle.copyWith(
-                              color: badgeDanger ? AppColors.adminDanger : AppColors.adminPositiveGreen,
-                            )
-                          : AppTextStyles.adminStatPercent),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  badge,
+                  textAlign: TextAlign.end,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: badgeDanger
+                      ? AppTextStyles.adminStatPercentDanger
+                      : (badgeIsText
+                            ? AppTextStyles.adminSectionSubtitle.copyWith(
+                                color: badgeDanger
+                                    ? AppColors.adminDanger
+                                    : AppColors.adminPositiveGreen,
+                              )
+                            : AppTextStyles.adminStatPercent),
+                ),
               ),
             ],
           ),
@@ -442,18 +454,25 @@ class _GuideApplicationsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Guide Applications', style: AppTextStyles.adminSectionTitle),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Review documents, guide activity and uploaded content',
-                    style: AppTextStyles.adminSectionSubtitle,
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Guide Applications',
+                      style: AppTextStyles.adminSectionTitle,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Review documents, guide activity and uploaded content',
+                      style: AppTextStyles.adminSectionSubtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -474,23 +493,30 @@ class _GuideApplicationsCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _MiniGuideTableHeader(),
-          const Divider(color: AppColors.adminDivider, height: 1),
-          if (guides.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(child: Text('No guide applications found.')),
-            )
-          else
-            ...guides.map(
-              (g) => _MiniGuideRow(
-                guide: g,
-                onApprove: () => onUpdateStatus(g, 'approved'),
-                onReject: () => onUpdateStatus(g, 'suspended'),
-                onSuspend: () => onUpdateStatus(g, 'suspended'),
-                onActivate: () => onUpdateStatus(g, 'approved'),
-              ),
+          AdminTableArea(
+            minWidth: 620,
+            child: Column(
+              children: [
+                _MiniGuideTableHeader(),
+                const Divider(color: AppColors.adminDivider, height: 1),
+                if (guides.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text('No guide applications found.')),
+                  )
+                else
+                  ...guides.map(
+                    (g) => _MiniGuideRow(
+                      guide: g,
+                      onApprove: () => onUpdateStatus(g, 'approved'),
+                      onReject: () => onUpdateStatus(g, 'suspended'),
+                      onSuspend: () => onUpdateStatus(g, 'suspended'),
+                      onActivate: () => onUpdateStatus(g, 'approved'),
+                    ),
+                  ),
+              ],
             ),
+          ),
         ],
       ),
     );
@@ -521,7 +547,7 @@ class _MiniGuideTableHeader extends StatelessWidget {
             child: Text('Status', style: AppTextStyles.adminTableHeader),
           ),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Text(
               'Actions',
               style: AppTextStyles.adminTableHeader,
@@ -605,7 +631,7 @@ class _MiniGuideRow extends StatelessWidget {
                 ),
               ),
               Expanded(flex: 2, child: _buildStatusChip(guide.status)),
-              Expanded(flex: 3, child: _buildActions(guide, context)),
+              Expanded(flex: 4, child: _buildActions(guide, context)),
             ],
           ),
         ),

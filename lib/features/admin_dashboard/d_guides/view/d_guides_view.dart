@@ -173,50 +173,86 @@ class _GuidesBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // Table header
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Row(
-                    children: [
-                      _h('Guide', 3),
-                      _h('Document', 4),
-                      _h('City', 2),
-                      _h('Status', 2),
-                      _h('Actions', 4, end: true),
-                    ],
-                  ),
-                ),
-                const Divider(color: AppColors.adminDivider, height: 1),
-
-                if (state is GuidesInitial || state is GuidesLoading)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (state is GuidesError)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text(state.message)),
-                  )
-                else if (guides.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: Text('No guide accounts yet.')),
-                  )
-                else
-                  ...guides.map(
-                    (guide) => _GuideRow(
-                      guide: guide,
-                      onApprove: () => _approve(context, guide),
-                      onReject: () => _reject(context, guide),
-                      onSuspend: () => _suspend(context, guide),
-                      onDetails: () => _showDetails(context, guide),
-                    ),
-                  ),
+                _buildTable(context, state, guides),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildTable(
+    BuildContext context,
+    GuidesState state,
+    List<AdminGuide> guides,
+  ) {
+    final header = Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            children: [
+              _h('Guide', 3),
+              _h('Document', 4),
+              _h('City', 2),
+              _h('Status', 2),
+              _h('Actions', 5, end: true),
+            ],
+          ),
+        ),
+        const Divider(color: AppColors.adminDivider, height: 1),
+      ],
+    );
+
+    if (state is GuidesInitial || state is GuidesLoading) {
+      return Column(
+        children: [
+          header,
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        ],
+      );
+    }
+    if (state is GuidesError) {
+      return Column(
+        children: [
+          header,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: Text(state.message)),
+          ),
+        ],
+      );
+    }
+    if (guides.isEmpty) {
+      return Column(
+        children: [
+          header,
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: Text('No guide accounts yet.')),
+          ),
+        ],
+      );
+    }
+
+    return AdminTableArea(
+      minWidth: 900,
+      child: Column(
+        children: [
+          header,
+          for (final guide in guides)
+            _GuideRow(
+              guide: guide,
+              onApprove: () => _approve(context, guide),
+              onReject: () => _reject(context, guide),
+              onSuspend: () => _suspend(context, guide),
+              onDetails: () => _showDetails(context, guide),
+            ),
+        ],
       ),
     );
   }
@@ -313,7 +349,7 @@ class _GuideRow extends StatelessWidget {
               Expanded(flex: 2, child: StatusChip(status: guide.status)),
               // Actions
               Expanded(
-                flex: 4,
+                flex: 5,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

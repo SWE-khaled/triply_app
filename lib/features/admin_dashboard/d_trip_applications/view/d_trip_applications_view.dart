@@ -290,103 +290,119 @@ class _ApplicationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isProcessed = app.status == 'approved' || app.status == 'rejected';
 
+    // Trip info block (no Expanded here: it is used both inside a Row and a
+    // Column depending on the available width).
+    final info = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                app.tripTitle,
+                style: AppTextStyles.adminTableCell.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: app.type == 'private'
+                    ? Colors.purple.withValues(alpha: 0.1)
+                    : Colors.blue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: app.type == 'private'
+                      ? Colors.purple.withValues(alpha: 0.3)
+                      : Colors.blue.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Text(
+                app.type.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: app.type == 'private' ? Colors.purple : Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 3),
+        Text(
+          'By ${app.guide} · ${app.date} · ${app.price}',
+          style: AppTextStyles.adminTableCellMuted,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+        if (app.status == 'rejected' && app.rejectionReason.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(
+            'Reason for rejection: ${app.rejectionReason}',
+            style: const TextStyle(
+              color: AppColors.adminDanger,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ],
+    );
+
+    final actions = isProcessed
+        ? StatusChip(status: app.status)
+        : Wrap(
+            alignment: WrapAlignment.end,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              Text(
+                'Pending Review',
+                style: AppTextStyles.adminTableCellMuted.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.adminTextSecondary,
+                ),
+              ),
+              OutlineActionButton(label: 'Review', onTap: onReview),
+              PrimaryActionButton(label: 'Approve', onTap: onApprove),
+              DangerActionButton(label: 'Reject', onTap: onReject),
+            ],
+          );
+
     return Column(
       children: [
         if (!isFirst) const Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 18),
-          child: Row(
-            children: [
-              // Trip info
-              Expanded(
-                child: Column(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // On narrow windows the actions move under the trip info
+              // instead of squeezing it (and overflowing the row).
+              if (constraints.maxWidth < 640) {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            app.tripTitle,
-                            style: AppTextStyles.adminTableCell.copyWith(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: app.type == 'private'
-                                ? Colors.purple.withValues(alpha: 0.1)
-                                : Colors.blue.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: app.type == 'private'
-                                  ? Colors.purple.withValues(alpha: 0.3)
-                                  : Colors.blue.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Text(
-                            app.type.toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: app.type == 'private'
-                                  ? Colors.purple
-                                  : Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'By ${app.guide} آ· ${app.date} آ· ${app.price}',
-                      style: AppTextStyles.adminTableCellMuted,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    if (app.status == 'rejected' &&
-                        app.rejectionReason.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        'Reason for rejection: ${app.rejectionReason}',
-                        style: const TextStyle(
-                          color: AppColors.adminDanger,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                    info,
+                    const SizedBox(height: 10),
+                    Align(alignment: Alignment.centerRight, child: actions),
                   ],
-                ),
-              ),
+                );
+              }
 
-              // Status or actions
-              if (isProcessed) ...[
-                StatusChip(status: app.status),
-              ] else ...[
-                Text(
-                  'Pending Review',
-                  style: AppTextStyles.adminTableCellMuted.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.adminTextSecondary,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                OutlineActionButton(label: 'Review', onTap: onReview),
-                const SizedBox(width: 8),
-                PrimaryActionButton(label: 'Approve', onTap: onApprove),
-                const SizedBox(width: 8),
-                DangerActionButton(label: 'Reject', onTap: onReject),
-              ],
-            ],
+              return Row(
+                children: [
+                  Expanded(child: info),
+                  const SizedBox(width: 14),
+                  actions,
+                ],
+              );
+            },
           ),
         ),
       ],
