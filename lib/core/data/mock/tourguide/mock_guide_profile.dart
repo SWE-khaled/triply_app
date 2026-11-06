@@ -1,5 +1,5 @@
 // Single source of truth for the tour-guide identity used by the
-// tourguide mock dataset.
+// tour_guide mock dataset.
 //
 // Every other mock file references these values (id, name, avatar,
 // rating), so the dataset never presents two different guides. Kept in

@@ -94,7 +94,7 @@ class GuideTripCard extends StatelessWidget {
                                 const SizedBox(width: 3),
                                 Expanded(
                                   child: Text(
-                                    '${trip.location} آ· ${trip.scheduleLabel}',
+                                    '${trip.location} · ${trip.scheduleLabel}',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.poppins(

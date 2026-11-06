@@ -106,12 +106,19 @@ class GuideDashboardRepository {
       yield _mockMetrics();
       return;
     }
-    await for (final _
-        in _firestore
-            .collection(bookingsCollection)
-            .where('guideId', isEqualTo: uid)
-            .snapshots()) {
-      yield await fetchMetrics();
+    try {
+      await for (final _
+          in _firestore
+              .collection(bookingsCollection)
+              .where('guideId', isEqualTo: uid)
+              .snapshots()) {
+        yield await fetchMetrics();
+      }
+    } on FirebaseException catch (e) {
+      // Signing out revokes access while the listener is still attached.
+      // Swallow only that expected shutdown race.
+      if (e.code == 'permission-denied' && currentGuideId != uid) return;
+      rethrow;
     }
   }
 

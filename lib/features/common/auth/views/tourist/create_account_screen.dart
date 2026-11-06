@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
+import 'package:triply/features/common/auth/views/tourist/sign_in_screen.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../../../../core/routing/app_routes.dart';
-import '../../../../core/services/app_prefs.dart';
-import '../../../common/auth/cubit/auth_cubit.dart';
-import '../../../common/auth/model/auth_role.dart';
-import '../widgets/auth_text_field.dart';
+import '../../../../../core/routing/app_routes.dart';
+import '../../../../../core/services/app_prefs.dart';
+import '../../cubit/auth_cubit.dart';
+import '../../model/auth_role.dart';
+import '../../widgets/auth_text_field.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -28,6 +27,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _confirmPasswordController = TextEditingController();
 
   late final List<TextEditingController> _controllers;
+
+  /// Keeps the button in its loading state until Home is pushed.
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -86,25 +88,44 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   Future<void> _handleCreateAccount(AuthCubit authCubit) async {
+    if (_isSubmitting || authCubit.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
-    final success = await authCubit.signUp(
-      role: AuthRole.tourist,
-      fullName: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      phone: normalizeEgyptianPhone(_phoneController.text),
-    );
-    if (success && mounted) {
+
+    setState(() => _isSubmitting = true);
+    var navigated = false;
+    try {
+      final success = await authCubit.signUp(
+        role: AuthRole.tourist,
+        fullName: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        phone: normalizeEgyptianPhone(_phoneController.text),
+      );
+      if (!mounted) return;
+
+      if (!success) {
+        setState(() => _isSubmitting = false);
+        final message = authCubit.errorMessage;
+        if (message != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(message)));
+        }
+        return;
+      }
+
       await AppPrefs.instance.setLastRole('tourist');
       await AppPrefs.instance.markOnboardingSeen('tourist');
       if (!mounted) return;
+
+      navigated = true;
       Navigator.of(
         context,
       ).pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
-    } else if (mounted && authCubit.errorMessage != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(authCubit.errorMessage!)));
+    } finally {
+      if (!navigated && mounted && _isSubmitting) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -181,7 +202,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   // ───────────── Create Account button (Disabled / Enabled) ─────────────
   Widget _buildCreateButton(AuthCubit authCubit) {
-    final enabled = _isFormFilled && !authCubit.isLoading;
+    final isSubmitting = _isSubmitting || authCubit.isLoading;
+    final enabled = _isFormFilled && !isSubmitting;
 
     return SizedBox(
       height: 56,
@@ -190,15 +212,19 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         onPressed: enabled ? () => _handleCreateAccount(authCubit) : null,
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: AuthColors.darkTeal,
+          backgroundColor: AppColors.darkTeal,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: const Color(0xFFE8ECEC),
-          disabledForegroundColor: const Color(0xFF7A8B8F),
+          disabledBackgroundColor: isSubmitting
+              ? AppColors.darkTeal
+              : const Color(0xFFE8ECEC),
+          disabledForegroundColor: isSubmitting
+              ? Colors.white
+              : const Color(0xFF7A8B8F),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
         ),
-        child: authCubit.isLoading
+        child: isSubmitting
             ? const SizedBox(
                 width: 24,
                 height: 24,
@@ -318,7 +344,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     RichText(
                       text: const TextSpan(
                         style: TextStyle(
-                          color: AuthColors.textGrey,
+                          color: AppColors.textGrey,
                           fontSize: 16,
                           height: 1.5,
                         ),
@@ -326,12 +352,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           TextSpan(text: 'By signing up, you agree to our '),
                           TextSpan(
                             text: 'Terms of Service',
-                            style: TextStyle(color: AuthColors.signInDark),
+                            style: TextStyle(color: AppColors.signInDark),
                           ),
                           TextSpan(text: ' and '),
                           TextSpan(
                             text: 'Privacy Policy',
-                            style: TextStyle(color: AuthColors.signInDark),
+                            style: TextStyle(color: AppColors.signInDark),
                           ),
                         ],
                       ),
@@ -346,7 +372,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           const Text(
                             'Already have an account? ',
                             style: TextStyle(
-                              color: AuthColors.textGrey,
+                              color: AppColors.textGrey,
                               fontSize: 16,
                             ),
                           ),
@@ -360,7 +386,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             child: const Text(
                               'Sign in',
                               style: TextStyle(
-                                color: AuthColors.signInDark,
+                                color: AppColors.signInDark,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),

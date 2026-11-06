@@ -42,8 +42,8 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
                 ? current.saving
                 : false;
             final commission = data?['commission']?.toString() ?? '10';
-            final rawMode = (data?['approvalMode'] as String?) ??
-                'Manual admin approval';
+            final rawMode =
+                (data?['approvalMode'] as String?) ?? 'Manual admin approval';
             final mode = approvalOptions.contains(rawMode)
                 ? rawMode
                 : 'Manual admin approval';
@@ -88,21 +88,15 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
     emit(current.copyWith(saving: true));
     try {
       final commission = double.tryParse(commissionText.trim()) ?? 10.0;
-      await _firestore
-          .collection('appSettings')
-          .doc('general')
-          .set({
-            'commission': commission,
-            'approvalMode': current.approvalMode,
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+      await _firestore.collection('appSettings').doc('general').set({
+        'commission': commission,
+        'approvalMode': current.approvalMode,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
 
       if (!isClosed) {
         emit(
-          current.copyWith(
-            commission: commissionText.trim(),
-            saving: false,
-          ),
+          current.copyWith(commission: commissionText.trim(), saving: false),
         );
       }
       return null;

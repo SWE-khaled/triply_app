@@ -330,7 +330,10 @@ class _GuideRow extends StatelessWidget {
                     const SizedBox(width: 6),
                     InkWell(
                       onTap: () => _showDetails(context),
-                      child: Text('View file', style: AppTextStyles.adminLinkText),
+                      child: Text(
+                        'View file',
+                        style: AppTextStyles.adminLinkText,
+                      ),
                     ),
                   ],
                 ),
@@ -425,9 +428,13 @@ class _GuideDetailsDialog extends StatelessWidget {
     try {
       // If it's a Cloudinary URL, convert to direct attachment download
       String downloadUrl = cleanUrl;
-      if (cleanUrl.contains('cloudinary.com') && cleanUrl.contains('/upload/')) {
+      if (cleanUrl.contains('cloudinary.com') &&
+          cleanUrl.contains('/upload/')) {
         if (!cleanUrl.contains('/upload/fl_attachment')) {
-          downloadUrl = cleanUrl.replaceFirst('/upload/', '/upload/fl_attachment/');
+          downloadUrl = cleanUrl.replaceFirst(
+            '/upload/',
+            '/upload/fl_attachment/',
+          );
         }
       }
 
@@ -476,9 +483,9 @@ class _GuideDetailsDialog extends StatelessWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not open document: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not open document: $e')));
       }
     }
   }
@@ -491,7 +498,8 @@ class _GuideDetailsDialog extends StatelessWidget {
   }) {
     final hasUrl = url.trim().isNotEmpty;
     final lower = url.toLowerCase();
-    final isImage = hasUrl &&
+    final isImage =
+        hasUrl &&
         (lower.contains('.jpg') ||
             lower.contains('.jpeg') ||
             lower.contains('.png') ||
@@ -554,8 +562,15 @@ class _GuideDetailsDialog extends StatelessWidget {
               ],
               ElevatedButton.icon(
                 onPressed: () => _handleDownload(context, url, fileName),
-                icon: const Icon(Icons.download_rounded, size: 16, color: Colors.white),
-                label: const Text('Download', style: TextStyle(color: Colors.white)),
+                icon: const Icon(
+                  Icons.download_rounded,
+                  size: 16,
+                  color: Colors.white,
+                ),
+                label: const Text(
+                  'Download',
+                  style: TextStyle(color: Colors.white),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.adminPrimary,
                   shape: RoundedRectangleBorder(
@@ -613,8 +628,8 @@ class _GuideDetailsDialog extends StatelessWidget {
         Text(
           hasUrl
               ? (fileName.toLowerCase().endsWith('.pdf')
-                  ? 'PDF Document (Click View to open)'
-                  : 'Document uploaded (Click View to open)')
+                    ? 'PDF Document (Click View to open)'
+                    : 'Document uploaded (Click View to open)')
               : 'Document preview not available',
           style: AppTextStyles.adminTableCellMuted,
         ),
@@ -701,28 +716,42 @@ class _GuideDetailsDialog extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Verification Documents
-              Text('Verification Documents', style: AppTextStyles.adminSectionTitle),
+              Text(
+                'Verification Documents',
+                style: AppTextStyles.adminSectionTitle,
+              ),
               const SizedBox(height: 12),
 
-              if (guide.idDocumentUrl.isNotEmpty || guide.licenseDocumentUrl.isNotEmpty) ...[
+              if (guide.idDocumentUrl.isNotEmpty ||
+                  guide.licenseDocumentUrl.isNotEmpty) ...[
                 if (guide.idDocumentUrl.isNotEmpty)
                   _buildDocSection(
                     context,
                     title: 'Tour Guide ID',
-                    fileName: guide.idDocumentUrl.split('/').last.split('?').first,
+                    fileName: guide.idDocumentUrl
+                        .split('/')
+                        .last
+                        .split('?')
+                        .first,
                     url: guide.idDocumentUrl,
                   ),
                 if (guide.licenseDocumentUrl.isNotEmpty)
                   _buildDocSection(
                     context,
                     title: 'Syndicate Membership / License',
-                    fileName: guide.licenseDocumentUrl.split('/').last.split('?').first,
+                    fileName: guide.licenseDocumentUrl
+                        .split('/')
+                        .last
+                        .split('?')
+                        .first,
                     url: guide.licenseDocumentUrl,
                   ),
               ] else
                 _buildDocSection(
                   context,
-                  title: guide.document.isNotEmpty ? guide.document : 'Verification Document',
+                  title: guide.document.isNotEmpty
+                      ? guide.document
+                      : 'Verification Document',
                   fileName: guide.docFileName,
                   url: guide.documentUrl,
                 ),

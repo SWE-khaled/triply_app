@@ -5,6 +5,7 @@ import 'package:triply/core/routing/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/circle_back_button.dart';
 import '../../../../../core/widgets/state_views.dart';
+import '../widget/guide_notifications_skeleton.dart';
 import '../cubit/guide_notifications_cubit.dart';
 import '../model/guide_notification.dart';
 import '../widget/guide_notification_tile.dart';
@@ -94,7 +95,7 @@ class _GuideNotificationsView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             // The builder sits outside the scroll view, so the loading
-            // spinner is centered in the screen.
+            // skeleton fills the same area the list will occupy.
             Expanded(
               child:
                   BlocBuilder<GuideNotificationsCubit, GuideNotificationsState>(
@@ -124,7 +125,8 @@ class _GuideNotificationsView extends StatelessWidget {
                                   },
                                 ),
                         GuideNotificationsInitial() ||
-                        GuideNotificationsLoading() => const AppLoadingView(),
+                        GuideNotificationsLoading() =>
+                          const GuideNotificationsSkeleton(),
                         GuideNotificationsError(:final error) => AppErrorView(
                           message: error,
                           onRetry: () =>

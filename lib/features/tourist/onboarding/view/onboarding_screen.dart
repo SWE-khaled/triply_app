@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/services/app_prefs.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -59,11 +60,11 @@ class _OnboardingScreen extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _goToSignIn() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SignInScreen()),
-    );
+  Future<void> _goToSignIn() async {
+    // The tourist slides are done: never show them again on this device.
+    await AppPrefs.instance.markOnboardingSeen('tourist');
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed(AppRoutes.signIn);
   }
 
   Widget _buildImage(String path) {

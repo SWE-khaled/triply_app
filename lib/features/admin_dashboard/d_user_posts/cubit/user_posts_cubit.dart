@@ -66,10 +66,7 @@ class UserPostsCubit extends Cubit<UserPostsState> {
     );
 
     try {
-      await _firestore
-          .collection('communityPosts')
-          .doc(post.id)
-          .delete();
+      await _firestore.collection('communityPosts').doc(post.id).delete();
 
       // Older documents also live in the legacy `posts` collection. That
       // cleanup is best-effort only and must not fail the deletion above.

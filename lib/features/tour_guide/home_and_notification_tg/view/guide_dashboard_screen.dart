@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import '../../../../core/routing/app_routes.dart';
-import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
-import '../../../common/AuthTourguide/view/tour_guide_verification_screen.dart';
+import '../../../common/auth/views/tour_guide/tour_guide_verification_screen.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/circle_icon_button.dart';
 import '../../../../../core/widgets/app_snackbar.dart';
 import '../../../../../core/widgets/profile_avatar.dart';
 import '../../../../../core/widgets/state_views.dart';
+import '../../profile_tg/data/tour_guide_profile_service.dart';
+import '../widget/dashboard_skeleton.dart';
 import '../cubit/dashboard_cubit.dart';
 import '../model/guide_dashboard_booking_request.dart';
 import '../model/guide_dashboard_stats.dart';
@@ -103,7 +104,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
   void initState() {
     super.initState();
     _notificationsStream = _notifications.watchNotifications();
-    _nameSubscription = TourGuideAuthService().watchMyName().listen(
+    _nameSubscription = TourGuideProfileService().watchMyName().listen(
       (name) {
         if (!mounted) return;
         setState(() => _firestoreName = name);
@@ -189,7 +190,8 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                     // The loading and the error views fill the whole body,
                     // so their spinner sits in the middle of the screen.
                     DashboardInitial() ||
-                    DashboardLoading() => const AppLoadingView(),
+                    DashboardInitial() ||
+                    DashboardLoading() => const DashboardSkeleton(),
                     DashboardError(:final error) => AppErrorView(
                       message: error,
                       onRetry: () => context.read<DashboardCubit>().load(),

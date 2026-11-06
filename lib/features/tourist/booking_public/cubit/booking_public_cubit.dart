@@ -107,6 +107,9 @@ class BookingPublicCubit extends Cubit<BookingPublicState> {
     required String bookingId,
     required String paymentId,
   }) async {
-    await _repository.confirmPayment(bookingId: bookingId, paymentId: paymentId);
+    await _repository.confirmPayment(
+      bookingId: bookingId,
+      paymentId: paymentId,
+    );
   }
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/common/auth/model/auth_role.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
-import '../../../../core/routing/app_routes.dart';
-import '../../../../core/services/app_prefs.dart';
+import '../../../../../core/routing/app_routes.dart';
+import '../../../../../core/services/app_prefs.dart';
+import '../../../../tour_guide/profile_tg/data/tour_guide_profile_service.dart';
+import '../../widgets/auth_button.dart';
+import '../../widgets/auth_text_field.dart';
 import 'tour_guide_verification_screen.dart';
 
 class TourGuideLoginScreen extends StatefulWidget {
@@ -23,6 +23,11 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  /// True from the tap until the next screen opens. The sign-in itself
+  /// finishes before the guide lookup and the preference writes, so the
+  /// cubit's loading flag alone would let the button re-enable too early.
+  bool _isSubmitting = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -31,54 +36,66 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
   }
 
   Future<void> _handleLogin(AuthCubit cubit) async {
+    if (_isSubmitting || cubit.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await cubit.signIn(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      role: AuthRole.guide,
-    );
-
-    if (!mounted) return;
-
-    if (!success) {
-      // Error is set in the cubit, show snackbar (this also covers the
-      // cross-role guard: the repository throws "tourist account" and
-      // signs the session out before anything opens).
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(cubit.errorMessage ?? 'Login failed'),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+    setState(() => _isSubmitting = true);
+    var navigated = false;
+    try {
+      final success = await cubit.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        role: AuthRole.guide,
       );
-      return;
+
+      if (!mounted) return;
+
+      if (!success) {
+        setState(() => _isSubmitting = false);
+        // Error is set in the cubit, show snackbar (this also covers the
+        // cross-role guard: the repository throws "tourist account" and
+        // signs the session out before anything opens).
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(cubit.errorMessage ?? 'Login failed'),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        return;
+      }
+
+      // The shared repository only lets a guide account through (non-guide
+      // roles are signed out and thrown), so a successful sign-in is a guide.
+      // Remember it before the next screen: this is what makes the app
+      // open the guide flow directly on later launches.
+      await AppPrefs.instance.setLastRole('guide');
+      await AppPrefs.instance.markOnboardingSeen('guide');
+
+      // Verified guides go straight home; others complete verification.
+      // Verification state lives in Firestore, so it survives logout/login.
+      final approved = await TourGuideProfileService().isVerificationApproved();
+      await AppPrefs.instance.setGuideVerified(approved);
+      if (!mounted) return;
+
+      navigated = true;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => approved
+              ? const GuideDashboardScreen()
+              : const TourGuideVerificationScreen(),
+        ),
+        (route) => false,
+      );
+    } finally {
+      if (!navigated && mounted && _isSubmitting) {
+        setState(() => _isSubmitting = false);
+      }
     }
-
-    // The shared repository only lets a guide account through (non-guide
-    // roles are signed out and thrown), so a successful sign-in is a guide.
-    // Remember it before the next screen: this is what makes the app
-    // open the guide flow directly on later launches.
-    await AppPrefs.instance.setLastRole('guide');
-    await AppPrefs.instance.markOnboardingSeen('guide');
-
-    // Verified guides go straight home; others complete verification.
-    // Verification state lives in Firestore, so it survives logout/login.
-    final approved = await TourGuideAuthService().isVerificationApproved();
-    await AppPrefs.instance.setGuideVerified(approved);
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (_) => approved
-            ? const GuideDashboardScreen()
-            : const TourGuideVerificationScreen(),
-      ),
-      (route) => false,
-    );
   }
 
   // ───────────── Header ─────────────
@@ -183,7 +200,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                         const Text(
                           'Sign in to manage your trips and travelers.',
                           style: TextStyle(
-                            color: AuthColors.textGrey,
+                            color: AppColors.textGrey,
                             fontSize: 15,
                           ),
                         ),
@@ -229,7 +246,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                           width: double.infinity,
                           child: AuthButton(
                             label: 'Log In',
-                            isLoading: cubit.isLoading,
+                            isLoading: _isSubmitting || cubit.isLoading,
                             onPressed: () => _handleLogin(cubit),
                           ),
                         ),
@@ -241,7 +258,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                               const Text(
                                 "Don't have an account? ",
                                 style: TextStyle(
-                                  color: AuthColors.textGrey,
+                                  color: AppColors.textGrey,
                                   fontSize: 16,
                                 ),
                               ),
@@ -252,7 +269,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                 child: const Text(
                                   'Create Guide Account',
                                   style: TextStyle(
-                                    color: AuthColors.signInDark,
+                                    color: AppColors.signInDark,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -276,7 +293,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                 child: const Text(
                                   'Are you a tourist? Sign in',
                                   style: TextStyle(
-                                    color: AuthColors.signInDark,
+                                    color: AppColors.signInDark,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -289,7 +306,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                 child: const Text(
                                   'Admin portal',
                                   style: TextStyle(
-                                    color: AuthColors.textGrey,
+                                    color: AppColors.textGrey,
                                     fontSize: 14,
                                   ),
                                 ),

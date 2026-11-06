@@ -154,7 +154,9 @@ class AdminGuidesRepository {
             : doc.id;
         final existing = verificationByGuide[guideId];
         // If an approved verification doc already exists, never overwrite it with a pending doc
-        if (existing != null && existing['status'] == 'approved' && data['status'] != 'approved') {
+        if (existing != null &&
+            existing['status'] == 'approved' &&
+            data['status'] != 'approved') {
           continue;
         }
         verificationByGuide[guideId] = data;
@@ -230,9 +232,7 @@ class AdminGuidesRepository {
         'isApproved': approve,
         'status': statusStr,
         'isActive': approve,
-        'verification': {
-          'reviewStatus': statusStr,
-        },
+        'verification': {'reviewStatus': statusStr},
       });
 
       // 2. Update the public profile in guides/{guideId}
@@ -287,9 +287,7 @@ class AdminGuidesRepository {
         'isApproved': false,
         'isActive': false,
         'status': 'suspended',
-        'verification': {
-          'reviewStatus': 'rejected',
-        },
+        'verification': {'reviewStatus': 'rejected'},
       });
 
       try {
@@ -321,7 +319,8 @@ class AdminGuidesRepository {
     List<AdminGuideTrip> trips,
   ) {
     final data = doc.data() ?? const <String, dynamic>{};
-    final userIsApproved = (data['isApproved'] as bool?) == true ||
+    final userIsApproved =
+        (data['isApproved'] as bool?) == true ||
         (data['status'] as String?) == 'approved' ||
         (data['verification'] is Map &&
             data['verification']['reviewStatus'] == 'approved');
@@ -340,13 +339,15 @@ class AdminGuidesRepository {
       status = 'pending';
     }
 
-    final idUrl = (verification['idDocumentUrl'] as String?) ??
+    final idUrl =
+        (verification['idDocumentUrl'] as String?) ??
         (data['idDocumentUrl'] as String?) ??
         (data['verification'] is Map
             ? (data['verification']['idDocumentUrl'] as String?)
             : null) ??
         '';
-    final licenseUrl = (verification['licenseDocumentUrl'] as String?) ??
+    final licenseUrl =
+        (verification['licenseDocumentUrl'] as String?) ??
         (data['licenseDocumentUrl'] as String?) ??
         (data['verification'] is Map
             ? (data['verification']['licenseDocumentUrl'] as String?)
@@ -355,7 +356,9 @@ class AdminGuidesRepository {
 
     final activeDocName = idUrl.isNotEmpty
         ? 'Tour Guide ID'
-        : (licenseUrl.isNotEmpty ? 'Syndicate Membership' : 'Verification Document');
+        : (licenseUrl.isNotEmpty
+              ? 'Syndicate Membership'
+              : 'Verification Document');
 
     final primaryUrl = idUrl.isNotEmpty ? idUrl : licenseUrl;
 

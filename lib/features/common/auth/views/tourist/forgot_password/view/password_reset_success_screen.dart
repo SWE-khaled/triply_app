@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../widgets/auth_button.dart';
-import 'sign_in_screen.dart';
+import '../../../../widgets/auth_button.dart';
+import '../../sign_in_screen.dart';
 
 class PasswordResetSuccessScreen extends StatelessWidget {
   const PasswordResetSuccessScreen({super.key});

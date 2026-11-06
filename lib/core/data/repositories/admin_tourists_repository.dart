@@ -47,7 +47,8 @@ class AdminTourist {
 
   factory AdminTourist.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
-    final name = (data['fullName'] as String?) ??
+    final name =
+        (data['fullName'] as String?) ??
         (data['name'] as String?) ??
         (data['displayName'] as String?) ??
         'Tourist';
@@ -84,7 +85,7 @@ class AdminTourist {
 /// Repository for managing tourist users from Firestore in the admin dashboard.
 class AdminTouristsRepository {
   AdminTouristsRepository({FirestoreService? firestore})
-      : _firestore = firestore ?? FirestoreService();
+    : _firestore = firestore ?? FirestoreService();
 
   static const String usersCollection = 'users';
   final FirestoreService _firestore;
@@ -107,18 +108,15 @@ class AdminTouristsRepository {
 
   /// Real-time stream of tourists from Firestore.
   Stream<List<AdminTourist>> watchTourists() {
-    return _firestore
-        .collection(usersCollection)
-        .snapshots()
-        .map((snapshot) {
-          return snapshot.docs
-              .where((doc) {
-                final role = doc.data()['role'] as String?;
-                return role != 'guide';
-              })
-              .map((doc) => AdminTourist.fromDoc(doc))
-              .toList();
-        });
+    return _firestore.collection(usersCollection).snapshots().map((snapshot) {
+      return snapshot.docs
+          .where((doc) {
+            final role = doc.data()['role'] as String?;
+            return role != 'guide';
+          })
+          .map((doc) => AdminTourist.fromDoc(doc))
+          .toList();
+    });
   }
 
   /// Toggles tourist status between 'active' and 'suspended'.
@@ -134,4 +132,3 @@ class AdminTouristsRepository {
     }
   }
 }
-

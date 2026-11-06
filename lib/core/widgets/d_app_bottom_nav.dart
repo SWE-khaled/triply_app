@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 
@@ -183,7 +183,10 @@ class _SidebarFooter extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(adminName, style: AppTextStyles.adminSidebarUserName),
-                  Text('Super Admin', style: AppTextStyles.adminSidebarUserRole),
+                  Text(
+                    'Super Admin',
+                    style: AppTextStyles.adminSidebarUserRole,
+                  ),
                 ],
               ),
             ],
@@ -198,4 +201,3 @@ class _SidebarFooter extends StatelessWidget {
     );
   }
 }
-

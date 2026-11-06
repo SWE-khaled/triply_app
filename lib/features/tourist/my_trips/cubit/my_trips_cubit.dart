@@ -116,8 +116,9 @@ class MyTripsCubit extends Cubit<MyTripsState>
     for (final booking in bookings) {
       final trip = byId[booking.tripId];
       if (trip == null) continue;
-      final effective =
-          expiredIds.contains(booking.id) ? 'cancelled' : booking.status;
+      final effective = expiredIds.contains(booking.id)
+          ? 'cancelled'
+          : booking.status;
       _statusByTrip[booking.tripId] = effective;
       joined.add(_cardOf(trip, booking, _tripStatus(effective, booking)));
     }

@@ -40,10 +40,7 @@ final class UserPostsSuccess extends UserPostsState {
     }).toList();
   }
 
-  UserPostsSuccess copyWith({
-    List<CommunityPost>? posts,
-    String? query,
-  }) {
+  UserPostsSuccess copyWith({List<CommunityPost>? posts, String? query}) {
     return UserPostsSuccess(
       posts: posts ?? this.posts,
       query: query ?? this.query,

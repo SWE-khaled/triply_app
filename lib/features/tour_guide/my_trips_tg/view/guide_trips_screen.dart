@@ -8,6 +8,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/data/guide_trip_details_source.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../widgets/guide_trips_skeleton.dart';
 import '../../../chat/widgets/chat_unread_builder.dart';
 import '../cubit/guide_trips_cubit.dart';
 import '../model/guide_trip.dart';
@@ -351,7 +352,7 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                               },
                             ),
                     GuideTripsInitial() ||
-                    GuideTripsLoading() => const AppLoadingView(),
+                    GuideTripsLoading() => const GuideTripsSkeleton(),
                     GuideTripsError(:final error) => AppErrorView(
                       message: error,
                       onRetry: () => context.read<GuideTripsCubit>().refresh(),

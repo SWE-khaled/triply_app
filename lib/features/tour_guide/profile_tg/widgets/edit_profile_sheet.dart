@@ -10,9 +10,10 @@ import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/core/constants/egypt_cities.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/profile_avatar.dart';
-import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+
+import '../data/tour_guide_profile_service.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;
@@ -142,7 +143,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
 
       await user.updateDisplayName(newName);
       if (newPhotoUrl != null) await user.updatePhotoURL(newPhotoUrl);
-      await TourGuideAuthService().updateProfileFields(
+      await TourGuideProfileService().updateProfileFields(
         name: newName,
         about: _aboutController.text.trim(),
         location: _selectedLocation ?? '',

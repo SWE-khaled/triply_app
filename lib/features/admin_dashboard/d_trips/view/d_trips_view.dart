@@ -41,9 +41,7 @@ class _TripsBody extends StatelessWidget {
     messenger.showSnackBar(
       SnackBar(
         content: Text(
-          ok
-              ? 'Trip rejected successfully.'
-              : 'Could not reject the trip.',
+          ok ? 'Trip rejected successfully.' : 'Could not reject the trip.',
         ),
         backgroundColor: ok ? null : AppColors.adminDanger,
       ),
@@ -274,7 +272,10 @@ class _TripRow extends StatelessWidget {
               ),
               Expanded(
                 flex: 2,
-                child: Text(trip.price, style: AppTextStyles.adminTableCellMuted),
+                child: Text(
+                  trip.price,
+                  style: AppTextStyles.adminTableCellMuted,
+                ),
               ),
               Expanded(flex: 2, child: StatusChip(status: trip.status)),
               Expanded(
@@ -387,4 +388,3 @@ class _ViewTripDialog extends StatelessWidget {
     );
   }
 }
-

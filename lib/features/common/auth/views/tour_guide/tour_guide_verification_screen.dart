@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../../../../core/services/cloudinary_service.dart';
+import '../../../../../core/services/cloudinary_service.dart';
+import '../../../../tour_guide/profile_tg/data/tour_guide_profile_service.dart';
 
 class TourGuideVerificationScreen extends StatefulWidget {
   const TourGuideVerificationScreen({super.key});
@@ -24,7 +24,7 @@ class _TourGuideVerificationScreenState
   bool _isLoading = false;
 
   final CloudinaryService _cloudinaryService = CloudinaryService();
-  final TourGuideAuthService _authService = TourGuideAuthService();
+  final TourGuideProfileService _authService = TourGuideProfileService();
 
   Future<void> _pickFile(int type) async {
     try {

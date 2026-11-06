@@ -24,6 +24,11 @@ class AuthButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
+          foregroundColor: Colors.white,
+          // Keep the brand colour while the button is disabled for loading,
+          // so it does not flash grey before the navigation finishes.
+          disabledBackgroundColor: backgroundColor,
+          disabledForegroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
           ),

@@ -118,7 +118,6 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
     }
   }
 
-
   Future<void> logout() async {
     await _auth.signOut();
     emit(const AdminAuthLoggedOut());

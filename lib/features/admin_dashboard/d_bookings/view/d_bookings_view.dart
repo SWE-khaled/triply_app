@@ -260,7 +260,10 @@ class _BookingRow extends StatelessWidget {
               Expanded(flex: 2, child: StatusChip(status: booking.status)),
               Expanded(
                 flex: 2,
-                child: Text(booking.price, style: AppTextStyles.adminTableCellMuted),
+                child: Text(
+                  booking.price,
+                  style: AppTextStyles.adminTableCellMuted,
+                ),
               ),
               Expanded(
                 flex: 2,
@@ -286,10 +289,7 @@ class _ViewBookingDialog extends StatelessWidget {
   final AdminBooking booking;
   final ValueChanged<String>? onStatusChange;
 
-  const _ViewBookingDialog({
-    required this.booking,
-    this.onStatusChange,
-  });
+  const _ViewBookingDialog({required this.booking, this.onStatusChange});
 
   @override
   Widget build(BuildContext context) {
@@ -338,7 +338,8 @@ class _ViewBookingDialog extends StatelessWidget {
               _row('Tour Guide:', booking.guide),
               _row('Date:', booking.date),
               _row('Travelers:', '${booking.travelers}'),
-              if (booking.location.isNotEmpty) _row('Location:', booking.location),
+              if (booking.location.isNotEmpty)
+                _row('Location:', booking.location),
               _row('Price:', booking.price),
               _row('Total:', booking.price),
               _row('Status:', booking.status.toUpperCase()),
@@ -358,7 +359,10 @@ class _ViewBookingDialog extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.adminPrimary,
                       ),
-                      child: const Text('Confirm', style: TextStyle(color: Colors.white)),
+                      child: const Text(
+                        'Confirm',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   if (booking.status != 'confirmed') const SizedBox(width: 8),
                   if (booking.status != 'cancelled')
@@ -398,4 +402,3 @@ class _ViewBookingDialog extends StatelessWidget {
     );
   }
 }
-

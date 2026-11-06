@@ -30,7 +30,8 @@ final class GuidesSuccess extends GuidesState {
 
   const GuidesSuccess({required this.guides, this.busy = false});
 
-  int get pendingCount => guides.where((guide) => guide.status == 'pending').length;
+  int get pendingCount =>
+      guides.where((guide) => guide.status == 'pending').length;
 
   GuidesSuccess copyWith({List<AdminGuide>? guides, bool? busy}) {
     return GuidesSuccess(

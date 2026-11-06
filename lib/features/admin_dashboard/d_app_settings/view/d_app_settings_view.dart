@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -164,10 +164,7 @@ class _AppSettingsBodyState extends State<_AppSettingsBody> {
                   .map(
                     (option) => DropdownMenuItem(
                       value: option,
-                      child: Text(
-                        option,
-                        style: AppTextStyles.adminTableCell,
-                      ),
+                      child: Text(option, style: AppTextStyles.adminTableCell),
                     ),
                   )
                   .toList(),
@@ -188,11 +185,7 @@ class _AppSettingsBodyState extends State<_AppSettingsBody> {
           final isStacked = constraints.maxWidth < 600;
           if (isStacked) {
             return Column(
-              children: [
-                fields[0],
-                const SizedBox(height: 16),
-                fields[1],
-              ],
+              children: [fields[0], const SizedBox(height: 16), fields[1]],
             );
           }
 
@@ -227,10 +220,7 @@ class _AppSettingsBodyState extends State<_AppSettingsBody> {
                   strokeWidth: 2,
                 ),
               )
-            : Text(
-                'Save Settings',
-                style: AppTextStyles.adminButtonPrimary,
-              ),
+            : Text('Save Settings', style: AppTextStyles.adminButtonPrimary),
       ),
     ];
   }

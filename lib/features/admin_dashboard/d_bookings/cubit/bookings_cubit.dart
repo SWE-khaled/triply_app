@@ -55,10 +55,7 @@ class BookingsCubit extends Cubit<BookingsState> {
     final optimistic = current.copyWith(
       bookings: [
         for (final item in current.bookings)
-          if (item.id == booking.id)
-            item.copyWith(status: status)
-          else
-            item,
+          if (item.id == booking.id) item.copyWith(status: status) else item,
       ],
       busy: true,
     );
@@ -78,10 +75,7 @@ class BookingsCubit extends Cubit<BookingsState> {
   void _emitSuccess() {
     if (isClosed) return;
     emit(
-      BookingsSuccess(
-        bookings: List.unmodifiable(_bookings),
-        query: _query,
-      ),
+      BookingsSuccess(bookings: List.unmodifiable(_bookings), query: _query),
     );
   }
 

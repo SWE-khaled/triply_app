@@ -610,7 +610,9 @@ class _MiniGuideRow extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        guide.document.isNotEmpty ? guide.document : 'National ID',
+                        guide.document.isNotEmpty
+                            ? guide.document
+                            : 'National ID',
                         style: AppTextStyles.adminTableCellMuted,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -761,4 +763,3 @@ class _SmallFilledBtn extends StatelessWidget {
     );
   }
 }
-

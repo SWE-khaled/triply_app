@@ -29,11 +29,7 @@ final class TripsSuccess extends TripsState {
   final String query;
   final bool busy;
 
-  const TripsSuccess({
-    required this.trips,
-    this.query = '',
-    this.busy = false,
-  });
+  const TripsSuccess({required this.trips, this.query = '', this.busy = false});
 
   List<TripRowData> get filtered {
     final q = query.trim().toLowerCase();
@@ -46,11 +42,7 @@ final class TripsSuccess extends TripsState {
     }).toList();
   }
 
-  TripsSuccess copyWith({
-    List<TripRowData>? trips,
-    String? query,
-    bool? busy,
-  }) {
+  TripsSuccess copyWith({List<TripRowData>? trips, String? query, bool? busy}) {
     return TripsSuccess(
       trips: trips ?? this.trips,
       query: query ?? this.query,

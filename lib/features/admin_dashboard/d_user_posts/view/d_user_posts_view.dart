@@ -35,7 +35,9 @@ class _UserPostsBody extends StatelessWidget {
         context: context,
         builder: (dialogContext) => AlertDialog(
           scrollable: true,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text('Delete Post'),
           content: Text(
             'Are you sure you want to delete this post by ${post.authorName}?',
@@ -50,7 +52,10 @@ class _UserPostsBody extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.adminDanger,
               ),
-              child: const Text('Delete', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -80,10 +85,8 @@ class _UserPostsBody extends StatelessWidget {
   Future<void> _viewPost(BuildContext context, CommunityPost post) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
-      builder: (_) => _ViewUserPostDialog(
-        post: post,
-        imageBuilder: _buildPostImage,
-      ),
+      builder: (_) =>
+          _ViewUserPostDialog(post: post, imageBuilder: _buildPostImage),
     );
     if (shouldDelete == true && context.mounted) {
       await _removePost(context, post, skipConfirmation: true);
@@ -343,10 +346,7 @@ class _ViewUserPostDialog extends StatelessWidget {
   final CommunityPost post;
   final Widget Function(String, {double height}) imageBuilder;
 
-  const _ViewUserPostDialog({
-    required this.post,
-    required this.imageBuilder,
-  });
+  const _ViewUserPostDialog({required this.post, required this.imageBuilder});
 
   String get _title {
     final text = post.text.trim();
@@ -566,4 +566,3 @@ class _ViewUserPostDialog extends StatelessWidget {
     );
   }
 }
-

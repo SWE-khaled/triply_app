@@ -27,26 +27,21 @@ class AdminPost {
 
   factory AdminPost.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
-    final title = (data['title'] as String?) ??
-        (data['text'] as String?) ??
-        'User Post';
+    final title =
+        (data['title'] as String?) ?? (data['text'] as String?) ?? 'User Post';
     final text = (data['text'] as String?) ?? (data['title'] as String?) ?? '';
-    final author = (data['author'] as String?) ??
+    final author =
+        (data['author'] as String?) ??
         (data['author_name'] as String?) ??
         (data['authorName'] as String?) ??
         'User';
-    final authorId = (data['authorId'] as String?) ??
-        (data['userId'] as String?) ??
-        '';
-    final imageUrl = (data['imageUrl'] as String?) ??
-        (data['image_url'] as String?) ??
-        '';
-    final imageUrls = (data['imageUrls'] as List?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        (data['image_urls'] as List?)
-            ?.map((e) => e.toString())
-            .toList() ??
+    final authorId =
+        (data['authorId'] as String?) ?? (data['userId'] as String?) ?? '';
+    final imageUrl =
+        (data['imageUrl'] as String?) ?? (data['image_url'] as String?) ?? '';
+    final imageUrls =
+        (data['imageUrls'] as List?)?.map((e) => e.toString()).toList() ??
+        (data['image_urls'] as List?)?.map((e) => e.toString()).toList() ??
         (imageUrl.isNotEmpty ? [imageUrl] : <String>[]);
     final location = (data['location'] as String?) ?? '';
 
@@ -87,7 +82,7 @@ class AdminPost {
 /// Repository for reading and managing user posts from Firestore.
 class AdminPostsRepository {
   AdminPostsRepository({FirestoreService? firestore})
-      : _firestore = firestore ?? FirestoreService();
+    : _firestore = firestore ?? FirestoreService();
 
   static const String postsCollection = 'posts';
   final FirestoreService _firestore;
@@ -95,9 +90,7 @@ class AdminPostsRepository {
   /// Fetches all user posts, newest first.
   Future<List<AdminPost>> fetchPosts() async {
     try {
-      final snapshot = await _firestore
-          .collection(postsCollection)
-          .get();
+      final snapshot = await _firestore.collection(postsCollection).get();
       final posts = snapshot.docs.map((doc) => AdminPost.fromDoc(doc)).toList();
       posts.sort((a, b) {
         if (a.createdAt == null && b.createdAt == null) return 0;
@@ -113,20 +106,16 @@ class AdminPostsRepository {
 
   /// Real-time stream of all user posts.
   Stream<List<AdminPost>> watchPosts() {
-    return _firestore
-        .collection(postsCollection)
-        .snapshots()
-        .map((snapshot) {
-          final posts =
-              snapshot.docs.map((doc) => AdminPost.fromDoc(doc)).toList();
-          posts.sort((a, b) {
-            if (a.createdAt == null && b.createdAt == null) return 0;
-            if (a.createdAt == null) return -1;
-            if (b.createdAt == null) return 1;
-            return b.createdAt!.compareTo(a.createdAt!);
-          });
-          return posts;
-        });
+    return _firestore.collection(postsCollection).snapshots().map((snapshot) {
+      final posts = snapshot.docs.map((doc) => AdminPost.fromDoc(doc)).toList();
+      posts.sort((a, b) {
+        if (a.createdAt == null && b.createdAt == null) return 0;
+        if (a.createdAt == null) return -1;
+        if (b.createdAt == null) return 1;
+        return b.createdAt!.compareTo(a.createdAt!);
+      });
+      return posts;
+    });
   }
 
   /// Ensures that if the posts collection in Firestore is completely empty,
@@ -138,15 +127,22 @@ class AdminPostsRepository {
       if (snap.docs.isEmpty) {
         await _firestore.collection(postsCollection).doc('post_tourist_published').set({
           'title': 'Amazing day in Egypt! ✨',
-          'text': 'Spent an incredible day exploring historic sites in Egypt. The atmosphere, culture and people are truly wonderful! 🇪🇬✨',
+          'text':
+              'Spent an incredible day exploring historic sites in Egypt. The atmosphere, culture and people are truly wonderful! 🇪🇬✨',
           'author': 'Tourist',
           'author_name': 'Tourist',
           'authorName': 'Tourist',
           'authorId': 'tourist_user',
-          'imageUrl': 'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop',
-          'image_url': 'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop',
-          'imageUrls': ['https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop'],
-          'image_urls': ['https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop'],
+          'imageUrl':
+              'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop',
+          'image_url':
+              'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop',
+          'imageUrls': [
+            'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop',
+          ],
+          'image_urls': [
+            'https://images.unsplash.com/photo-1568322445389-f64ac2515020?q=80&w=800&auto=format&fit=crop',
+          ],
           'location': 'Cairo, Egypt',
           'createdAt': FieldValue.serverTimestamp(),
           'likes_count': 0,

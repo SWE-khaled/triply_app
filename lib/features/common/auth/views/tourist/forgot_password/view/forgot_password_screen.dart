@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../../auth/cubit/auth_cubit.dart';
-import '../widgets/auth_button.dart';
-import '../widgets/auth_step_icon.dart';
-import '../widgets/auth_text_field.dart';
+import '../../../../cubit/auth_cubit.dart';
+import '../../../../widgets/auth_button.dart';
+import '../../../../widgets/auth_step_icon.dart';
+import '../../../../widgets/auth_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -19,6 +19,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
+  /// Keeps the button loading until the screen is popped.
+  bool _isSubmitting = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -26,19 +29,37 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _handleSendCode(AuthCubit authCubit) async {
+    if (_isSubmitting || authCubit.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
-    final success = await authCubit.sendPasswordResetEmail(
-      _emailController.text.trim(),
-    );
-    if (success && mounted) {
+
+    setState(() => _isSubmitting = true);
+    var dismissed = false;
+    try {
+      final success = await authCubit.sendPasswordResetEmail(
+        _emailController.text.trim(),
+      );
+      if (!mounted) return;
+
+      if (!success) {
+        setState(() => _isSubmitting = false);
+        final message = authCubit.errorMessage;
+        if (message != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(message)));
+        }
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Reset link sent to your email')),
       );
+      dismissed = true;
       Navigator.of(context).pop();
-    } else if (mounted && authCubit.errorMessage != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(authCubit.errorMessage!)));
+    } finally {
+      if (!dismissed && mounted && _isSubmitting) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -83,7 +104,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   AuthButton(
                     label: 'Send ',
                     backgroundColor: AppColors.signInDark,
-                    isLoading: authCubit.isLoading,
+                    isLoading: _isSubmitting || authCubit.isLoading,
                     onPressed: () => _handleSendCode(authCubit),
                   ),
                   const SizedBox(height: 20),

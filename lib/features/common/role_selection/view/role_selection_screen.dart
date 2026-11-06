@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:triply/features/admin_dashboard/d_auth/view/admin_login_view.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../../../common/AuthTourist/screens/onboarding_screen.dart';
-import '../../onboarding/view/tour_guide_onboarding_screen.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/services/app_prefs.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
+
+  /// Opens the flow of the chosen role, skipping the slides when they were
+  /// already shown once. Without a remembered role there is no completed
+  /// login on this device, so the user lands on the login of the chosen
+  /// role after the (first-time) onboarding.
+  Future<void> _openRole(BuildContext context, String role) async {
+    final seen = await AppPrefs.instance.hasSeenOnboarding(role);
+    if (!context.mounted) return;
+
+    final route = switch ((role, seen)) {
+      ('guide', true) => AppRoutes.guideLogin,
+      ('guide', false) => AppRoutes.guideOnboarding,
+      (_, true) => AppRoutes.signIn,
+      _ => AppRoutes.onboarding,
+    };
+    Navigator.of(context).pushNamed(route);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +77,7 @@ class RoleSelectionScreen extends StatelessWidget {
               // Tourist Card
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const OnboardingScreen(),
-                      ),
-                    );
-                  },
+                  onTap: () => _openRole(context, 'tourist'),
                   child: _RoleCard(
                     imagePath: 'assets/images/edits/role1p.jpg',
                     title: 'Tourist',
@@ -82,14 +91,7 @@ class RoleSelectionScreen extends StatelessWidget {
               // Tour Guide Card
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const TourGuideOnboardingScreen(),
-                      ),
-                    );
-                  },
+                  onTap: () => _openRole(context, 'guide'),
                   child: _RoleCard(
                     imagePath: 'assets/images/edits/role2p.jpg',
                     title: 'Tour Guide',
@@ -102,14 +104,7 @@ class RoleSelectionScreen extends StatelessWidget {
               const SizedBox(height: 16),
               // Footer
               InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AdminLoginView(),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.of(context).pushNamed(AdminRoutes.login),
                 child: Center(
                   child: Text(
                     'Triply Admin Portal',
@@ -150,8 +145,7 @@ class _RoleCard extends StatelessWidget {
             imagePath,
             fit: BoxFit.cover,
             // Colored fallback if the asset is missing or invalid
-            errorBuilder: (_, __, ___) =>
-                Container(color: AppColors.deepNile),
+            errorBuilder: (_, __, ___) => Container(color: AppColors.deepNile),
           ),
 
           // ── Gradient overlay ──────────────────────────────────────────

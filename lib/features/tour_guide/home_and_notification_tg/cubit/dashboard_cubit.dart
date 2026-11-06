@@ -1,15 +1,13 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/safe_emit_mixin.dart';
-
 import '../../../../core/data/mock/tourguide/mock_guide_dashboard.dart';
 import '../../../../core/data/repositories/guide_dashboard_repository.dart';
 import '../../../../core/data/repositories/guide_trips_repository.dart';
 import '../../../../core/helper/price_format.dart';
-import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
+import '../../profile_tg/data/tour_guide_profile_service.dart';
 import '../model/guide_dashboard_booking_request.dart';
 import '../model/guide_dashboard_stats.dart';
 
@@ -37,7 +35,7 @@ class DashboardCubit extends Cubit<DashboardState>
     // (pending → "Waiting for admin approval", approved → banner gone).
     // The Firestore snapshot listener fires without any tab switch or
     // reload.
-    _verificationSubscription = TourGuideAuthService()
+    _verificationSubscription = TourGuideProfileService()
         .watchVerificationSubmission()
         .listen(
           (data) {
@@ -102,7 +100,7 @@ class DashboardCubit extends Cubit<DashboardState>
 
   Future<bool> _isVerified() async {
     try {
-      return await TourGuideAuthService().isVerificationApproved();
+      return await TourGuideProfileService().isVerificationApproved();
     } catch (_) {
       // Offline or missing document: keep the banner, never crash.
       return false;

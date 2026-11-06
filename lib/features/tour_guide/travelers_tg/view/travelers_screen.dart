@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../widgets/travelers_skeleton.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
 import '../cubit/travelers_cubit.dart';
 import '../widgets/traveler_card.dart';
@@ -115,7 +116,7 @@ class _TravelersView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             // The builder sits outside the scroll view, so the loading
-            // spinner is centered in the screen.
+            // skeleton fills the same area the list will occupy.
             Expanded(
               child: BlocBuilder<TravelersCubit, TravelersState>(
                 builder: (context, state) {
@@ -149,7 +150,7 @@ class _TravelersView extends StatelessWidget {
                       ),
                     ),
                     TravelersInitial() ||
-                    TravelersLoading() => const AppLoadingView(),
+                    TravelersLoading() => const TravelersSkeleton(),
                     TravelersError(:final error) => AppErrorView(
                       message: error,
                       onRetry: () =>

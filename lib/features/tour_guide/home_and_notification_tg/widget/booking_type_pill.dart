@@ -17,9 +17,9 @@ class BookingTypePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isPrivate ? AppColors.primaryLight : _cream,
+        color: isPrivate ? AppColors.guidedTourBg : _cream,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -27,7 +27,7 @@ class BookingTypePill extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          color: isPrivate ? AppColors.primary : _tanText,
+          color: isPrivate ? AppColors.guidedTourText : _tanText,
         ),
       ),
     );

@@ -30,9 +30,7 @@ class _TripApplicationsBody extends StatelessWidget {
     AdminTripApplication application,
   ) async {
     final messenger = ScaffoldMessenger.of(context);
-    final ok = await context.read<TripApplicationsCubit>().approve(
-      application,
-    );
+    final ok = await context.read<TripApplicationsCubit>().approve(application);
     messenger.showSnackBar(
       SnackBar(
         content: Text(
@@ -137,54 +135,54 @@ class _TripApplicationsBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (application.imageUrl.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    application.imageUrl,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  application.imageUrl,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
                     height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      height: 200,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.image, size: 50, color: Colors.grey),
-                      ),
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.image, size: 50, color: Colors.grey),
                     ),
                   ),
                 ),
+              ),
+            const SizedBox(height: 16),
+            Text(
+              'Date: ${application.date}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text('Travelers: ${application.travelers} travelers'),
+            if (application.location.isNotEmpty)
+              Text('Location: ${application.location}'),
+            Text(
+              'Price: ${application.price}',
+              style: const TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (application.itinerary.isNotEmpty) ...[
               const SizedBox(height: 16),
-              Text(
-                'Date: ${application.date}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              const Text(
+                'Itinerary:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
-              Text('Travelers: ${application.travelers} travelers'),
-              if (application.location.isNotEmpty)
-                Text('Location: ${application.location}'),
-              Text(
-                'Price: ${application.price}',
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (application.itinerary.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                const Text(
-                  'Itinerary:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                ...application.itinerary.asMap().entries.map(
-                  (entry) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      '${(entry.key + 1).toString().padLeft(2, '0')} '
-                      '${entry.value}',
-                    ),
+              const SizedBox(height: 8),
+              ...application.itinerary.asMap().entries.map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    '${(entry.key + 1).toString().padLeft(2, '0')} '
+                    '${entry.value}',
                   ),
                 ),
-              ],
+              ),
+            ],
           ],
         ),
         actions: [
@@ -256,8 +254,7 @@ class _TripApplicationsBody extends StatelessWidget {
                         app: entry.value,
                         onApprove: () => _approve(context, entry.value),
                         onReject: () => _reject(context, entry.value),
-                        onReview: () =>
-                            _showReviewDialog(context, entry.value),
+                        onReview: () => _showReviewDialog(context, entry.value),
                         isFirst: entry.key == 0,
                       ),
                   ],
@@ -409,4 +406,3 @@ class _ApplicationItem extends StatelessWidget {
     );
   }
 }
-

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../core/theme/app_colors.dart';
 import '../../admin_dashboard/d_auth/cubit/admin_auth_cubit.dart';
 import '../../admin_dashboard/d_auth/model/admin_session.dart';
 import '../../admin_dashboard/d_auth/view/admin_login_view.dart';
 import '../../admin_dashboard/d_home/view/d_home_view.dart';
-import '../../common/AuthTourguide/view/tour_guide_login_screen.dart';
-import '../../common/AuthTourguide/view/tour_guide_verification_screen.dart';
-import '../../common/AuthTourist/screens/sign_in_screen.dart';
+import '../../common/auth/views/tour_guide/tour_guide_login_screen.dart';
+import '../../common/auth/views/tour_guide/tour_guide_verification_screen.dart';
+import '../../common/auth/views/tourist/sign_in_screen.dart';
+import '../../common/role_selection/view/role_selection_screen.dart';
 import '../../tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
-import '../../tour_guide/role_selection/view/role_selection_screen.dart';
 import '../../tourist/home/view/home_screen.dart';
 import '../cubit/startup_cubit.dart';
 import '../cubit/startup_state.dart';

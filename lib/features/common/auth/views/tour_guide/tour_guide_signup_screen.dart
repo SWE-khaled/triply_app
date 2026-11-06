@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/common/auth/model/auth_role.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
-import '../../../../core/routing/app_routes.dart';
-import '../../../../core/services/app_prefs.dart';
+import 'package:triply/core/theme/app_colors.dart';
+
+import '../../../../../core/routing/app_routes.dart';
+import '../../../../../core/services/app_prefs.dart';
+import '../../widgets/auth_text_field.dart';
 
 class TourGuideSignupScreen extends StatefulWidget {
   const TourGuideSignupScreen({super.key});
@@ -25,6 +26,9 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
   final _confirmPasswordController = TextEditingController();
 
   late final List<TextEditingController> _controllers;
+
+  /// Keeps the button in its loading state until Verification opens.
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -56,42 +60,55 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
   }
 
   Future<void> _handleRegister(AuthCubit cubit) async {
+    if (_isSubmitting || cubit.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await cubit.signUp(
-      role: AuthRole.guide,
-      fullName: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      phone: '+20${_phoneController.text.trim()}',
-      licenseNumber: '',
-      languages: const ['Arabic', 'English'], // default; can extend later
-    );
+    setState(() => _isSubmitting = true);
+    var navigated = false;
+    try {
+      final success = await cubit.signUp(
+        role: AuthRole.guide,
+        fullName: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        phone: '+20${_phoneController.text.trim()}',
+        licenseNumber: '',
+        languages: const ['Arabic', 'English'], // default; can extend later
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (success) {
+      if (!success) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(cubit.errorMessage ?? 'Registration failed'),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        return;
+      }
+
       // The account exists and the session is live: remember the guide
       // flow so the app reopens on the verification/dashboard next launch.
       await AppPrefs.instance.setLastRole('guide');
       await AppPrefs.instance.markOnboardingSeen('guide');
       if (!mounted) return;
+
+      navigated = true;
       Navigator.pushNamedAndRemoveUntil(
         context,
         AppRoutes.guideVerification,
         (route) => false,
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(cubit.errorMessage ?? 'Registration failed'),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
+    } finally {
+      if (!navigated && mounted && _isSubmitting) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
@@ -168,7 +185,8 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
 
   // ───────────── Continue button (Disabled / Enabled) ─────────────
   Widget _buildContinueButton(AuthCubit cubit) {
-    final enabled = _isFormFilled && !cubit.isLoading;
+    final isSubmitting = _isSubmitting || cubit.isLoading;
+    final enabled = _isFormFilled && !isSubmitting;
 
     return SizedBox(
       height: 56,
@@ -177,15 +195,19 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
         onPressed: enabled ? () => _handleRegister(cubit) : null,
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: AuthColors.darkTeal,
+          backgroundColor: AppColors.darkTeal,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: const Color(0xFFE8ECEC),
-          disabledForegroundColor: const Color(0xFF7A8B8F),
+          disabledBackgroundColor: isSubmitting
+              ? AppColors.darkTeal
+              : const Color(0xFFE8ECEC),
+          disabledForegroundColor: isSubmitting
+              ? Colors.white
+              : const Color(0xFF7A8B8F),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
         ),
-        child: cubit.isLoading
+        child: isSubmitting
             ? const SizedBox(
                 width: 24,
                 height: 24,
@@ -257,7 +279,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                             child: Text(
                               '🇪🇬 +20',
                               style: TextStyle(
-                                color: AuthColors.textDark,
+                                color: AppColors.textDark,
                                 fontSize: 15,
                               ),
                             ),
@@ -340,7 +362,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                               const Text(
                                 'Already have an account? ',
                                 style: TextStyle(
-                                  color: AuthColors.textGrey,
+                                  color: AppColors.textGrey,
                                   fontSize: 16,
                                 ),
                               ),
@@ -351,7 +373,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                                 child: const Text(
                                   'Log In',
                                   style: TextStyle(
-                                    color: AuthColors.signInDark,
+                                    color: AppColors.signInDark,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),

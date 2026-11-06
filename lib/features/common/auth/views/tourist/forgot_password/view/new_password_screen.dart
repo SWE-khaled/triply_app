@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../widgets/auth_button.dart';
-import '../widgets/auth_step_icon.dart';
-import '../widgets/auth_text_field.dart';
+import '../../../../widgets/auth_button.dart';
+import '../../../../widgets/auth_step_icon.dart';
+import '../../../../widgets/auth_text_field.dart';
 import 'password_reset_success_screen.dart';
 
 class NewPasswordScreen extends StatefulWidget {
@@ -31,18 +31,22 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   }
 
   Future<void> _handleResetPassword() async {
+    if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
+
     setState(() => _isLoading = true);
+    var navigated = false;
     try {
       await FirebaseAuth.instance.confirmPasswordReset(
         code: widget.oobCode,
         newPassword: _passwordController.text,
       );
-      if (mounted) {
-        Navigator.of(
-          context,
-        ).pushReplacementNamed(PasswordResetSuccessScreen.routeName);
-      }
+      if (!mounted) return;
+
+      navigated = true;
+      Navigator.of(
+        context,
+      ).pushReplacementNamed(PasswordResetSuccessScreen.routeName);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -50,7 +54,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
         ).showSnackBar(SnackBar(content: Text('Failed to reset password: $e')));
       }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (!navigated && mounted) setState(() => _isLoading = false);
     }
   }
 

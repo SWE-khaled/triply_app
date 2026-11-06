@@ -5,13 +5,18 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/circle_back_button.dart';
 import '../../../../../core/widgets/network_image_fallback.dart';
 import '../../../../../core/widgets/state_views.dart';
+import '../widget/booking_details_skeleton.dart';
 import '../cubit/booking_details_cubit.dart';
 import '../model/booking_details.dart';
 import '../widget/booking_type_pill.dart';
 
-/// Cream tint from Figma (back button). Local const only â€” the global
+/// Cream tint from Figma (back button). Local const only — the global
 /// theme in `core/theme/` is left untouched.
 const Color _cream = Color(0xFFFAF5EA);
+
+/// Hairline card border from Figma (near-white on white). Local const only —
+/// the global theme in `core/theme/` is left untouched.
+const Color _hairline = Color(0xFFF7F9FA);
 
 /// Traveler profile + trip booking details for one New Booking.
 /// Opened from [DashboardScreen] with a booking id.
@@ -60,9 +65,11 @@ class _BookingDetailsView extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            const Divider(height: 1, thickness: 1, color: _hairline),
+            const SizedBox(height: 18),
             // The builder sits outside the scroll view, so the loading
-            // spinner is centered in the screen.
+            // skeleton fills the same area the cards will occupy.
             Expanded(
               child: BlocBuilder<BookingDetailsCubit, BookingDetailsState>(
                 builder: (context, state) {
@@ -80,7 +87,7 @@ class _BookingDetailsView extends StatelessWidget {
                         ),
                       ),
                     BookingDetailsInitial() ||
-                    BookingDetailsLoading() => const AppLoadingView(),
+                    BookingDetailsLoading() => const BookingDetailsSkeleton(),
                     BookingDetailsError(:final error) => AppErrorView(
                       message: error,
                       onRetry: () => context.read<BookingDetailsCubit>().load(),
@@ -98,11 +105,11 @@ class _BookingDetailsView extends StatelessWidget {
   Widget _guestCard(BookingDetails details) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: _hairline),
       ),
       child: Column(
         children: [
@@ -126,7 +133,7 @@ class _BookingDetailsView extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${details.country} آ· ${details.travelerLabel}',
+            '${details.country} · ${details.travelerLabel}',
             style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
           const SizedBox(height: 12),
@@ -143,7 +150,7 @@ class _BookingDetailsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: _hairline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,19 +163,19 @@ class _BookingDetailsView extends StatelessWidget {
               color: AppColors.title,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             details.datetimeLabel,
             style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
             details.location,
             style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           Text(
-            'Booking #${details.bookingCode} آ· ${details.priceLabel}',
+            'Booking #${details.bookingCode} · ${details.priceLabel}',
             style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
         ],

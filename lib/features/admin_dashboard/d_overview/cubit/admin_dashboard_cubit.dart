@@ -130,7 +130,10 @@ class AdminDashboardCubit extends Cubit<AdminDashboardState> {
     final previous = _guides;
     _guides = [
       for (final current in _guides)
-        if (current.uid == guide.uid) current.copyWith(status: status) else current,
+        if (current.uid == guide.uid)
+          current.copyWith(status: status)
+        else
+          current,
     ];
     _emitSuccess();
 

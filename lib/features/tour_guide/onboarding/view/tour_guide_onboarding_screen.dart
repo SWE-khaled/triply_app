@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../common/AuthTourguide/view/tour_guide_login_screen.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/services/app_prefs.dart';
 
 class TourGuideOnboardingScreen extends StatefulWidget {
   const TourGuideOnboardingScreen({super.key});
@@ -59,11 +60,11 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
     super.dispose();
   }
 
-  void _goToLogin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const TourGuideLoginScreen()),
-    );
+  Future<void> _goToLogin() async {
+    // The guide slides are done: never show them again on this device.
+    await AppPrefs.instance.markOnboardingSeen('guide');
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed(AppRoutes.guideLogin);
   }
 
   Widget _buildImage(String path) {

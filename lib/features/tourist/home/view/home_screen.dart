@@ -322,9 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage(
-            'assets/images/edits/home_image.png',
-          ),
+          image: AssetImage('assets/images/edits/home_image.png'),
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.only(
@@ -347,22 +345,22 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               children: [
                 ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      'assets/images/edits/Frame 1.png',
-                      width: 27,
-                      height: 44,
-                      fit: BoxFit.cover,
-                    ),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    'assets/images/edits/Frame 1.png',
+                    width: 27,
+                    height: 44,
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(width: 6),
-                  Image.asset(
-                    'assets/images/edits/Frame 2.png',
-                    height: 28,
-                    width: 64,
-                    fit: BoxFit.contain,
-                  ),
-                  Spacer(),
+                ),
+                const SizedBox(width: 6),
+                Image.asset(
+                  'assets/images/edits/Frame 2.png',
+                  height: 28,
+                  width: 64,
+                  fit: BoxFit.contain,
+                ),
+                Spacer(),
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -419,10 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 10),
-            Text(
-              'DISCOVER EGYPT YOUR WAY',
-              style: AppTextStyles.heroSubtitle,
-            ),
+            Text('DISCOVER EGYPT YOUR WAY', style: AppTextStyles.heroSubtitle),
             const SizedBox(height: 4),
             const Text(
               'Ready for your\nnext adventure?',

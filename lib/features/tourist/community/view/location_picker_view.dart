@@ -125,7 +125,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
                 itemCount: places.length,
-                separatorBuilder: (_,__) => const SizedBox(height: 10),
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final place = places[index];
                   return LocationPlaceRow(

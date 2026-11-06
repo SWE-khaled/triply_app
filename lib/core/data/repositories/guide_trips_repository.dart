@@ -89,6 +89,14 @@ class GuideTripsRepository {
         );
       }
     } catch (e) {
+      // Signing out revokes access while the listener is still attached.
+      // That expected shutdown race is silent; anything else is logged and
+      // falls back to the mock dataset.
+      if (e is FirebaseException &&
+          e.code == 'permission-denied' &&
+          currentGuideId != uid) {
+        return;
+      }
       debugPrint('GuideTripsRepository.watchTrips failed: $e');
       // Network down, rules missing, … — keep the app usable.
       if (!emitted) yield _mockTrips();
@@ -254,9 +262,7 @@ class GuideTripsRepository {
       'startAt': trip.startAt == null
           ? null
           : Timestamp.fromDate(trip.startAt!),
-      'endAt': trip.endAt == null
-          ? null
-          : Timestamp.fromDate(trip.endAt!),
+      'endAt': trip.endAt == null ? null : Timestamp.fromDate(trip.endAt!),
       'duration': trip.duration,
       'priceEgp': trip.priceEgp,
       'capacity': trip.capacity,

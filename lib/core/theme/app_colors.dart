@@ -19,6 +19,20 @@ class AppColors {
   static const Color nileCyan = Color(0xFF196B7D);
 
   // =========================================================================
+  // auth
+  // =========================================================================
+
+  static const Color darkTeal = Color(0xFF0E4A56);
+  static const Color darkTealEnd = Color(0xFF1C6670);
+  static const Color mutedTeal = Color(0xFF7FA8AC);
+  static const Color signInDark = Color(0xFF14555F);
+  static const Color fieldBackground = Color(0xFFF4F5F6);
+  static const Color fieldBorder = Color(0xFFE3E6E8);
+  static const Color iconGrey = Color(0xFF9AA5A9);
+  static const Color successTeal = Color(0xFF3FAE9A);
+  static const Color lightCircleBg = Color(0xFFEFF3F3);
+
+  // =========================================================================
   // Backgrounds & surfaces
   // =========================================================================
   static const Color pureWhite = Color(0xFFFFFFFF);
@@ -29,8 +43,6 @@ class AppColors {
   static const Color searchBg = Color(0xFFF2F4F4);
   static const Color chatIconBg = Color(0xFFF2F4F4);
   static const Color inputFill = Color(0xFFF2F2F2);
-  static const Color fieldBackground = Color(0xFFF4F5F6);
-  static const Color lightCircleBg = Color(0xFFEFF3F3);
   static const Color storyBg = Color(0xFFFFF8ED);
 
   // =========================================================================
@@ -52,10 +64,8 @@ class AppColors {
   // Borders & dividers
   // =========================================================================
   static const Color borderColor = Color(0x1A0E5261);
-  static const Color iconGrey = Color(0xFF9AA5A9);
   static const Color cardBorder = Color(0xFFE5EAEA);
   static const Color cardShadow = Color(0x1A000000);
-  static const Color fieldBorder = Color(0xFFE3E6E8);
 
   // =========================================================================
   // Accent
@@ -85,15 +95,12 @@ class AppColors {
   // Guided tour
   // =========================================================================
   static const Color guidedTourText = Color(0xFF4DA7A0);
-  static final Color guidedTourBg = const Color(0xFF4DA7A0).withValues(alpha: 0.15);
+  static final Color guidedTourBg = const Color(
+    0xFF4DA7A0,
+  ).withValues(alpha: 0.15);
   static const Color bulletGold = Color(0xFFD8B66A);
   static const Color chipGrey = Color(0xFFF0F3F3);
   static const Color chipTextGrey = Color(0xFF526B72);
-  static const Color darkTeal = Color(0xFF0E4A56);
-  static const Color darkTealEnd = Color(0xFF1C6670);
-  static const Color mutedTeal = Color(0xFF7FA8AC);
-  static const Color signInDark = Color(0xFF14555F);
-  static const Color successTeal = Color(0xFF3FAE9A);
 
   // =========================================================================
   // Admin Dashboard (prefix: admin)

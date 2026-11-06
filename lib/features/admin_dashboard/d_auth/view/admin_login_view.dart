@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
-import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/features/admin_dashboard/d_home/view/d_home_view.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/services/app_prefs.dart';
+import '../../../common/auth/widgets/auth_button.dart';
+import '../../../common/auth/widgets/auth_text_field.dart';
 import '../cubit/admin_auth_cubit.dart';
-
 
 class AdminLoginView extends StatefulWidget {
   const AdminLoginView({super.key});
@@ -37,6 +38,10 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     );
     if (!mounted) return;
     if (success && cubit.session != null) {
+      // Remember the admin session so the next launch restores the
+      // dashboard instead of opening a user flow.
+      await AppPrefs.instance.setLastRole('admin');
+      if (!mounted) return;
       final session = cubit.session!;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -53,7 +58,6 @@ class _AdminLoginViewState extends State<AdminLoginView> {
       ).showSnackBar(SnackBar(content: Text(cubit.errorMessage!)));
     }
   }
-
 
   BoxDecoration _gradient({BorderRadius? radius}) => BoxDecoration(
     gradient: const LinearGradient(
@@ -87,7 +91,6 @@ class _AdminLoginViewState extends State<AdminLoginView> {
       ],
     );
   }
-
 
   Widget _buildMobileHeader() {
     return Container(
@@ -137,7 +140,6 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     );
   }
 
- 
   Widget _buildWebBrandPanel() {
     return Container(
       decoration: _gradient(),
@@ -177,7 +179,6 @@ class _AdminLoginViewState extends State<AdminLoginView> {
     );
   }
 
-
   Widget _buildForm(AdminAuthCubit cubit, AdminAuthState state) {
     return Form(
       key: _formKey,
@@ -195,7 +196,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
           const SizedBox(height: 8),
           const Text(
             'Sign in with your admin identifier',
-            style: TextStyle(color: AuthColors.textGrey, fontSize: 16),
+            style: TextStyle(color: AppColors.textGrey, fontSize: 16),
           ),
           const SizedBox(height: 28),
           _label('Email'),
@@ -231,12 +232,25 @@ class _AdminLoginViewState extends State<AdminLoginView> {
               onPressed: () => _handleLogin(cubit),
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 16),
+          // Escape hatch: an admin session on a shared device must not
+          // lock the app on this screen forever.
+          Center(
+            child: TextButton(
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.roleSelection, (_) => false),
+              child: const Text(
+                'Back to Triply',
+                style: TextStyle(color: AppColors.textGrey, fontSize: 14),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
         ],
       ),
     );
   }
-
 
   Widget _buildScrollableForm(
     AdminAuthCubit cubit,
@@ -268,7 +282,6 @@ class _AdminLoginViewState extends State<AdminLoginView> {
               builder: (context, constraints) {
                 final isWeb = constraints.maxWidth >= _webBreakpoint;
 
-      
                 if (isWeb) {
                   return Row(
                     children: [
@@ -290,7 +303,6 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                   );
                 }
 
-     
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

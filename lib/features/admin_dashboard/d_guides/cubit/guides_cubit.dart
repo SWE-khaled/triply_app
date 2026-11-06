@@ -91,11 +91,7 @@ class GuidesCubit extends Cubit<GuidesState> {
     return _finish(current, optimistic, ok);
   }
 
-  bool _finish(
-    GuidesSuccess previous,
-    GuidesSuccess optimistic,
-    bool ok,
-  ) {
+  bool _finish(GuidesSuccess previous, GuidesSuccess optimistic, bool ok) {
     if (isClosed) return ok;
     if (ok) {
       emit(optimistic.copyWith(busy: false));

@@ -9,9 +9,7 @@ class DioHelper {
     dio = Dio(
       BaseOptions(
         baseUrl: ApiConst.baseUrl,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: {"Content-Type": "application/json"},
         receiveDataWhenStatusError: true,
       ),
     );
@@ -27,10 +25,8 @@ class DioHelper {
   }) async {
     return await dio.post(url, data: data);
   }
-  Future<Response> putData(
-      String path, {
-        required dynamic data,
-      }) async {
+
+  Future<Response> putData(String path, {required dynamic data}) async {
     return await dio.put(path, data: data);
   }
 
@@ -38,4 +34,3 @@ class DioHelper {
     return await dio.delete(path);
   }
 }
-

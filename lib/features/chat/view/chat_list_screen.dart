@@ -15,7 +15,6 @@ import '../model/chat_audience.dart';
 import '../util/chat_time.dart';
 import '../widgets/chat_avatar.dart';
 
-
 class ChatListScreen extends StatefulWidget {
   final ChatRepository? repository;
   final ChatAudience audience;
@@ -373,7 +372,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       itemCount: chats.length,
-      separatorBuilder: (_, _) => const SizedBox(height:5),
+      separatorBuilder: (_, _) => const SizedBox(height: 5),
       itemBuilder: (context, index) {
         final chat = chats[index];
         return _ChatTile(
@@ -487,13 +486,10 @@ class _ChatTile extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: 
-            Colors.white,
-            // : Colors.white,
+        color: Colors.white,
+        // : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color:   AppColors.cardBorder
-        ),
+        border: Border.all(color: AppColors.cardBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -513,10 +509,7 @@ class _ChatTile extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(2.5),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    
-                  ),
+                  decoration: BoxDecoration(shape: BoxShape.circle),
                   child: ChatAvatar(
                     name: name,
                     avatarUrl: profile.avatarUrl,

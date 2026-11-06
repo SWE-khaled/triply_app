@@ -55,7 +55,8 @@ class _UsersBody extends StatelessWidget {
                 Expanded(
                   child: CardSectionHeader(
                     title: 'Manage Tourists',
-                    subtitle: 'Search, review and control all tourist accounts.',
+                    subtitle:
+                        'Search, review and control all tourist accounts.',
                   ),
                 ),
               ],
@@ -304,7 +305,10 @@ class _ViewUserDialog extends StatelessWidget {
               const SizedBox(height: 24),
               _buildDetailRow('Name:', tourist.name),
               _buildDetailRow('Email:', tourist.email),
-              _buildDetailRow('Phone:', tourist.phone.isNotEmpty ? tourist.phone : 'Not provided'),
+              _buildDetailRow(
+                'Phone:',
+                tourist.phone.isNotEmpty ? tourist.phone : 'Not provided',
+              ),
               _buildDetailRow('Type:', tourist.type),
               _buildDetailRow('Activity:', tourist.activity),
               _buildDetailRow('Status:', tourist.status.toUpperCase()),
@@ -331,4 +335,3 @@ class _ViewUserDialog extends StatelessWidget {
     );
   }
 }
-

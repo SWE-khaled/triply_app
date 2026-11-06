@@ -88,8 +88,7 @@ class BookingCubit extends Cubit<BookingState> {
   }
 
   /// The end moment of the private booking (start + selected duration).
-  DateTime? get endAt =>
-      startAt?.add(Duration(hours: durationHours));
+  DateTime? get endAt => startAt?.add(Duration(hours: durationHours));
 
   double get subtotal => PriceCalculator.subtotal(
     guide.pricePerHour,

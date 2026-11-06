@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
-import '../../../../core/routing/app_routes.dart';
-import '../../../../core/services/app_prefs.dart';
-import '../../../common/auth/cubit/auth_cubit.dart';
-import '../../../common/auth/model/auth_role.dart';
-import '../widgets/auth_button.dart';
-import '../widgets/auth_text_field.dart';
+import 'package:triply/core/theme/app_colors.dart';
+import '../../../../../core/routing/app_routes.dart';
+import '../../../../../core/services/app_prefs.dart';
+import '../../cubit/auth_cubit.dart';
+import '../../model/auth_role.dart';
+import '../../widgets/auth_button.dart';
+import '../../widgets/auth_text_field.dart';
 import 'create_account_screen.dart';
-import 'forgot_password_screen.dart';
+import 'forgot_password/view/forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -24,6 +24,12 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  /// True from the tap until the next screen opens. The cubit's own
+  /// [AuthCubit.isLoading] ends as soon as Firebase answers, but the
+  /// session still has to be remembered before navigating; keeping this
+  /// flag on avoids the button flashing back to its idle state.
+  bool _isSubmitting = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -32,19 +38,63 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _handleSignIn(AuthCubit authCubit) async {
+    if (_isSubmitting || authCubit.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
-    final success = await authCubit.signIn(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      role: AuthRole.tourist,
-    );
-    if (success && mounted) {
+
+    setState(() => _isSubmitting = true);
+    var navigated = false;
+    try {
+      final success = await authCubit.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        role: AuthRole.tourist,
+      );
+      if (!mounted) return;
+
+      if (!success) {
+        setState(() => _isSubmitting = false);
+        _showError(authCubit.errorMessage);
+        return;
+      }
+
       await _completeTouristSignIn();
-    } else if (mounted && authCubit.errorMessage != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(authCubit.errorMessage!)));
+      navigated = true;
+    } finally {
+      if (!navigated && mounted && _isSubmitting) {
+        setState(() => _isSubmitting = false);
+      }
     }
+  }
+
+  Future<void> _handleGoogleSignIn(AuthCubit authCubit) async {
+    if (_isSubmitting || authCubit.isLoading) return;
+
+    setState(() => _isSubmitting = true);
+    var navigated = false;
+    try {
+      final success = await authCubit.signInWithGoogle(role: AuthRole.tourist);
+      if (!mounted) return;
+
+      if (!success) {
+        setState(() => _isSubmitting = false);
+        _showError(authCubit.errorMessage);
+        return;
+      }
+
+      await _completeTouristSignIn();
+      navigated = true;
+    } finally {
+      if (!navigated && mounted && _isSubmitting) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+  }
+
+  void _showError(String? message) {
+    if (message == null || !mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   /// Remembers the successful tourist login (this is what makes the app
@@ -120,14 +170,14 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget _socialButton({
     required String label,
     required String assetPath,
-    required VoidCallback onPressed,
+    required VoidCallback? onPressed,
   }) {
     return SizedBox(
       height: 56,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: AuthColors.textGrey, width: 1.5),
+          side: const BorderSide(color: AppColors.textGrey, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -140,7 +190,7 @@ class _SignInScreenState extends State<SignInScreen> {
             Text(
               label,
               style: const TextStyle(
-                color: AuthColors.signInDark,
+                color: AppColors.signInDark,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
@@ -154,6 +204,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     final authCubit = context.watch<AuthCubit>();
+    final isSubmitting = _isSubmitting || authCubit.isLoading;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -182,7 +233,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       const Text(
                         'Sign in to continue your journey',
                         style: TextStyle(
-                          color: AuthColors.textGrey,
+                          color: AppColors.textGrey,
                           fontSize: 16,
                         ),
                       ),
@@ -241,7 +292,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           child: const Text(
                             'Forgot password?',
                             style: TextStyle(
-                              color: AuthColors.signInDark,
+                              color: AppColors.signInDark,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -254,7 +305,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         width: double.infinity,
                         child: AuthButton(
                           label: 'Sign In',
-                          isLoading: authCubit.isLoading,
+                          isLoading: isSubmitting,
                           onPressed: () => _handleSignIn(authCubit),
                         ),
                       ),
@@ -263,7 +314,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         child: Text(
                           'or continue with',
                           style: TextStyle(
-                            color: AuthColors.textGrey,
+                            color: AppColors.textGrey,
                             fontSize: 16,
                           ),
                         ),
@@ -275,13 +326,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: _socialButton(
                               label: 'Google',
                               assetPath: 'assets/images/icon/google_logo.png',
-                              onPressed: () async {
-                                final success = await authCubit
-                                    .signInWithGoogle(role: AuthRole.tourist);
-                                if (success && mounted) {
-                                  await _completeTouristSignIn();
-                                }
-                              },
+                              onPressed: isSubmitting
+                                  ? null
+                                  : () => _handleGoogleSignIn(authCubit),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -289,9 +336,11 @@ class _SignInScreenState extends State<SignInScreen> {
                             child: _socialButton(
                               label: 'Apple',
                               assetPath: 'assets/images/icon/apple_logo.png',
-                              onPressed: () {
-                                // TODO: implement Apple sign-in
-                              },
+                              onPressed: isSubmitting
+                                  ? null
+                                  : () {
+                                      // TODO: implement Apple sign-in
+                                    },
                             ),
                           ),
                         ],
@@ -304,7 +353,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             const Text(
                               "Don't have an account? ",
                               style: TextStyle(
-                                color: AuthColors.textGrey,
+                                color: AppColors.textGrey,
                                 fontSize: 16,
                               ),
                             ),
@@ -315,7 +364,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               child: const Text(
                                 'Sign up',
                                 style: TextStyle(
-                                  color: AuthColors.signInDark,
+                                  color: AppColors.signInDark,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -337,7 +386,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               child: const Text(
                                 'Are you a tour guide? Sign in',
                                 style: TextStyle(
-                                  color: AuthColors.signInDark,
+                                  color: AppColors.signInDark,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -350,7 +399,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               child: const Text(
                                 'Admin portal',
                                 style: TextStyle(
-                                  color: AuthColors.textGrey,
+                                  color: AppColors.textGrey,
                                   fontSize: 14,
                                 ),
                               ),

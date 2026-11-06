@@ -22,10 +22,7 @@ class PrivacySecurityScreen extends StatelessWidget {
                 children: [
                   CircleBackButton(),
                   SizedBox(width: 12),
-                  Text(
-                    'Privacy & security',
-                    style: AppTextStyles.pageTitle,
-                  ),
+                  Text('Privacy & security', style: AppTextStyles.pageTitle),
                 ],
               ),
               const SizedBox(height: 16),
@@ -50,7 +47,7 @@ class PrivacySecurityScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha:.1),
+                  color: Colors.grey.withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Column(

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_snackbar.dart';
 import '../../home_and_notification_tg/view/guide_notifications_screen.dart';
 import '../../home_and_notification_tg/widget/guide_bottom_nav.dart';
 import '../../../chat/widgets/chat_unread_builder.dart';
@@ -13,8 +12,8 @@ import '../view/guide_settings_screen.dart';
 import '../widgets/edit_profile_sheet.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_menu_section.dart';
+import '../widgets/profile_skeleton.dart';
 import '../widgets/profile_stats_card.dart';
-import '../../role_selection/view/role_selection_screen.dart';
 
 /// Guide profile_tg: thin composer over section widgets.
 /// Dialogs + navigation stay here; rows live in widgets/.
@@ -39,26 +38,10 @@ class _ProfileTourGuideView extends StatelessWidget {
 
   /// Shows while the guide's profile is being read from Firestore —
   /// prevents the flash of empty data (0 reviews, empty About…) before
-  /// the real values arrive.
+  /// the real values arrive. Returns the body only: the outer Scaffold
+  /// keeps the real guide bottom nav visible.
   Widget _buildLoadingView(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 12),
-              Text(
-                'Loading profile…',
-                style: TextStyle(fontSize: 14, color: AppColors.subtitle),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return const ProfileSkeleton();
   }
 
   /// Error view shown when the profile read fails — with a retry button.
@@ -122,16 +105,20 @@ class _ProfileTourGuideView extends StatelessWidget {
       ),
     );
     if (confirmed != true || !context.mounted) return;
+    final authCubit = context.read<AuthCubit>();
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    // Leave the guide routes *before* revoking the token. Every guide
+    // screen closes its cubit on dispose, which cancels the Firestore
+    // listeners; if the token is dropped first, those listeners receive
+    // permission-denied errors while they are being torn down.
+    navigator.pushNamedAndRemoveUntil(AppRoutes.guideLogin, (_) => false);
+    await WidgetsBinding.instance.endOfFrame;
     try {
-      await context.read<AuthCubit>().signOut();
-      if (!context.mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
-        (_) => false,
-      );
+      await authCubit.signOut();
     } catch (e) {
-      if (!context.mounted) return;
-      showAppSnackBar(context, 'Logout failed: $e', icon: Icons.error_outline);
+      messenger.showSnackBar(SnackBar(content: Text('Logout failed: $e')));
     }
   }
 

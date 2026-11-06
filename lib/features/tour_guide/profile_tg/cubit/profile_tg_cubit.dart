@@ -1,12 +1,12 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/safe_emit_mixin.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:triply/core/widgets/profile_avatar.dart';
-import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
+import 'package:triply/features/tour_guide/profile_tg/model/tour_guide_profile.dart';
+import '../data/tour_guide_profile_service.dart';
 
 part 'profile_tg_state.dart';
 
@@ -30,7 +30,7 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
     // reject decision through Firestore snapshots — no reload needed.
     // Lives on guideVerifications/{uid}, exactly the document the admin
     // dashboard writes, so the screen always agrees with it.
-    _verificationSubscription = TourGuideAuthService()
+    _verificationSubscription = TourGuideProfileService()
         .watchVerificationSubmission()
         .listen(
           (data) {
@@ -110,7 +110,7 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
   Future<void> loadRemoteProfile() async {
     safeEmit(const ProfileTgLoading());
     try {
-      final service = TourGuideAuthService();
+      final service = TourGuideProfileService();
       final profile = await service.fetchMyProfile();
       _profile = profile;
       // Publish the public profile the tourists browse — without it the

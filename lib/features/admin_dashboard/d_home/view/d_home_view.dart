@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/tour_guide/role_selection/view/role_selection_screen.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/d_app_bottom_nav.dart';
@@ -70,10 +70,9 @@ class _HomeViewState extends State<HomeView> {
     if (confirmed != true || !context.mounted) return;
     context.read<AdminAuthCubit>().logout();
     if (!context.mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
-      (_) => false,
-    );
+    Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil(AdminRoutes.login, (_) => false);
   }
 
   @override
@@ -437,4 +436,3 @@ Widget buildTableHeader(List<Map<String, dynamic>> columns) {
     ),
   );
 }
-

@@ -8,6 +8,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../widgets/guide_trip_details_skeleton.dart';
 import '../../../../core/widgets/trip_image.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
@@ -412,7 +413,9 @@ class GuideTripDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 GuideTripDetailsInitial() ||
-                GuideTripDetailsLoading() => const AppLoadingView(),
+                GuideTripDetailsLoading() => GuideTripDetailsSkeleton(
+                  onBack: () => Navigator.of(context).pop(),
+                ),
                 GuideTripDetailsError(:final error) => AppErrorView(
                   message: error,
                   onRetry: () =>
