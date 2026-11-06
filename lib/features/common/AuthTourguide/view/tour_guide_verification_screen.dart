@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/common/AuthTourguide/view/tour_guide_login_screen.dart';
+import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
+import 'package:triply/core/routing/app_routes.dart';
 import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/services/cloudinary_service.dart';
 
@@ -137,14 +139,29 @@ class _TourGuideVerificationScreenState
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back Button
+                  // Back Button — leaves the guide session and returns to
+                  // the guide login without stacking it over this screen.
                   GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TourGuideLoginScreen(),
-                      ),
-                    ),
+                    onTap: _isLoading
+                        ? null
+                        : () async {
+                            final navigator = Navigator.of(context);
+                            final authCubit = context.read<AuthCubit>();
+                            // Navigate first: the verification screen's
+                            // Firestore listener is cancelled on dispose,
+                            // before the auth token is revoked.
+                            navigator.pushNamedAndRemoveUntil(
+                              AppRoutes.guideLogin,
+                              (_) => false,
+                            );
+                            await WidgetsBinding.instance.endOfFrame;
+                            try {
+                              await authCubit.signOut();
+                            } catch (_) {
+                              // Already on the login screen; the next
+                              // sign-in simply overwrites the old token.
+                            }
+                          },
                     child: Container(
                       width: 44,
                       height: 44,
@@ -307,9 +324,7 @@ class _TourGuideVerificationScreenState
                             'You can use your dashboard while your documents are being reviewed, but you can\'t publish trips yet.',
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.deepNile.withValues(
-                                alpha: 0.70,
-                              ),
+                              color: AppColors.deepNile.withValues(alpha: 0.70),
                               height: 1.4,
                             ),
                           ),
@@ -365,8 +380,7 @@ class _TourGuideVerificationScreenState
                     StreamBuilder<Map<String, dynamic>?>(
                       stream: _authService.watchVerificationSubmission(),
                       builder: (context, snapshot) {
-                        final status =
-                            snapshot.data?['status'] as String?;
+                        final status = snapshot.data?['status'] as String?;
                         final locked =
                             status == 'pending' || status == 'approved';
                         return Column(
@@ -376,8 +390,9 @@ class _TourGuideVerificationScreenState
                               title: 'Upload your ID',
                               subtitle: 'JPG, PNG or PDF · max 10 MB',
                               file: _idFile,
-                              onTap:
-                                  (locked || _isLoading) ? null : () => _pickFile(1),
+                              onTap: (locked || _isLoading)
+                                  ? null
+                                  : () => _pickFile(1),
                             ),
                             const SizedBox(height: 14),
 
@@ -388,8 +403,9 @@ class _TourGuideVerificationScreenState
                               subtitle:
                                   'Tourism ID, syndicate card or professional license',
                               file: _licenseFile,
-                              onTap:
-                                  (locked || _isLoading) ? null : () => _pickFile(2),
+                              onTap: (locked || _isLoading)
+                                  ? null
+                                  : () => _pickFile(2),
                             ),
                           ],
                         );
@@ -406,8 +422,7 @@ class _TourGuideVerificationScreenState
                       child: StreamBuilder<Map<String, dynamic>?>(
                         stream: _authService.watchVerificationSubmission(),
                         builder: (context, snapshot) {
-                          final status =
-                              snapshot.data?['status'] as String?;
+                          final status = snapshot.data?['status'] as String?;
                           final approved = status == 'approved';
                           final pending = status == 'pending';
                           // Submit when files are chosen, not loading,
@@ -420,9 +435,7 @@ class _TourGuideVerificationScreenState
                               backgroundColor: canSubmitNow
                                   ? AppColors.deepNile
                                   : const Color(0xFF7A9B9F),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 18,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
                               ),
@@ -442,10 +455,10 @@ class _TourGuideVerificationScreenState
                                     approved
                                         ? 'Documents approved ✓'
                                         : pending
-                                            ? 'Under review — waiting for admin'
-                                            : status == 'rejected'
-                                                ? 'Re-upload documents'
-                                                : 'Submit for Review',
+                                        ? 'Under review — waiting for admin'
+                                        : status == 'rejected'
+                                        ? 'Re-upload documents'
+                                        : 'Submit for Review',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,

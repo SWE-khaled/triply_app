@@ -20,7 +20,11 @@ final class AuthLoading extends AuthState {
 final class AuthSuccess extends AuthState {
   final User user;
 
-  const AuthSuccess({required this.user});
+  /// The role confirmed by the last action (`tourist` / `guide`).
+  /// Null for a session restored at launch, before an action runs.
+  final AuthRole? role;
+
+  const AuthSuccess({required this.user, this.role});
 }
 
 /// Signed out.

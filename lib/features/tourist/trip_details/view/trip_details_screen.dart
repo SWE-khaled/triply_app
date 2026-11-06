@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/data/mock/tourist/mock_guides.dart';
-import '../../../common/AuthTourist/data/auth_repository.dart';
+import '../../../common/auth/data/auth_repository.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/state_views.dart';

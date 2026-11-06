@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
-import '../../../common/AuthTourist/cubit/auth_cubit.dart';
-import '../../../tour_guide/role_selection/view/role_selection_screen.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
 import '../widget/account_option_tile.dart';
@@ -137,10 +136,9 @@ class SettingsScreen extends StatelessWidget {
     try {
       await context.read<AuthCubit>().signOut();
       if (!context.mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
-        (_) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.signIn, (_) => false);
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(

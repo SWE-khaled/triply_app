@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../common/AuthTourist/cubit/auth_cubit.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/tourist/community/data/community_posts_repository.dart';
 import 'package:triply/features/tourist/community/model/community_post.dart';
 import 'profile_screen.dart'

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
-import '../cubit/auth_cubit.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/services/app_prefs.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
+import '../../../common/auth/model/auth_role.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_text_field.dart';
 import 'create_account_screen.dart';
@@ -33,14 +36,24 @@ class _SignInScreenState extends State<SignInScreen> {
     final success = await authCubit.signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
+      role: AuthRole.tourist,
     );
     if (success && mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      await _completeTouristSignIn();
     } else if (mounted && authCubit.errorMessage != null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(authCubit.errorMessage!)));
     }
+  }
+
+  /// Remembers the successful tourist login (this is what makes the app
+  /// open Home directly next launch) and clears every auth screen below.
+  Future<void> _completeTouristSignIn() async {
+    await AppPrefs.instance.setLastRole('tourist');
+    await AppPrefs.instance.markOnboardingSeen('tourist');
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
   }
 
   // ───────────── Header ─────────────
@@ -264,11 +277,9 @@ class _SignInScreenState extends State<SignInScreen> {
                               assetPath: 'assets/images/icon/google_logo.png',
                               onPressed: () async {
                                 final success = await authCubit
-                                    .signInWithGoogle();
+                                    .signInWithGoogle(role: AuthRole.tourist);
                                 if (success && mounted) {
-                                  Navigator.of(
-                                    context,
-                                  ).pushReplacementNamed('/home');
+                                  await _completeTouristSignIn();
                                 }
                               },
                             ),
@@ -307,6 +318,40 @@ class _SignInScreenState extends State<SignInScreen> {
                                   color: AuthColors.signInDark,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 4,
+                          children: [
+                            TextButton(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AppRoutes.guideLogin),
+                              child: const Text(
+                                'Are you a tour guide? Sign in',
+                                style: TextStyle(
+                                  color: AuthColors.signInDark,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(
+                                context,
+                              ).pushNamed(AdminRoutes.login),
+                              child: const Text(
+                                'Admin portal',
+                                style: TextStyle(
+                                  color: AuthColors.textGrey,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),

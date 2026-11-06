@@ -9,7 +9,7 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../../core/widgets/trip_image.dart';
-import '../../../common/AuthTourist/cubit/auth_cubit.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
 import '../cubit/guide_trip_details_cubit.dart';
 import '../model/guide_trip_details.dart';

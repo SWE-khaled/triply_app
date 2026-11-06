@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
+import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/tourist/user_profile/view/profile_screen.dart';
 import 'package:triply/features/tourist/home/view/home_screen.dart';
 import 'package:triply/features/tourist/map/view/map_view.dart';

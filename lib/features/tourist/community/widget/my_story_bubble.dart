@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../../../common/AuthTourist/cubit/auth_cubit.dart'; // عدّل المسار لو مختلف
+import '../../../common/auth/cubit/auth_cubit.dart'; // عدّل المسار لو مختلف
 
 class MyStoryBubble extends StatelessWidget {
   final bool hasStory;

@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../../../core/services/profile_self_heal_service.dart';
-
 /// Model for a Tour Guide user profile stored in Firestore.
 class TourGuideProfile {
   final String uid;
@@ -91,79 +89,18 @@ class TourGuideProfile {
   }
 }
 
-/// Handles all Firebase Auth + Firestore operations for Tour Guides.
-/// Kept separate from the tourist AuthRepository to avoid coupling.
+/// Handles the tour guide's profile, verification and public listing in
+/// Firestore.
+///
+/// Authentication (sign up / sign in / sign out / role guards) lives in the
+/// shared `AuthCubit` + `AuthRepository` under `features/common/auth`.
 class TourGuideAuthService {
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
-  final ProfileSelfHealService _profileHeal;
 
-  TourGuideAuthService({
-    FirebaseAuth? auth,
-    FirebaseFirestore? db,
-    ProfileSelfHealService? profileHeal,
-  }) : _auth = auth ?? FirebaseAuth.instance,
-       _db = db ?? FirebaseFirestore.instance,
-       _profileHeal = profileHeal ?? ProfileSelfHealService();
-
-  // ──────────────── Registration ────────────────
-
-  /// Creates a Firebase Auth user and writes the guide profile to Firestore.
-  Future<UserCredential> registerGuide({
-    required String name,
-    required String email,
-    required String password,
-    required String phone,
-    required String licenseNumber,
-    List<String> languages = const [],
-    double pricePerHour = 0,
-  }) async {
-    // 1. Create Auth user
-    final credential = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final uid = credential.user!.uid;
-
-    // 2. Update display name
-    await credential.user!.updateDisplayName(name);
-
-    // 3. Write Firestore document
-    final profile = TourGuideProfile(
-      uid: uid,
-      name: name,
-      email: email,
-      phone: phone,
-      licenseNumber: licenseNumber,
-      languages: languages,
-      photoUrl: _auth.currentUser?.photoURL ?? '',
-      pricePerHour: pricePerHour,
-    );
-
-    await _db.collection('users').doc(uid).set(profile.toMap());
-
-    // The public profile: this is what the tourists browse. The id is the
-    // uid, so the trips of this guide are found by the very same key.
-    await _db.collection(guidesCollection).doc(uid).set({
-      'guideId': uid,
-      'name': name,
-      'specialty': '',
-      'avatarUrl': profile.photoUrl,
-      'coverUrl': '',
-      'location': '',
-      'about': '',
-      'languages': languages,
-      'rating': 0,
-      'reviewCount': 0,
-      'pricePerHour': pricePerHour,
-      'currency': 'EGP',
-      'isApproved': false,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    return credential;
-  }
+  TourGuideAuthService({FirebaseAuth? auth, FirebaseFirestore? db})
+    : _auth = auth ?? FirebaseAuth.instance,
+      _db = db ?? FirebaseFirestore.instance;
 
   // ──────────────── Public profile ────────────────
 
@@ -218,42 +155,6 @@ class TourGuideAuthService {
     } catch (_) {
       // The profile is a convenience — the guide still works without it.
     }
-  }
-
-  // ──────────────── Login ────────────────
-
-  /// Signs in with email/password and returns the role from Firestore.
-  ///
-  /// Cross-role guard: a tourist (or admin) account is signed out
-  /// immediately and a readable exception is thrown — the guide app
-  /// never opens on a non-guide session.
-  Future<({UserCredential credential, String role})> signInGuide({
-    required String email,
-    required String password,
-  }) async {
-    final credential = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final uid = credential.user!.uid;
-    final doc = await _db.collection('users').doc(uid).get();
-
-    if (!doc.exists) {
-      throw Exception('User profile not found. Please contact support.');
-    }
-
-    final role = (doc.data()?['role'] as String?) ?? 'tourist';
-    if (role != 'guide') {
-      // Drop the session at once — the account belongs to another app.
-      await _auth.signOut();
-      throw Exception(
-        'This account is not a guide account — please use the tourist app to sign in.',
-      );
-    }
-    // Self-heal the profile from Firebase Auth (silent, never blocks login).
-    _profileHeal.healAfterSignIn();
-    return (credential: credential, role: role);
   }
 
   // ──────────────── Verification ────────────────
@@ -314,8 +215,7 @@ class TourGuideAuthService {
     } on FirebaseException catch (error) {
       // Signing out revokes access before the dashboard route has finished
       // disposing its listener. Ignore only that expected shutdown race.
-      if (error.code == 'permission-denied' &&
-          _auth.currentUser?.uid != uid) {
+      if (error.code == 'permission-denied' && _auth.currentUser?.uid != uid) {
         yield '';
         return;
       }
@@ -387,18 +287,27 @@ class TourGuideAuthService {
       yield false;
       return;
     }
-    await for (final snapshot
-        in _db.collection('guideVerifications').doc(uid).snapshots()) {
-      final data = snapshot.data();
-      if (data != null && data['status'] == 'approved') {
-        yield true;
-      } else {
-        final userDoc = await _db.collection('users').doc(uid).get();
-        final userData = userDoc.data();
-        yield userData != null &&
-            (userData['isApproved'] == true ||
-                userData['status'] == 'approved');
+    try {
+      await for (final snapshot
+          in _db.collection('guideVerifications').doc(uid).snapshots()) {
+        final data = snapshot.data();
+        if (data != null && data['status'] == 'approved') {
+          yield true;
+        } else {
+          final userDoc = await _db.collection('users').doc(uid).get();
+          final userData = userDoc.data();
+          yield userData != null &&
+              (userData['isApproved'] == true ||
+                  userData['status'] == 'approved');
+        }
       }
+    } on FirebaseException catch (error) {
+      // Signing out revokes access before the listener is torn down.
+      if (error.code == 'permission-denied' && _auth.currentUser?.uid != uid) {
+        yield false;
+        return;
+      }
+      rethrow;
     }
   }
 
@@ -415,32 +324,34 @@ class TourGuideAuthService {
       yield null;
       return;
     }
-    await for (final snapshot
-        in _db.collection('guideVerifications').doc(uid).snapshots()) {
-      final data = snapshot.data();
-      if (data != null && data['status'] == 'approved') {
-        yield data;
-      } else {
-        final userDoc = await _db.collection('users').doc(uid).get();
-        final userData = userDoc.data();
-        if (userData != null &&
-            (userData['isApproved'] == true ||
-                userData['status'] == 'approved')) {
-          final merged = Map<String, dynamic>.of(data ?? {});
-          merged['status'] = 'approved';
-          yield merged;
-        } else {
+    try {
+      await for (final snapshot
+          in _db.collection('guideVerifications').doc(uid).snapshots()) {
+        final data = snapshot.data();
+        if (data != null && data['status'] == 'approved') {
           yield data;
+        } else {
+          final userDoc = await _db.collection('users').doc(uid).get();
+          final userData = userDoc.data();
+          if (userData != null &&
+              (userData['isApproved'] == true ||
+                  userData['status'] == 'approved')) {
+            final merged = Map<String, dynamic>.of(data ?? {});
+            merged['status'] = 'approved';
+            yield merged;
+          } else {
+            yield data;
+          }
         }
       }
+    } on FirebaseException catch (error) {
+      // Signing out revokes access before the listener is torn down.
+      if (error.code == 'permission-denied' && _auth.currentUser?.uid != uid) {
+        yield null;
+        return;
+      }
+      rethrow;
     }
-  }
-
-  /// Signs out the current Firebase session. Permanent account data
-  /// (profile, verification) stays in Firestore — relogin restores it.
-  Future<void> signOut() async {
-    await _auth.signOut();
-    _profileHeal.resetSession();
   }
 
   /// Fetches the role of the currently signed-in user.
@@ -449,32 +360,5 @@ class TourGuideAuthService {
     if (uid == null) return null;
     final doc = await _db.collection('users').doc(uid).get();
     return doc.data()?['role'] as String?;
-  }
-
-  /// Converts FirebaseAuthException codes into readable messages.
-  String getErrorMessage(Object error) {
-    if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'email-already-in-use':
-          return 'This email is already registered. Please sign in instead.';
-        case 'weak-password':
-          return 'Password is too weak. Use at least 6 characters.';
-        case 'invalid-email':
-          return 'Please enter a valid email address.';
-        case 'user-not-found':
-          return 'No guide account found with this email.';
-        case 'wrong-password':
-        case 'invalid-credential':
-          return 'Incorrect email or password.';
-        case 'too-many-requests':
-          return 'Too many attempts. Please try again later.';
-        default:
-          return error.message ?? 'An unexpected error occurred.';
-      }
-    }
-    // Plain `Exception('...')` prints with an "Exception: " prefix —
-    // strip it so the snackbar shows the message only.
-    final text = error.toString();
-    return text.startsWith('Exception: ') ? text.substring(11) : text;
   }
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourguide/data/tour_guide_auth_service.dart';
-import 'package:triply/features/common/AuthTourguide/cubit/tour_guide_auth_cubit.dart';
+import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
+import 'package:triply/features/common/auth/model/auth_role.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_button.dart';
 import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
 import 'package:triply/features/common/AuthTourist/widgets/auth_text_field.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
-import 'tour_guide_signup_screen.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/services/app_prefs.dart';
 import 'tour_guide_verification_screen.dart';
 
 class TourGuideLoginScreen extends StatefulWidget {
@@ -28,20 +30,21 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
     super.dispose();
   }
 
-  Future<void> _handleLogin(TourGuideAuthCubit cubit) async {
+  Future<void> _handleLogin(AuthCubit cubit) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final role = await cubit.signInGuide(
+    final success = await cubit.signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
+      role: AuthRole.guide,
     );
 
     if (!mounted) return;
 
-    if (role == null) {
+    if (!success) {
       // Error is set in the cubit, show snackbar (this also covers the
-      // cross-role guard: the service throws "tourist account" and signs
-      // the session out before anything opens).
+      // cross-role guard: the repository throws "tourist account" and
+      // signs the session out before anything opens).
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(cubit.errorMessage ?? 'Login failed'),
@@ -55,11 +58,17 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
       return;
     }
 
-    // The service only lets a guide account through (non-guide roles
-    // are signed out and thrown), so a successful sign-in is a guide.
+    // The shared repository only lets a guide account through (non-guide
+    // roles are signed out and thrown), so a successful sign-in is a guide.
+    // Remember it before the next screen: this is what makes the app
+    // open the guide flow directly on later launches.
+    await AppPrefs.instance.setLastRole('guide');
+    await AppPrefs.instance.markOnboardingSeen('guide');
+
     // Verified guides go straight home; others complete verification.
     // Verification state lives in Firestore, so it survives logout/login.
     final approved = await TourGuideAuthService().isVerificationApproved();
+    await AppPrefs.instance.setGuideVerified(approved);
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
@@ -145,129 +154,158 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TourGuideAuthCubit(),
-      child: BlocBuilder<TourGuideAuthCubit, TourGuideAuthState>(
-        builder: (context, state) {
-          final cubit = context.read<TourGuideAuthCubit>();
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Welcome back, Guide',
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F3238),
-                            ),
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        final cubit = context.read<AuthCubit>();
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Welcome back, Guide',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1F3238),
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Sign in to manage your trips and travelers.',
-                            style: TextStyle(
-                              color: AuthColors.textGrey,
-                              fontSize: 15,
-                            ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Sign in to manage your trips and travelers.',
+                          style: TextStyle(
+                            color: AuthColors.textGrey,
+                            fontSize: 15,
                           ),
-                          const SizedBox(height: 28),
-                          _label('Email address'),
-                          const SizedBox(height: 10),
-                          AuthTextField(
-                            controller: _emailController,
-                            hintText: 'guide@email.com',
-                            icon: Icons.mail_outline,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!v.contains('@') || !v.contains('.')) {
-                                return 'Enter a valid email address';
-                              }
-                              return null;
-                            },
+                        ),
+                        const SizedBox(height: 28),
+                        _label('Email address'),
+                        const SizedBox(height: 10),
+                        AuthTextField(
+                          controller: _emailController,
+                          hintText: 'guide@email.com',
+                          icon: Icons.mail_outline,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (v) {
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!v.contains('@') || !v.contains('.')) {
+                              return 'Enter a valid email address';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 22),
+                        _label('Password'),
+                        const SizedBox(height: 10),
+                        AuthTextField(
+                          controller: _passwordController,
+                          hintText: 'Enter your password',
+                          icon: Icons.lock_outline,
+                          isPassword: true,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            if (v.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 28),
+                        SizedBox(
+                          height: 56,
+                          width: double.infinity,
+                          child: AuthButton(
+                            label: 'Log In',
+                            isLoading: cubit.isLoading,
+                            onPressed: () => _handleLogin(cubit),
                           ),
-                          const SizedBox(height: 22),
-                          _label('Password'),
-                          const SizedBox(height: 10),
-                          AuthTextField(
-                            controller: _passwordController,
-                            hintText: 'Enter your password',
-                            icon: Icons.lock_outline,
-                            isPassword: true,
-                            validator: (v) {
-                              if (v == null || v.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              if (v.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
+                        ),
+                        const SizedBox(height: 28),
+                        Center(
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              const Text(
+                                "Don't have an account? ",
+                                style: TextStyle(
+                                  color: AuthColors.textGrey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => Navigator.of(
+                                  context,
+                                ).pushNamed(AppRoutes.guideSignup),
+                                child: const Text(
+                                  'Create Guide Account',
+                                  style: TextStyle(
+                                    color: AuthColors.signInDark,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 28),
-                          SizedBox(
-                            height: 56,
-                            width: double.infinity,
-                            child: AuthButton(
-                              label: 'Log In',
-                              isLoading: cubit.isLoading,
-                              onPressed: () => _handleLogin(cubit),
-                            ),
-                          ),
-                          const SizedBox(height: 28),
-                          Center(
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                const Text(
-                                  "Don't have an account? ",
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 4,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context)
+                                    .pushNamedAndRemoveUntil(
+                                      AppRoutes.signIn,
+                                      (_) => false,
+                                    ),
+                                child: const Text(
+                                  'Are you a tourist? Sign in',
+                                  style: TextStyle(
+                                    color: AuthColors.signInDark,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.of(
+                                  context,
+                                ).pushNamed(AdminRoutes.login),
+                                child: const Text(
+                                  'Admin portal',
                                   style: TextStyle(
                                     color: AuthColors.textGrey,
-                                    fontSize: 16,
+                                    fontSize: 14,
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          const TourGuideSignupScreen(),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Create Guide Account',
-                                    style: TextStyle(
-                                      color: AuthColors.signInDark,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../cubit/auth_cubit.dart';
+import '../../auth/cubit/auth_cubit.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_step_icon.dart';
 import '../widgets/auth_text_field.dart';

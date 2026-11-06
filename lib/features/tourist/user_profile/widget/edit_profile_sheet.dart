@@ -10,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/profile_avatar.dart';
-import '../../../common/AuthTourist/cubit/auth_cubit.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;

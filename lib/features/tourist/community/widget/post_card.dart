@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/location_tag_chip.dart';
-import '../../../common/AuthTourist/cubit/auth_cubit.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
 import '../model/community_post.dart';
 import 'post_images.dart';
 

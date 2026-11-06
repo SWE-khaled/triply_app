@@ -4,7 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/AuthTourist/screens/sign_in_screen.dart';
 import 'package:triply/features/common/AuthTourist/constants/auth_colors.dart';
 import 'package:triply/core/theme/app_colors.dart';
-import '../cubit/auth_cubit.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/services/app_prefs.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
+import '../../../common/auth/model/auth_role.dart';
 import '../widgets/auth_text_field.dart';
 
 class CreateAccountScreen extends StatefulWidget {
@@ -85,13 +88,19 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   Future<void> _handleCreateAccount(AuthCubit authCubit) async {
     if (!_formKey.currentState!.validate()) return;
     final success = await authCubit.signUp(
+      role: AuthRole.tourist,
       fullName: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
       phone: normalizeEgyptianPhone(_phoneController.text),
     );
     if (success && mounted) {
-      Navigator.of(context).pushReplacementNamed('/home');
+      await AppPrefs.instance.setLastRole('tourist');
+      await AppPrefs.instance.markOnboardingSeen('tourist');
+      if (!mounted) return;
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
     } else if (mounted && authCubit.errorMessage != null) {
       ScaffoldMessenger.of(
         context,

@@ -6,7 +6,7 @@ import 'package:triply/core/data/repositories/firestore_chat_repository.dart';
 import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/core/widgets/app_snackbar.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
-import 'package:triply/features/common/AuthTourist/cubit/auth_cubit.dart';
+import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/widget/guide_bottom_nav.dart';
 import '../../../core/routing/app_routes.dart';
 import '../cubit/chat_list_cubit.dart';

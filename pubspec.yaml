@@ -46,6 +46,8 @@ dependencies:
   dio: ^5.11.1
   webview_flutter: ^4.14.1
   pay_with_paymob: ^1.4.0
+  shared_preferences: ^2.5.6
+  shimmer: ^4.0.0
 
 
 

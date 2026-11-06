@@ -14,9 +14,16 @@ import 'features/tourist/checkout/paymob_settings.dart';
 import 'features/tourist/user_profile/view/privacy_security_screen.dart';
 import 'features/tourist/user_profile/view/profile_screen.dart';
 import 'firebase_options.dart';
+import 'features/splash/cubit/startup_cubit.dart';
+import 'features/splash/view/startup_gate.dart';
 import 'features/tour_guide/role_selection/view/role_selection_screen.dart';
+import 'features/tour_guide/onboarding/view/tour_guide_onboarding_screen.dart';
+import 'features/common/AuthTourguide/view/tour_guide_login_screen.dart';
+import 'features/common/AuthTourguide/view/tour_guide_signup_screen.dart';
+import 'features/common/AuthTourguide/view/tour_guide_verification_screen.dart';
+import 'features/admin_dashboard/d_auth/view/admin_login_view.dart';
 import 'core/theme/app_theme.dart';
-import 'features/common/AuthTourist/cubit/auth_cubit.dart';
+import 'features/common/auth/cubit/auth_cubit.dart';
 import 'features/tourist/home/view/home_screen.dart';
 import 'features/tourist/notifications/view/notifications_screen.dart';
 import 'features/tourist/search/view/search_screen.dart';
@@ -38,32 +45,35 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => AuthCubit())],
+      providers: [
+        // One session cubit for both roles. Not lazy: it starts listening
+        // to Firebase at launch, so the restored user is ready by the time
+        // any screen reads it (and the profile self-heal can run).
+        BlocProvider(lazy: false, create: (_) => AuthCubit()),
+        // Resolves the restored Firebase session while the splash animates.
+        // Not lazy: the work must start at launch, not when the gate mounts.
+        BlocProvider(lazy: false, create: (_) => StartupCubit()..resolve()),
+      ],
       child: MaterialApp(
         title: 'Triply',
         debugShowCheckedModeBanner: false,
         theme: buildAppTheme(),
         onGenerateInitialRoutes: (_) => [
-          AppRoutes.splash(
-            nextPageBuilder: (_) => BlocBuilder<AuthCubit, AuthState>(
-              builder: (context, state) {
-                switch (state) {
-                  case AuthInitial():
-                    return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
-                    );
-                  default:
-                    return const RoleSelectionScreen();
-                }
-              },
-            ),
-          ),
+          AppRoutes.splash(nextPageBuilder: (_) => const StartupGate()),
         ],
         routes: {
           AppRoutes.home: (context) => const HomeScreen(),
           AppRoutes.search: (context) => const SearchScreen(),
           AppRoutes.notifications: (context) => const NotificationsScreen(),
           AppRoutes.onboarding: (context) => const OnboardingScreen(),
+          AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
+          AppRoutes.guideOnboarding: (context) =>
+              const TourGuideOnboardingScreen(),
+          AppRoutes.guideLogin: (context) => const TourGuideLoginScreen(),
+          AppRoutes.guideSignup: (context) => const TourGuideSignupScreen(),
+          AppRoutes.guideVerification: (context) =>
+              const TourGuideVerificationScreen(),
+          AdminRoutes.login: (context) => const AdminLoginView(),
           AppRoutes.signIn: (context) => const SignInScreen(),
           AppRoutes.createAccount: (context) => const CreateAccountScreen(),
           ForgotPasswordScreen.routeName: (context) =>

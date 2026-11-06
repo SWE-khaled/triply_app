@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/mock/tourist/mock_emergency_contacts.dart';
 import '../../../../core/data/mock/tourist/mock_profile.dart';
 import '../../../../core/data/my_bookings_public.dart';
-import '../../../common/AuthTourist/data/auth_repository.dart';
+import '../../../common/auth/data/auth_repository.dart';
 import '../model/emergency_contact.dart';
 import 'profile_state.dart';
 

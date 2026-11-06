@@ -41,6 +41,11 @@ class AppRoutes {
   static const String search = '/search';
   static const String notifications = '/notifications';
   static const String onboarding = '/onboarding';
+  static const String roleSelection = '/role-selection';
+  static const String guideOnboarding = '/guide-onboarding';
+  static const String guideLogin = '/guide-login';
+  static const String guideSignup = '/guide-signup';
+  static const String guideVerification = '/guide-verification';
   static const String signIn = '/sign-in';
   static const String createAccount = '/create-account';
   static const String forgotPassword = '/forgot-password';

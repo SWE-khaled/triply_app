@@ -11,7 +11,7 @@ import 'package:triply/core/constants/egypt_cities.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/profile_avatar.dart';
 import '../../../common/AuthTourguide/data/tour_guide_auth_service.dart';
-import '../../../common/AuthTourist/cubit/auth_cubit.dart';
+import '../../../common/auth/cubit/auth_cubit.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class EditProfileSheet extends StatefulWidget {
