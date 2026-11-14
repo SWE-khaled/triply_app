@@ -32,7 +32,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   try {
-    await dotenv.load(fileName: '.env');
+    await dotenv.load(fileName: '.env'); 
   } catch (_) {}
   PaymobSettings.initialize();
   DioHelper().initialization();
