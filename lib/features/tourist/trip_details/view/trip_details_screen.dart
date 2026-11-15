@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
-import '../../../common/auth/data/auth_repository.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/state_views.dart';
+import '../../../../core/widgets/app_shimmer.dart';
 import '../../guides/view/guide_profile_screen.dart';
 import 'package:triply/features/chat/widgets/message_guide_button.dart';
 import '../../my_trips/widgets/booking_badges.dart';
@@ -137,8 +137,12 @@ class TripDetailsScreen extends StatelessWidget {
         builder: (context, state) {
           if (state is! TripDetailsSuccess) {
             return state is TripDetailsError
-                ? AppErrorView(message: state.error)
-                : const AppLoadingView();
+                ? AppErrorView(
+                    message: state.error,
+                    onRetry: () =>
+                        context.read<TripDetailsCubit>().loadTrip(trip),
+                  )
+                : const _TripDetailsSkeleton();
           }
           final details = state.details;
           return SingleChildScrollView(
@@ -196,7 +200,9 @@ class TripDetailsScreen extends StatelessWidget {
                         FutureBuilder<String?>(
                           future: details.guideId.isEmpty
                               ? Future<String?>.value(null)
-                              : AuthRepository().getUserPhone(details.guideId),
+                              : context.read<TripDetailsCubit>().guidePhone(
+                                  details.guideId,
+                                ),
                           builder: (context, snapshot) => GuideCard(
                             details: details,
                             guidePhone: snapshot.data,
@@ -223,4 +229,67 @@ class TripDetailsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _TripDetailsSkeleton extends StatelessWidget {
+  const _TripDetailsSkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: SingleChildScrollView(
+      child: Column(
+        children: [
+          const ShimmerBox(
+            width: double.infinity,
+            height: 300,
+            borderRadius: BorderRadius.zero,
+          ),
+          Transform.translate(
+            offset: const Offset(0, -20),
+            child: ShimmerCard(
+              radius: 24,
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  ShimmerLine(width: 210, height: 22),
+                  SizedBox(height: 10),
+                  ShimmerLine(width: 150, height: 12),
+                  SizedBox(height: 20),
+                  ShimmerBox(
+                    width: double.infinity,
+                    height: 44,
+                    borderRadius: BorderRadius.all(Radius.circular(14)),
+                  ),
+                  SizedBox(height: 18),
+                  ShimmerBox(
+                    width: double.infinity,
+                    height: 42,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  SizedBox(height: 18),
+                  ShimmerLine(width: 100, height: 16),
+                  SizedBox(height: 10),
+                  ShimmerLine(height: 12),
+                  SizedBox(height: 8),
+                  ShimmerLine(width: 260, height: 12),
+                  SizedBox(height: 18),
+                  ShimmerCard(
+                    padding: EdgeInsets.all(14),
+                    child: Row(
+                      children: [
+                        ShimmerCircle(size: 48),
+                        SizedBox(width: 12),
+                        Expanded(child: ShimmerLine(width: 160, height: 13)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

@@ -11,6 +11,8 @@ import 'community_cloudinary_uploader.dart';
 abstract class CommunityPostsRepository {
   Stream<List<CommunityPost>> watchPosts();
 
+  Stream<List<CommunityPost>> watchMyPosts();
+
   Future<CommunityPost> createPost({
     required List<XFile> images,
     required String text,
@@ -81,6 +83,7 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
   }
 
   /// All posts belonging to the current user, without the feed's page limit.
+  @override
   Stream<List<CommunityPost>> watchMyPosts() {
     final uid = _auth.currentUser?.uid;
     if (uid == null || uid.isEmpty) {

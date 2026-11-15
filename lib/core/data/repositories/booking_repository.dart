@@ -201,28 +201,25 @@ class BookingRepository {
 
   /// The bookings of the signed-in tourist.
   ///
-  /// Returns null when the read failed — the caller falls back to the
-  /// session store then.
-  Future<List<TouristBooking>?> fetchMyBookings() async {
+  /// An empty list means no signed-in tourist or no bookings. Read failures
+  /// propagate so the screen can show its error state.
+  Future<List<TouristBooking>> fetchMyBookings() async {
     final uid = currentTouristId;
-    if (uid == null) return null;
-    try {
-      final snapshot = await _firestore
-          .collection(bookingsCollection)
-          .where('touristId', isEqualTo: uid)
-          .get();
-      return snapshot.docs
-          .map((doc) => TouristBooking.fromDocument(doc.data(), doc.id))
-          .toList();
-    } catch (_) {
-      return null;
-    }
+    if (uid == null) return const [];
+    final snapshot = await _firestore
+        .collection(bookingsCollection)
+        .where('touristId', isEqualTo: uid)
+        .get();
+    return snapshot.docs
+        .map((doc) => TouristBooking.fromDocument(doc.data(), doc.id))
+        .toList();
   }
 
   /// Books a guide directly, without a published trip.
   Future<BookingReceipt> createPrivateBooking({
     required String guideId,
     required String guideName,
+    String guideImageUrl = '',
     required String title,
     required int travelers,
     required double totalPrice,
@@ -230,6 +227,7 @@ class BookingRepository {
     DateTime? startAt,
     DateTime? endAt,
     String meetingPoint = '',
+    String dateLabel = '',
     String notes = '',
     String specialRequests = '',
   }) async {
@@ -255,6 +253,8 @@ class BookingRepository {
       'tripId': '',
       'touristId': uid,
       'guideId': guideId,
+      'guideName': guideName,
+      'guide_image_url': guideImageUrl,
       'tour_title': title,
       'guest_name': guest?['name'] ?? guest?['fullName'] ?? '',
       'country': '',
@@ -268,7 +268,7 @@ class BookingRepository {
       'totalPrice': totalPrice,
       'price_label': 'EGP ${totalPrice.toStringAsFixed(0)}',
       'detail_label': '$travelers traveler${travelers == 1 ? '' : 's'}',
-      'datetime_label': '',
+      'datetime_label': dateLabel,
       'location': meetingPoint,
       'booking_code': bookingRef.id,
       'notes': notes,
@@ -347,10 +347,7 @@ class BookingRepository {
   /// trip seats are released inside the same transaction (never below 0,
   /// never above the trip's capacity). Private trips have no trip to
   /// release seats on.
-  Future<void> cancelBooking({
-    required String bookingId,
-    required bool wasPaid,
-  }) async {
+  Future<void> cancelBooking({required String bookingId}) async {
     final uid = currentTouristId;
     if (uid == null) {
       throw const BookingException('Sign in before cancelling a booking.');
@@ -370,6 +367,13 @@ class BookingRepository {
       final tripId = (data['tripId'] as String?) ?? '';
       final seats = (data['seats'] as num?)?.toInt() ?? 0;
       final isPrivate = data['is_private'] == true;
+      final wasPaid = data['paymentStatus'] == 'paid';
+      DocumentReference<Map<String, dynamic>>? tripDoc;
+      DocumentSnapshot<Map<String, dynamic>>? tripSnap;
+      if (tripId.isNotEmpty && !isPrivate && seats > 0) {
+        tripDoc = trips.doc(tripId);
+        tripSnap = await tx.get(tripDoc);
+      }
       tx.update(bookingRef, {
         'status': 'cancelled',
         'cancelledAt': FieldValue.serverTimestamp(),
@@ -379,19 +383,15 @@ class BookingRepository {
       });
       // Release the seats of a public trip (bounded by [0, capacity]).
       // Private trips have no published trip to release seats on.
-      if (tripId.isNotEmpty && !isPrivate && seats > 0) {
-        final tripDoc = trips.doc(tripId);
-        final tripSnap = await tx.get(tripDoc);
-        if (tripSnap.exists) {
-          final trip = tripSnap.data() ?? const <String, dynamic>{};
-          final capacity = (trip['capacity'] as num?)?.toInt() ?? 0;
-          final booked = (trip['bookedSeats'] as num?)?.toInt() ?? 0;
-          final released = (booked - seats).clamp(0, capacity);
-          tx.update(tripDoc, {
-            'bookedSeats': released,
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
-        }
+      if (tripDoc != null && tripSnap != null && tripSnap.exists) {
+        final trip = tripSnap.data() ?? const <String, dynamic>{};
+        final capacity = (trip['capacity'] as num?)?.toInt() ?? 0;
+        final booked = (trip['bookedSeats'] as num?)?.toInt() ?? 0;
+        final released = (booked - seats).clamp(0, capacity);
+        tx.update(tripDoc, {
+          'bookedSeats': released,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
       }
     });
   }

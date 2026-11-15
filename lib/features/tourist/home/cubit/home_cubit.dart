@@ -9,6 +9,7 @@ import 'package:triply/core/data/models/public_trip.dart';
 import 'package:triply/core/data/repositories/public_guides_repository.dart';
 import 'package:triply/core/data/repositories/public_trips_repository.dart';
 import 'package:triply/core/data/repositories/tourist_notifications_repository.dart';
+import 'package:triply/core/utils/page_load_error.dart';
 import 'package:triply/core/utils/safe_emit_mixin.dart';
 import '../../notifications/model/notification_item.dart';
 import '../model/guide.dart';
@@ -56,6 +57,7 @@ class HomeCubit extends Cubit<HomeState> with SafeEmitMixin<HomeState> {
 
   /// How many notifications the tourist did not read yet.
   int _unreadNotifications = 0;
+  bool _isLoading = false;
 
   List<Place> get places => _places;
   List<Guide> get guides => _guides;
@@ -75,14 +77,23 @@ class HomeCubit extends Cubit<HomeState> with SafeEmitMixin<HomeState> {
 
   /// Reads the places, the guides and the trips.
   Future<void> load() async {
+    if (_isLoading || state is HomeSuccess) return;
+    _isLoading = true;
     safeEmit(const HomeLoading());
     try {
       _places = _mockPlaces();
 
-      final remoteGuides = await _guidesRepository.fetchApprovedGuides();
+      final guidesFuture = _guidesRepository.fetchApprovedGuides();
+      final tripsFuture = _tripsRepository.fetchApprovedTrips(
+        rethrowOnError: true,
+      );
+      await Future.wait<void>([
+        guidesFuture.then<void>((_) {}),
+        tripsFuture.then<void>((_) {}),
+      ]);
+      final remoteGuides = await guidesFuture;
       _guides = remoteGuides.map(Guide.fromPublicGuide).take(2).toList();
-
-      final remote = await _tripsRepository.fetchApprovedTrips();
+      final remote = await tripsFuture;
       _trips = (remote ?? _mockTrips()).map(Trip.fromPublicTrip).toList();
 
       safeEmit(
@@ -95,7 +106,9 @@ class HomeCubit extends Cubit<HomeState> with SafeEmitMixin<HomeState> {
         ),
       );
     } catch (e) {
-      safeEmit(HomeError(error: e.toString()));
+      safeEmit(HomeError(error: pageLoadErrorMessage(e)));
+    } finally {
+      _isLoading = false;
     }
   }
 

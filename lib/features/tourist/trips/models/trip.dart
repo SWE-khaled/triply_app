@@ -4,6 +4,7 @@ enum TripStatus { upcoming, ongoing, completed, cancelled }
 
 class Trip {
   final String id;
+  final String? bookingId;
   final String title;
   final String dateLabel;
   final String guideName;
@@ -16,6 +17,7 @@ class Trip {
 
   const Trip({
     required this.id,
+    this.bookingId,
     required this.title,
     required this.dateLabel,
     required this.guideName,

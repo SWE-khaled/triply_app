@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/utils/page_load_error.dart';
 
 import '../data/community_posts_repository.dart';
 import '../data/community_stories_repository.dart';
@@ -30,14 +31,7 @@ class CommunityCubit extends Cubit<CommunityState> {
            isLoadingPosts: true,
          ),
        ) {
-    _postsSubscription = _postsRepository.watchPosts().listen(
-      _onPosts,
-      onError: _onPostsError,
-    );
-    _storiesSubscription = _storiesRepository.watchStories().listen(
-      _onStories,
-      onError: _onStoriesError,
-    );
+    _listenToFeeds();
     _expiryTimer = Timer.periodic(
       const Duration(seconds: 1),
       (_) => pruneExpiredStories(),
@@ -79,6 +73,33 @@ class CommunityCubit extends Cubit<CommunityState> {
 
   List<CommunityPost> get posts => state.posts;
 
+  void _listenToFeeds() {
+    _postsSubscription = _postsRepository.watchPosts().listen(
+      _onPosts,
+      onError: _onPostsError,
+    );
+    _storiesSubscription = _storiesRepository.watchStories().listen(
+      _onStories,
+      onError: _onStoriesError,
+    );
+  }
+
+  void retryInitialLoad() {
+    unawaited(_postsSubscription?.cancel());
+    unawaited(_storiesSubscription?.cancel());
+    emit(
+      state.copyWith(
+        isLoadingPosts: true,
+        hasLoadedPosts: false,
+        clearPostsError: true,
+        isLoadingStories: true,
+        hasLoadedStories: false,
+        clearStoriesError: true,
+      ),
+    );
+    _listenToFeeds();
+  }
+
   void _onPosts(List<CommunityPost> posts) {
     if (isClosed) return;
 
@@ -86,6 +107,7 @@ class CommunityCubit extends Cubit<CommunityState> {
       state.copyWith(
         posts: posts,
         isLoadingPosts: false,
+        hasLoadedPosts: true,
         clearPostsError: true,
       ),
     );
@@ -97,9 +119,7 @@ class CommunityCubit extends Cubit<CommunityState> {
     emit(
       state.copyWith(
         isLoadingPosts: false,
-        postsError: error is CommunityPostsException
-            ? error.message
-            : 'Could not load Community posts.',
+        postsError: pageLoadErrorMessage(error),
       ),
     );
   }
@@ -132,6 +152,7 @@ class CommunityCubit extends Cubit<CommunityState> {
         stories: others,
         myStories: mine,
         isLoadingStories: false,
+        hasLoadedStories: true,
         clearStoriesError: true,
       ),
     );
@@ -143,9 +164,7 @@ class CommunityCubit extends Cubit<CommunityState> {
     emit(
       state.copyWith(
         isLoadingStories: false,
-        storiesError: error is CommunityStoriesException
-            ? error.message
-            : 'Could not load Community Stories.',
+        storiesError: pageLoadErrorMessage(error),
       ),
     );
   }

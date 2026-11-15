@@ -860,6 +860,7 @@ class _BookingScreenState extends State<BookingScreen> {
       receipt = await BookingRepository().createPrivateBooking(
         guideId: guideId,
         guideName: guideName,
+        guideImageUrl: guideImage,
         title: 'Private tour with $guideName',
         travelers: _controller.travelers,
         totalPrice: _controller.total,
@@ -867,6 +868,7 @@ class _BookingScreenState extends State<BookingScreen> {
         startAt: startAt,
         endAt: endAt,
         meetingPoint: _controller.meetingPoint,
+        dateLabel: _controller.dateLabel,
       );
     } on BookingException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));

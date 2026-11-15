@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:latlong2/latlong.dart' as latlng;
 import 'package:triply/features/tourist/home/view/home_screen.dart';
+import '../../../../core/widgets/app_shimmer.dart';
+import '../../../../core/widgets/state_views.dart';
 
 import '../../user_profile/view/profile_screen.dart';
 import '../cubit/map_cubit.dart';
@@ -30,24 +32,22 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  late final MapCubit controller;
+  MapCubit get controller => context.read<MapCubit>();
   late final TextEditingController searchController;
   final fmap.MapController _mapController = fmap.MapController();
 
   @override
   void initState() {
     super.initState();
-    // Owned here (like the old controller) so helpers keep working
-    // unchanged; provided below for BlocBuilder rebuilds.
-    controller = MapCubit();
     searchController = TextEditingController();
   }
 
   @override
-  void dispose() {
-    controller.close();
-    searchController.dispose();
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (searchController.text != controller.searchQuery) {
+      searchController.text = controller.searchQuery;
+    }
   }
 
   void _openPlaceDetail(Place place) {
@@ -102,47 +102,44 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: controller,
-      child: Scaffold(
-        extendBody: true, // map extends under the glass nav
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          bottom: false, // <-- let the map reach the bottom of the screen
-          child: BlocBuilder<MapCubit, MapState>(
-            builder: (context, state) {
-              // Sealed states: only a ready catalog renders the map UI.
-              return switch (state) {
-                MapSuccessState() => _buildContent(state),
-                MapErrorState(:final message) => _buildError(message),
-                _ => const Center(child: CircularProgressIndicator()),
-              };
-            },
-          ),
-        ),
-        bottomNavigationBar: AppBottomNav(
-          currentIndex: 2,
-          onTap: (index) {
-            if (index == 0) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
-              );
-            } else if (index == 1) {
-              Navigator.of(context).push(AppRoutes.myTrips());
-            } else if (index == 3) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CommunityScreen()),
-              );
-            } else if (index == 4) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              );
-            }
+    return Scaffold(
+      extendBody: true, // map extends under the glass nav
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        bottom: false, // <-- let the map reach the bottom of the screen
+        child: BlocBuilder<MapCubit, MapState>(
+          builder: (context, state) {
+            // Sealed states: only a ready catalog renders the map UI.
+            return switch (state) {
+              MapSuccessState() => _buildContent(state),
+              MapErrorState(:final message) => _buildError(message),
+              _ => const _MapSkeleton(),
+            };
           },
         ),
+      ),
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: 2,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          } else if (index == 1) {
+            Navigator.of(context).push(AppRoutes.myTrips());
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CommunityScreen()),
+            );
+          } else if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            );
+          }
+        },
       ),
     );
   }
@@ -224,28 +221,47 @@ class _MapScreenState extends State<MapScreen> {
 
   /// Catalog empty on both sources; [controller.retry] restarts the load.
   Widget _buildError(String message) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.wifi_off_outlined, size: 48, color: Colors.grey),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
-            ),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: controller.retry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try again'),
-            ),
-          ],
-        ),
-      ),
-    );
+    return AppErrorView(message: message, onRetry: controller.retry);
   }
+}
+
+class _MapSkeleton extends StatelessWidget {
+  const _MapSkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: ShimmerBox(
+            width: double.infinity,
+            height: 48,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              ShimmerBox(width: 56, height: 32),
+              SizedBox(width: 8),
+              ShimmerBox(width: 90, height: 32),
+              SizedBox(width: 8),
+              ShimmerBox(width: 72, height: 32),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: ShimmerBox(
+            width: double.infinity,
+            height: double.infinity,
+            borderRadius: BorderRadius.zero,
+            color: const Color(0xFFE7EDED),
+          ),
+        ),
+      ],
+    ),
+  );
 }

@@ -27,12 +27,18 @@ import 'features/common/auth/cubit/auth_cubit.dart';
 import 'features/tourist/home/view/home_screen.dart';
 import 'features/tourist/notifications/view/notifications_screen.dart';
 import 'features/tourist/search/view/search_screen.dart';
+import 'features/tourist/home/cubit/home_cubit.dart';
+import 'features/tourist/map/cubit/map_cubit.dart';
+import 'features/tourist/community/cubit/community_cubit.dart';
+import 'features/tourist/my_trips/cubit/my_trips_cubit.dart';
+import 'features/tourist/user_profile/cubit/profile_cubit.dart';
+import 'features/tourist/trip_details/cubit/trip_details_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   try {
-    await dotenv.load(fileName: '.env'); 
+    await dotenv.load(fileName: '.env');
   } catch (_) {}
   PaymobSettings.initialize();
   DioHelper().initialization();
@@ -53,6 +59,17 @@ class MyApp extends StatelessWidget {
         // Resolves the restored Firebase session while the splash animates.
         // Not lazy: the work must start at launch, not when the gate mounts.
         BlocProvider(lazy: false, create: (_) => StartupCubit()..resolve()),
+        // Tourist page Cubits live for this app session and are created only
+        // when their page is first opened.
+        BlocProvider(create: (_) => HomeCubit()),
+        BlocProvider(
+          create: (context) =>
+              ProfileCubit(userId: context.read<AuthCubit>().user?.uid),
+        ),
+        BlocProvider(create: (_) => CommunityCubit()),
+        BlocProvider(create: (_) => MapCubit()),
+        BlocProvider(create: (_) => MyTripsCubit()),
+        BlocProvider(create: (_) => TripDetailsCubit()),
       ],
       child: MaterialApp(
         title: 'Triply',

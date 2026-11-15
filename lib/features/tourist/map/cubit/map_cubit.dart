@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/mock/tourist/mock_places.dart';
+import '../../../../core/utils/page_load_error.dart';
 import '../model/place.dart';
 import 'map_state.dart';
 
@@ -10,20 +10,24 @@ class MapCubit extends Cubit<MapState> {
     _loadFromFirestore();
   }
 
-  /// Firestore copy once loaded; the const mock stays as the base and
-  /// the offline fallback.
+  /// The Firestore catalog once loaded; mock places are available only
+  /// until the initial request completes.
   List<Place> _allPlaces = mockPlaces.map((e) => Place.fromJson(e)).toList();
   String _searchQuery = '';
   MapFilter _selectedFilter = MapFilter.all;
   Place? _selectedPlace;
+  bool _isLoading = false;
 
   /// Camera focus in the view reads this.
   Place? get selectedPlace => _selectedPlace;
+  String get searchQuery => _searchQuery;
 
   /// Manual re-entry after [MapErrorState].
   void retry() => _loadFromFirestore();
 
   Future<void> _loadFromFirestore() async {
+    if (_isLoading || state is MapSuccessState) return;
+    _isLoading = true;
     emit(const MapLoadingState());
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -33,24 +37,20 @@ class MapCubit extends Cubit<MapState> {
           .map((doc) => Place.fromJson(doc.data()))
           .toList();
       if (isClosed) return;
-      // A fresh/empty Firestore project keeps the local mock as base.
-      if (remote.isNotEmpty) _allPlaces = remote;
+      _allPlaces = remote;
       _emitFiltered();
-    } catch (e) {
-      debugPrint('MapCubit: Firestore load failed → mock fallback: $e');
+    } catch (error) {
       if (isClosed) return;
-      // Offline / rules error: the const mock rescues the map, so the
-      // error state is reserved for "nothing to show at all" — that one
-      // offers [retry] from the view.
-      if (_allPlaces.isEmpty) {
-        emit(
-          const MapErrorState(
-            'Could not load places. Check your connection and try again.',
-          ),
-        );
-      } else {
+      if (error is FirebaseException && error.code == 'permission-denied') {
+        // The current Firestore rules do not grant tourists access to
+        // `places`; keep the existing bundled map catalog usable in that
+        // case. Network failures still surface the connection error below.
         _emitFiltered();
+        return;
       }
+      emit(MapErrorState(pageLoadErrorMessage(error)));
+    } finally {
+      _isLoading = false;
     }
   }
 

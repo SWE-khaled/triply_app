@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,6 +13,8 @@ import '../model/community_post.dart';
 import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_shimmer.dart';
+import '../../../../core/widgets/state_views.dart';
 import '../../../../core/widgets/circle_icon_button.dart';
 import '../widget/community_posts_empty_state.dart';
 import '../widget/my_story_bubble.dart';
@@ -38,14 +38,13 @@ class _CommunityScreenState extends State<CommunityScreen>
   @override
   void initState() {
     super.initState();
-    _cubit = CommunityCubit();
+    _cubit = context.read<CommunityCubit>();
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    unawaited(_cubit.close());
     super.dispose();
   }
 
@@ -201,6 +200,11 @@ class _CommunityScreenState extends State<CommunityScreen>
           final currentUserId = context.watch<AuthCubit>().user?.uid ?? '';
           final hasMyStory = cubit.myStories.isNotEmpty;
           final rings = cubit.userRings;
+          final initialError = !state.hasLoadedPosts
+              ? state.postsError
+              : !state.hasLoadedStories
+              ? state.storiesError
+              : null;
 
           return Scaffold(
             extendBody: true, // content extends under the glass nav
@@ -208,166 +212,175 @@ class _CommunityScreenState extends State<CommunityScreen>
             body: SafeArea(
               bottom:
                   false, // <-- let the content reach the bottom of the screen
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: initialError != null
+                  ? AppErrorView(
+                      message: initialError,
+                      onRetry: cubit.retryInitialLoad,
+                    )
+                  : !state.hasLoadedPosts || !state.hasLoadedStories
+                  ? const _CommunitySkeleton()
+                  : Column(
                       children: [
-                        const Text(
-                          'Community',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        CircleIconButton(
-                          icon: Icons.add,
-                          onTap: () => _openComposer(context),
-                          backgroundColor: AppColors.primaryTeal,
-                          iconColor: Colors.white,
-                          iconSize: 27,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Expanded(
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 5),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      MyStoryBubble(
-                                        hasStory: hasMyStory,
-                                        onAddTap: () =>
-                                            _pickMyStoryImage(context),
-                                        onViewTap: () {
-                                          if (currentUserId.isNotEmpty) {
-                                            _openStoryViewerForUser(
-                                              context,
-                                              currentUserId,
-                                            );
-                                          }
-                                        },
-                                      ),
-                                      for (
-                                        var i = 0;
-                                        i < rings.length;
-                                        i++
-                                      ) ...[
-                                        const SizedBox(width: 14),
-                                        StoryRing(
-                                          story: rings[i],
-                                          ringColor: [
-                                            AppColors.primaryTeal,
-                                            AppColors.starGold,
-                                            AppColors.accentOrange,
-                                          ][i % 3],
-                                          onTap: () => _openStoryViewerForUser(
-                                            context,
-                                            rings[i].authorId,
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
+                              const Text(
+                                'Community',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              if (state.storiesError != null)
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    16,
-                                    4,
-                                    16,
-                                    0,
-                                  ),
-                                  child: Text(
-                                    state.storiesError!,
-                                    style: const TextStyle(
-                                      color: AppColors.textGrey,
-                                      fontSize: 12,
+                              CircleIconButton(
+                                icon: Icons.add,
+                                onTap: () => _openComposer(context),
+                                backgroundColor: AppColors.primaryTeal,
+                                iconColor: Colors.white,
+                                iconSize: 27,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Expanded(
+                          child: CustomScrollView(
+                            slivers: [
+                              SliverToBoxAdapter(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 5),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            MyStoryBubble(
+                                              hasStory: hasMyStory,
+                                              onAddTap: () =>
+                                                  _pickMyStoryImage(context),
+                                              onViewTap: () {
+                                                if (currentUserId.isNotEmpty) {
+                                                  _openStoryViewerForUser(
+                                                    context,
+                                                    currentUserId,
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                            for (
+                                              var i = 0;
+                                              i < rings.length;
+                                              i++
+                                            ) ...[
+                                              const SizedBox(width: 14),
+                                              StoryRing(
+                                                story: rings[i],
+                                                ringColor: [
+                                                  AppColors.primaryTeal,
+                                                  AppColors.starGold,
+                                                  AppColors.accentOrange,
+                                                ][i % 3],
+                                                onTap: () =>
+                                                    _openStoryViewerForUser(
+                                                      context,
+                                                      rings[i].authorId,
+                                                    ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    const SizedBox(height: 8),
+                                    if (state.storiesError != null)
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          16,
+                                          4,
+                                          16,
+                                          0,
+                                        ),
+                                        child: Text(
+                                          state.storiesError!,
+                                          style: const TextStyle(
+                                            color: AppColors.textGrey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    if (state.postsError != null)
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          16,
+                                          4,
+                                          16,
+                                          0,
+                                        ),
+                                        child: Text(
+                                          state.postsError!,
+                                          style: const TextStyle(
+                                            color: AppColors.textGrey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                              if (state.postsError != null)
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    16,
-                                    4,
-                                    16,
-                                    0,
+                              ),
+                              if (state.showPostsEmptyState)
+                                const SliverFillRemaining(
+                                  hasScrollBody: false,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom: 100,
+                                    ), // <-- space for nav
+                                    child: CommunityPostsEmptyState(),
                                   ),
-                                  child: Text(
-                                    state.postsError!,
-                                    style: const TextStyle(
-                                      color: AppColors.textGrey,
-                                      fontSize: 12,
-                                    ),
+                                )
+                              else
+                                SliverPadding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 100,
+                                  ), // <-- space for nav
+                                  sliver: SliverList(
+                                    delegate: SliverChildBuilderDelegate((
+                                      context,
+                                      index,
+                                    ) {
+                                      final post = cubit.posts[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                          12,
+                                          8,
+                                          12,
+                                          16,
+                                        ),
+                                        child: PostCard(
+                                          post: post,
+                                          onLike: () {
+                                            _toggleLike(context, cubit, post);
+                                          },
+                                          onDelete: () =>
+                                              _deletePost(context, cubit, post),
+                                          // Placeholders: no comments/share screens in Figma.
+                                          onComments: () {},
+                                          onShare: () {},
+                                        ),
+                                      );
+                                    }, childCount: cubit.posts.length),
                                   ),
                                 ),
                             ],
                           ),
                         ),
-                        if (state.showPostsEmptyState)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                bottom: 100,
-                              ), // <-- space for nav
-                              child: CommunityPostsEmptyState(),
-                            ),
-                          )
-                        else
-                          SliverPadding(
-                            padding: const EdgeInsets.only(
-                              bottom: 100,
-                            ), // <-- space for nav
-                            sliver: SliverList(
-                              delegate: SliverChildBuilderDelegate((
-                                context,
-                                index,
-                              ) {
-                                final post = cubit.posts[index];
-                                return Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    12,
-                                    8,
-                                    12,
-                                    16,
-                                  ),
-                                  child: PostCard(
-                                    post: post,
-                                    onLike: () {
-                                      _toggleLike(context, cubit, post);
-                                    },
-                                    onDelete: () =>
-                                        _deletePost(context, cubit, post),
-                                    // Placeholders: no comments/share screens in Figma.
-                                    onComments: () {},
-                                    onShare: () {},
-                                  ),
-                                );
-                              }, childCount: cubit.posts.length),
-                            ),
-                          ),
                       ],
                     ),
-                  ),
-                ],
-              ),
             ),
             bottomNavigationBar: AppBottomNav(
               currentIndex: 3,
@@ -397,4 +410,81 @@ class _CommunityScreenState extends State<CommunityScreen>
       ),
     );
   }
+}
+
+class _CommunitySkeleton extends StatelessWidget {
+  const _CommunitySkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
+            child: Row(
+              children: const [
+                ShimmerLine(width: 150, height: 28),
+                Spacer(),
+                ShimmerCircle(size: 38),
+              ],
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 112,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              itemCount: 5,
+              separatorBuilder: (_, _) => const SizedBox(width: 14),
+              itemBuilder: (_, _) => const Column(
+                children: [
+                  ShimmerCircle(size: 66),
+                  SizedBox(height: 8),
+                  ShimmerLine(width: 56, height: 10),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (_, _) => Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+              child: ShimmerCard(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    ShimmerBox(
+                      width: double.infinity,
+                      height: 210,
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      children: [
+                        ShimmerCircle(size: 38),
+                        SizedBox(width: 10),
+                        Expanded(child: ShimmerLine(width: 150)),
+                      ],
+                    ),
+                    SizedBox(height: 14),
+                    ShimmerLine(width: 200, height: 13),
+                    SizedBox(height: 8),
+                    ShimmerLine(height: 11),
+                    SizedBox(height: 8),
+                    ShimmerLine(width: 240, height: 11),
+                  ],
+                ),
+              ),
+            ),
+            childCount: 2,
+          ),
+        ),
+      ],
+    ),
+  );
 }

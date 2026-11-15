@@ -23,7 +23,6 @@ import '../../features/tourist/trips/models/trip.dart';
 import '../../features/tourist/trips/view/trips_screen.dart';
 import '../../features/tourist/trip_details/cubit/trip_details_cubit.dart';
 import '../../features/tourist/trip_details/view/trip_details_screen.dart';
-import '../../features/tourist/my_trips/cubit/my_trips_cubit.dart';
 import '../../features/tourist/my_trips/view/my_trips_screen.dart';
 import '../../features/tourist/popular/cubit/popular_cubit.dart';
 import '../../features/tourist/popular/view/popular_trips_screen.dart';
@@ -79,10 +78,14 @@ class AppRoutes {
 
   static Route<void> tripDetails(Trip trip, {bool isBooked = false}) {
     return MaterialPageRoute(
-      builder: (_) => BlocProvider(
-        create: (_) => TripDetailsCubit()..loadTrip(trip),
-        child: TripDetailsScreen(trip: trip, isBooked: isBooked),
-      ),
+      builder: (context) {
+        final cubit = context.read<TripDetailsCubit>();
+        cubit.loadTrip(trip);
+        return BlocProvider.value(
+          value: cubit,
+          child: TripDetailsScreen(trip: trip, isBooked: isBooked),
+        );
+      },
     );
   }
 
@@ -96,12 +99,7 @@ class AppRoutes {
   }
 
   static Route<void> myTrips() {
-    return MaterialPageRoute(
-      builder: (_) => BlocProvider(
-        create: (_) => MyTripsCubit(),
-        child: const MyTripsScreen(),
-      ),
-    );
+    return MaterialPageRoute(builder: (_) => const MyTripsScreen());
   }
 
   static Route<void> guideDashboard() {

@@ -6,6 +6,7 @@ import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../community/view/community_view.dart';
@@ -48,6 +49,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
   }
 
   Future<void> _confirmDelete(Trip trip) async {
+    final cubit = context.read<MyTripsCubit>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -70,9 +72,19 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
         ],
       ),
     );
-    if (confirmed != true || !context.mounted) return;
-    context.read<MyTripsCubit>().refresh();
-    if (!context.mounted) return;
+    if (confirmed != true || !mounted) return;
+    try {
+      await cubit.cancelBooking(trip);
+    } catch (_) {
+      if (!mounted) return;
+      showAppSnackBar(
+        context,
+        'Could not cancel this booking. Please try again.',
+        icon: Icons.error_outline,
+      );
+      return;
+    }
+    if (!mounted) return;
     showAppSnackBar(
       context,
       'booking cancelled; the team will handle the refund (test payment)',
@@ -167,8 +179,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                   builder: (context, state) {
                     if (state is! MyTripsSuccess) {
                       return state is MyTripsError
-                          ? AppErrorView(message: state.error)
-                          : const AppLoadingView();
+                          ? AppErrorView(
+                              message: state.error,
+                              onRetry: context.read<MyTripsCubit>().refresh,
+                            )
+                          : const _MyTripsSkeleton();
                     }
                     final trips = state.trips;
                     if (trips.isEmpty) {
@@ -184,7 +199,9 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                       separatorBuilder: (_, _) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final trip = trips[index];
-                        final isPrivate = MyBookingsPublic.isPrivate(trip.id);
+                        final isPrivate =
+                            trip.category == 'private' ||
+                            MyBookingsPublic.isPrivate(trip.id);
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -261,6 +278,67 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
             Navigator.pushNamed(context, AppRoutes.profile);
           }
         },
+      ),
+    );
+  }
+}
+
+class _MyTripsSkeleton extends StatelessWidget {
+  const _MyTripsSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppShimmer(
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
+        itemCount: 3,
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
+        itemBuilder: (context, index) => Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 6),
+              child: Row(
+                children: const [
+                  ShimmerBox(width: 92, height: 26),
+                  Spacer(),
+                  ShimmerBox(width: 34, height: 34),
+                ],
+              ),
+            ),
+            ShimmerCard(
+              radius: 16,
+              child: Row(
+                children: [
+                  const ShimmerBox(
+                    width: 105,
+                    height: 148,
+                    borderRadius: BorderRadius.horizontal(
+                      left: Radius.circular(16),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          ShimmerLine(width: 130, height: 14),
+                          SizedBox(height: 10),
+                          ShimmerLine(width: 100, height: 11),
+                          SizedBox(height: 8),
+                          ShimmerLine(width: 120, height: 11),
+                          SizedBox(height: 18),
+                          ShimmerLine(width: 70, height: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

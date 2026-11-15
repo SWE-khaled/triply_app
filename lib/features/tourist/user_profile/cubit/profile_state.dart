@@ -1,3 +1,5 @@
+import '../../community/model/community_post.dart';
+
 class ProfileState {
   final bool notificationsEnabled;
   final String selectedLanguage;
@@ -8,6 +10,11 @@ class ProfileState {
   final String? bio;
   final bool isLoadingProfile;
   final String? profileError;
+  final List<CommunityPost> posts;
+  final bool isLoadingPosts;
+  final bool hasLoadedProfile;
+  final bool hasLoadedPosts;
+  final String? postsError;
 
   const ProfileState({
     this.notificationsEnabled = true,
@@ -19,6 +26,11 @@ class ProfileState {
     this.bio,
     this.isLoadingProfile = false,
     this.profileError,
+    this.posts = const [],
+    this.isLoadingPosts = false,
+    this.hasLoadedProfile = false,
+    this.hasLoadedPosts = false,
+    this.postsError,
   });
 
   ProfileState copyWith({
@@ -32,6 +44,12 @@ class ProfileState {
     bool? isLoadingProfile,
     String? profileError,
     bool clearProfileError = false,
+    List<CommunityPost>? posts,
+    bool? isLoadingPosts,
+    bool? hasLoadedProfile,
+    bool? hasLoadedPosts,
+    String? postsError,
+    bool clearPostsError = false,
   }) {
     return ProfileState(
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -45,6 +63,11 @@ class ProfileState {
       profileError: clearProfileError
           ? null
           : profileError ?? this.profileError,
+      posts: posts ?? this.posts,
+      isLoadingPosts: isLoadingPosts ?? this.isLoadingPosts,
+      hasLoadedProfile: hasLoadedProfile ?? this.hasLoadedProfile,
+      hasLoadedPosts: hasLoadedPosts ?? this.hasLoadedPosts,
+      postsError: clearPostsError ? null : postsError ?? this.postsError,
     );
   }
 }

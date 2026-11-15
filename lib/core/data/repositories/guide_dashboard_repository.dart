@@ -19,7 +19,7 @@ class GuideDashboardMetrics {
   /// How many bookings the guide ever received.
   final int totalBookings;
 
-  /// Sum of every booking total — the earnings shown on the dashboard.
+  /// Sum of successfully paid, non-cancelled bookings.
   final double totalEarnings;
 
   /// The "New bookings" rows.
@@ -80,11 +80,11 @@ class GuideDashboardRepository {
       final rows = snapshot.docs
           .map((doc) => _toBookingRequest(doc.data(), doc.id))
           .toList();
-      final earnings = snapshot.docs.fold<double>(
-        0,
-        (sum, doc) =>
-            sum + ((doc.data()['totalPrice'] as num?)?.toDouble() ?? 0),
-      );
+      final earnings = snapshot.docs.fold<double>(0, (sum, doc) {
+        final data = doc.data();
+        if (!_isEligiblePaidBooking(data)) return sum;
+        return sum + ((data['totalPrice'] as num?)?.toDouble() ?? 0);
+      });
       return GuideDashboardMetrics(
         totalBookings: snapshot.docs.length,
         totalEarnings: earnings,
@@ -204,7 +204,9 @@ class GuideDashboardRepository {
           .collection(bookingsCollection)
           .where('guideId', isEqualTo: uid)
           .get();
-      final activities = snapshot.docs.map((doc) {
+      final activities = snapshot.docs.where((doc) {
+        return _isEligiblePaidBooking(doc.data());
+      }).map((doc) {
         final data = doc.data();
         return EarningActivity(
           id: 'ea-${doc.id}',
@@ -225,6 +227,11 @@ class GuideDashboardRepository {
       return _mockEarnings();
     }
   }
+
+  bool _isEligiblePaidBooking(Map<String, dynamic> data) =>
+      data['paymentStatus'] == 'paid' &&
+      data['status'] != 'cancelled' &&
+      data['refundStatus'] != 'owed';
 
   /// Reads a booking document into a dashboard row.
   BookingRequest _toBookingRequest(Map<String, dynamic>? data, String id) {

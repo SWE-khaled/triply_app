@@ -26,7 +26,9 @@ class PublicTripsRepository {
   ///
   /// Returns null when the read failed — that is the caller's cue to
   /// fall back to the mock dataset.
-  Future<List<PublicTrip>?> fetchApprovedTrips() async {
+  Future<List<PublicTrip>?> fetchApprovedTrips({
+    bool rethrowOnError = false,
+  }) async {
     try {
       final snapshot = await _firestore
           .collection(tripsCollection)
@@ -36,6 +38,7 @@ class PublicTripsRepository {
           .map((doc) => PublicTrip.fromDocument(doc.data(), doc.id))
           .toList();
     } catch (_) {
+      if (rethrowOnError) rethrow;
       return null;
     }
   }
@@ -61,12 +64,16 @@ class PublicTripsRepository {
   }
 
   /// One trip, or null when it does not exist.
-  Future<PublicTrip?> fetchTrip(String tripId) async {
+  Future<PublicTrip?> fetchTrip(
+    String tripId, {
+    bool rethrowOnError = false,
+  }) async {
     try {
       final data = await _firestore.readDoc(tripsCollection, tripId);
       if (data == null) return null;
       return PublicTrip.fromDocument(data, tripId);
     } catch (_) {
+      if (rethrowOnError) rethrow;
       return null;
     }
   }
@@ -75,21 +82,25 @@ class PublicTripsRepository {
   ///
   /// The Firestore SDK does not accept a list of ids in a
   /// `FieldPath.documentId` query ("must provide a valid String"), so the
-  /// trips are read one by one — a tourist has only a handful of them.
-  Future<List<PublicTrip>> fetchTripsByIds(List<String> tripIds) async {
+  /// trips are fetched concurrently — each booking needs its own trip read.
+  Future<List<PublicTrip>> fetchTripsByIds(
+    List<String> tripIds, {
+    bool rethrowOnError = false,
+  }) async {
     final wanted = tripIds.where((id) => id.isNotEmpty).toSet().toList();
     if (wanted.isEmpty) return const [];
-    final trips = <PublicTrip>[];
-    for (final id in wanted) {
-      try {
-        final data = await _firestore.readDoc(tripsCollection, id);
-        if (data == null) continue;
-        trips.add(PublicTrip.fromDocument(data, id));
-      } catch (_) {
-        // One missing trip must not lose the others.
-        continue;
-      }
+    try {
+      final trips = await Future.wait(
+        wanted.map((id) async {
+          final data = await _firestore.readDoc(tripsCollection, id);
+          if (data == null) return null;
+          return PublicTrip.fromDocument(data, id);
+        }),
+      );
+      return trips.whereType<PublicTrip>().toList();
+    } catch (_) {
+      if (rethrowOnError) rethrow;
+      return const [];
     }
-    return trips;
   }
 }

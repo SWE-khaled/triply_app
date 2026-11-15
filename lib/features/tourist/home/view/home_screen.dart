@@ -11,6 +11,7 @@ import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
 import '../../user_profile/view/profile_screen.dart';
@@ -32,21 +33,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final HomeCubit controller;
-
-  @override
-  void initState() {
-    super.initState();
-    // Owned here (like the old controller) so helpers keep working
-    // unchanged; provided below for BlocBuilder rebuilds.
-    controller = HomeCubit();
-  }
-
-  @override
-  void dispose() {
-    controller.close();
-    super.dispose();
-  }
+  HomeCubit get controller => context.read<HomeCubit>();
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +41,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final photoUrl = user?.photoURL;
     final name = user?.displayName ?? '';
 
-    return BlocProvider.value(
-      value: controller,
-      child: Scaffold(
-        extendBody: true,
-        body: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, _) => SingleChildScrollView(
+    return Scaffold(
+      extendBody: true,
+      body: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          if (state is HomeInitial || state is HomeLoading) {
+            return const _HomeSkeleton();
+          }
+          if (state is HomeError) {
+            return AppErrorView(message: state.error, onRetry: controller.load);
+          }
+          if (state is! HomeSuccess) return const _HomeSkeleton();
+          return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -83,9 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: controller.places.length,
+                    itemCount: state.places.length,
                     itemBuilder: (context, i) {
-                      final place = controller.places[i];
+                      final place = state.places[i];
                       return PlaceCard(
                         place: place,
                         onTap: () {
@@ -121,44 +114,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: BlocBuilder<HomeCubit, HomeState>(
-                    builder: (context, state) {
-                      if (state is HomeError) {
-                        return AppErrorView(
-                          message: state.error,
-                          onRetry: controller.load,
-                        );
-                      }
-                      if (state is! HomeSuccess) {
-                        return const SizedBox(
-                          height: 96,
-                          child: AppLoadingView(),
-                        );
-                      }
-                      if (state.guides.isEmpty) {
-                        return const _SectionEmpty(
+                  child: state.guides.isEmpty
+                      ? const _SectionEmpty(
                           icon: Icons.person_search_outlined,
                           message: 'No guides published yet — check back soon!',
-                        );
-                      }
-                      return Column(
-                        children: [
-                          for (final guide in state.guides)
-                            GuideTile(
-                              guide: guide,
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        GuideProfileScreen(guideId: guide.id),
-                                  ),
-                                );
-                              },
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+                        )
+                      : Column(
+                          children: [
+                            for (final guide in state.guides)
+                              GuideTile(
+                                guide: guide,
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          GuideProfileScreen(guideId: guide.id),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ),
                 ),
                 const SizedBox(height: 12),
                 Padding(
@@ -172,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                controller.trips.isEmpty
+                state.trips.isEmpty
                     ? const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: _SectionEmpty(
@@ -186,9 +162,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: controller.trips.length,
+                          itemCount: state.trips.length,
                           itemBuilder: (context, i) {
-                            final trip = controller.trips[i];
+                            final trip = state.trips[i];
                             return TripCard(
                               trip: trip,
                               onTap: () => _openTripDetails(context, trip),
@@ -224,88 +200,86 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 84),
               ],
             ),
-          ),
-        ),
-        floatingActionButton: ChatUnreadBuilder(
-          builder: (context, unread) => Stack(
-            clipBehavior: Clip.none,
-            children: [
-              SizedBox(
-                width: 60,
-                height: 60,
-                child: FloatingActionButton(
-                  key: const Key('home-chat-button'),
-                  tooltip: 'Messages',
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  elevation: 8,
-                  shape: const CircleBorder(),
-                  onPressed: () =>
-                      Navigator.of(context).push(AppRoutes.chatList()),
-                  child: const Icon(Icons.chat_bubble_outline, size: 25),
-                ),
+          );
+        },
+      ),
+      floatingActionButton: ChatUnreadBuilder(
+        builder: (context, unread) => Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: FloatingActionButton(
+                key: const Key('home-chat-button'),
+                tooltip: 'Messages',
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 8,
+                shape: const CircleBorder(),
+                onPressed: () =>
+                    Navigator.of(context).push(AppRoutes.chatList()),
+                child: const Icon(Icons.chat_bubble_outline, size: 25),
               ),
-              if (unread > 0)
-                Positioned(
-                  top: -6,
-                  right: -6,
-                  child: IgnorePointer(
-                    child: Container(
-                      key: const Key('home-chat-badge'),
-                      constraints: const BoxConstraints(
-                        minWidth: 26,
-                        minHeight: 26,
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.accentOrange,
-                        shape: unread > 99
-                            ? BoxShape.rectangle
-                            : BoxShape.circle,
-                        borderRadius: unread > 99
-                            ? BorderRadius.circular(13)
-                            : null,
-                        border: Border.all(color: Colors.white, width: 3),
-                      ),
-                      child: Text(
-                        unread > 99 ? '99+' : '$unread',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          height: 1,
-                        ),
+            ),
+            if (unread > 0)
+              Positioned(
+                top: -6,
+                right: -6,
+                child: IgnorePointer(
+                  child: Container(
+                    key: const Key('home-chat-badge'),
+                    constraints: const BoxConstraints(
+                      minWidth: 26,
+                      minHeight: 26,
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.accentOrange,
+                      shape: unread > 99 ? BoxShape.rectangle : BoxShape.circle,
+                      borderRadius: unread > 99
+                          ? BorderRadius.circular(13)
+                          : null,
+                      border: Border.all(color: Colors.white, width: 3),
+                    ),
+                    child: Text(
+                      unread > 99 ? '99+' : '$unread',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1,
                       ),
                     ),
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
-        bottomNavigationBar: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, _) => AppBottomNav(
-            currentIndex: controller.bottomNavIndex,
-            onTap: (index) {
-              if (index == 0) {
-                controller.setBottomNavIndex(index);
-              } else if (index == 1) {
-                Navigator.of(context).push(AppRoutes.myTrips());
-              } else if (index == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: ((context) => MapScreen())),
-                ); //map
-              } else if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: ((context) => CommunityScreen())),
-                ); //community
-              } else if (index == 4) {
-                Navigator.pushNamed(context, AppRoutes.profile);
-              }
-            },
-          ),
+      ),
+      bottomNavigationBar: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, _) => AppBottomNav(
+          currentIndex: controller.bottomNavIndex,
+          onTap: (index) {
+            if (index == 0) {
+              controller.setBottomNavIndex(index);
+            } else if (index == 1) {
+              Navigator.of(context).push(AppRoutes.myTrips());
+            } else if (index == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: ((context) => MapScreen())),
+              ); //map
+            } else if (index == 3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: ((context) => CommunityScreen())),
+              ); //community
+            } else if (index == 4) {
+              Navigator.pushNamed(context, AppRoutes.profile);
+            }
+          },
         ),
       ),
     );
@@ -453,6 +427,135 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+class _HomeSkeleton extends StatelessWidget {
+  const _HomeSkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ShimmerCard(
+            radius: 24,
+            child: SizedBox(
+              height: 245,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    ShimmerLine(width: 145, height: 28),
+                    SizedBox(height: 48),
+                    ShimmerLine(width: 190, height: 12),
+                    SizedBox(height: 8),
+                    ShimmerLine(width: 230, height: 22),
+                    SizedBox(height: 18),
+                    ShimmerBox(
+                      width: double.infinity,
+                      height: 44,
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const _HomeSectionSkeleton(titleWidth: 140),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 190,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: 3,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (_, _) => const SizedBox(
+                width: 150,
+                child: ShimmerCard(
+                  child: ShimmerBox(
+                    width: 150,
+                    height: 190,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          const _HomeSectionSkeleton(titleWidth: 110),
+          const SizedBox(height: 12),
+          for (var i = 0; i < 2; i++)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: ShimmerCard(
+                padding: EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    ShimmerCircle(size: 44),
+                    SizedBox(width: 12),
+                    Expanded(child: ShimmerLine(height: 13)),
+                  ],
+                ),
+              ),
+            ),
+          const SizedBox(height: 22),
+          const _HomeSectionSkeleton(titleWidth: 130),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 180,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: 2,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (_, _) => const SizedBox(
+                width: 220,
+                child: ShimmerCard(
+                  child: ShimmerBox(
+                    width: 220,
+                    height: 180,
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: ShimmerBox(
+              width: double.infinity,
+              height: 120,
+              borderRadius: BorderRadius.all(Radius.circular(18)),
+            ),
+          ),
+          const SizedBox(height: 96),
+        ],
+      ),
+    ),
+  );
+}
+
+class _HomeSectionSkeleton extends StatelessWidget {
+  const _HomeSectionSkeleton({required this.titleWidth});
+
+  final double titleWidth;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Row(
+      children: [
+        ShimmerLine(width: titleWidth, height: 18),
+        const Spacer(),
+        const ShimmerLine(width: 48, height: 12),
+      ],
+    ),
+  );
 }
 
 /// The friendly placeholder shown when a home section has no data yet

@@ -13,6 +13,14 @@ class TouristBooking {
   /// The title of the trip at the time of the booking.
   final String tourTitle;
 
+  /// Whether this booking is for a guide rather than a published trip.
+  final bool isPrivate;
+
+  final String guideId;
+  final String guideName;
+  final String imageUrl;
+  final String dateLabel;
+
   /// How many seats were taken.
   final int seats;
 
@@ -39,6 +47,11 @@ class TouristBooking {
     required this.seats,
     required this.totalPrice,
     required this.status,
+    this.isPrivate = false,
+    this.guideId = '',
+    this.guideName = '',
+    this.imageUrl = '',
+    this.dateLabel = '',
     this.paymentStatus = '',
     this.expiresAt,
     this.endAt,
@@ -62,13 +75,39 @@ class TouristBooking {
     // `traveler_count` — the raw document decides, not the defaults.
     final seats =
         (data?['seats'] as num?) ?? (data?['traveler_count'] as num?) ?? 0;
+    final tripId = (merged['tripId'] as String?) ?? '';
+    final tourTitle = (merged['tour_title'] as String?) ?? '';
+    final rawGuideName = (data?['guideName'] as String?)?.trim() ?? '';
+    final guideName = rawGuideName.isNotEmpty
+        ? rawGuideName
+        : tourTitle.startsWith('Private tour with ')
+        ? tourTitle.substring('Private tour with '.length)
+        : '';
+    final startAt = merged['startAt'] is Timestamp
+        ? (merged['startAt'] as Timestamp).toDate()
+        : null;
+    final storedDateLabel = (data?['datetime_label'] as String?)?.trim() ?? '';
+    final dateLabel = storedDateLabel.isNotEmpty
+        ? storedDateLabel
+        : startAt == null
+        ? ''
+        : '${startAt.year}-'
+              '${startAt.month.toString().padLeft(2, '0')}-'
+              '${startAt.day.toString().padLeft(2, '0')}';
     return TouristBooking(
       id: id,
-      tripId: (merged['tripId'] as String?) ?? '',
-      tourTitle: (merged['tour_title'] as String?) ?? '',
+      tripId: tripId,
+      tourTitle: tourTitle,
       seats: seats.toInt(),
       totalPrice: ((merged['totalPrice'] as num?) ?? 0).toDouble(),
       status: (merged['status'] as String?) ?? '',
+      isPrivate:
+          data?['is_private'] == true ||
+          (tripId.isEmpty && tourTitle.isNotEmpty),
+      guideId: (data?['guideId'] as String?) ?? '',
+      guideName: guideName,
+      imageUrl: (data?['guide_image_url'] as String?) ?? '',
+      dateLabel: dateLabel,
       paymentStatus: (merged['paymentStatus'] as String?) ?? '',
       expiresAt: merged['expiresAt'] is Timestamp
           ? (merged['expiresAt'] as Timestamp).toDate()

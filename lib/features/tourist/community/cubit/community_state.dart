@@ -10,8 +10,10 @@ class CommunityState {
 
   final List<CommunityPost> posts;
   final bool isLoadingStories;
+  final bool hasLoadedStories;
   final String? storiesError;
   final bool isLoadingPosts;
+  final bool hasLoadedPosts;
   final String? postsError;
 
   const CommunityState({
@@ -19,8 +21,10 @@ class CommunityState {
     required this.myStories,
     required this.posts,
     this.isLoadingStories = false,
+    this.hasLoadedStories = false,
     this.storiesError,
     this.isLoadingPosts = false,
+    this.hasLoadedPosts = false,
     this.postsError,
   });
 
@@ -34,9 +38,11 @@ class CommunityState {
     List<CommunityStory>? myStories,
     List<CommunityPost>? posts,
     bool? isLoadingStories,
+    bool? hasLoadedStories,
     String? storiesError,
     bool clearStoriesError = false,
     bool? isLoadingPosts,
+    bool? hasLoadedPosts,
     String? postsError,
     bool clearPostsError = false,
   }) {
@@ -45,10 +51,12 @@ class CommunityState {
       myStories: myStories ?? this.myStories,
       posts: posts ?? this.posts,
       isLoadingStories: isLoadingStories ?? this.isLoadingStories,
+      hasLoadedStories: hasLoadedStories ?? this.hasLoadedStories,
       storiesError: clearStoriesError
           ? null
           : (storiesError ?? this.storiesError),
       isLoadingPosts: isLoadingPosts ?? this.isLoadingPosts,
+      hasLoadedPosts: hasLoadedPosts ?? this.hasLoadedPosts,
       postsError: clearPostsError ? null : (postsError ?? this.postsError),
     );
   }

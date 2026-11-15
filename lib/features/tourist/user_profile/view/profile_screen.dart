@@ -4,14 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/profile_avatar.dart';
+import '../../../../core/widgets/state_views.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
-import '../../../common/auth/data/auth_repository.dart';
 import '../../community/view/community_view.dart';
+import '../../community/data/community_posts_repository.dart';
 import '../../home/view/home_screen.dart';
 import '../../map/view/map_view.dart';
-import '../../../tourist/community/data/community_posts_repository.dart';
 import '../../../tourist/community/model/community_post.dart';
 import '../../../tourist/community/widget/post_images.dart';
 import '../cubit/profile_cubit.dart';
@@ -26,16 +27,9 @@ const _muted = Color(0xFF62777D);
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
   @override
-  Widget build(BuildContext context) => BlocProvider(
-    create: (context) {
-      final uid =
-          context.read<AuthCubit>().user?.uid ??
-          AuthRepository().currentUser?.uid;
-      return ProfileCubit(userId: uid);
-    },
-    child: const _ProfileBody(),
-  );
+  Widget build(BuildContext context) => const _ProfileBody();
 }
 
 class _ProfileBody extends StatefulWidget {
@@ -45,9 +39,6 @@ class _ProfileBody extends StatefulWidget {
 }
 
 class _ProfileBodyState extends State<_ProfileBody> {
-  late final Stream<List<CommunityPost>> _posts =
-      FirestoreCommunityPostsRepository().watchMyPosts();
-
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthCubit>().user;
@@ -72,6 +63,20 @@ class _ProfileBodyState extends State<_ProfileBody> {
             .where((s) => s.isNotEmpty)
             .join(', ');
         final bio = state.bio?.trim() ?? '';
+        final posts = state.posts;
+        final mine = user == null
+            ? <CommunityPost>[]
+            : posts
+                  .where(
+                    (post) =>
+                        post.authorId.isNotEmpty && post.authorId == user.uid,
+                  )
+                  .toList();
+        final initialError = !state.hasLoadedProfile
+            ? state.profileError
+            : !state.hasLoadedPosts
+            ? state.postsError
+            : null;
         return Scaffold(
           extendBody: true,
           backgroundColor: Colors.white,
@@ -114,138 +119,120 @@ class _ProfileBodyState extends State<_ProfileBody> {
               const SizedBox(width: 4),
             ],
           ),
-          body: StreamBuilder<List<CommunityPost>>(
-            stream: _posts,
-            builder: (context, postsSnapshot) {
-              final posts = postsSnapshot.data ?? const <CommunityPost>[];
-              final mine = user == null
-                  ? <CommunityPost>[]
-                  : posts
-                        .where(
-                          (post) =>
-                              post.authorId.isNotEmpty &&
-                              post.authorId == user.uid,
-                        )
-                        .toList();
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-                children: [
-                  Row(
-                    children: [
-                      ClipOval(child: ProfileAvatar(imageUrl: photo, size: 66)),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: _ink,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              location.isEmpty
-                                  ? 'Location not added'
-                                  : location,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: _muted,
-                              ),
-                            ),
-                          ],
+          body: !state.hasLoadedProfile || !state.hasLoadedPosts
+              ? initialError != null
+                    ? AppErrorView(
+                        message: initialError,
+                        onRetry: cubit.retryInitialLoad,
+                      )
+                    : const _ProfileSkeleton()
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                  children: [
+                    Row(
+                      children: [
+                        ClipOval(
+                          child: ProfileAvatar(imageUrl: photo, size: 66),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  _stats(
-                    cubit.stats,
-                    postCount: postsSnapshot.hasData && !postsSnapshot.hasError
-                        ? mine.length
-                        : null,
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Bio',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      color: _ink,
-                    ),
-                  ),
-                  const SizedBox(height: 7),
-                  Text(
-                    state.isLoadingProfile
-                        ? 'Loading bio…'
-                        : bio.isEmpty
-                        ? 'No bio added yet.'
-                        : bio,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      height: 1.5,
-                      color: _muted,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'Published posts',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: _ink,
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: _ink,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                location.isEmpty
+                                    ? 'Location not added'
+                                    : location,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: _muted,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _stats(cubit.stats, postCount: mine.length),
+                    const SizedBox(height: 18),
+                    const Text(
+                      'Bio',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: _ink,
                       ),
-                      TextButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const MyPostsScreen(),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      state.isLoadingProfile
+                          ? 'Loading bio…'
+                          : bio.isEmpty
+                          ? 'No bio added yet.'
+                          : bio,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        height: 1.5,
+                        color: _muted,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Published posts',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: _ink,
+                            ),
                           ),
                         ),
-                        child: const Row(
-                          children: [
-                            Text(
-                              'View all',
-                              style: TextStyle(color: _teal, fontSize: 12),
+                        TextButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const MyPostsScreen(),
                             ),
-                            SizedBox(width: 5),
-                            Icon(Icons.arrow_forward, color: _teal, size: 16),
-                          ],
+                          ),
+                          child: const Row(
+                            children: [
+                              Text(
+                                'View all',
+                                style: TextStyle(color: _teal, fontSize: 12),
+                              ),
+                              SizedBox(width: 5),
+                              Icon(Icons.arrow_forward, color: _teal, size: 16),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  if (postsSnapshot.hasError)
-                    _info('Could not load published posts.')
-                  else if (!postsSnapshot.hasData)
-                    const Padding(
-                      padding: EdgeInsets.all(22),
-                      child: Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  else if (mine.isEmpty)
-                    _info('You have no published posts yet.')
-                  else
-                    ProfilePostCard(
-                      post: mine.first,
-                      compact: true,
-                      authorAvatarUrl: photo ?? '',
-                      onDelete: null,
-                      onShare: () => shareProfilePost(context, mine.first),
+                      ],
                     ),
-                ],
-              );
-            },
-          ),
+                    if (state.postsError != null)
+                      _info(state.postsError!)
+                    else if (mine.isEmpty)
+                      _info('You have no published posts yet.')
+                    else
+                      ProfilePostCard(
+                        post: mine.first,
+                        compact: true,
+                        authorAvatarUrl: photo ?? '',
+                        onDelete: null,
+                        onShare: () => shareProfilePost(context, mine.first),
+                      ),
+                  ],
+                ),
           bottomNavigationBar: AppBottomNav(
             currentIndex: 4,
             onTap: (index) {
@@ -351,6 +338,73 @@ class _ProfileBodyState extends State<_ProfileBody> {
   );
   void _message(String text) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+}
+
+class _ProfileSkeleton extends StatelessWidget {
+  const _ProfileSkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      children: [
+        const Row(
+          children: [
+            ShimmerCircle(size: 66),
+            SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ShimmerLine(width: 130, height: 16),
+                  SizedBox(height: 8),
+                  ShimmerLine(width: 96, height: 12),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        const ShimmerCard(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            children: [
+              Expanded(child: Center(child: ShimmerLine(width: 32))),
+              Expanded(child: Center(child: ShimmerLine(width: 32))),
+              Expanded(child: Center(child: ShimmerLine(width: 32))),
+              Expanded(child: Center(child: ShimmerLine(width: 32))),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        const ShimmerLine(width: 44, height: 16),
+        const SizedBox(height: 10),
+        const ShimmerLine(height: 12),
+        const SizedBox(height: 7),
+        const ShimmerLine(width: 230, height: 12),
+        const SizedBox(height: 20),
+        const ShimmerLine(width: 150, height: 16),
+        const SizedBox(height: 12),
+        const ShimmerCard(
+          padding: EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ShimmerBox(
+                width: double.infinity,
+                height: 120,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              SizedBox(height: 12),
+              ShimmerLine(width: 120, height: 13),
+              SizedBox(height: 8),
+              ShimmerLine(width: 190, height: 12),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class ProfilePostCard extends StatelessWidget {
