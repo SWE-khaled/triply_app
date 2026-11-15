@@ -16,7 +16,7 @@ class PublicGuide {
   final double rating;
   final int reviewCount;
 
-  /// The guide's hourly rate in EGP.
+  /// The guide's hourly rate.
   final double pricePerHour;
 
   final String currency;
@@ -54,11 +54,12 @@ class PublicGuide {
       'rating': 0,
       'reviewCount': 0,
       'pricePerHour': 0,
-      'currency': '\$',
+      'currency': 'EGP',
       'isApproved': false,
       ...?data,
     };
     merged['id'] = id;
+    final currency = merged['currency'] as String?;
     return PublicGuide(
       id: id,
       name: (merged['name'] as String?) ?? '',
@@ -71,7 +72,7 @@ class PublicGuide {
       rating: ((merged['rating'] as num?) ?? 0).toDouble(),
       reviewCount: ((merged['reviewCount'] as num?) ?? 0).toInt(),
       pricePerHour: ((merged['pricePerHour'] as num?) ?? 0).toDouble(),
-      currency: (merged['currency'] as String?) ?? '\$',
+      currency: currency == null || currency.trim().isEmpty ? 'EGP' : currency,
       isApproved: (merged['isApproved'] as bool?) ?? false,
     );
   }

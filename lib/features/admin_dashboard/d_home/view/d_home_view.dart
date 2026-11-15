@@ -9,6 +9,7 @@ import '../../d_overview/view/d_overview_view.dart';
 import '../../d_trips/view/d_trips_view.dart';
 import '../../d_users/view/d_users_view.dart';
 import '../../d_bookings/view/d_bookings_view.dart';
+import '../../d_reports/view/d_reports_view.dart';
 import '../../d_user_posts/view/d_user_posts_view.dart';
 import '../../d_guides/view/d_guides_view.dart';
 import '../../d_trip_applications/view/d_trip_applications_view.dart';
@@ -32,6 +33,7 @@ class _HomeViewState extends State<HomeView> {
     'Trips',
     'Users',
     'Bookings',
+    'Chat Reports',
     'User Posts',
     'Guides',
     'Trip Applications',
@@ -43,6 +45,7 @@ class _HomeViewState extends State<HomeView> {
     TripsView(),
     UsersView(),
     BookingsView(),
+    ReportsView(),
     UserPostsView(),
     GuidesView(),
     TripApplicationsView(),

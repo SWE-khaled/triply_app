@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:triply/features/tourist/checkout/paymob_mobile_viewport_js.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -13,12 +15,14 @@ class VisaScreen extends StatefulWidget {
     required this.iframeId,
     required this.onFinished,
     required this.onError,
+    required this.onDiagnostic,
   });
 
   final String finalToken;
   final String iframeId;
   final VoidCallback onFinished;
   final VoidCallback onError;
+  final ValueChanged<String> onDiagnostic;
 
   @override
   State<VisaScreen> createState() => _VisaScreenState();
@@ -47,27 +51,55 @@ class _VisaScreenState extends State<VisaScreen> {
             if (url.contains('success=true') && !url.contains('iframes')) {
               if (!_succeeded) {
                 _succeeded = true;
+                widget.onDiagnostic('payment_callback_success');
                 widget.onFinished();
               }
             } else if (url.contains('success=false') && !_failed) {
               _failed = true;
+              widget.onDiagnostic('payment_callback_failure');
               widget.onError();
             }
             return NavigationDecision.navigate;
           },
+          onPageStarted: (_) {
+            widget.onDiagnostic('page_started');
+          },
           onPageFinished: (_) {
-            _controller
-                .runJavaScript(paymobMobileViewportJs)
-                .catchError((_) {});
+            widget.onDiagnostic('page_finished');
+            _controller.runJavaScript(paymobMobileViewportJs).catchError((
+              Object error,
+            ) {
+              widget.onDiagnostic(
+                'viewport_script_failed exception=${error.runtimeType}',
+              );
+            });
+          },
+          onHttpError: (error) {
+            widget.onDiagnostic(
+              'http_error status=${error.response?.statusCode ?? 'unknown'}',
+            );
+          },
+          onWebResourceError: (error) {
+            widget.onDiagnostic('resource_error code=${error.errorCode}');
           },
         ),
-      )
-      ..loadRequest(
-        Uri.parse(
-          'https://accept.paymob.com/api/acceptance/iframes/'
-          '${widget.iframeId}?payment_token=${widget.finalToken}',
-        ),
       );
+    widget.onDiagnostic('load_request_started');
+    unawaited(
+      _controller
+          .loadRequest(
+            Uri.parse(
+              'https://accept.paymob.com/api/acceptance/iframes/'
+              '${widget.iframeId}?payment_token=${widget.finalToken}',
+            ),
+          )
+          .then((_) => widget.onDiagnostic('load_request_succeeded'))
+          .catchError((Object error) {
+            widget.onDiagnostic(
+              'load_request_failed exception=${error.runtimeType}',
+            );
+          }),
+    );
   }
 
   @override

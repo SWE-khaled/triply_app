@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
-import '../../../../core/data/mock/tourist/mock_guides.dart';
 import '../../../common/auth/data/auth_repository.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -123,13 +122,10 @@ class TripDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _openGuideProfile(BuildContext context, String guideName) {
-    final guide = mockGuides.firstWhere(
-      (g) => g.name == guideName,
-      orElse: () => mockGuides.first,
-    );
+  void _openGuideProfile(BuildContext context, String guideId) {
+    if (guideId.isEmpty) return;
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => GuideProfileScreen(guideId: guide.id)),
+      MaterialPageRoute(builder: (_) => GuideProfileScreen(guideId: guideId)),
     );
   }
 
@@ -198,14 +194,18 @@ class TripDetailsScreen extends StatelessWidget {
                         ],
                         const SizedBox(height: 14),
                         FutureBuilder<String?>(
-                          future: AuthRepository().getGuidePhoneByName(
-                            details.guideName,
-                          ),
+                          future: details.guideId.isEmpty
+                              ? Future<String?>.value(null)
+                              : AuthRepository().getUserPhone(details.guideId),
                           builder: (context, snapshot) => GuideCard(
                             details: details,
                             guidePhone: snapshot.data,
-                            onTap: () =>
-                                _openGuideProfile(context, details.guideName),
+                            onTap: details.guideId.isEmpty
+                                ? null
+                                : () => _openGuideProfile(
+                                    context,
+                                    details.guideId,
+                                  ),
                           ),
                         ),
                         if (isBooked) ...[

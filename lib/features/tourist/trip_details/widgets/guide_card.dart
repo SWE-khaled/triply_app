@@ -5,7 +5,7 @@ import '../model/trip_details.dart';
 
 class GuideCard extends StatelessWidget {
   final TripDetails details;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   /// Registered guide phone from Firestore; row hidden when null/empty.
   final String? guidePhone;

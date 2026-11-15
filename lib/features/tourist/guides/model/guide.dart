@@ -14,7 +14,7 @@ class Guide {
   final double rating;
   final int reviewCount;
   final double pricePerHour;
-  final String currency; // e.g. "\$" — locked display rule for list
+  final String currency; // e.g. "EGP" or a currency symbol
   final bool isVerified;
 
   const Guide({
@@ -53,6 +53,7 @@ class Guide {
   }
 
   factory Guide.fromJson(Map<String, dynamic> json) {
+    final currency = json['currency'] as String?;
     return Guide(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -67,9 +68,14 @@ class Guide {
       rating: (json['rating'] as num? ?? 0).toDouble(),
       reviewCount: (json['review_count'] as num? ?? 0).toInt(),
       pricePerHour: (json['price_per_hour'] as num? ?? 0).toDouble(),
-      currency: json['currency'] as String? ?? '\$',
+      currency: currency == null || currency.trim().isEmpty ? 'EGP' : currency,
       isVerified: json['is_verified'] as bool? ?? true,
     );
+  }
+
+  String formatPrice(double amount) {
+    final value = amount.toStringAsFixed(0);
+    return currency.length > 1 ? '$currency $value' : '$currency$value';
   }
 
   Map<String, dynamic> toJson() {

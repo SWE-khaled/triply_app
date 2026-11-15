@@ -94,6 +94,7 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
       MaterialPageRoute(
         builder: (_) => PaymentView(
           price: cubit.total(details.priceEgp),
+          flow: PaymentFlow.publicBooking,
           onPaymentSuccess: () async {
             if (!mounted) return;
             await cubit.confirmPayment(
@@ -238,46 +239,6 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                   seats: state.seats,
                   fee: cubit.fee(details.priceEgp),
                   total: total,
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.cardBorder),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Payment method',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.title,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          ChoiceChip(
-                            label: const Text('Card'),
-                            selected: state.paymentMethod == 'card',
-                            onSelected: (_) =>
-                                cubit.changePaymentMethod('card'),
-                          ),
-                          ChoiceChip(
-                            label: const Text('Wallet'),
-                            selected: state.paymentMethod == 'wallet',
-                            onSelected: (_) =>
-                                cubit.changePaymentMethod('wallet'),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),

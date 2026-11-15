@@ -16,31 +16,25 @@ class PublicGuidesRepository {
 
   /// The approved guides.
   ///
-  /// Returns null when the read failed — that is the caller's cue to
-  /// fall back to the mock dataset.
-  Future<List<PublicGuide>?> fetchApprovedGuides() async {
-    try {
-      final snapshot = await _firestore
-          .collection(guidesCollection)
-          .where('isApproved', isEqualTo: true)
-          .get();
-      return snapshot.docs
-          .map((doc) => PublicGuide.fromDocument(doc.data(), doc.id))
-          .toList();
-    } catch (_) {
-      return null;
-    }
+  /// A successful empty list means no approved guides exist. Read errors
+  /// propagate to the caller so they cannot be mistaken for an empty result.
+  Future<List<PublicGuide>> fetchApprovedGuides() async {
+    final snapshot = await _firestore
+        .collection(guidesCollection)
+        .where('isApproved', isEqualTo: true)
+        .get();
+    return snapshot.docs
+        .map((doc) => PublicGuide.fromDocument(doc.data(), doc.id))
+        .toList();
   }
 
   /// One guide, or null when the profile does not exist.
+  ///
+  /// Read errors propagate; null is reserved for a missing profile.
   Future<PublicGuide?> fetchGuide(String guideId) async {
     if (guideId.isEmpty) return null;
-    try {
-      final data = await _firestore.readDoc(guidesCollection, guideId);
-      if (data == null) return null;
-      return PublicGuide.fromDocument(data, guideId);
-    } catch (_) {
-      return null;
-    }
+    final data = await _firestore.readDoc(guidesCollection, guideId);
+    if (data == null) return null;
+    return PublicGuide.fromDocument(data, guideId);
   }
 }

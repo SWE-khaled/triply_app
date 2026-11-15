@@ -9,11 +9,12 @@ import '../cubit/booking_state.dart';
 import 'package:triply/features/tourist/booking/widgets/booking_widgets.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/data/repositories/booking_repository.dart';
+import 'package:triply/features/tourist/guides/model/guide.dart';
 
 class BookingScreen extends StatefulWidget {
-  final String guideId;
+  final Guide guide;
 
-  const BookingScreen({super.key, required this.guideId});
+  const BookingScreen({super.key, required this.guide});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -28,7 +29,7 @@ class _BookingScreenState extends State<BookingScreen> {
     super.initState();
     // Owned here (like the old controller) so every helper keeps working
     // unchanged; provided below for BlocBuilder rebuilds.
-    _controller = BookingCubit(guideId: widget.guideId);
+    _controller = BookingCubit(guide: widget.guide);
     _notesController = TextEditingController();
   }
 
@@ -189,7 +190,7 @@ class _BookingScreenState extends State<BookingScreen> {
         if (_controller.selectedPlace != null) ...[
           const SizedBox(height: 8),
           Text(
-            'Guide rate: EGP ${_controller.guide.pricePerHour.toInt()}/hr · ${_controller.selectedPlace!.name}',
+            'Guide rate: ${_controller.guide.formatPrice(_controller.guide.pricePerHour)}/hr · ${_controller.selectedPlace!.name}',
             style: const TextStyle(fontSize: 12, color: AppColors.subtitle),
           ),
         ],
@@ -448,18 +449,17 @@ class _BookingScreenState extends State<BookingScreen> {
         const SizedBox(height: 6),
         SummaryRow(
           label:
-              '${guide.currency}${guide.pricePerHour.toStringAsFixed(0)}/hr × ${_controller.durationHours} hrs × ${_controller.travelers} travelers',
-          value: '${guide.currency}${_controller.subtotal.toStringAsFixed(0)}',
+              '${guide.formatPrice(guide.pricePerHour)}/hr × ${_controller.durationHours} hrs × ${_controller.travelers} travelers',
+          value: guide.formatPrice(_controller.subtotal),
         ),
         SummaryRow(
           label: 'Service fee (5%)',
-          value:
-              '${guide.currency}${_controller.serviceFee.toStringAsFixed(0)}',
+          value: guide.formatPrice(_controller.serviceFee),
         ),
         const Divider(color: AppColors.cardBorder),
         SummaryRow(
           label: 'Total',
-          value: '${guide.currency}${_controller.total.toStringAsFixed(0)}',
+          value: guide.formatPrice(_controller.total),
           bold: true,
         ),
         _paymentMethodCard(),
@@ -581,7 +581,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     Expanded(
                       child: _miniStat(
                         'Total',
-                        '${guide.currency}${_controller.total.toStringAsFixed(0)}',
+                        guide.formatPrice(_controller.total),
                         highlight: true,
                       ),
                     ),
@@ -713,8 +713,7 @@ class _BookingScreenState extends State<BookingScreen> {
       );
     }
     // Step 3 confirm
-    final totalLabel =
-        '${_controller.guide.currency}${_controller.total.toStringAsFixed(0)}';
+    final totalLabel = _controller.guide.formatPrice(_controller.total);
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -890,6 +889,7 @@ class _BookingScreenState extends State<BookingScreen> {
       MaterialPageRoute(
         builder: (_) => PaymentView(
           price: _controller.total,
+          flow: PaymentFlow.privateBooking,
           onPaymentSuccess: () async {
             if (!mounted) return;
             await BookingRepository().confirmPayment(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../paymob_mobile_viewport_js.dart';
@@ -12,11 +14,13 @@ class MobileWalletScreen extends StatefulWidget {
     required this.redirectUrl,
     required this.onSuccess,
     required this.onError,
+    required this.onDiagnostic,
   });
 
   final String redirectUrl;
   final VoidCallback onSuccess;
   final VoidCallback onError;
+  final ValueChanged<String> onDiagnostic;
 
   @override
   State<MobileWalletScreen> createState() => _MobileWalletScreenState();
@@ -45,22 +49,50 @@ class _MobileWalletScreenState extends State<MobileWalletScreen> {
             if (url.contains('success=true')) {
               if (!_succeeded) {
                 _succeeded = true;
+                widget.onDiagnostic('payment_callback_success');
                 widget.onSuccess();
               }
             } else if (url.contains('success=false') && !_failed) {
               _failed = true;
+              widget.onDiagnostic('payment_callback_failure');
               widget.onError();
             }
             return NavigationDecision.navigate;
           },
+          onPageStarted: (_) {
+            widget.onDiagnostic('page_started');
+          },
           onPageFinished: (_) {
-            _controller
-                .runJavaScript(paymobMobileViewportJs)
-                .catchError((_) {});
+            widget.onDiagnostic('page_finished');
+            _controller.runJavaScript(paymobMobileViewportJs).catchError((
+              Object error,
+            ) {
+              widget.onDiagnostic(
+                'viewport_script_failed exception=${error.runtimeType}',
+              );
+            });
+          },
+          onHttpError: (error) {
+            widget.onDiagnostic(
+              'http_error status=${error.response?.statusCode ?? 'unknown'}',
+            );
+          },
+          onWebResourceError: (error) {
+            widget.onDiagnostic('resource_error code=${error.errorCode}');
           },
         ),
-      )
-      ..loadRequest(Uri.parse(widget.redirectUrl));
+      );
+    widget.onDiagnostic('load_request_started');
+    unawaited(
+      _controller
+          .loadRequest(Uri.parse(widget.redirectUrl))
+          .then((_) => widget.onDiagnostic('load_request_succeeded'))
+          .catchError((Object error) {
+            widget.onDiagnostic(
+              'load_request_failed exception=${error.runtimeType}',
+            );
+          }),
+    );
   }
 
   @override

@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import 'package:triply/features/tourist/guides/cubit/guide_profile_cubit.dart';
 
+import 'package:triply/features/tourist/guides/model/guide.dart';
 import 'package:triply/features/tourist/guides/model/trip.dart' as guide_trip;
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import 'package:triply/core/widgets/guide_shared_widgets.dart';
 import 'package:triply/features/tourist/booking/view/booking_screen.dart';
 import 'package:triply/features/tourist/guides/widgets/trip_card.dart';
 import 'package:triply/features/chat/widgets/message_guide_button.dart';
+import 'package:triply/core/widgets/state_views.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
@@ -40,45 +42,59 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return BlocProvider.value(
+      value: _controller,
+      child: Scaffold(
         backgroundColor: Colors.white,
-        scrolledUnderElevation: 0.0,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          scrolledUnderElevation: 0.0,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+          ),
+          title: const Text(
+            'Guide profile',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+          ),
         ),
-        title: const Text(
-          'Guide profile',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-        ),
-      ),
-      body: BlocProvider.value(
-        value: _controller,
-        child: BlocBuilder<GuideProfileCubit, GuideProfileState>(
-          builder: (context, _) {
-            final trips = _controller.trips;
+        body: BlocBuilder<GuideProfileCubit, GuideProfileState>(
+          builder: (context, state) {
+            if (state is GuideProfileInitial || state is GuideProfileLoading) {
+              return const AppLoadingView();
+            }
+            if (state is GuideProfileError) {
+              return AppErrorView(
+                message: state.error,
+                onRetry: _controller.load,
+              );
+            }
+            if (state is! GuideProfileSuccess) return const AppLoadingView();
             return CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(child: _buildIdentity()),
-                SliverToBoxAdapter(child: _buildStats()),
-                SliverToBoxAdapter(child: _buildLanguages()),
-                SliverToBoxAdapter(child: _buildAbout()),
-                SliverToBoxAdapter(child: _buildTrips(trips)),
-                SliverToBoxAdapter(child: SizedBox(height: 96)),
+                SliverToBoxAdapter(child: _buildIdentity(state.guide)),
+                SliverToBoxAdapter(child: _buildStats(state.guide)),
+                SliverToBoxAdapter(child: _buildLanguages(state.guide)),
+                SliverToBoxAdapter(child: _buildAbout(state.guide)),
+                SliverToBoxAdapter(
+                  child: _buildTrips(state.trips, state.guide),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 96)),
               ],
             );
           },
         ),
+        bottomNavigationBar: BlocBuilder<GuideProfileCubit, GuideProfileState>(
+          builder: (context, state) => state is GuideProfileSuccess
+              ? _buildBottomBar(state.guide)
+              : const SizedBox.shrink(),
+        ),
       ),
-      bottomNavigationBar: _buildBottomBar(),
     );
   }
 
-  Widget _buildIdentity() {
-    final guide = _controller.guide;
+  Widget _buildIdentity(Guide guide) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Column(
@@ -176,8 +192,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  Widget _buildStats() {
-    final guide = _controller.guide;
+  Widget _buildStats(Guide guide) {
     return Container(
       margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: EdgeInsets.symmetric(vertical: 14),
@@ -195,7 +210,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           ),
           _divider(),
           _StatItem(
-            value: '${guide.pricePerHour}${guide.currency}',
+            value: '${guide.formatPrice(guide.pricePerHour)}/hr',
             label: 'Price/hr',
           ),
         ],
@@ -207,8 +222,8 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     return Container(width: 1, height: 32, color: Color(0xFF8A9EA3));
   }
 
-  Widget _buildLanguages() {
-    final langs = _controller.guide.languages;
+  Widget _buildLanguages(Guide guide) {
+    final langs = guide.languages;
     if (langs.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
@@ -228,8 +243,8 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  Widget _buildAbout() {
-    final about = _controller.guide.about;
+  Widget _buildAbout(Guide guide) {
+    final about = guide.about;
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
@@ -259,14 +274,18 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
 
   /// Opens the existing Trip Details for a guide trip; the public
   /// booking flow starts from there (no direct jump into booking).
-  void _openTripDetails(BuildContext context, guide_trip.Trip trip) {
+  void _openTripDetails(
+    BuildContext context,
+    guide_trip.Trip trip,
+    Guide guide,
+  ) {
     Navigator.of(context).push(
       AppRoutes.tripDetails(
         trips_model.Trip(
           id: trip.id,
           title: trip.title,
           dateLabel: trip.dateLabel,
-          guideName: _controller.guide.name,
+          guideName: guide.name,
           peopleCount: 1,
           priceEgp: trip.price,
           imageUrl: trip.imageUrl,
@@ -278,7 +297,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  Widget _buildTrips(List trips) {
+  Widget _buildTrips(List<guide_trip.Trip> trips, Guide guide) {
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
@@ -306,8 +325,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
               itemBuilder: (context, i) => TripCard(
                 trip: trips[i],
                 // Opens the trip details first; booking starts from there.
-                onTap: () =>
-                    _openTripDetails(context, trips[i] as guide_trip.Trip),
+                onTap: () => _openTripDetails(context, trips[i], guide),
               ),
             ),
         ],
@@ -315,7 +333,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(Guide guide) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -326,8 +344,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) =>
-                          BookingScreen(guideId: _controller.guide.id),
+                      builder: (_) => BookingScreen(guide: guide),
                     ),
                   );
                 },
@@ -346,9 +363,9 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
               ),
             ),
             MessageGuideButton(
-              guideId: _controller.guide.id,
-              guideName: _controller.guide.name,
-              guideAvatar: _controller.guide.avatarUrl,
+              guideId: guide.id,
+              guideName: guide.name,
+              guideAvatar: guide.avatarUrl,
             ),
           ],
         ),

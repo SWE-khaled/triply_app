@@ -1,9 +1,14 @@
-import 'dart:async';
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:triply/features/tourist/checkout/view/visa_view.dart';
 import '../../../../core/network/dio_helper.dart';
 import '../model/payment_data.dart';
 import 'mobile_wallet_view.dart';
+
+enum PaymentFlow { publicBooking, privateBooking }
 
 enum _PaymentMethod { visa, wallet }
 
@@ -19,11 +24,13 @@ class PaymentView extends StatefulWidget {
     required this.onPaymentSuccess,
     required this.price,
     required this.onPaymentError,
+    required this.flow,
   });
 
   final VoidCallback onPaymentSuccess;
   final double price;
   final VoidCallback onPaymentError;
+  final PaymentFlow flow;
 
   @override
   PaymentViewState createState() => PaymentViewState();
@@ -36,16 +43,6 @@ class PaymentViewState extends State<PaymentView> {
   _PaymentMethod _method = _PaymentMethod.visa;
   bool _loading = false;
 
-  /// The Paymob auth token. Fetched in the background when the screen
-  /// opens, and again on demand if that did not work.
-  String _authToken = '';
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(_prefetchAuthToken());
-  }
-
   @override
   void dispose() {
     _walletNumber.dispose();
@@ -54,17 +51,11 @@ class PaymentViewState extends State<PaymentView> {
 
   // ---------- Paymob steps ----------
 
-  Future<void> _prefetchAuthToken() async {
-    try {
-      _authToken = await _fetchAuthToken();
-    } catch (_) {
-      // Fetched again when the tourist confirms.
-    }
-  }
-
-  Future<String> _fetchAuthToken() async {
-    final response = await DioHelper.postData(
-      url: '/auth/tokens',
+  Future<String> _fetchAuthToken({required String method}) async {
+    final response = await _postPaymob(
+      endpoint: '/auth/tokens',
+      stage: 'auth_token',
+      method: method,
       data: {'api_key': paymentData.apiKey},
     );
     return response.data['token'] as String;
@@ -73,9 +64,14 @@ class PaymentViewState extends State<PaymentView> {
   /// Amount in piasters, rounded — never "12345.0" or "1234.9999".
   String get _amountCents => (widget.price * 100).round().toString();
 
-  Future<String> _registerOrder(String authToken) async {
-    final response = await DioHelper.postData(
-      url: '/ecommerce/orders',
+  Future<String> _registerOrder(
+    String authToken, {
+    required String method,
+  }) async {
+    final response = await _postPaymob(
+      endpoint: '/ecommerce/orders',
+      stage: 'order',
+      method: method,
       data: {
         'auth_token': authToken,
         'delivery_needed': 'false',
@@ -89,47 +85,74 @@ class PaymentViewState extends State<PaymentView> {
 
   Future<String> _requestPaymentKey(
     String orderId, {
+    required String authToken,
     required bool wallet,
+    required String method,
   }) async {
     final user = paymentData.userData;
     final integrationId = wallet
         ? paymentData.integrationMobileWalletId
         : paymentData.integrationCardId;
-    final response = await DioHelper.postData(
-      url: '/acceptance/payment_keys',
-      data: {
-        'auth_token': _authToken,
-        'amount_cents': _amountCents,
-        'expiration': 3600,
-        'order_id': orderId,
-        'billing_data': {
-          'apartment': 'NA',
-          'email': user?.email ?? 'NA',
-          'floor': 'NA',
-          'first_name': user?.name ?? 'NA',
-          'street': 'NA',
-          'building': 'NA',
-          'phone_number': user?.phone ?? 'NA',
-          'shipping_method': 'NA',
-          'postal_code': 'NA',
-          'city': 'NA',
-          'country': 'NA',
-          'last_name': user?.lastName ?? 'NA',
-          'state': 'NA',
+    late final Response response;
+    try {
+      response = await _postPaymob(
+        endpoint: '/acceptance/payment_keys',
+        stage: 'payment_key',
+        method: method,
+        data: {
+          'auth_token': authToken,
+          'amount_cents': _amountCents,
+          'expiration': 3600,
+          'order_id': orderId,
+          'billing_data': {
+            'apartment': 'NA',
+            'email': user?.email ?? 'NA',
+            'floor': 'NA',
+            'first_name': user?.name ?? 'NA',
+            'street': 'NA',
+            'building': 'NA',
+            'phone_number': user?.phone ?? 'NA',
+            'shipping_method': 'NA',
+            'postal_code': 'NA',
+            'city': 'NA',
+            'country': 'NA',
+            'last_name': user?.lastName ?? 'NA',
+            'state': 'NA',
+          },
+          'currency': 'EGP',
+          'integration_id': int.tryParse(integrationId) ?? integrationId,
+          'lock_order_when_paid': 'false',
         },
-        'currency': 'EGP',
-        'integration_id': int.tryParse(integrationId) ?? integrationId,
-        'lock_order_when_paid': 'false',
-      },
-    );
+      );
+    } on DioException catch (error) {
+      final response = error.response;
+      if (response != null && response.statusCode == 401) {
+        _logPaymentKeyUnauthorized(
+          response,
+          method: method,
+          wallet: wallet,
+          integrationId: integrationId,
+          authToken: authToken,
+          orderId: orderId,
+          userValues: [user?.email, user?.name, user?.lastName, user?.phone],
+        );
+      }
+      rethrow;
+    }
     return response.data['token'] as String;
   }
 
   /// Starts the wallet payment and returns the page the tourist
   /// finishes it on.
-  Future<String> _payWithWallet(String paymentToken, String number) async {
-    final response = await DioHelper.postData(
-      url: '/acceptance/payments/pay',
+  Future<String> _payWithWallet(
+    String paymentToken,
+    String number, {
+    required String method,
+  }) async {
+    final response = await _postPaymob(
+      endpoint: '/acceptance/payments/pay',
+      stage: 'wallet_charge',
+      method: method,
       data: {
         'source': {'identifier': number, 'subtype': 'WALLET'},
         'payment_token': paymentToken,
@@ -139,6 +162,279 @@ class PaymentViewState extends State<PaymentView> {
     final url = data is Map ? (data['redirect_url']?.toString() ?? '') : '';
     if (url.isEmpty) throw Exception('The wallet payment has no redirect url');
     return url;
+  }
+
+  Future<Response> _postPaymob({
+    required String endpoint,
+    required String stage,
+    required String method,
+    required Map<String, dynamic> data,
+  }) async {
+    _logDiagnostic(
+      event: 'request_started',
+      stage: stage,
+      method: method,
+      endpoint: endpoint,
+    );
+    try {
+      final response = await DioHelper.postData(url: endpoint, data: data);
+      _logDiagnostic(
+        event: 'request_succeeded',
+        stage: stage,
+        method: method,
+        endpoint: endpoint,
+        statusCode: response.statusCode,
+      );
+      return response;
+    } on DioException catch (error) {
+      _logDiagnostic(
+        event: 'request_failed',
+        stage: stage,
+        method: method,
+        endpoint: endpoint,
+        statusCode: error.response?.statusCode,
+        error: error,
+      );
+      rethrow;
+    } catch (error) {
+      _logDiagnostic(
+        event: 'request_failed',
+        stage: stage,
+        method: method,
+        endpoint: endpoint,
+        error: error,
+      );
+      rethrow;
+    }
+  }
+
+  void _logDiagnostic({
+    required String event,
+    required String stage,
+    required String method,
+    String? endpoint,
+    int? statusCode,
+    Object? error,
+  }) {
+    if (!kDebugMode) return;
+    debugPrint(
+      '[PaymobDiag] flow=${widget.flow.name} method=$method stage=$stage '
+      'event=$event'
+      '${endpoint == null ? '' : ' endpoint=$endpoint'}'
+      '${statusCode == null ? '' : ' httpStatus=$statusCode'}'
+      '${error == null ? '' : ' exception=${error.runtimeType}'}',
+    );
+  }
+
+  void _logPaymentKeyUnauthorized(
+    Response response, {
+    required String method,
+    required bool wallet,
+    required String integrationId,
+    required String authToken,
+    required String orderId,
+    required List<String?> userValues,
+  }) {
+    if (!kDebugMode) return;
+
+    final contentType = response.headers.value(Headers.contentTypeHeader);
+    final candidateContentType = contentType?.split(';').first.trim() ?? '';
+    final normalizedContentType =
+        RegExp(
+          r'^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$',
+        ).hasMatch(candidateContentType)
+        ? candidateContentType
+        : 'unknown';
+    final cardIntegrationSelected = !wallet && method == 'visa';
+    final cardIntegrationPresent = paymentData.integrationCardId.isNotEmpty;
+    final cardIntegrationValue = int.tryParse(paymentData.integrationCardId);
+    final cardIntegrationNumeric = cardIntegrationValue != null;
+    final responseDetails = _safePaymentKeyErrorDetails(
+      response.data,
+      sensitiveValues: [
+        paymentData.apiKey,
+        authToken,
+        integrationId,
+        orderId,
+        _amountCents,
+        ...userValues,
+      ],
+    );
+
+    debugPrint(
+      '[PaymobDiag] flow=${widget.flow.name} stage=payment_key '
+      'method=$method event=unauthorized httpStatus=${response.statusCode} '
+      'contentType=$normalizedContentType '
+      'responseDataType=${response.data.runtimeType} '
+      'selectedMethodVisa=$cardIntegrationSelected '
+      'selectedIntegrationIsCard=${!wallet && integrationId == paymentData.integrationCardId} '
+      'cardIntegrationPresent=$cardIntegrationPresent '
+      'cardIntegrationNumeric=$cardIntegrationNumeric '
+      'cardIntegrationNonZero=${cardIntegrationValue != null && cardIntegrationValue != 0} '
+      'responseDetails=$responseDetails',
+    );
+  }
+
+  String _safePaymentKeyErrorDetails(
+    Object? data, {
+    required List<String?> sensitiveValues,
+  }) {
+    if (data == null) return 'response_details_unavailable';
+
+    Object? parsedData = data;
+    if (data is String) {
+      try {
+        parsedData = jsonDecode(data);
+      } on FormatException {
+        final summary = _sanitizePaymentDiagnosticText(
+          data,
+          sensitiveValues: sensitiveValues,
+        );
+        return summary.isEmpty ? 'response_details_unavailable' : summary;
+      }
+    }
+
+    if (parsedData is! Map) return 'response_details_unavailable';
+
+    const allowedFields = {
+      'message',
+      'detail',
+      'error',
+      'errors',
+      'description',
+    };
+    final excerpts = <String>[];
+    for (final entry in parsedData.entries) {
+      final key = entry.key;
+      if (key is! String || !allowedFields.contains(key.toLowerCase())) {
+        continue;
+      }
+      final value = _safePaymentDiagnosticValue(
+        entry.value,
+        sensitiveValues: sensitiveValues,
+      );
+      if (value.isNotEmpty) excerpts.add('${key.toLowerCase()}=$value');
+      if (excerpts.length == allowedFields.length) break;
+    }
+
+    if (excerpts.isEmpty) return 'response_details_unavailable';
+    final details = excerpts.join(' | ');
+    return details.length > 500 ? details.substring(0, 500) : details;
+  }
+
+  String _safePaymentDiagnosticValue(
+    Object? value, {
+    required List<String?> sensitiveValues,
+    int depth = 0,
+  }) {
+    if (depth > 2 || value == null) return '';
+    if (value is String) {
+      return _sanitizePaymentDiagnosticText(
+        value,
+        sensitiveValues: sensitiveValues,
+      );
+    }
+    if (value is List) {
+      return value
+          .take(3)
+          .map(
+            (item) => _safePaymentDiagnosticValue(
+              item,
+              sensitiveValues: sensitiveValues,
+              depth: depth + 1,
+            ),
+          )
+          .where((item) => item.isNotEmpty)
+          .join(', ');
+    }
+    if (value is Map) {
+      return value.entries
+          .take(3)
+          .map((entry) {
+            final key = entry.key;
+            if (key is String &&
+                RegExp(
+                  r'api[_ -]?key|auth[_ -]?token|payment[_ -]?(key|token)|integration[_ -]?id|token|card|wallet|phone|email|name|address|billing',
+                  caseSensitive: false,
+                ).hasMatch(key)) {
+              return '[redacted-field]';
+            }
+            final item = _safePaymentDiagnosticValue(
+              entry.value,
+              sensitiveValues: sensitiveValues,
+              depth: depth + 1,
+            );
+            return item;
+          })
+          .where((item) => item.isNotEmpty)
+          .join(', ');
+    }
+    return '';
+  }
+
+  String _sanitizePaymentDiagnosticText(
+    String value, {
+    required List<String?> sensitiveValues,
+  }) {
+    var sanitized = value;
+    final knownValues =
+        sensitiveValues
+            .whereType<String>()
+            .where((item) => item.trim().length >= 3)
+            .where(
+              (item) => !RegExp(
+                r'^(?:N/?A|none|null|unknown)$',
+                caseSensitive: false,
+              ).hasMatch(item.trim()),
+            )
+            .toSet()
+            .toList()
+          ..sort((left, right) => right.length.compareTo(left.length));
+    for (final sensitiveValue in knownValues) {
+      sanitized = sanitized.replaceAllMapped(
+        RegExp(
+          '(^|[^A-Za-z0-9])(${RegExp.escape(sensitiveValue)})(?=\$|[^A-Za-z0-9])',
+        ),
+        (match) => '${match.group(1)}[redacted]',
+      );
+    }
+
+    sanitized = sanitized
+        .replaceAll(
+          RegExp(
+            r"""\b(api[_ -]?key|auth[_ -]?token|payment[_ -]?(key|token)|integration[_ -]?id|token|card([_ -]?number)?|wallet([_ -]?number)?|phone([_ -]?number)?|email|name|first[_ -]?name|last[_ -]?name|address|billing[_ -]?[a-z_]*)\b\s*["']?\s*[:=]\s*["']?[^,\s;"'}]+""",
+            caseSensitive: false,
+          ),
+          '[redacted-field]',
+        )
+        .replaceAll(
+          RegExp(r'https?://\S+', caseSensitive: false),
+          '[redacted-url]',
+        )
+        .replaceAll(
+          RegExp(
+            r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b',
+            caseSensitive: false,
+          ),
+          '[redacted-email]',
+        )
+        .replaceAll(
+          RegExp(
+            r'\b(integration[_ -]?id|card(?:[_ -]?(?:number|no))?|wallet(?:[_ -]?(?:number|no))?|phone(?:[_ -]?number)?|mobile(?:[_ -]?(?:number|no))?|account(?:[_ -]?number)?)\b(?:\s+(?:is|number|id))?\s*[:=#]?\s*[+(\d][\d\s().-]{2,}\d',
+            caseSensitive: false,
+          ),
+          '[redacted-sensitive-number]',
+        )
+        .replaceAll(RegExp(r'\b\d{13,19}\b'), '[redacted-card-number]')
+        .replaceAll(RegExp(r'\b[A-Za-z0-9_-]{24,}\b'), '[redacted-token]')
+        .replaceAll(RegExp(r'[\r\n\t]+'), ' ')
+        .replaceAll(RegExp(r'\s{2,}'), ' ')
+        .trim();
+
+    if (sanitized.length > 180) {
+      sanitized = '${sanitized.substring(0, 180)}…';
+    }
+    return sanitized;
   }
 
   // ---------- Confirm ----------
@@ -161,21 +457,39 @@ class PaymentViewState extends State<PaymentView> {
     }
 
     setState(() => _loading = true);
+    final method = wallet ? 'wallet' : 'visa';
+    var stage = 'auth_token';
     try {
-      if (_authToken.isEmpty) _authToken = await _fetchAuthToken();
-      final orderId = await _registerOrder(_authToken);
-      final paymentToken = await _requestPaymentKey(orderId, wallet: wallet);
+      _logDiagnostic(event: 'confirm_started', stage: stage, method: method);
+      final authToken = await _fetchAuthToken(method: method);
+      stage = 'order';
+      final orderId = await _registerOrder(authToken, method: method);
+      stage = 'payment_key';
+      final paymentToken = await _requestPaymentKey(
+        orderId,
+        authToken: authToken,
+        wallet: wallet,
+        method: method,
+      );
       if (!mounted) return;
 
       if (wallet) {
-        final redirectUrl = await _payWithWallet(paymentToken, number);
+        stage = 'wallet_charge';
+        final redirectUrl = await _payWithWallet(
+          paymentToken,
+          number,
+          method: method,
+        );
         if (!mounted) return;
         _open(
           MobileWalletScreen(
             redirectUrl: redirectUrl,
             onSuccess: widget.onPaymentSuccess,
             onError: widget.onPaymentError,
+            onDiagnostic: (event) =>
+                _logDiagnostic(event: event, stage: 'webview', method: method),
           ),
+          method: method,
         );
       } else {
         _open(
@@ -184,20 +498,38 @@ class PaymentViewState extends State<PaymentView> {
             iframeId: paymentData.iframeId,
             onFinished: widget.onPaymentSuccess,
             onError: widget.onPaymentError,
+            onDiagnostic: (event) =>
+                _logDiagnostic(event: event, stage: 'webview', method: method),
           ),
+          method: method,
         );
       }
-    } catch (_) {
-      // The token may have expired: fetch a new one on the next try.
-      _authToken = '';
+    } catch (error) {
+      _logDiagnostic(
+        event: 'payment_flow_failed',
+        stage: stage,
+        method: method,
+        statusCode: error is DioException ? error.response?.statusCode : null,
+        error: error,
+      );
       if (mounted) widget.onPaymentError();
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  void _open(Widget screen) {
+  void _open(Widget screen, {required String method}) {
+    _logDiagnostic(
+      event: 'payment_screen_push_started',
+      stage: 'navigation',
+      method: method,
+    );
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+    _logDiagnostic(
+      event: 'payment_screen_push_succeeded',
+      stage: 'navigation',
+      method: method,
+    );
   }
 
   void _toast(String message) {

@@ -14,6 +14,7 @@ const List<_NavItem> _navItems = [
   _NavItem('Trips', Icons.luggage_outlined),
   _NavItem('Users', Icons.people_outline),
   _NavItem('Bookings', Icons.bookmark_border),
+  _NavItem('Chat Reports', Icons.flag_outlined),
   _NavItem('User Posts', Icons.article_outlined),
   _NavItem('Guides', Icons.verified_user_outlined),
   _NavItem('Trip Applications', Icons.assignment_outlined),

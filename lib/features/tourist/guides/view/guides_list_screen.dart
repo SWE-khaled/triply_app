@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
+import 'package:triply/core/widgets/state_views.dart';
 import 'package:triply/features/tourist/guides/cubit/guides_cubit.dart';
 
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
@@ -41,8 +42,17 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
         child: BlocProvider.value(
           value: _controller,
           child: BlocBuilder<GuidesCubit, GuidesState>(
-            builder: (context, _) {
-              final guides = _controller.filteredGuides;
+            builder: (context, state) {
+              if (state is GuidesInitial || state is GuidesLoading) {
+                return const AppLoadingView();
+              }
+              if (state is GuidesError) {
+                return AppErrorView(
+                  message: state.error,
+                  onRetry: _controller.load,
+                );
+              }
+              final guides = state is GuidesSuccess ? state.guides : const [];
               return CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(child: _buildHeader()),

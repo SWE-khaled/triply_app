@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart';
 import 'package:triply/core/data/mock/tourist/mock_places.dart';
 import 'package:triply/features/tourist/booking/model/booking.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
@@ -8,15 +7,19 @@ import 'package:triply/features/tourist/map/model/place.dart';
 import 'booking_state.dart';
 
 /// Feature-focused cubit for the 4-step Booking flow.
-/// Local mock state only — no backend, no delays.
+/// Form state is local; guide identity and pricing come from the approved
+/// Firestore Guide passed into this Cubit. Place options remain mock data.
 class BookingCubit extends Cubit<BookingState> {
+  final Guide guide;
   final String guideId;
 
   /// Notes scratch text. Kept outside the emitted state on purpose:
   /// typing must not rebuild the whole flow.
   String _notes = '';
 
-  BookingCubit({required this.guideId}) : super(const BookingState());
+  BookingCubit({required this.guide})
+    : guideId = guide.id,
+      super(const BookingState());
 
   static const List<String> timeSlots = [
     '7:00 AM',
@@ -55,13 +58,6 @@ class BookingCubit extends Cubit<BookingState> {
   int get travelers => state.travelers;
   String get meetingPoint => state.meetingPoint;
   String get notes => _notes;
-
-  Guide get guide {
-    return mockGuides.firstWhere(
-      (g) => g.id == guideId,
-      orElse: () => mockGuides.first,
-    );
-  }
 
   int get durationHours =>
       PriceCalculator.durationHoursFor(state.durationLabel);

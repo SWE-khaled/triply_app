@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart' as guides_src;
-import 'package:triply/core/data/mock/tourist/mock_guides1.dart';
 import 'package:triply/core/data/mock/tourist/mock_place_trips.dart';
 import 'package:triply/core/data/mock/tourist/mock_places.dart';
 import 'package:triply/core/data/mock/tourist/mock_stories.dart';
@@ -25,7 +23,8 @@ part 'place_detail_state.dart';
 /// The place doc comes from Firestore (`places/{placeId}`, the same
 /// catalog the map reads, with the bundled mock as offline fallback).
 /// The guides come from Firestore (the approved profiles of `guides`,
-/// filtered by the guide's profile location) — same fallback chain.
+/// filtered by the guide's profile location); guide read failures are
+/// surfaced as errors instead of substituting mock guides.
 /// The trips come from Firestore — the approved ones, and only those
 /// whose location matches the place's Firestore `name`. The bundled
 /// mock trips rescue the offline case with their own place_id match.
@@ -63,12 +62,9 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
     try {
       _place = await _fetchPlace() ?? _mockPlace();
 
-      // Firestore guides (approved only), filtered to this place's
-      // location; the bundled mock rescues the screen offline.
+      // Firestore guides (approved only), filtered to this place's location.
       final remoteGuides = await _guidesRepository.fetchApprovedGuides();
-      _guides = remoteGuides == null
-          ? mockGuides1.map((e) => Guide.fromJson(e)).toList()
-          : _guidesOfPlace(remoteGuides).map(_toGuide).toList();
+      _guides = _guidesOfPlace(remoteGuides).map(_toGuide).toList();
       _stories = mockStories
           .where((e) => e['place_id'] == place.id)
           .map((e) => Story.fromJson(e))
@@ -126,15 +122,6 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
         selectedTabIndex: state.selectedTabIndex,
       ),
     );
-  }
-
-  /// Resolves a place guide to the Guide Profile id by matching the existing
-  /// guide name against the Local Guides list (same source as See All).
-  String guideProfileIdFor(Guide guide) {
-    for (final g in guides_src.mockGuides) {
-      if (g.name == guide.name) return g.id;
-    }
-    return guides_src.mockGuides.first.id;
   }
 
   /// Resolves a place trip to the existing public-trip model so it can open

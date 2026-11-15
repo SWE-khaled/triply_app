@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart';
-import 'package:triply/core/data/mock/tourist/mock_trips.dart';
 import 'package:triply/core/data/repositories/public_guides_repository.dart';
 import 'package:triply/core/data/repositories/public_trips_repository.dart';
 import 'package:triply/core/utils/safe_emit_mixin.dart';
@@ -31,12 +29,8 @@ class GuideProfileCubit extends Cubit<GuideProfileState>
   final PublicGuidesRepository _guidesRepository;
   final PublicTripsRepository _tripsRepository;
 
-  Guide _guide = _mockGuide();
-  List<Trip> _trips = const [];
   bool _isBookmarked = false;
 
-  Guide get guide => _guide;
-  List<Trip> get trips => _trips;
   bool get isBookmarked => _isBookmarked;
 
   /// Reads the guide and its trips.
@@ -44,21 +38,23 @@ class GuideProfileCubit extends Cubit<GuideProfileState>
     safeEmit(const GuideProfileLoading());
     try {
       final remote = await _guidesRepository.fetchGuide(guideId);
-      if (remote != null) {
-        _guide = Guide.fromPublicGuide(remote);
+      if (remote == null || !remote.isApproved) {
+        throw StateError('This guide is unavailable or not approved.');
       }
+      final guide = Guide.fromPublicGuide(remote);
 
       final remoteTrips = await _tripsRepository.fetchApprovedTripsOfGuide(
         guideId,
       );
-      _trips = remoteTrips == null
-          ? _mockTrips()
-          : remoteTrips.map(Trip.fromPublicTrip).toList();
+      if (remoteTrips == null) {
+        throw StateError('Could not load this guide’s trips.');
+      }
+      final trips = remoteTrips.map(Trip.fromPublicTrip).toList();
 
       safeEmit(
         GuideProfileSuccess(
-          guide: _guide,
-          trips: _trips,
+          guide: guide,
+          trips: trips,
           isBookmarked: _isBookmarked,
         ),
       );
@@ -79,16 +75,4 @@ class GuideProfileCubit extends Cubit<GuideProfileState>
       ),
     );
   }
-
-  /// The bundled guide, used when Firestore cannot be reached.
-  static Guide _mockGuide() {
-    final found = mockGuides.firstWhere(
-      (g) => g.id == '',
-      orElse: () => mockGuides.first,
-    );
-    return found;
-  }
-
-  /// The bundled trips, used when Firestore cannot be reached.
-  static List<Trip> _mockTrips() => mockTripsForGuide(mockGuides.first.id);
 }

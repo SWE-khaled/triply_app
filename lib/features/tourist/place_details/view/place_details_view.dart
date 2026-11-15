@@ -217,9 +217,8 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                         onGuideTap: (guide) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => GuideProfileScreen(
-                                guideId: controller.guideProfileIdFor(guide),
-                              ),
+                              builder: (_) =>
+                                  GuideProfileScreen(guideId: guide.id),
                             ),
                           );
                         },

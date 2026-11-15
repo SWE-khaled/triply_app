@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/core/data/mock/tourist/mock_guides.dart';
-import 'package:triply/core/data/models/public_guide.dart';
+import 'package:triply/core/data/mock/tourist/mock_guides.dart'
+    show mockGuideLanguageFilters;
 import 'package:triply/core/data/repositories/public_guides_repository.dart';
 import 'package:triply/core/utils/safe_emit_mixin.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
@@ -10,8 +10,7 @@ part 'guides_state.dart';
 
 /// The list of the tour guides.
 ///
-/// The guides come from Firestore — the approved ones — and the mock
-/// dataset is the fallback for when the read fails (offline).
+/// The guides come from Firestore — approved profiles only.
 class GuidesCubit extends Cubit<GuidesState> with SafeEmitMixin<GuidesState> {
   GuidesCubit({PublicGuidesRepository? repository})
     : _repository = repository ?? PublicGuidesRepository(),
@@ -40,9 +39,7 @@ class GuidesCubit extends Cubit<GuidesState> with SafeEmitMixin<GuidesState> {
     safeEmit(const GuidesLoading());
     try {
       final remote = await _repository.fetchApprovedGuides();
-      _allGuides = (remote ?? _mockGuides())
-          .map(Guide.fromPublicGuide)
-          .toList();
+      _allGuides = remote.map(Guide.fromPublicGuide).toList();
       _emitSuccess();
     } catch (e) {
       safeEmit(GuidesError(error: e.toString()));
@@ -83,25 +80,4 @@ class GuidesCubit extends Cubit<GuidesState> with SafeEmitMixin<GuidesState> {
       return matchesSearch && matchesLang;
     }).toList();
   }
-
-  /// The bundled guides, used when Firestore cannot be reached.
-  static List<PublicGuide> _mockGuides() => mockGuides
-      .map(
-        (g) => PublicGuide(
-          id: g.id,
-          name: g.name,
-          specialty: g.specialty,
-          avatarUrl: g.avatarUrl,
-          coverUrl: g.coverUrl,
-          location: g.location,
-          about: g.about,
-          languages: g.languages,
-          rating: g.rating,
-          reviewCount: g.reviewCount,
-          pricePerHour: g.pricePerHour,
-          currency: g.currency,
-          isApproved: g.isVerified,
-        ),
-      )
-      .toList();
 }

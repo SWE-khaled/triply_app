@@ -185,11 +185,6 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                       itemBuilder: (context, index) {
                         final trip = trips[index];
                         final isPrivate = MyBookingsPublic.isPrivate(trip.id);
-                        // The status comes from the booking itself, not
-                        // from the session store.
-                        final isPending =
-                            context.read<MyTripsCubit>().statusFor(trip.id) ==
-                            'pending';
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -201,10 +196,6 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                               child: Row(
                                 children: [
                                   BookingKindIcon(isPrivate: isPrivate),
-                                  if (isPending) ...[
-                                    const SizedBox(width: 12),
-                                    const PendingApprovalLabel(),
-                                  ],
                                   const Spacer(),
                                   GestureDetector(
                                     onTap: () => _confirmDelete(trip),

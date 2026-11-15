@@ -119,8 +119,7 @@ class GuideCard extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text:
-                                  '${guide.currency}${guide.pricePerHour.toStringAsFixed(0)}',
+                              text: guide.formatPrice(guide.pricePerHour),
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,

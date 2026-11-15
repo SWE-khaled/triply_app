@@ -29,23 +29,48 @@ class StoryRing extends StatelessWidget {
               border: Border.all(color: AppColors.accentOrange, width: 3),
             ),
             child: CircleAvatar(
-              radius: 32,
+              radius: 36,
               backgroundColor: AppColors.chipGrey,
-              backgroundImage: NetworkImage(story.imageUrl),
-              onBackgroundImageError: (_, _) {},
+              foregroundImage: _avatarImage(story.authorAvatarUrl),
+              onForegroundImageError: (_, _) {},
+              child: Text(
+                story.userName.isEmpty ? '?' : story.userName[0].toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.textGrey,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            story.userName,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0,
+          SizedBox(
+            width: 72,
+            child: Text(
+              story.userName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 0,
+                color: AppColors.textDark,
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  static ImageProvider? _avatarImage(String value) {
+    final url = value.trim();
+    final uri = Uri.tryParse(url);
+    if (uri == null ||
+        (uri.scheme != 'https' && uri.scheme != 'http') ||
+        uri.host.isEmpty) {
+      return null;
+    }
+    return NetworkImage(url);
   }
 }

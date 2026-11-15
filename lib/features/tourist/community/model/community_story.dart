@@ -90,8 +90,18 @@ class CommunityStory {
     final story = CommunityStory(
       id: id,
       authorId: authorId,
-      authorName: _string(values['authorName'], fallback: 'Traveler'),
-      authorAvatarUrl: _string(values['authorAvatarUrl']),
+      authorName: _firstString(values, const [
+        'authorName',
+        'author_name',
+        'userName',
+        'user_name',
+      ], fallback: 'Traveler'),
+      authorAvatarUrl: _firstString(values, const [
+        'authorAvatarUrl',
+        'author_avatar_url',
+        'avatarUrl',
+        'photoUrl',
+      ]),
       imageUrl: imageUrl,
       createdAt: createdAt,
       expiresAt: _date(values['expiresAt']) ?? createdAt.add(lifetime),
@@ -151,6 +161,18 @@ class CommunityStory {
 
   static String _string(Object? value, {String fallback = ''}) =>
       value is String ? value : fallback;
+
+  static String _firstString(
+    Map<String, dynamic> values,
+    List<String> keys, {
+    String fallback = '',
+  }) {
+    for (final key in keys) {
+      final value = values[key];
+      if (value is String && value.trim().isNotEmpty) return value.trim();
+    }
+    return fallback;
+  }
 
   static DateTime? _date(Object? value) {
     if (value is Timestamp) return value.toDate();
