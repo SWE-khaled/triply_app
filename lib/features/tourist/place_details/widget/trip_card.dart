@@ -128,7 +128,7 @@ class TripCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${trip.peopleCount}\nPeople',
+                        '${trip.maxPeople}\nPeople',
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 11,

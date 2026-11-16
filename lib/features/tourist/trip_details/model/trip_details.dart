@@ -70,7 +70,11 @@ class TripDetails {
   });
 
   /// Builds the details model from the neutral Firestore model.
-  factory TripDetails.fromPublicTrip(PublicTrip trip) {
+  factory TripDetails.fromPublicTrip(
+    PublicTrip trip, {
+    String fallbackGuideId = '',
+    String fallbackGuideAvatarUrl = '',
+  }) {
     return TripDetails(
       id: trip.id,
       tripId: trip.id,
@@ -91,12 +95,47 @@ class TripDetails {
       meetingPoint: trip.meetingPoint,
       priceEgp: trip.priceEgp,
       guideName: trip.guideName,
-      guideAvatarUrl: trip.guideAvatarUrl,
-      guideId: trip.guideId,
+      guideAvatarUrl: trip.guideAvatarUrl.isNotEmpty
+          ? trip.guideAvatarUrl
+          : fallbackGuideAvatarUrl,
+      guideId: trip.guideId.isNotEmpty ? trip.guideId : fallbackGuideId,
       guideRating: trip.guideRating,
       guideReviews: trip.guideReviews,
       topRatedGuide: trip.topRatedGuide,
       imageUrl: trip.imageUrl,
+    );
+  }
+
+  TripDetails withGuideFallback({
+    String guideId = '',
+    String guideAvatarUrl = '',
+  }) {
+    return TripDetails(
+      id: id,
+      tripId: tripId,
+      tag: tag,
+      title: title,
+      rating: rating,
+      reviewsCount: reviewsCount,
+      location: location,
+      duration: duration,
+      groupType: groupType,
+      languages: languages,
+      about: about,
+      highlights: highlights,
+      itinerary: itinerary,
+      notes: notes,
+      meetingPoint: meetingPoint,
+      priceEgp: priceEgp,
+      guideName: guideName,
+      guideAvatarUrl: this.guideAvatarUrl.isNotEmpty
+          ? this.guideAvatarUrl
+          : guideAvatarUrl,
+      guideId: this.guideId.isNotEmpty ? this.guideId : guideId,
+      guideRating: guideRating,
+      guideReviews: guideReviews,
+      topRatedGuide: topRatedGuide,
+      imageUrl: imageUrl,
     );
   }
 

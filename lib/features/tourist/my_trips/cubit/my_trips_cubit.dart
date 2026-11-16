@@ -61,7 +61,9 @@ class MyTripsCubit extends Cubit<MyTripsState>
       _booked = await _tripsOf(bookings, expiredIds);
       _hasLoaded = true;
       _applyTab(_selectedTab);
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('MyTripsCubit.load failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
       safeEmit(MyTripsError(error: pageLoadErrorMessage(error)));
     } finally {
       _isLoading = false;

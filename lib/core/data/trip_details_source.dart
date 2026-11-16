@@ -19,6 +19,8 @@ class TripDetailsSource {
     String? imageUrl,
     double? priceEgp,
     String? guideName,
+    String guideId = '',
+    String guideAvatarUrl = '',
   }) {
     for (final d in all) {
       if (d.tripId == tripId) return d;
@@ -42,7 +44,10 @@ class TripDetailsSource {
       meetingPoint: base.meetingPoint,
       priceEgp: priceEgp ?? base.priceEgp,
       guideName: guideName ?? base.guideName,
-      guideAvatarUrl: base.guideAvatarUrl,
+      guideAvatarUrl: guideAvatarUrl.isNotEmpty
+          ? guideAvatarUrl
+          : base.guideAvatarUrl,
+      guideId: guideId,
       guideRating: base.guideRating,
       guideReviews: base.guideReviews,
       topRatedGuide: base.topRatedGuide,

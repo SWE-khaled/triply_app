@@ -9,6 +9,9 @@ class Trip {
   final String currency;
   final String imageUrl;
 
+  /// The maximum number of travelers configured by the guide.
+  final int capacity;
+
   Trip({
     required this.id,
     required this.placeId,
@@ -19,7 +22,12 @@ class Trip {
     required this.price,
     required this.currency,
     required this.imageUrl,
+    this.capacity = 0,
   });
+
+  /// The maximum group size, falling back to the booked count only when an
+  /// older bundled record has no capacity.
+  int get maxPeople => capacity > 0 ? capacity : peopleCount;
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(
@@ -32,6 +40,7 @@ class Trip {
       price: (json['price'] as num).toDouble(),
       currency: json['currency'] as String,
       imageUrl: json['image_url'] as String,
+      capacity: ((json['capacity'] as num?) ?? 0).toInt(),
     );
   }
 
@@ -46,6 +55,7 @@ class Trip {
       'price': price,
       'currency': currency,
       'image_url': imageUrl,
+      'capacity': capacity,
     };
   }
 }

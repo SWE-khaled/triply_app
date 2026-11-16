@@ -12,6 +12,12 @@ class Trip {
   final double price;
   final String currency; // e.g. "EGP"
 
+  /// The maximum number of travelers configured by the guide.
+  final int capacity;
+
+  /// How many seats are already booked.
+  final int bookedSeats;
+
   const Trip({
     required this.id,
     required this.guideId,
@@ -21,6 +27,8 @@ class Trip {
     required this.durationLabel,
     required this.price,
     required this.currency,
+    this.capacity = 0,
+    this.bookedSeats = 0,
   });
 
   /// Builds the card model from the neutral Firestore model.
@@ -34,6 +42,8 @@ class Trip {
       durationLabel: trip.durationLabel,
       price: trip.priceEgp,
       currency: 'EGP',
+      capacity: trip.capacity,
+      bookedSeats: trip.bookedSeats,
     );
   }
 
@@ -47,6 +57,8 @@ class Trip {
       durationLabel: json['duration_label'] as String? ?? '',
       price: (json['price'] as num? ?? 0).toDouble(),
       currency: json['currency'] as String? ?? 'EGP',
+      capacity: ((json['capacity'] as num?) ?? 0).toInt(),
+      bookedSeats: ((json['bookedSeats'] as num?) ?? 0).toInt(),
     );
   }
 
@@ -60,6 +72,8 @@ class Trip {
       'duration_label': durationLabel,
       'price': price,
       'currency': currency,
+      'capacity': capacity,
+      'bookedSeats': bookedSeats,
     };
   }
 

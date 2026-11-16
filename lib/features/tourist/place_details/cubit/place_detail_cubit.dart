@@ -145,7 +145,7 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
       imageUrl: trip.imageUrl,
       status: trips_model.TripStatus.upcoming,
       category: 'historical',
-      capacity: 12,
+      capacity: trip.capacity,
     );
   }
 
@@ -217,6 +217,7 @@ class PlaceDetailCubit extends Cubit<PlaceDetailState>
       price: trip.priceEgp,
       currency: 'EGP',
       imageUrl: trip.imageUrl,
+      capacity: trip.capacity,
     );
   }
 

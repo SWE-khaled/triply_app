@@ -14,6 +14,7 @@ import '../../features/tour_guide/profile_tg/view/profile_tour_guide_screen.dart
 import '../../features/tour_guide/travelers_tg/view/travelers_screen.dart';
 import '../../features/tour_guide/trip_details_tg/model/guide_trip_details.dart';
 import '../../features/tour_guide/trip_details_tg/view/guide_trip_details_screen.dart';
+import '../../features/tourist/all_trips/view/all_trips_screen.dart';
 import '../../features/tourist/booking_public/cubit/booking_public_cubit.dart';
 import '../../features/tourist/booking_public/view/booking_confirmed_screen.dart';
 import '../../features/tourist/booking_public/view/booking_public_screen.dart';
@@ -73,6 +74,12 @@ class AppRoutes {
     // page reuses the data from the initial loading cycle instead of
     // creating a new Cubit and re-reading the trips on every visit.
     return MaterialPageRoute(builder: (_) => const PopularTripsScreen());
+  }
+
+  /// See All of the Popular Trips section: every approved trip, not just
+  /// the short preview shown on Home.
+  static Route<void> allTrips() {
+    return MaterialPageRoute(builder: (_) => const AllTripsScreen());
   }
 
   static Route<void> tripDetails(Trip trip, {bool isBooked = false}) {

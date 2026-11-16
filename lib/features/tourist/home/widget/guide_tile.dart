@@ -89,7 +89,7 @@ class GuideTile extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        'From \$${guide.pricePerHour.toInt()}',
+                        'From EGP ${guide.pricePerHour.toInt()}',
                         style: AppTextStyles.price,
                       ),
                       const Text('/hr', style: AppTextStyles.bodyGrey),

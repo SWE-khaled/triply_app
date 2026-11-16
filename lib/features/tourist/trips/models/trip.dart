@@ -8,6 +8,8 @@ class Trip {
   final String title;
   final String dateLabel;
   final String guideName;
+  final String guideId;
+  final String guideAvatarUrl;
   final int peopleCount;
   final double priceEgp;
   final String imageUrl;
@@ -21,6 +23,8 @@ class Trip {
     required this.title,
     required this.dateLabel,
     required this.guideName,
+    this.guideId = '',
+    this.guideAvatarUrl = '',
     required this.peopleCount,
     required this.priceEgp,
     required this.imageUrl,
@@ -29,6 +33,11 @@ class Trip {
     required this.capacity,
   });
 
+  /// The maximum number of travelers the guide configured for this trip.
+  /// Falls back to the booked count only when an older document has no
+  /// capacity — never to a hardcoded number.
+  int get maxPeople => capacity > 0 ? capacity : peopleCount;
+
   /// Builds the card model from the neutral Firestore model.
   factory Trip.fromPublicTrip(PublicTrip trip) {
     return Trip(
@@ -36,6 +45,8 @@ class Trip {
       title: trip.title,
       dateLabel: trip.dateLabel,
       guideName: trip.guideName,
+      guideId: trip.guideId,
+      guideAvatarUrl: trip.guideAvatarUrl,
       peopleCount: trip.bookedSeats,
       priceEgp: trip.priceEgp,
       imageUrl: trip.imageUrl,
@@ -51,6 +62,8 @@ class Trip {
       title: json['title'] as String,
       dateLabel: json['dateLabel'] as String,
       guideName: json['guideName'] as String,
+      guideId: json['guideId'] as String? ?? '',
+      guideAvatarUrl: json['guideAvatarUrl'] as String? ?? '',
       peopleCount: json['peopleCount'] as int,
       priceEgp: (json['priceEgp'] as num).toDouble(),
       imageUrl: json['imageUrl'] as String,
@@ -69,6 +82,8 @@ class Trip {
       'title': title,
       'dateLabel': dateLabel,
       'guideName': guideName,
+      'guideId': guideId,
+      'guideAvatarUrl': guideAvatarUrl,
       'peopleCount': peopleCount,
       'priceEgp': priceEgp,
       'imageUrl': imageUrl,

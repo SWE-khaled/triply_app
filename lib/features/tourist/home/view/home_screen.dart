@@ -141,9 +141,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: SectionHeader(
                     title: 'Popular Trips',
-                    // TODO(Figma): no destination in Figma yet.
                     onSeeAllTap: () {
-                      Navigator.of(context).push(AppRoutes.popular());
+                      Navigator.of(context).push(AppRoutes.allTrips());
                     },
                   ),
                 ),
@@ -162,7 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: state.trips.length,
+                          itemCount: state.trips.length > 5
+                              ? 5
+                              : state.trips.length,
                           itemBuilder: (context, i) {
                             final trip = state.trips[i];
                             return TripCard(
@@ -296,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title: trip.title,
           dateLabel: trip.dateLabel,
           guideName: trip.guideName,
-          peopleCount: 0,
+          peopleCount: trip.bookedSeats,
           priceEgp: trip.price,
           imageUrl: trip.imageUrl,
           status: trips_model.TripStatus.upcoming,

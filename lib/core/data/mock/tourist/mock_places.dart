@@ -23,7 +23,7 @@ const List<Map<String, dynamic>> mockPlaces = [
       'Sound & Light Show',
     ],
     'image_url':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9IePq10R48nkP8fWNXSVTLvqMrTbwbpG0B22GnLacBA&s=10',
+        'https://i.pinimg.com/1200x/bf/c1/b8/bfc1b8d2a527bb6438c5f93c4b2a6648.jpg',
     'is_favorite': false,
   },
   {
@@ -257,7 +257,7 @@ const List<Map<String, dynamic>> mockPlaces = [
         'Rescued from the rising waters of the Nile by UNESCO, this island temple complex is revered for its Ptolemaic architecture.',
     'highlights': ['Temple of Isis', 'Kiosk of Trajan', 'Boat Ride Access'],
     'image_url':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCQa3JUd7LH1dnlt_t_Pcy9XXkFax-iH8Lb_MSVHHQjA&s=10',
+        'https://i.pinimg.com/736x/10/8b/e4/108be435dedcad3080d6a633ce888748.jpg',
     'is_favorite': false,
   },
   {
@@ -794,7 +794,7 @@ const List<Map<String, dynamic>> mockPlaces = [
       'Spice Markets',
     ],
     'image_url':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1uawIsaJaVbm8Vcjjkig5JWiratkm67WPLLxS_oyTTQ&s=10',
+        'https://i.pinimg.com/736x/01/ee/38/01ee3865001d85be6e4ec5cf5dcd3cc0.jpg',
     'is_favorite': false,
   },
   {
@@ -842,7 +842,7 @@ const List<Map<String, dynamic>> mockPlaces = [
       'Camel Ride Option',
     ],
     'image_url':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReFiIcnAlXn2j4W1eYsMixxzO5W9Ho4dogLHerM8lSnw&s=10',
+        'https://i.pinimg.com/736x/10/8b/e4/108be435dedcad3080d6a633ce888748.jpg',
     'is_favorite': false,
   },
   {

@@ -8,7 +8,6 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/app_snackbar.dart';
-import '../../../../core/widgets/state_views.dart';
 import '../../community/view/community_view.dart';
 import '../../home/view/home_screen.dart';
 import '../../map/view/map_view.dart';
@@ -178,12 +177,26 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                 child: BlocBuilder<MyTripsCubit, MyTripsState>(
                   builder: (context, state) {
                     if (state is! MyTripsSuccess) {
-                      return state is MyTripsError
-                          ? AppErrorView(
-                              message: state.error,
-                              onRetry: context.read<MyTripsCubit>().refresh,
-                            )
-                          : const _MyTripsSkeleton();
+                      if (state is MyTripsError) {
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: EmptyTrips(
+                                tabName: 'Upcoming',
+                                title: 'No Trips Yet',
+                                message:
+                                    'Could not load your trips. ${state.error}',
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: context.read<MyTripsCubit>().refresh,
+                              child: const Text('Try again'),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        );
+                      }
+                      return const _MyTripsSkeleton();
                     }
                     final trips = state.trips;
                     if (trips.isEmpty) {
@@ -210,39 +223,49 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                                 left: 4,
                                 bottom: 6,
                               ),
-                              child: Row(
-                                children: [
-                                  BookingKindIcon(isPrivate: isPrivate),
-                                  const Spacer(),
-                                  GestureDetector(
-                                    onTap: () => _confirmDelete(trip),
-                                    behavior: HitTestBehavior.opaque,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.background,
-                                        border: Border.all(
-                                          color: AppColors.cardBorder,
+                              child: BookingKindIcon(isPrivate: isPrivate),
+                            ),
+                            Stack(
+                              children: [
+                                TripCard(
+                                  trip: trip,
+                                  currencyLabel: isPrivate ? '\$' : 'EGP',
+                                  onTap: () => _openDetails(trip),
+                                  onViewDetails: () => _openDetails(trip),
+                                  // Chat: placeholder — no chat screen exists yet.
+                                  onChat: () {},
+                                ),
+                                Positioned(
+                                  top: 2,
+                                  right: 2,
+                                  child: PopupMenuButton<String>(
+                                    tooltip: 'Trip options',
+                                    padding: const EdgeInsets.all(8),
+                                    onSelected: (value) {
+                                      if (value == 'delete') {
+                                        _confirmDelete(trip);
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem<String>(
+                                        value: 'delete',
+                                        child: Text(
+                                          'Delete',
+                                          style: TextStyle(
+                                            color: AppColors.accentOrange,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: const Icon(
-                                        Icons.delete_outline,
-                                        size: 18,
-                                        color: AppColors.accentOrange,
-                                      ),
+                                    ],
+                                    icon: const Icon(
+                                      Icons.more_vert,
+                                      size: 20,
+                                      color: AppColors.textDark,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            TripCard(
-                              trip: trip,
-                              currencyLabel: isPrivate ? '\$' : 'EGP',
-                              onTap: () => _openDetails(trip),
-                              onViewDetails: () => _openDetails(trip),
-                              // Chat: placeholder — no chat screen exists yet.
-                              onChat: () {},
+                                ),
+                              ],
                             ),
                           ],
                         );

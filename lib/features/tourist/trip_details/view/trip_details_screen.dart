@@ -33,7 +33,7 @@ class TripDetailsScreen extends StatelessWidget {
 
   static const List<String> tabs = [
     'About',
-    'Highlights',
+    'Highlight',
     'Itinerary',
     'Notes',
   ];

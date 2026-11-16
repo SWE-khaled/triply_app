@@ -5,7 +5,7 @@ const List<Map<String, dynamic>> mockPlacesRaw = [
     'city': 'Giza',
     'country': 'Egypt',
     'image_url':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvi3xmuK5KiYF8KD8GsDkenLC8aypmvHxgOoyDviuSsg&s=10',
+        'https://i.pinimg.com/1200x/bf/c1/b8/bfc1b8d2a527bb6438c5f93c4b2a6648.jpg',
     'is_favorite': false,
   },
   {
@@ -14,7 +14,7 @@ const List<Map<String, dynamic>> mockPlacesRaw = [
     'city': 'Cairo',
     'country': 'Egypt',
     'image_url':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3d1F6I1VkP9vmN-ohhQ8-drlpILaCIPeM517yMRzzkQ&s=10',
+        'https://i.pinimg.com/736x/01/ee/38/01ee3865001d85be6e4ec5cf5dcd3cc0.jpg',
     'is_favorite': false,
   },
   {
@@ -23,7 +23,7 @@ const List<Map<String, dynamic>> mockPlacesRaw = [
     'city': 'Aswan',
     'country': 'Egypt',
     'image_url':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxpGWwQqw3qmyLkJ-E7ES-6saHVet3wOF97NptrHsspw&s=10',
+        'https://i.pinimg.com/736x/10/8b/e4/108be435dedcad3080d6a633ce888748.jpg',
     'is_favorite': false,
   },
 ];

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import 'package:triply/features/tourist/guides/cubit/guide_profile_cubit.dart';
-
 import 'package:triply/features/tourist/guides/model/guide.dart';
 import 'package:triply/features/tourist/guides/model/trip.dart' as guide_trip;
 import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
@@ -286,12 +285,14 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           title: trip.title,
           dateLabel: trip.dateLabel,
           guideName: guide.name,
-          peopleCount: 1,
+          guideId: guide.id,
+          guideAvatarUrl: guide.avatarUrl,
+          peopleCount: trip.bookedSeats,
           priceEgp: trip.price,
           imageUrl: trip.imageUrl,
           status: trips_model.TripStatus.upcoming,
           category: 'historical',
-          capacity: 12,
+          capacity: trip.capacity,
         ),
       ),
     );
@@ -311,6 +312,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
               color: Color(0xFF1A1A1A),
             ),
           ),
+          SizedBox(height: 14),
           if (trips.isEmpty)
             const Text(
               'No trips available',
@@ -362,10 +364,17 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                 ),
               ),
             ),
-            MessageGuideButton(
-              guideId: guide.id,
-              guideName: guide.name,
-              guideAvatar: guide.avatarUrl,
+            const SizedBox(width: 8),
+            // Original chat button size; AnimatedSize smooths the
+            // layout change when it appears after loading.
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              child: MessageGuideButton(
+                guideId: guide.id,
+                guideName: guide.name,
+                guideAvatar: guide.avatarUrl,
+              ),
             ),
           ],
         ),

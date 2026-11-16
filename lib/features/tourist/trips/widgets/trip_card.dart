@@ -143,7 +143,7 @@ class TripCard extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                '${trip.peopleCount}',
+                                '${trip.maxPeople}',
                                 style: GoogleFonts.poppins(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,

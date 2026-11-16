@@ -7,8 +7,14 @@ import '../../../../core/theme/app_colors.dart';
 class EmptyTrips extends StatelessWidget {
   final String tabName;
   final String? title;
+  final String? message;
 
-  const EmptyTrips({super.key, required this.tabName, this.title});
+  const EmptyTrips({
+    super.key,
+    required this.tabName,
+    this.title,
+    this.message,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +49,7 @@ class EmptyTrips extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Explore Egypt and book your first adventure',
+              message ?? 'Explore Egypt and book your first adventure',
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 13,

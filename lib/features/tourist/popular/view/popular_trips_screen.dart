@@ -13,7 +13,11 @@ import '../../trips/widgets/trip_card.dart';
 import '../cubit/popular_cubit.dart';
 
 class PopularTripsScreen extends StatelessWidget {
-  const PopularTripsScreen({super.key});
+  /// The screen title. The same list is reused by the All Trips screen,
+  /// which only changes the heading.
+  final String title;
+
+  const PopularTripsScreen({super.key, this.title = 'Popular Trips'});
 
   void _openDetails(BuildContext context, Trip trip) {
     Navigator.of(context).push(AppRoutes.tripDetails(trip));
@@ -33,7 +37,7 @@ class PopularTripsScreen extends StatelessWidget {
                 children: [
                   const CircleBackButton(),
                   const SizedBox(width: 12),
-                  Text('Popular Trips', style: AppTextStyles.screenTitle),
+                  Text(title, style: AppTextStyles.screenTitle),
                 ],
               ),
             ),

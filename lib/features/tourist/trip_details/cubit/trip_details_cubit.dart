@@ -49,13 +49,17 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
     final cached = _loadedTrips[trip.id];
     if (cached != null) {
       _selectedTab = cached.selectedTab;
-      safeEmit(
-        TripDetailsSuccess(
-          details: cached.details,
-          selectedTab: cached.selectedTab,
-          isFavorite: _favoriteIds.contains(trip.id),
-        ),
+      final details = cached.details.withGuideFallback(
+        guideId: trip.guideId,
+        guideAvatarUrl: trip.guideAvatarUrl,
       );
+      final success = TripDetailsSuccess(
+        details: details,
+        selectedTab: cached.selectedTab,
+        isFavorite: _favoriteIds.contains(trip.id),
+      );
+      _loadedTrips[trip.id] = success;
+      safeEmit(success);
       return;
     }
     if (_loadingTripId == trip.id) return;
@@ -64,15 +68,21 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
     // trip keeps its error view instead of restarting the shimmer.
     if (state is! TripDetailsError) safeEmit(const TripDetailsLoading());
     try {
-      final remote = await _repository.fetchTrip(trip.id, rethrowOnError: true);
+      final remote = await _repository.fetchTrip(trip.id);
       final details = remote != null
-          ? TripDetails.fromPublicTrip(remote)
+          ? TripDetails.fromPublicTrip(
+              remote,
+              fallbackGuideId: trip.guideId,
+              fallbackGuideAvatarUrl: trip.guideAvatarUrl,
+            )
           : _source.getByTripId(
               trip.id,
               title: trip.title,
               imageUrl: trip.imageUrl,
               priceEgp: trip.priceEgp,
               guideName: trip.guideName,
+              guideId: trip.guideId,
+              guideAvatarUrl: trip.guideAvatarUrl,
             );
       final success = TripDetailsSuccess(
         details: details,

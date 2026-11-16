@@ -18,6 +18,9 @@ class Trip {
   /// How many travelers the trip accepts.
   final int capacity;
 
+  /// How many seats are already booked on the trip.
+  final int bookedSeats;
+
   const Trip({
     required this.id,
     required this.title,
@@ -28,6 +31,7 @@ class Trip {
     this.dateLabel = '',
     this.guideName = '',
     this.capacity = 12,
+    this.bookedSeats = 0,
   });
 
   /// Builds the card model from the neutral Firestore model.
@@ -42,6 +46,7 @@ class Trip {
       dateLabel: trip.dateLabel,
       guideName: trip.guideName,
       capacity: trip.capacity,
+      bookedSeats: trip.bookedSeats,
     );
   }
 
@@ -53,6 +58,9 @@ class Trip {
       duration: json['duration'] as String? ?? '',
       location: json['location'] as String? ?? '',
       price: (json['price'] as num? ?? 0).toDouble(),
+      capacity: (json['capacity'] as num? ?? 12).toInt(),
+      bookedSeats: ((json['bookedSeats'] ?? json['peopleCount']) as num? ?? 0)
+          .toInt(),
     );
   }
 
@@ -64,6 +72,8 @@ class Trip {
       'duration': duration,
       'location': location,
       'price': price,
+      'capacity': capacity,
+      'bookedSeats': bookedSeats,
     };
   }
 }
