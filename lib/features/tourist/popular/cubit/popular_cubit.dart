@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/data/mock/tourist/mock_trips_public.dart';
 import 'package:triply/core/data/models/public_trip.dart';
 import 'package:triply/core/data/repositories/public_trips_repository.dart';
+import 'package:triply/core/utils/page_load_error.dart';
 import 'package:triply/core/utils/safe_emit_mixin.dart';
 import '../../trips/models/trip.dart';
 
@@ -37,15 +38,30 @@ class PopularCubit extends Cubit<PopularState>
   /// The category the list is filtered by.
   String _selectedCategory = 'All';
 
+  /// True while the one initial read of this session is in flight.
+  bool _isLoading = false;
+
   /// Reads the approved trips and applies the current filter.
+  ///
+  /// The Cubit lives for the whole app session, so the read runs once: the
+  /// retained success state is reused on every later visit and retries only
+  /// happen after a real error.
   Future<void> load() async {
-    safeEmit(const PopularLoading());
+    if (_isLoading || state is PopularSuccess) return;
+    _isLoading = true;
+    // Only the very first read shows the shimmer; a retry after an error
+    // keeps the error view instead of restarting the skeleton.
+    if (state is PopularInitial) safeEmit(const PopularLoading());
     try {
-      final remote = await _repository.fetchApprovedTrips();
+      final remote = await _repository.fetchApprovedTrips(
+        rethrowOnError: true,
+      );
       _all = remote ?? _mockTrips();
       _applyCategory(_selectedCategory);
     } catch (e) {
-      safeEmit(PopularError(error: e.toString()));
+      safeEmit(PopularError(error: pageLoadErrorMessage(e)));
+    } finally {
+      _isLoading = false;
     }
   }
 

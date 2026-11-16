@@ -38,8 +38,18 @@ class ProfileCubit extends Cubit<ProfileState> {
   final CommunityPostsRepository _postsRepository;
   final String? _userId;
   StreamSubscription<List<CommunityPost>>? _postsSubscription;
+  bool _isLoadingProfile = false;
 
   Future<void> loadUserProfile(String userId) async {
+    if (_isLoadingProfile) return;
+    _isLoadingProfile = true;
+    // Only the very first read shows the shimmer. A retry after an error
+    // keeps the error view until the request resolves.
+    if (!state.hasLoadedProfile && state.profileError == null) {
+      emit(
+        state.copyWith(isLoadingProfile: true, clearProfileError: true),
+      );
+    }
     try {
       final data = await _authRepository.getUserProfile(userId);
       if (isClosed) return;
@@ -80,6 +90,8 @@ class ProfileCubit extends Cubit<ProfileState> {
           profileError: pageLoadErrorMessage(error),
         ),
       );
+    } finally {
+      _isLoadingProfile = false;
     }
   }
 
@@ -109,12 +121,15 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   void retryInitialLoad() {
-    if (state.profileError != null && _userId != null) {
-      unawaited(loadUserProfile(_userId));
+    final userId = _userId;
+    if (state.profileError != null && userId != null) {
+      unawaited(loadUserProfile(userId));
     }
     if (state.postsError != null) {
+      // Re-subscribe without clearing the error or the loaded flag, so the
+      // error view stays until the feed answers and the shimmer never
+      // restarts.
       unawaited(_postsSubscription?.cancel());
-      emit(state.copyWith(isLoadingPosts: true, clearPostsError: true));
       _watchMyPosts();
     }
   }

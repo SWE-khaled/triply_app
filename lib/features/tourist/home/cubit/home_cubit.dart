@@ -37,9 +37,12 @@ class HomeCubit extends Cubit<HomeState> with SafeEmitMixin<HomeState> {
         .listen(
           _onNotifications,
           // A stream that is refused (the user signed out, the rules
-          // changed) must not become an unhandled exception.
-          onError: (Object error) =>
-              safeEmit(HomeError(error: error.toString())),
+          // changed) must not throw away a Home that already loaded its
+          // content. Only the unread badge is affected.
+          onError: (Object error) {
+            _unreadNotifications = 0;
+            _emitSuccess();
+          },
         );
     load();
   }
@@ -79,7 +82,10 @@ class HomeCubit extends Cubit<HomeState> with SafeEmitMixin<HomeState> {
   Future<void> load() async {
     if (_isLoading || state is HomeSuccess) return;
     _isLoading = true;
-    safeEmit(const HomeLoading());
+    // Only the very first read shows the shimmer. A retry after an error
+    // keeps the error view until the request resolves, so the loading
+    // skeleton never restarts.
+    if (state is HomeInitial) safeEmit(const HomeLoading());
     try {
       _places = _mockPlaces();
 

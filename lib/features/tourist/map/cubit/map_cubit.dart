@@ -28,7 +28,9 @@ class MapCubit extends Cubit<MapState> {
   Future<void> _loadFromFirestore() async {
     if (_isLoading || state is MapSuccessState) return;
     _isLoading = true;
-    emit(const MapLoadingState());
+    // Only the very first read shows the shimmer; a retry after an error
+    // keeps the error view instead of restarting the skeleton.
+    if (state is MapInitial) emit(const MapLoadingState());
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('places')

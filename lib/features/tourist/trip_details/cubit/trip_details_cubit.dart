@@ -60,7 +60,9 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
     }
     if (_loadingTripId == trip.id) return;
     _loadingTripId = trip.id;
-    safeEmit(const TripDetailsLoading());
+    // A new trip may show the details skeleton, but a retry of a failed
+    // trip keeps its error view instead of restarting the shimmer.
+    if (state is! TripDetailsError) safeEmit(const TripDetailsLoading());
     try {
       final remote = await _repository.fetchTrip(trip.id, rethrowOnError: true);
       final details = remote != null

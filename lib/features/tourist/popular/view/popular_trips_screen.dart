@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
@@ -140,7 +141,7 @@ class PopularTripsScreen extends StatelessWidget {
                       message: error,
                       onRetry: () => context.read<PopularCubit>().load(),
                     ),
-                    _ => const AppLoadingView(),
+                    _ => const _PopularTripsSkeleton(),
                   };
                 },
               ),
@@ -150,4 +151,65 @@ class PopularTripsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PopularTripsSkeleton extends StatelessWidget {
+  const _PopularTripsSkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+      itemCount: 4,
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
+      itemBuilder: (_, _) => const ShimmerCard(
+        radius: 16,
+        child: SizedBox(
+          height: 148,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ShimmerBox(
+                width: 105,
+                height: 148,
+                borderRadius: BorderRadius.horizontal(
+                  left: Radius.circular(16),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(10, 12, 10, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ShimmerLine(width: 145, height: 14),
+                          SizedBox(height: 7),
+                          ShimmerLine(width: 105, height: 12),
+                          SizedBox(height: 7),
+                          ShimmerLine(width: 120, height: 12),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          ShimmerCircle(size: 14),
+                          SizedBox(width: 8),
+                          ShimmerLine(width: 46, height: 12),
+                          Spacer(),
+                          ShimmerLine(width: 72, height: 14),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

@@ -85,18 +85,10 @@ class CommunityCubit extends Cubit<CommunityState> {
   }
 
   void retryInitialLoad() {
+    // Re-subscribe without resetting the loading flags: the error view stays
+    // on screen until the feeds answer, so the shimmer never restarts.
     unawaited(_postsSubscription?.cancel());
     unawaited(_storiesSubscription?.cancel());
-    emit(
-      state.copyWith(
-        isLoadingPosts: true,
-        hasLoadedPosts: false,
-        clearPostsError: true,
-        isLoadingStories: true,
-        hasLoadedStories: false,
-        clearStoriesError: true,
-      ),
-    );
     _listenToFeeds();
   }
 

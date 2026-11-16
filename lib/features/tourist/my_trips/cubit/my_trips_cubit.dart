@@ -48,7 +48,11 @@ class MyTripsCubit extends Cubit<MyTripsState>
   Future<void> load() async {
     if (_isLoading) return;
     _isLoading = true;
-    if (!_hasLoaded) safeEmit(const MyTripsLoading());
+    // Only the very first read shows the shimmer; a retry after an error
+    // keeps the error view instead of restarting the skeleton.
+    if (!_hasLoaded && state is! MyTripsError) {
+      safeEmit(const MyTripsLoading());
+    }
     try {
       final bookings = await _bookingRepository.fetchMyBookings();
       // Lazy expiry (no scheduler): cancel any of the tourist's own pending

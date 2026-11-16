@@ -24,7 +24,6 @@ import '../../features/tourist/trips/view/trips_screen.dart';
 import '../../features/tourist/trip_details/cubit/trip_details_cubit.dart';
 import '../../features/tourist/trip_details/view/trip_details_screen.dart';
 import '../../features/tourist/my_trips/view/my_trips_screen.dart';
-import '../../features/tourist/popular/cubit/popular_cubit.dart';
 import '../../features/tourist/popular/view/popular_trips_screen.dart';
 
 /// Single route table: named routes (String constants) + route builders.
@@ -62,18 +61,18 @@ class AppRoutes {
 
   static Route<void> trips() {
     return MaterialPageRoute(
-      builder: (_) =>
-          BlocProvider(create: (_) => TripsCubit(), child: const TripsScreen()),
+      builder: (context) => BlocProvider.value(
+        value: context.read<TripsCubit>(),
+        child: const TripsScreen(),
+      ),
     );
   }
 
   static Route<void> popular() {
-    return MaterialPageRoute(
-      builder: (_) => BlocProvider(
-        create: (_) => PopularCubit(),
-        child: const PopularTripsScreen(),
-      ),
-    );
+    // The PopularCubit is app-session scoped (provided in main.dart), so the
+    // page reuses the data from the initial loading cycle instead of
+    // creating a new Cubit and re-reading the trips on every visit.
+    return MaterialPageRoute(builder: (_) => const PopularTripsScreen());
   }
 
   static Route<void> tripDetails(Trip trip, {bool isBooked = false}) {

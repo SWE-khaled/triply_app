@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:triply/core/widgets/app_shimmer.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/core/widgets/state_views.dart';
 import 'package:triply/features/tourist/guides/cubit/guides_cubit.dart';
@@ -15,21 +16,21 @@ class GuidesListScreen extends StatefulWidget {
 }
 
 class _GuidesListScreenState extends State<GuidesListScreen> {
-  late final GuidesCubit _controller;
+  GuidesCubit get _controller => context.read<GuidesCubit>();
   late final TextEditingController _searchFieldController;
 
   @override
   void initState() {
     super.initState();
-    // Owned here (like the old controller) so helpers keep working
-    // unchanged; provided below for BlocBuilder rebuilds.
-    _controller = GuidesCubit();
-    _searchFieldController = TextEditingController();
+    // The Cubit is app-session scoped (provided in main.dart): reuse its
+    // retained search text instead of starting a new loading cycle here.
+    _searchFieldController = TextEditingController(
+      text: _controller.searchQuery,
+    );
   }
 
   @override
   void dispose() {
-    _controller.close();
     _searchFieldController.dispose();
     super.dispose();
   }
@@ -44,7 +45,7 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
           child: BlocBuilder<GuidesCubit, GuidesState>(
             builder: (context, state) {
               if (state is GuidesInitial || state is GuidesLoading) {
-                return const AppLoadingView();
+                return const _GuidesListSkeleton();
               }
               if (state is GuidesError) {
                 return AppErrorView(
@@ -193,6 +194,130 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
       ),
     );
   }
+}
+
+class _GuidesListSkeleton extends StatelessWidget {
+  const _GuidesListSkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: Row(
+              children: [
+                const ShimmerCircle(size: 41),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    ShimmerLine(width: 110, height: 17),
+                    SizedBox(height: 7),
+                    ShimmerLine(width: 90, height: 12),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: ShimmerBox(
+              width: double.infinity,
+              height: 48,
+              borderRadius: BorderRadius.all(Radius.circular(14)),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 60,
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              scrollDirection: Axis.horizontal,
+              itemCount: 4,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (_, index) => ShimmerBox(
+                width: [58.0, 82.0, 72.0, 88.0][index],
+                height: 36,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: _GuideCardSkeleton(),
+              ),
+              childCount: 4,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _GuideCardSkeleton extends StatelessWidget {
+  const _GuideCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) => ShimmerCard(
+    radius: 20,
+    padding: const EdgeInsets.all(12),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ShimmerBox(
+          width: 56,
+          height: 56,
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              ShimmerLine(width: 135, height: 15),
+              SizedBox(height: 7),
+              ShimmerLine(width: 100, height: 12),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  ShimmerBox(
+                    width: 48,
+                    height: 20,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  SizedBox(width: 6),
+                  ShimmerBox(
+                    width: 56,
+                    height: 20,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  ShimmerLine(width: 74, height: 12),
+                  Spacer(),
+                  ShimmerLine(width: 82, height: 13),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _EmptyState extends StatelessWidget {

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/data/mock/tourist/mock_guides.dart'
     show mockGuideLanguageFilters;
 import 'package:triply/core/data/repositories/public_guides_repository.dart';
+import 'package:triply/core/utils/page_load_error.dart';
 import 'package:triply/core/utils/safe_emit_mixin.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 
@@ -34,15 +35,28 @@ class GuidesCubit extends Cubit<GuidesState> with SafeEmitMixin<GuidesState> {
   /// The guides that pass the filters.
   List<Guide> get filteredGuides => _filter(_searchQuery, _selectedLanguage);
 
+  /// True while the one initial read of this session is in flight.
+  bool _isLoading = false;
+
   /// Reads the approved guides.
+  ///
+  /// The Cubit is app-session scoped, so a successful read is retained and
+  /// never repeated by navigation. [load] only runs again after an error
+  /// (the manual retry).
   Future<void> load() async {
-    safeEmit(const GuidesLoading());
+    if (_isLoading || state is GuidesSuccess) return;
+    _isLoading = true;
+    // Only the very first read shows the shimmer; a retry after an error
+    // keeps the error view instead of restarting the skeleton.
+    if (state is GuidesInitial) safeEmit(const GuidesLoading());
     try {
       final remote = await _repository.fetchApprovedGuides();
       _allGuides = remote.map(Guide.fromPublicGuide).toList();
       _emitSuccess();
     } catch (e) {
-      safeEmit(GuidesError(error: e.toString()));
+      safeEmit(GuidesError(error: pageLoadErrorMessage(e)));
+    } finally {
+      _isLoading = false;
     }
   }
 

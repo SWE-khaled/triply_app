@@ -33,6 +33,9 @@ import 'features/tourist/community/cubit/community_cubit.dart';
 import 'features/tourist/my_trips/cubit/my_trips_cubit.dart';
 import 'features/tourist/user_profile/cubit/profile_cubit.dart';
 import 'features/tourist/trip_details/cubit/trip_details_cubit.dart';
+import 'features/tourist/popular/cubit/popular_cubit.dart';
+import 'features/tourist/guides/cubit/guides_cubit.dart';
+import 'features/tourist/trips/cubit/trips_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,8 +62,9 @@ class MyApp extends StatelessWidget {
         // Resolves the restored Firebase session while the splash animates.
         // Not lazy: the work must start at launch, not when the gate mounts.
         BlocProvider(lazy: false, create: (_) => StartupCubit()..resolve()),
-        // Tourist page Cubits live for this app session and are created only
-        // when their page is first opened.
+        // Tourist page Cubits live for this app session. They are created on
+        // the first tourist page opening and keep their loaded data until
+        // the process restarts, so revisiting a page never reloads it.
         BlocProvider(create: (_) => HomeCubit()),
         BlocProvider(
           create: (context) =>
@@ -70,6 +74,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => MapCubit()),
         BlocProvider(create: (_) => MyTripsCubit()),
         BlocProvider(create: (_) => TripDetailsCubit()),
+        BlocProvider(create: (_) => PopularCubit()),
+        BlocProvider(create: (_) => GuidesCubit()),
+        BlocProvider(create: (_) => TripsCubit()),
       ],
       child: MaterialApp(
         title: 'Triply',
