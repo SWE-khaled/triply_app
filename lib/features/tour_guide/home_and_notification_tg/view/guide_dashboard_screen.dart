@@ -242,141 +242,141 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
     final avatarUrl = firebasePhoto.isNotEmpty
         ? firebasePhoto
         : ProfileAvatar.defaultAvatar;
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _header(context, avatarUrl),
-          const SizedBox(height: 16),
-          if (showVerificationBanner) ...[
-            _verificationBanner(context),
-            const SizedBox(height: 20),
-          ] else
-            const SizedBox(height: 4),
-          const Text(
-            'Dashboard',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-              color: AppColors.title,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Welcome back, $guideName',
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: StatCard(
-                  icon: Icons.people_outline,
-                  value: '${stats.totalBookings}',
-                  label: 'Total Bookings',
-                  onTap: () {},
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: StatCard(
-                  icon: Icons.calendar_today_outlined,
-                  value: '${stats.upcomingTrips}',
-                  label: 'Upcoming Trips',
-                  // No Upcoming tab exists in My Trips; Active
-                  // holds the scheduled upcoming trips.
-                  onTap: () => Navigator.push(
-                    context,
-                    AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: StatCard(
-                  icon: Icons.work_outline,
-                  value: '${stats.activeTrips}',
-                  label: 'Active Trips',
-                  onTap: () => Navigator.push(
-                    context,
-                    AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: StatCard(
-                  icon: Icons.layers_outlined,
-                  value: '${stats.completedTrips}',
-                  label: 'Completed Trips',
-                  onTap: () => Navigator.push(
-                    context,
-                    AppRoutes.guideTrips(
-                      initialStatus: GuideTripStatus.completed,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: StatCard(
-                  icon: Icons.credit_card_outlined,
-                  value: stats.earningsLabel,
-                  label: 'Earnings',
-                  highlighted: true,
-                  valueTeal: true,
-                  onTap: () => Navigator.push(context, AppRoutes.earnings()),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: StatCard(
-                  icon: Icons.notifications_none_outlined,
-                  value: '${stats.pendingRequests}',
-                  label: 'Pending Requests',
-                  onTap: () => Navigator.push(
-                    context,
-                    AppRoutes.guideTrips(
-                      initialStatus: GuideTripStatus.pending,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    // The outer BlocBuilder already wraps this in a padded scroll view;
+    // a second scroll view here was redundant and nested the scroll gesture.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _header(context, avatarUrl),
+        const SizedBox(height: 16),
+        if (showVerificationBanner) ...[
+          _verificationBanner(context),
           const SizedBox(height: 20),
-          const Text(
-            'New bookings',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: AppColors.title,
+        ] else
+          const SizedBox(height: 4),
+        const Text(
+          'Dashboard',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: AppColors.title,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Welcome back, $guideName',
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: StatCard(
+                icon: Icons.people_outline,
+                value: '${stats.totalBookings}',
+                label: 'Total Bookings',
+                onTap: () {},
+              ),
             ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: StatCard(
+                icon: Icons.calendar_today_outlined,
+                value: '${stats.upcomingTrips}',
+                label: 'Upcoming Trips',
+                // No Upcoming tab exists in My Trips; Active
+                // holds the scheduled upcoming trips.
+                onTap: () => Navigator.push(
+                  context,
+                  AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: StatCard(
+                icon: Icons.work_outline,
+                value: '${stats.activeTrips}',
+                label: 'Active Trips',
+                onTap: () => Navigator.push(
+                  context,
+                  AppRoutes.guideTrips(initialStatus: GuideTripStatus.active),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: StatCard(
+                icon: Icons.layers_outlined,
+                value: '${stats.completedTrips}',
+                label: 'Completed Trips',
+                onTap: () => Navigator.push(
+                  context,
+                  AppRoutes.guideTrips(
+                    initialStatus: GuideTripStatus.completed,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: StatCard(
+                icon: Icons.credit_card_outlined,
+                value: stats.earningsLabel,
+                label: 'Earnings',
+                highlighted: true,
+                valueTeal: true,
+                onTap: () => Navigator.push(context, AppRoutes.earnings()),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: StatCard(
+                icon: Icons.notifications_none_outlined,
+                value: '${stats.pendingRequests}',
+                label: 'Pending Requests',
+                onTap: () => Navigator.push(
+                  context,
+                  AppRoutes.guideTrips(initialStatus: GuideTripStatus.pending),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'New bookings',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: AppColors.title,
+          ),
+        ),
+        const SizedBox(height: 12),
+        for (final b in bookings) ...[
+          BookingRequestCard(
+            booking: b,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BookingDetailsScreen(bookingId: b.id),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 12),
-          for (final b in bookings) ...[
-            BookingRequestCard(
-              booking: b,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => BookingDetailsScreen(bookingId: b.id),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-          ],
         ],
-      ),
+      ],
     );
   }
 

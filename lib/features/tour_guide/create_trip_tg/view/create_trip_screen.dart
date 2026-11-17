@@ -281,7 +281,6 @@ class _CreateTripViewState extends State<_CreateTripView> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.isEditing;
-    final halfWidth = (MediaQuery.sizeOf(context).width - 42) / 2;
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -299,12 +298,16 @@ class _CreateTripViewState extends State<_CreateTripView> {
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    isEditing ? widget.formTitle : 'Create Trip',
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.priceTeal,
+                  Expanded(
+                    child: Text(
+                      isEditing ? widget.formTitle : 'Create Trip',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.priceTeal,
+                      ),
                     ),
                   ),
                 ],
@@ -396,7 +399,6 @@ class _CreateTripViewState extends State<_CreateTripView> {
         ),
       ),
       bottomNavigationBar: FormBottomBar(
-        halfWidth: halfWidth,
         submitLabel: isEditing ? widget.submitLabel : 'Submit for Approval',
         onPreview: () => _preview(context),
         onSubmit: () => _submit(context, isEditing),

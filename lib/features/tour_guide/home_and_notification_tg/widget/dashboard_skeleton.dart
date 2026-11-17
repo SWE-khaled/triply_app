@@ -124,7 +124,7 @@ class _BookingCardSkeleton extends StatelessWidget {
                 children: const [
                   ShimmerLine(width: 120, height: 15),
                   SizedBox(height: 6),
-                  ShimmerLine(width: 150, height: 12),
+                  ShimmerLine(width: double.infinity, height: 12),
                   SizedBox(height: 6),
                   ShimmerLine(width: 100, height: 11),
                 ],

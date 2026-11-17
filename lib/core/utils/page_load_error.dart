@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 
 const pageNetworkErrorMessage =
     'Unable to load data. Please check your internet connection and try again.';
+const pageGenericErrorMessage = 'Unable to load data. Please try again.';
 
 String pageLoadErrorMessage(Object error) {
   final description = error.toString().toLowerCase();
@@ -34,5 +35,13 @@ String pageLoadErrorMessage(Object error) {
       description.contains('deadline-exceeded')) {
     return pageNetworkErrorMessage;
   }
-  return 'Unable to load data. Please try again.';
+  return pageGenericErrorMessage;
+}
+
+/// The message shown by My Trips: network failures keep the friendly
+/// connection hint, every other failure keeps the original exception so the
+/// generic text cannot hide the real cause.
+String pageLoadErrorDetail(Object error) {
+  final message = pageLoadErrorMessage(error);
+  return message == pageGenericErrorMessage ? error.toString() : message;
 }

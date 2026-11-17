@@ -47,6 +47,8 @@ class BookingRequestCard extends StatelessWidget {
                 children: [
                   Text(
                     booking.guestName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -56,6 +58,8 @@ class BookingRequestCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     booking.tourTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.subtitle,
@@ -63,6 +67,8 @@ class BookingRequestCard extends StatelessWidget {
                   ),
                   Text(
                     booking.detailLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.subtitle,

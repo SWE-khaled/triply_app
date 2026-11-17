@@ -59,15 +59,19 @@ class CardProfile extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        guide.name,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0E5261),
+                      Flexible(
+                        child: Text(
+                          guide.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0E5261),
+                          ),
                         ),
                       ),
-                      SizedBox(width: 15),
+                      const SizedBox(width: 15),
                       if (guide.isVerified)
                         Icon(
                           Icons.verified,
@@ -107,34 +111,38 @@ class CardProfile extends StatelessWidget {
                         reviewCountColor: Color(0xFFAAB8BC),
                       ),
                       const Spacer(),
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'From ',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFFE07A4F),
+                      Flexible(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'From ',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFFE07A4F),
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text:
-                                  '${guide.currency}${guide.pricePerHour.toStringAsFixed(0)}',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFFE07A4F),
+                              TextSpan(
+                                text:
+                                    '${guide.currency}${guide.pricePerHour.toStringAsFixed(0)}',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFFE07A4F),
+                                ),
                               ),
-                            ),
-                            const TextSpan(
-                              text: '/hr',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFFAAB8BC),
+                              const TextSpan(
+                                text: '/hr',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFFAAB8BC),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

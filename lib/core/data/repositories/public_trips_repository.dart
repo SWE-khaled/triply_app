@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+
 import '../models/public_trip.dart';
 import '../remote/firestore_service.dart';
 
@@ -92,9 +95,24 @@ class PublicTripsRepository {
     try {
       final trips = await Future.wait(
         wanted.map((id) async {
-          final data = await _firestore.readDoc(tripsCollection, id);
-          if (data == null) return null;
-          return PublicTrip.fromDocument(data, id);
+          try {
+            final data = await _firestore.readDoc(tripsCollection, id);
+            if (data == null) return null;
+            return PublicTrip.fromDocument(data, id);
+          } on FirebaseException catch (error) {
+            // A booking can reference a trip the tourist can no longer
+            // read (missing, rejected or cancelled). That is specific to
+            // this one booking: skip its join, keep the other bookings,
+            // and leave an auditable trace of the original error.
+            if (error.code == 'permission-denied') {
+              debugPrint(
+                'PublicTripsRepository.fetchTripsByIds: '
+                'trip $id is not readable (${error.code}).',
+              );
+              return null;
+            }
+            rethrow;
+          }
         }),
       );
       return trips.whereType<PublicTrip>().toList();

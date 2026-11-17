@@ -16,7 +16,14 @@ import '../../../../core/widgets/state_views.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
 import '../../user_profile/view/profile_screen.dart';
 import '../cubit/home_cubit.dart';
-
+import '../cubit/home_guides_cubit.dart';
+import '../cubit/home_guides_state.dart';
+import '../cubit/home_places_cubit.dart';
+import '../cubit/home_places_state.dart';
+import '../cubit/home_trips_cubit.dart';
+import '../cubit/home_trips_state.dart';
+import '../cubit/place_favorite_cubit.dart';
+import '../model/place.dart';
 import '../model/trip.dart';
 import '../widget/community_banner.dart';
 import '../widget/guide_tile.dart';
@@ -33,7 +40,39 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  HomeCubit get controller => context.read<HomeCubit>();
+  /// Bottom navigation is UI state, not a business operation.
+  int _bottomNavIndex = 0;
+
+  /// One favorite instance per place id, kept for this screen's lifetime so
+  /// scrolling a card out of view does not reset its session-local flag.
+  final Map<String, PlaceFavoriteCubit> _favoriteCubits = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<HomePlacesCubit>().load();
+      context.read<HomeGuidesCubit>().load();
+      context.read<HomeTripsCubit>().load();
+    });
+  }
+
+  @override
+  void dispose() {
+    for (final cubit in _favoriteCubits.values) {
+      cubit.close();
+    }
+    super.dispose();
+  }
+
+  PlaceFavoriteCubit _favoriteCubitFor(Place place) {
+    final existing = _favoriteCubits[place.id];
+    if (existing != null) return existing;
+    final cubit = PlaceFavoriteCubit(isFavorite: place.isFavorite);
+    _favoriteCubits[place.id] = cubit;
+    return cubit;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,166 +82,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       extendBody: true,
-      body: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) {
-          if (state is HomeInitial || state is HomeLoading) {
-            return const _HomeSkeleton();
-          }
-          if (state is HomeError) {
-            return AppErrorView(message: state.error, onRetry: controller.load);
-          }
-          if (state is! HomeSuccess) return const _HomeSkeleton();
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeroHeader(context, photoUrl, name),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SectionHeader(
-                    title: 'Popular Places',
-                    onSeeAllTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: ((context) => MapScreen())),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 220,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: state.places.length,
-                    itemBuilder: (context, i) {
-                      final place = state.places[i];
-                      return PlaceCard(
-                        place: place,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  PlaceDetailScreen(placeId: place.id),
-                            ),
-                          );
-                        },
-                        onFavoriteTap: () =>
-                            controller.toggleFavorite(place.id),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SectionHeader(
-                    title: 'Local Guides',
-                    // TODO(Figma): no destination in Figma yet.
-                    onSeeAllTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: ((context) => GuidesListScreen()),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: state.guides.isEmpty
-                      ? const _SectionEmpty(
-                          icon: Icons.person_search_outlined,
-                          message: 'No guides published yet — check back soon!',
-                        )
-                      : Column(
-                          children: [
-                            for (final guide in state.guides)
-                              GuideTile(
-                                guide: guide,
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          GuideProfileScreen(guideId: guide.id),
-                                    ),
-                                  );
-                                },
-                              ),
-                          ],
-                        ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SectionHeader(
-                    title: 'Popular Trips',
-                    onSeeAllTap: () {
-                      Navigator.of(context).push(AppRoutes.allTrips());
-                    },
-                  ),
-                ),
-                const SizedBox(height: 12),
-                state.trips.isEmpty
-                    ? const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: _SectionEmpty(
-                          icon: Icons.map_outlined,
-                          message:
-                              'No trips published yet — guides are adding new trips!',
-                        ),
-                      )
-                    : SizedBox(
-                        height: 180,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: state.trips.length > 5
-                              ? 5
-                              : state.trips.length,
-                          itemBuilder: (context, i) {
-                            final trip = state.trips[i];
-                            return TripCard(
-                              trip: trip,
-                              onTap: () => _openTripDetails(context, trip),
-                            );
-                          },
-                        ),
-                      ),
-                const SizedBox(height: 24),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Travelers in Egypt',
-                        style: AppTextStyles.sectionTitle,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CommunityBanner(
-                    // TODO(Figma): no destination in Figma yet.
-                    onJoinTap: () {},
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: CommunityStatsRow(),
-                ),
-                const SizedBox(height: 84),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BlocBuilder<HomeCubit, HomeState>(
+              builder: (context, _) {
+                return _buildHeroHeader(context, photoUrl, name);
+              },
             ),
-          );
-        },
+            const SizedBox(height: 16),
+            _buildPlacesSection(context),
+            const SizedBox(height: 24),
+            _buildGuidesSection(context),
+            const SizedBox(height: 12),
+            _buildTripsSection(context),
+            const SizedBox(height: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Travelers in Egypt',
+                    style: AppTextStyles.sectionTitle,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: CommunityBanner(
+                // TODO(Figma): no destination in Figma yet.
+                onJoinTap: () {},
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: CommunityStatsRow(),
+            ),
+            const SizedBox(height: 84),
+          ],
+        ),
       ),
       floatingActionButton: ChatUnreadBuilder(
         builder: (context, unread) => Stack(
@@ -259,31 +181,229 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, _) => AppBottomNav(
-          currentIndex: controller.bottomNavIndex,
-          onTap: (index) {
-            if (index == 0) {
-              controller.setBottomNavIndex(index);
-            } else if (index == 1) {
-              Navigator.of(context).push(AppRoutes.myTrips());
-            } else if (index == 2) {
+      bottomNavigationBar: AppBottomNav(
+        currentIndex: _bottomNavIndex,
+        onTap: (index) => _onBottomNavTap(context, index),
+      ),
+    );
+  }
+
+  Widget _buildPlacesSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SectionHeader(
+            title: 'Popular Places',
+            onSeeAllTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: ((context) => MapScreen())),
-              ); //map
-            } else if (index == 3) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: ((context) => CommunityScreen())),
-              ); //community
-            } else if (index == 4) {
-              Navigator.pushNamed(context, AppRoutes.profile);
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        BlocBuilder<HomePlacesCubit, HomePlacesState>(
+          builder: (context, state) {
+            if (state is HomePlacesInitial || state is HomePlacesLoading) {
+              return const _PlacesSkeleton();
             }
+            if (state is HomePlacesError) {
+              return SizedBox(
+                height: 220,
+                child: AppErrorView(
+                  message: state.message,
+                  onRetry: () => context.read<HomePlacesCubit>().load(),
+                ),
+              );
+            }
+            if (state is! HomePlacesSuccess || state.places.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: _SectionEmpty(
+                  icon: Icons.place_outlined,
+                  message: 'No places published yet — check back soon!',
+                ),
+              );
+            }
+            return SizedBox(
+              height: 220,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: state.places.length,
+                itemBuilder: (context, i) {
+                  final place = state.places[i];
+                  return BlocProvider.value(
+                    value: _favoriteCubitFor(place),
+                    child: PlaceCard(
+                      place: place,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                PlaceDetailScreen(placeId: place.id),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            );
           },
         ),
-      ),
+      ],
     );
+  }
+
+  Widget _buildGuidesSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SectionHeader(
+            title: 'Local Guides',
+            // TODO(Figma): no destination in Figma yet.
+            onSeeAllTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: ((context) => GuidesListScreen()),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        BlocBuilder<HomeGuidesCubit, HomeGuidesState>(
+          builder: (context, state) {
+            if (state is HomeGuidesInitial || state is HomeGuidesLoading) {
+              return const _GuidesSkeleton();
+            }
+            if (state is HomeGuidesError) {
+              return SizedBox(
+                height: 140,
+                child: AppErrorView(
+                  message: state.message,
+                  onRetry: () => context.read<HomeGuidesCubit>().load(),
+                ),
+              );
+            }
+            if (state is! HomeGuidesSuccess || state.guides.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: _SectionEmpty(
+                  icon: Icons.person_search_outlined,
+                  message: 'No guides published yet — check back soon!',
+                ),
+              );
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  for (final guide in state.guides)
+                    GuideTile(
+                      guide: guide,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                GuideProfileScreen(guideId: guide.id),
+                          ),
+                        );
+                      },
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTripsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SectionHeader(
+            title: 'Popular Trips',
+            onSeeAllTap: () {
+              Navigator.of(context).push(AppRoutes.allTrips());
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        BlocBuilder<HomeTripsCubit, HomeTripsState>(
+          builder: (context, state) {
+            if (state is HomeTripsInitial || state is HomeTripsLoading) {
+              return const _TripsSkeleton();
+            }
+            if (state is HomeTripsError) {
+              return SizedBox(
+                height: 180,
+                child: AppErrorView(
+                  message: state.message,
+                  onRetry: () => context.read<HomeTripsCubit>().load(),
+                ),
+              );
+            }
+            if (state is! HomeTripsSuccess || state.trips.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: _SectionEmpty(
+                  icon: Icons.map_outlined,
+                  message:
+                      'No trips published yet — guides are adding new trips!',
+                ),
+              );
+            }
+            return SizedBox(
+              height: 180,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: state.trips.length > 5 ? 5 : state.trips.length,
+                itemBuilder: (context, i) {
+                  final trip = state.trips[i];
+                  return TripCard(
+                    trip: trip,
+                    onTap: () => _openTripDetails(context, trip),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _onBottomNavTap(BuildContext context, int index) {
+    if (index == 0) {
+      setState(() => _bottomNavIndex = index);
+    } else if (index == 1) {
+      Navigator.of(context).push(AppRoutes.myTrips());
+    } else if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: ((context) => MapScreen())),
+      ); //map
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: ((context) => CommunityScreen())),
+      ); //community
+    } else if (index == 4) {
+      Navigator.pushNamed(context, AppRoutes.profile);
+    }
   }
 
   void _openTripDetails(BuildContext context, Trip trip) {
@@ -310,6 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHeroHeader(BuildContext context, String? photoUrl, String name) {
     final hasPhoto = photoUrl != null && photoUrl.isNotEmpty;
+    final unreadNotifications = context.read<HomeCubit>().unreadNotifications;
 
     return Container(
       decoration: const BoxDecoration(
@@ -365,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Colors.white,
                       ),
                     ),
-                    if (controller.unreadNotifications > 0)
+                    if (unreadNotifications > 0)
                       Positioned(
                         right: 6,
                         top: 6,
@@ -379,9 +500,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: Text(
-                            controller.unreadNotifications > 9
+                            unreadNotifications > 9
                                 ? '9+'
-                                : '${controller.unreadNotifications}',
+                                : '$unreadNotifications',
                             style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
@@ -430,68 +551,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HomeSkeleton extends StatelessWidget {
-  const _HomeSkeleton();
+class _PlacesSkeleton extends StatelessWidget {
+  const _PlacesSkeleton();
 
   @override
   Widget build(BuildContext context) => AppShimmer(
-    child: SingleChildScrollView(
+    child: SizedBox(
+      height: 190,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 3,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (_, _) => const SizedBox(
+          width: 150,
+          child: ShimmerCard(
+            child: ShimmerBox(
+              width: 150,
+              height: 190,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class _GuidesSkeleton extends StatelessWidget {
+  const _GuidesSkeleton();
+
+  @override
+  Widget build(BuildContext context) => AppShimmer(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ShimmerCard(
-            radius: 24,
-            child: SizedBox(
-              height: 245,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    ShimmerLine(width: 145, height: 28),
-                    SizedBox(height: 48),
-                    ShimmerLine(width: 190, height: 12),
-                    SizedBox(height: 8),
-                    ShimmerLine(width: 230, height: 22),
-                    SizedBox(height: 18),
-                    ShimmerBox(
-                      width: double.infinity,
-                      height: 44,
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const _HomeSectionSkeleton(titleWidth: 140),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 190,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: 3,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (_, _) => const SizedBox(
-                width: 150,
-                child: ShimmerCard(
-                  child: ShimmerBox(
-                    width: 150,
-                    height: 190,
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 22),
-          const _HomeSectionSkeleton(titleWidth: 110),
-          const SizedBox(height: 12),
           for (var i = 0; i < 2; i++)
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: EdgeInsets.symmetric(vertical: 6),
               child: ShimmerCard(
                 padding: EdgeInsets.all(12),
                 child: Row(
@@ -503,58 +601,35 @@ class _HomeSkeleton extends StatelessWidget {
                 ),
               ),
             ),
-          const SizedBox(height: 22),
-          const _HomeSectionSkeleton(titleWidth: 130),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 180,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: 2,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (_, _) => const SizedBox(
-                width: 220,
-                child: ShimmerCard(
-                  child: ShimmerBox(
-                    width: 220,
-                    height: 180,
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 22),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: ShimmerBox(
-              width: double.infinity,
-              height: 120,
-              borderRadius: BorderRadius.all(Radius.circular(18)),
-            ),
-          ),
-          const SizedBox(height: 96),
         ],
       ),
     ),
   );
 }
 
-class _HomeSectionSkeleton extends StatelessWidget {
-  const _HomeSectionSkeleton({required this.titleWidth});
-
-  final double titleWidth;
+class _TripsSkeleton extends StatelessWidget {
+  const _TripsSkeleton();
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: Row(
-      children: [
-        ShimmerLine(width: titleWidth, height: 18),
-        const Spacer(),
-        const ShimmerLine(width: 48, height: 12),
-      ],
+  Widget build(BuildContext context) => AppShimmer(
+    child: SizedBox(
+      height: 180,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 2,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (_, _) => const SizedBox(
+          width: 220,
+          child: ShimmerCard(
+            child: ShimmerBox(
+              width: 220,
+              height: 180,
+              borderRadius: BorderRadius.all(Radius.circular(16)),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }

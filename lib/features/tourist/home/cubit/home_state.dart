@@ -13,29 +13,13 @@ final class HomeLoading extends HomeState {
   const HomeLoading();
 }
 
+/// The Home shell state. Only the notification badge lives here now;
+/// the content sections have their own Cubits.
 final class HomeSuccess extends HomeState {
-  /// The places of the "Popular Places" row.
-  final List<Place> places;
-
-  /// The local guides of the "Local Guides" row.
-  final List<Guide> guides;
-
-  /// The trips of the "Trending Trips" row.
-  final List<Trip> trips;
-
-  /// The tab of the bottom navigation.
-  final int bottomNavIndex;
-
   /// How many notifications the tourist did not read yet.
   final int unreadNotifications;
 
-  const HomeSuccess({
-    required this.places,
-    required this.guides,
-    required this.trips,
-    required this.bottomNavIndex,
-    this.unreadNotifications = 0,
-  });
+  const HomeSuccess({required this.unreadNotifications});
 }
 
 final class HomeError extends HomeState {

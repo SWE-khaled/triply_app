@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:triply/features/common/auth/data/auth_repository.dart';
 import 'package:triply/core/data/repositories/public_trips_repository.dart';
 import 'package:triply/core/data/trip_details_source.dart';
 import 'package:triply/core/utils/page_load_error.dart';
@@ -22,23 +21,19 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
        super(const TripDetailsInitial());
 
   static final Set<String> _favoriteIds = <String>{};
-  final Map<String, TripDetailsSuccess> _loadedTrips = {};
-  final Map<String, Future<String?>> _guidePhoneRequests = {};
+
+  final Map<String, TripDetails> _detailsCache = {};
+  final Map<String, int> _tabByTrip = {};
 
   final TripDetailsSource _source;
   final PublicTripsRepository _repository;
 
+  /// Authoritative data for the currently open details page.
+  TripDetails? _openDetails;
+
   /// The tab of the details that is open.
   int _selectedTab = 0;
   String? _loadingTripId;
-
-  Future<String?> guidePhone(String guideId) {
-    if (guideId.isEmpty) return Future<String?>.value(null);
-    return _guidePhoneRequests.putIfAbsent(
-      guideId,
-      () => AuthRepository().getUserPhone(guideId),
-    );
-  }
 
   /// Loads the trip from Firestore.
   ///
@@ -46,20 +41,22 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
   /// keeps the trip's own card fields so a trip never shows another
   /// trip's content.
   Future<void> loadTrip(Trip trip) async {
-    final cached = _loadedTrips[trip.id];
-    if (cached != null) {
-      _selectedTab = cached.selectedTab;
-      final details = cached.details.withGuideFallback(
+    final cachedDetails = _detailsCache[trip.id];
+    if (cachedDetails != null) {
+      final details = cachedDetails.withGuideFallback(
         guideId: trip.guideId,
         guideAvatarUrl: trip.guideAvatarUrl,
       );
-      final success = TripDetailsSuccess(
-        details: details,
-        selectedTab: cached.selectedTab,
-        isFavorite: _favoriteIds.contains(trip.id),
+      _detailsCache[trip.id] = details;
+      _openDetails = details;
+      _selectedTab = _tabByTrip[trip.id] ?? 0;
+      safeEmit(
+        TripDetailsSuccess(
+          details: details,
+          selectedTab: _selectedTab,
+          isFavorite: _favoriteIds.contains(trip.id),
+        ),
       );
-      _loadedTrips[trip.id] = success;
-      safeEmit(success);
       return;
     }
     if (_loadingTripId == trip.id) return;
@@ -84,13 +81,16 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
               guideId: trip.guideId,
               guideAvatarUrl: trip.guideAvatarUrl,
             );
-      final success = TripDetailsSuccess(
-        details: details,
-        selectedTab: _selectedTab,
-        isFavorite: _favoriteIds.contains(trip.id),
+      _detailsCache[trip.id] = details;
+      _tabByTrip[trip.id] = _selectedTab;
+      _openDetails = details;
+      safeEmit(
+        TripDetailsSuccess(
+          details: details,
+          selectedTab: _selectedTab,
+          isFavorite: _favoriteIds.contains(trip.id),
+        ),
       );
-      _loadedTrips[trip.id] = success;
-      safeEmit(success);
     } catch (error) {
       safeEmit(TripDetailsError(error: pageLoadErrorMessage(error)));
     } finally {
@@ -100,15 +100,16 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
 
   void selectTab(int index) {
     _selectedTab = index;
-    final current = state;
-    if (current is! TripDetailsSuccess) return;
-    final updated = TripDetailsSuccess(
-      details: current.details,
-      selectedTab: index,
-      isFavorite: current.isFavorite,
+    final details = _openDetails;
+    if (details == null) return;
+    _tabByTrip[details.id] = index;
+    safeEmit(
+      TripDetailsSuccess(
+        details: details,
+        selectedTab: index,
+        isFavorite: _favoriteIds.contains(details.id),
+      ),
     );
-    safeEmit(updated);
-    _loadedTrips[current.details.id] = updated;
   }
 
   /// Toggles favorite, returns the new state for the View's toast.
@@ -119,15 +120,15 @@ class TripDetailsCubit extends Cubit<TripDetailsState>
     } else {
       _favoriteIds.remove(tripId);
     }
-    final current = state;
-    if (current is TripDetailsSuccess) {
-      final updated = TripDetailsSuccess(
-        details: current.details,
-        selectedTab: current.selectedTab,
-        isFavorite: nowFavorite,
+    final details = _openDetails;
+    if (details != null) {
+      safeEmit(
+        TripDetailsSuccess(
+          details: details,
+          selectedTab: _selectedTab,
+          isFavorite: _favoriteIds.contains(details.id),
+        ),
       );
-      safeEmit(updated);
-      _loadedTrips[updated.details.id] = updated;
     }
     return nowFavorite;
   }

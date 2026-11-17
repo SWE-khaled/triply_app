@@ -11,7 +11,8 @@ class SearchCubit extends Cubit<SearchState> {
   final List<Place> allPlaces = mockPlaces.map(Place.fromJson).toList();
 
   SearchCubit()
-    : super(SearchState(recentSearches: List.of(mockRecentSearches)));
+    : _recentSearches = List.of(mockRecentSearches),
+      super(SearchState(recentSearches: List.of(mockRecentSearches)));
 
   static const _popularSearchIds = [
     'giza_pyramids',
@@ -29,10 +30,16 @@ class SearchCubit extends Cubit<SearchState> {
     'abu_simbel',
   ];
 
-  String get query => state.query;
-  SearchFilter get activeFilter => state.activeFilter;
-  List<String> get recentSearches => state.recentSearches;
-  bool get submitted => state.submitted;
+  /// Authoritative fields for the local search session.
+  String _query = '';
+  SearchFilter _activeFilter = SearchFilter.all;
+  List<String> _recentSearches;
+  bool _submitted = false;
+
+  String get query => _query;
+  SearchFilter get activeFilter => _activeFilter;
+  List<String> get recentSearches => List.unmodifiable(_recentSearches);
+  bool get submitted => _submitted;
 
   Place _byId(String id) =>
       allPlaces.firstWhere((p) => p.id == id, orElse: () => allPlaces.first);
@@ -46,8 +53,8 @@ class SearchCubit extends Cubit<SearchState> {
   ];
 
   List<Place> get results {
-    if (!state.submitted || state.query.trim().isEmpty) return [];
-    final q = state.query.trim().toLowerCase();
+    if (!_submitted || _query.trim().isEmpty) return [];
+    final q = _query.trim().toLowerCase();
     return allPlaces
         .where(
           (p) =>
@@ -60,44 +67,59 @@ class SearchCubit extends Cubit<SearchState> {
   }
 
   bool get showEmptyState =>
-      state.submitted && state.query.trim().isNotEmpty && results.isEmpty;
-  bool get showDefaultContent => !state.submitted || state.query.trim().isEmpty;
+      _submitted && _query.trim().isNotEmpty && results.isEmpty;
+  bool get showDefaultContent => !_submitted || _query.trim().isEmpty;
 
   void setQuery(String value) {
-    emit(state.copyWith(query: value, submitted: value.trim().isNotEmpty));
+    _query = value;
+    _submitted = value.trim().isNotEmpty;
+    _emitState();
   }
 
   void clearQuery() {
-    emit(state.copyWith(query: '', submitted: false));
+    _query = '';
+    _submitted = false;
+    _emitState();
   }
 
   void submit(String value) {
     final v = value.trim();
-    final recents = [...state.recentSearches];
-    if (v.isNotEmpty && !recents.contains(v)) {
-      recents.insert(0, v);
-      if (recents.length > 10) {
-        recents.removeLast();
+    if (v.isNotEmpty && !_recentSearches.contains(v)) {
+      _recentSearches = [v, ..._recentSearches];
+      if (_recentSearches.length > 10) {
+        _recentSearches = _recentSearches.take(10).toList();
       }
     }
-    emit(
-      state.copyWith(query: value, submitted: true, recentSearches: recents),
-    );
+    _query = value;
+    _submitted = true;
+    _emitState();
   }
 
   void setFilter(SearchFilter filter) {
-    emit(state.copyWith(activeFilter: filter));
+    _activeFilter = filter;
+    _emitState();
   }
 
   void removeRecent(String value) {
-    emit(
-      state.copyWith(
-        recentSearches: state.recentSearches.where((r) => r != value).toList(),
-      ),
-    );
+    _recentSearches =
+        _recentSearches.where((r) => r != value).toList(growable: false);
+    _emitState();
   }
 
   void clearRecents() {
-    emit(state.copyWith(recentSearches: []));
+    _recentSearches = const [];
+    _emitState();
+  }
+
+  /// Emits a fresh snapshot from the authoritative fields only.
+  void _emitState() {
+    emit(
+      SearchState(
+        query: _query,
+        activeFilter: _activeFilter,
+        recentSearches: List.of(_recentSearches),
+        submitted: _submitted,
+      ),
+    );
   }
 }

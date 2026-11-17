@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../common/auth/cubit/auth_cubit.dart';
-import 'package:triply/features/tourist/community/data/community_posts_repository.dart';
-import 'package:triply/features/tourist/community/model/community_post.dart';
-import 'profile_screen.dart'
-    show ProfilePostCard, deleteCommunityPost, shareProfilePost;
+import '../../community/cubit/post_actions_cubit.dart';
+import '../../community/cubit/post_actions_state.dart';
+import '../../community/model/community_post.dart';
+import '../cubit/profile_posts_cubit.dart';
+import '../cubit/profile_posts_state.dart';
+import 'profile_screen.dart' show ProfilePostCard, shareProfilePost;
 
-class MyPostsScreen extends StatefulWidget {
+class MyPostsScreen extends StatelessWidget {
   const MyPostsScreen({super.key});
-  @override
-  State<MyPostsScreen> createState() => _MyPostsScreenState();
-}
-
-class _MyPostsScreenState extends State<MyPostsScreen> {
-  late final Stream<List<CommunityPost>> _posts =
-      FirestoreCommunityPostsRepository().watchMyPosts();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -55,10 +50,9 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
           ),
         ),
         Expanded(
-          child: StreamBuilder<List<CommunityPost>>(
-            stream: _posts,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
+          child: BlocBuilder<ProfilePostsCubit, ProfilePostsState>(
+            builder: (context, state) {
+              if (state.errorMessage != null) {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(28),
@@ -69,18 +63,12 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                   ),
                 );
               }
-              if (!snapshot.hasData) {
+              if (!state.hasLoaded) {
                 return const Center(child: CircularProgressIndicator());
               }
-              final uid = FirebaseAuth.instance.currentUser?.uid;
-              final posts = (snapshot.data ?? const <CommunityPost>[])
-                  .where(
-                    (post) =>
-                        uid != null &&
-                        post.authorId.isNotEmpty &&
-                        post.authorId == uid,
-                  )
-                  .toList();
+              final posts = context.read<ProfilePostsCubit>().myPosts(
+                context.read<AuthCubit>().user?.uid,
+              );
               if (posts.isEmpty) {
                 return const Center(
                   child: Padding(
@@ -97,41 +85,14 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                 padding: const EdgeInsets.fromLTRB(10, 8, 10, 24),
                 children: [
                   for (final post in posts) ...[
-                    ProfilePostCard(
-                      post: post,
-                      compact: false,
-                      authorAvatarUrl:
-                          context.watch<AuthCubit>().user?.photoURL ?? '',
-                      onDelete: () => deleteCommunityPost(context, post),
-                      onShare: () => shareProfilePost(context, post),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(2, 8, 2, 20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              post.location,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Color(0xFF62777D),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => deleteCommunityPost(context, post),
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF0E5865),
-                              ),
-                            ),
-                          ),
-                        ],
+                    BlocProvider<PostActionsCubit>(
+                      key: ValueKey(post.id),
+                      create: (_) => PostActionsCubit(
+                        post: post,
+                        onDeleted: () =>
+                            context.read<ProfilePostsCubit>().removePost(post),
                       ),
+                      child: _MyPostItem(post: post),
                     ),
                   ],
                   const Center(
@@ -154,4 +115,72 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
       ],
     ),
   );
+}
+
+class _MyPostItem extends StatelessWidget {
+  const _MyPostItem({required this.post});
+
+  final CommunityPost post;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<PostActionsCubit, PostActionsState>(
+      listener: (context, state) {
+        if (!context.mounted ||
+            state.action != PostActionsCubit.deleteAction) {
+          return;
+        }
+        if (state is PostActionSucceeded) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Post deleted.')));
+        } else if (state is PostActionFailed && state.errorMessage != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ProfilePostCard(
+            post: post,
+            compact: false,
+            authorAvatarUrl:
+                context.watch<AuthCubit>().user?.photoURL ?? '',
+            onDelete: () => context.read<PostActionsCubit>().delete(),
+            onShare: () => shareProfilePost(context, post),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(2, 8, 2, 20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    post.location,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF62777D),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => context.read<PostActionsCubit>().delete(),
+                  child: const Text(
+                    'Delete',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0E5865),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

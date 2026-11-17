@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,9 +9,12 @@ import 'package:triply/features/tourist/home/view/home_screen.dart';
 import 'package:triply/features/tourist/map/view/map_view.dart';
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
-import '../data/community_posts_repository.dart';
-import '../data/community_stories_repository.dart';
-import '../model/community_post.dart';
+import '../cubit/community_stories_cubit.dart';
+import '../cubit/community_stories_state.dart';
+import '../cubit/post_actions_cubit.dart';
+import '../cubit/publish_content_cubit.dart';
+import '../cubit/publish_content_state.dart';
+import '../cubit/story_actions_cubit.dart';
 import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
@@ -33,12 +38,12 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen>
     with WidgetsBindingObserver {
   final ImagePicker _picker = ImagePicker();
-  late final CommunityCubit _cubit;
+  late final CommunityStoriesCubit _storiesCubit;
 
   @override
   void initState() {
     super.initState();
-    _cubit = context.read<CommunityCubit>();
+    _storiesCubit = context.read<CommunityStoriesCubit>();
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -51,7 +56,7 @@ class _CommunityScreenState extends State<CommunityScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _cubit.pruneExpiredStories();
+      _storiesCubit.pruneExpiredStories();
     }
   }
 
@@ -59,74 +64,18 @@ class _CommunityScreenState extends State<CommunityScreen>
     final result = await Navigator.of(context).push<ComposerResult>(
       MaterialPageRoute(builder: (_) => const NewPostScreen()),
     );
-    if (result == null) return;
-    if (!context.mounted) return;
+    if (result == null || !context.mounted) return;
 
-    final cubit = context.read<CommunityCubit>();
-    try {
-      if (result.isStory) {
-        final image = result.image;
-        if (image == null) return;
-        await cubit.publishStory(image);
-      } else {
-        await cubit.publishPost(
-          images: result.images,
-          text: result.text ?? '',
-          location: result.location,
-        );
-      }
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(_communityErrorMessage(error))));
-      return;
+    final publish = context.read<PublishContentCubit>();
+    if (result.isStory) {
+      await publish.publishStory(result.image);
+    } else {
+      await publish.publishPost(
+        images: result.images,
+        text: result.text ?? '',
+        location: result.location,
+      );
     }
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Posted!',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _toggleLike(
-    BuildContext context,
-    CommunityCubit cubit,
-    CommunityPost post,
-  ) async {
-    try {
-      await cubit.toggleLike(post);
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(_communityErrorMessage(error))));
-    }
-  }
-
-  Future<void> _deletePost(
-    BuildContext context,
-    CommunityCubit cubit,
-    CommunityPost post,
-  ) async {
-    try {
-      await cubit.deletePost(post);
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(_communityErrorMessage(error))));
-    }
-  }
-
-  String _communityErrorMessage(Object error) {
-    if (error is CommunityPostsException) return error.message;
-    if (error is CommunityStoriesException) return error.message;
-    return 'Could not update Community. Please try again.';
   }
 
   /// Quick "+" action on the story bubble itself: opens the gallery directly
@@ -145,46 +94,27 @@ class _CommunityScreenState extends State<CommunityScreen>
       ).showSnackBar(SnackBar(content: Text("Can't open the gallery: $error")));
       return;
     }
-    if (picked == null) return;
-    if (!context.mounted) return;
-
-    try {
-      await context.read<CommunityCubit>().publishStory(picked);
-    } catch (error) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(_communityErrorMessage(error))));
-      return;
-    }
-
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Posted!',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-        ),
-      ),
-    );
+    if (picked == null || !context.mounted) return;
+    await context.read<PublishContentCubit>().publishStory(picked);
   }
 
   /// Opens the viewer with ONLY the tapped user's stories - never mixed.
   void _openStoryViewerForUser(BuildContext context, String authorId) {
-    final cubit = context.read<CommunityCubit>();
-    final userStories = cubit.storiesOf(authorId);
+    final userStories = _storiesCubit.storiesOf(authorId);
     if (userStories.isEmpty) return;
+    final actionsCubit = StoryActionsCubit(stories: userStories);
     Navigator.of(context)
         .push(
           MaterialPageRoute(
             fullscreenDialog: true,
             builder: (_) => BlocProvider.value(
-              value: cubit,
+              value: actionsCubit,
               child: StoryViewerScreen(stories: userStories),
             ),
           ),
         )
         .then((_) {
+          unawaited(actionsCubit.close());
           // Refresh rings after possible deletions inside the viewer.
           if (mounted) setState(() {});
         });
@@ -192,219 +122,261 @@ class _CommunityScreenState extends State<CommunityScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _cubit,
-      child: BlocBuilder<CommunityCubit, CommunityState>(
-        builder: (context, state) {
-          final cubit = context.read<CommunityCubit>();
-          final currentUserId = context.watch<AuthCubit>().user?.uid ?? '';
-          final hasMyStory = cubit.myStories.isNotEmpty;
-          final rings = cubit.userRings;
-          final initialError = !state.hasLoadedPosts
-              ? state.postsError
-              : !state.hasLoadedStories
-              ? state.storiesError
-              : null;
+    return BlocListener<PublishContentCubit, PublishContentState>(
+      listener: (context, state) {
+        if (!mounted) return;
+        if (state is ContentPublished) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Posted!',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+            ),
+          );
+        } else if (state is PublishFailed && state.errorMessage != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+        }
+      },
+      child: BlocBuilder<CommunityStoriesCubit, CommunityStoriesState>(
+        builder: (context, storyState) {
+          return BlocBuilder<CommunityPostsCubit, CommunityPostsState>(
+            builder: (context, postState) {
+              final currentUserId = context.watch<AuthCubit>().user?.uid ?? '';
+              final hasMyStory = storyState.myStories.isNotEmpty;
+              final rings = _storiesCubit.userRings;
+              final initialError = !postState.hasLoaded
+                  ? postState.errorMessage
+                  : !storyState.hasLoaded
+                  ? storyState.errorMessage
+                  : null;
 
-          return Scaffold(
-            extendBody: true, // content extends under the glass nav
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              bottom:
-                  false, // <-- let the content reach the bottom of the screen
-              child: initialError != null
-                  ? AppErrorView(
-                      message: initialError,
-                      onRetry: cubit.retryInitialLoad,
-                    )
-                  : !state.hasLoadedPosts || !state.hasLoadedStories
-                  ? const _CommunitySkeleton()
-                  : Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Community',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
-                                ),
+              return Scaffold(
+                extendBody: true, // content extends under the glass nav
+                backgroundColor: Colors.white,
+                body: SafeArea(
+                  bottom:
+                      false, // <-- let the content reach the bottom of the screen
+                  child: initialError != null
+                      ? AppErrorView(
+                          message: initialError,
+                          onRetry: () {
+                            if (postState.errorMessage == initialError) {
+                              context.read<CommunityPostsCubit>().retry();
+                            } else {
+                              _storiesCubit.retry();
+                            }
+                          },
+                        )
+                      : !postState.hasLoaded || !storyState.hasLoaded
+                      ? const _CommunitySkeleton()
+                      : Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                20,
+                                12,
+                                20,
+                                4,
                               ),
-                              CircleIconButton(
-                                icon: Icons.add,
-                                onTap: () => _openComposer(context),
-                                backgroundColor: AppColors.primaryTeal,
-                                iconColor: Colors.white,
-                                iconSize: 27,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'Community',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  CircleIconButton(
+                                    icon: Icons.add,
+                                    onTap: () => _openComposer(context),
+                                    backgroundColor: AppColors.primaryTeal,
+                                    iconColor: Colors.white,
+                                    iconSize: 27,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Expanded(
-                          child: CustomScrollView(
-                            slivers: [
-                              SliverToBoxAdapter(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 5),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            MyStoryBubble(
-                                              hasStory: hasMyStory,
-                                              onAddTap: () =>
-                                                  _pickMyStoryImage(context),
-                                              onViewTap: () {
-                                                if (currentUserId.isNotEmpty) {
-                                                  _openStoryViewerForUser(
-                                                    context,
-                                                    currentUserId,
-                                                  );
-                                                }
-                                              },
+                            ),
+                            const SizedBox(height: 6),
+                            Expanded(
+                              child: CustomScrollView(
+                                slivers: [
+                                  SliverToBoxAdapter(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 5,
                                             ),
-                                            for (
-                                              var i = 0;
-                                              i < rings.length;
-                                              i++
-                                            ) ...[
-                                              const SizedBox(width: 14),
-                                              StoryRing(
-                                                story: rings[i],
-                                                ringColor: [
-                                                  AppColors.primaryTeal,
-                                                  AppColors.starGold,
-                                                  AppColors.accentOrange,
-                                                ][i % 3],
-                                                onTap: () =>
-                                                    _openStoryViewerForUser(
-                                                      context,
-                                                      rings[i].authorId,
-                                                    ),
-                                              ),
-                                            ],
-                                          ],
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                MyStoryBubble(
+                                                  hasStory: hasMyStory,
+                                                  onAddTap: () =>
+                                                      _pickMyStoryImage(context),
+                                                  onViewTap: () {
+                                                    if (currentUserId
+                                                        .isNotEmpty) {
+                                                      _openStoryViewerForUser(
+                                                        context,
+                                                        currentUserId,
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                                for (var i = 0;
+                                                    i < rings.length;
+                                                    i++) ...[
+                                                  const SizedBox(width: 14),
+                                                  StoryRing(
+                                                    story: rings[i],
+                                                    ringColor: [
+                                                      AppColors.primaryTeal,
+                                                      AppColors.starGold,
+                                                      AppColors.accentOrange,
+                                                    ][i % 3],
+                                                    onTap: () =>
+                                                        _openStoryViewerForUser(
+                                                          context,
+                                                          rings[i].authorId,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
                                         ),
+                                        const SizedBox(height: 8),
+                                        if (storyState.errorMessage != null)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.fromLTRB(
+                                                  16,
+                                                  4,
+                                                  16,
+                                                  0,
+                                                ),
+                                            child: Text(
+                                              storyState.errorMessage!,
+                                              style: const TextStyle(
+                                                color: AppColors.textGrey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        if (postState.errorMessage != null)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.fromLTRB(
+                                                  16,
+                                                  4,
+                                                  16,
+                                                  0,
+                                                ),
+                                            child: Text(
+                                              postState.errorMessage!,
+                                              style: const TextStyle(
+                                                color: AppColors.textGrey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (postState.showPostsEmptyState)
+                                    const SliverFillRemaining(
+                                      hasScrollBody: false,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(bottom: 100),
+                                        child: CommunityPostsEmptyState(),
+                                      ),
+                                    )
+                                  else
+                                    SliverPadding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 100,
+                                      ),
+                                      sliver: SliverList(
+                                        delegate: SliverChildBuilderDelegate((
+                                          context,
+                                          index,
+                                        ) {
+                                          final post = postState.posts[index];
+                                          return Padding(
+                                            padding:
+                                                const EdgeInsets.fromLTRB(
+                                                  12,
+                                                  8,
+                                                  12,
+                                                  16,
+                                                ),
+                                            child: BlocProvider<PostActionsCubit>(
+                                              key: ValueKey(post.id),
+                                              create: (_) => PostActionsCubit(
+                                                post: post,
+                                                onDeleted: () => context
+                                                    .read<CommunityPostsCubit>()
+                                                    .removePost(post),
+                                              ),
+                                              child: PostCard(
+                                                post: post,
+                                                // Placeholders: no comments/share
+                                                // screens in Figma.
+                                                onComments: () {},
+                                                onShare: () {},
+                                              ),
+                                            ),
+                                          );
+                                        }, childCount: postState.posts.length),
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
-                                    if (state.storiesError != null)
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                          16,
-                                          4,
-                                          16,
-                                          0,
-                                        ),
-                                        child: Text(
-                                          state.storiesError!,
-                                          style: const TextStyle(
-                                            color: AppColors.textGrey,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-                                    if (state.postsError != null)
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                          16,
-                                          4,
-                                          16,
-                                          0,
-                                        ),
-                                        child: Text(
-                                          state.postsError!,
-                                          style: const TextStyle(
-                                            color: AppColors.textGrey,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
+                                ],
                               ),
-                              if (state.showPostsEmptyState)
-                                const SliverFillRemaining(
-                                  hasScrollBody: false,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                      bottom: 100,
-                                    ), // <-- space for nav
-                                    child: CommunityPostsEmptyState(),
-                                  ),
-                                )
-                              else
-                                SliverPadding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 100,
-                                  ), // <-- space for nav
-                                  sliver: SliverList(
-                                    delegate: SliverChildBuilderDelegate((
-                                      context,
-                                      index,
-                                    ) {
-                                      final post = cubit.posts[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                          12,
-                                          8,
-                                          12,
-                                          16,
-                                        ),
-                                        child: PostCard(
-                                          post: post,
-                                          onLike: () {
-                                            _toggleLike(context, cubit, post);
-                                          },
-                                          onDelete: () =>
-                                              _deletePost(context, cubit, post),
-                                          // Placeholders: no comments/share screens in Figma.
-                                          onComments: () {},
-                                          onShare: () {},
-                                        ),
-                                      );
-                                    }, childCount: cubit.posts.length),
-                                  ),
-                                ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-            ),
-            bottomNavigationBar: AppBottomNav(
-              currentIndex: 3,
-              onTap: (index) {
-                if (index == 0) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  );
-                } else if (index == 1) {
-                  Navigator.of(context).push(AppRoutes.myTrips());
-                } else if (index == 2) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => MapScreen()),
-                  ); // map
-                } else if (index == 4) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                  ); // profile
-                }
-              },
-            ),
+                ),
+                bottomNavigationBar: AppBottomNav(
+                  currentIndex: 3,
+                  onTap: (index) {
+                    if (index == 0) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeScreen(),
+                        ),
+                      );
+                    } else if (index == 1) {
+                      Navigator.of(context).push(AppRoutes.myTrips());
+                    } else if (index == 2) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => MapScreen()),
+                      ); // map
+                    } else if (index == 4) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ProfileScreen(),
+                        ),
+                      ); // profile
+                    }
+                  },
+                ),
+              );
+            },
           );
         },
       ),

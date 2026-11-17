@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routing/app_routes.dart';
-import '../../../../core/services/app_prefs.dart';
+import '../cubit/onboarding_preference_cubit.dart';
+import '../cubit/onboarding_preference_state.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -60,11 +62,10 @@ class _OnboardingScreen extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  Future<void> _goToSignIn() async {
-    // The tourist slides are done: never show them again on this device.
-    await AppPrefs.instance.markOnboardingSeen('tourist');
-    if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(AppRoutes.signIn);
+  void _goToSignIn() {
+    // The local-storage write belongs to the cubit; the listener below
+    // navigates once it has completed, exactly as before.
+    context.read<OnboardingPreferenceCubit>().complete();
   }
 
   Widget _buildImage(String path) {
@@ -86,9 +87,15 @@ class _OnboardingScreen extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final isLast = _currentPage == _slides.length - 1;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
+    return BlocListener<OnboardingPreferenceCubit, OnboardingPreferenceState>(
+      listener: (context, state) {
+        if (state is OnboardingPreferenceSaved && context.mounted) {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.signIn);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
@@ -243,6 +250,7 @@ class _OnboardingScreen extends State<OnboardingScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

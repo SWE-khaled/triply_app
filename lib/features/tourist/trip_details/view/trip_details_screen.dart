@@ -10,6 +10,8 @@ import '../../guides/view/guide_profile_screen.dart';
 import 'package:triply/features/chat/widgets/message_guide_button.dart';
 import '../../my_trips/widgets/booking_badges.dart';
 import '../../trips/models/trip.dart';
+import '../cubit/guide_phone_cubit.dart';
+import '../cubit/guide_phone_state.dart';
 import '../cubit/trip_details_cubit.dart';
 
 import '../widgets/booking_bar.dart';
@@ -131,9 +133,15 @@ class TripDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: BlocBuilder<TripDetailsCubit, TripDetailsState>(
+    return BlocListener<TripDetailsCubit, TripDetailsState>(
+      listener: (context, state) {
+        if (state is TripDetailsSuccess && state.details.guideId.isNotEmpty) {
+          context.read<GuidePhoneCubit>().loadPhone(state.details.guideId);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: BlocBuilder<TripDetailsCubit, TripDetailsState>(
         builder: (context, state) {
           if (state is! TripDetailsSuccess) {
             return state is TripDetailsError
@@ -197,22 +205,22 @@ class TripDetailsScreen extends StatelessWidget {
                           ),
                         ],
                         const SizedBox(height: 14),
-                        FutureBuilder<String?>(
-                          future: details.guideId.isEmpty
-                              ? Future<String?>.value(null)
-                              : context.read<TripDetailsCubit>().guidePhone(
-                                  details.guideId,
-                                ),
-                          builder: (context, snapshot) => GuideCard(
-                            details: details,
-                            guidePhone: snapshot.data,
-                            onTap: details.guideId.isEmpty
-                                ? null
-                                : () => _openGuideProfile(
-                                    context,
-                                    details.guideId,
-                                  ),
-                          ),
+                        BlocBuilder<GuidePhoneCubit, GuidePhoneState>(
+                          builder: (context, phoneState) {
+                            final phone = phoneState is GuidePhoneSuccess
+                                ? phoneState.phone
+                                : null;
+                            return GuideCard(
+                              details: details,
+                              guidePhone: phone,
+                              onTap: details.guideId.isEmpty
+                                  ? null
+                                  : () => _openGuideProfile(
+                                      context,
+                                      details.guideId,
+                                    ),
+                            );
+                          },
                         ),
                         if (isBooked) ...[
                           const SizedBox(height: 16),
@@ -226,6 +234,7 @@ class TripDetailsScreen extends StatelessWidget {
             ),
           );
         },
+      ),
       ),
     );
   }

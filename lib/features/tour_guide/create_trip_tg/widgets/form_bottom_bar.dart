@@ -3,16 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
-/// Sticky Preview / Submit bar. Fixed halves (no flex → ParentData-safe).
+/// Sticky Preview / Submit bar. Two equal flex halves adapt to the available
+/// width (including view insets) instead of assuming the full screen width.
 class FormBottomBar extends StatelessWidget {
-  final double halfWidth;
   final VoidCallback onPreview;
   final VoidCallback onSubmit;
   final String submitLabel;
 
   const FormBottomBar({
     super.key,
-    required this.halfWidth,
     required this.onPreview,
     required this.onSubmit,
     this.submitLabel = 'Submit for Approval',
@@ -24,10 +23,8 @@ class FormBottomBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: halfWidth,
+            Expanded(
               child: GestureDetector(
                 onTap: onPreview,
                 behavior: HitTestBehavior.opaque,
@@ -51,8 +48,7 @@ class FormBottomBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            SizedBox(
-              width: halfWidth,
+            Expanded(
               child: GestureDetector(
                 onTap: onSubmit,
                 behavior: HitTestBehavior.opaque,

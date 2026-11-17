@@ -1,16 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/profile_avatar.dart';
-import '../../../common/auth/cubit/auth_cubit.dart';
+import '../cubit/update_profile_cubit.dart';
+import '../cubit/update_profile_state.dart';
 
 class EditProfileSheet extends StatefulWidget {
   final String name;
@@ -45,9 +42,8 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   late final TextEditingController _bioController = TextEditingController(
     text: widget.bio,
   );
-  File? _pickedImage;
+  XFile? _pickedImage;
   bool _removePhoto = false;
-  bool _loading = false;
 
   @override
   void dispose() {
@@ -147,7 +143,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
       );
       if (picked != null && mounted) {
         setState(() {
-          _pickedImage = File(picked.path);
+          _pickedImage = picked;
           _removePhoto = false;
         });
       }
@@ -160,238 +156,196 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
     }
   }
 
-  Future<String> _uploadImage(File file) async {
-    const cloudName = 'yl49wcys';
-    const preset = 'djowcnxm';
-    final uri = Uri.parse(
-      'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
-    );
-    final request = http.MultipartRequest('POST', uri)
-      ..fields['upload_preset'] = preset
-      ..files.add(await http.MultipartFile.fromPath('file', file.path));
-    final response = await request.send();
-    final body = await response.stream.bytesToString();
-    if (response.statusCode != 200) {
-      throw Exception('Photo upload failed. Please try again.');
-    }
-    return (jsonDecode(body) as Map<String, dynamic>)['secure_url'] as String;
-  }
-
+  /// UI-only: validation, upload and Firestore writes belong to the cubit.
   Future<void> _save() async {
-    final name = _nameController.text.trim();
-    if (name.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Name can\'t be empty')));
-      return;
-    }
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please sign in first.')));
-      return;
-    }
-    final authCubit = context.read<AuthCubit>();
-    final messenger = ScaffoldMessenger.of(context);
-    setState(() => _loading = true);
-    try {
-      final newPhotoUrl = _pickedImage == null
-          ? null
-          : await _uploadImage(_pickedImage!);
-      if (!mounted) return;
-      final photo = _removePhoto ? '' : (newPhotoUrl ?? user.photoURL ?? '');
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'fullName': name,
-        'displayName': name,
-        'avatarUrl': photo,
-        'city': _cityController.text.trim(),
-        'country': _countryController.text.trim(),
-        'bio': _bioController.text.trim(),
-      }, SetOptions(merge: true));
-      await user.updateDisplayName(name);
-      if (_pickedImage != null || _removePhoto) {
-        await user.updatePhotoURL(photo.isEmpty ? null : photo);
-      }
-      await authCubit.refreshUser();
-      if (!mounted) return;
-      messenger.showSnackBar(const SnackBar(content: Text('Profile updated.')));
-      Navigator.of(context).pop(true);
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not save profile: $error')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+    await context.read<UpdateProfileCubit>().save(
+      name: _nameController.text.trim(),
+      city: _cityController.text.trim(),
+      country: _countryController.text.trim(),
+      bio: _bioController.text.trim(),
+      image: _pickedImage,
+      removePhoto: _removePhoto,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading =
+        context.watch<UpdateProfileCubit>().state is UpdateProfileLoading;
     final imageUrl = _removePhoto ? '' : (widget.photoUrl ?? '');
     final location = [
       _cityController.text.trim(),
       _countryController.text.trim(),
     ].where((value) => value.isNotEmpty).join(', ');
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+
+    return BlocListener<UpdateProfileCubit, UpdateProfileState>(
+      listener: (context, state) {
+        if (!mounted || state.message == null) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(state.message!)));
+        if (state is ProfileUpdateSucceeded) {
+          Navigator.of(context).pop(true);
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-          onPressed: _loading ? null : () => Navigator.pop(context),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+            onPressed: isLoading ? null : () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'Edit profile',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          titleSpacing: 0,
         ),
-        title: const Text(
-          'Edit profile',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-        ),
-        titleSpacing: 0,
-      ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - 30,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFE2E8E9)),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 21,
-                          backgroundColor: const Color(0xFFE7F2F0),
-                          backgroundImage: _pickedImage != null
-                              ? FileImage(_pickedImage!)
-                              : null,
-                          child: _pickedImage == null
-                              ? ClipOval(
-                                  child: ProfileAvatar(
-                                    imageUrl: imageUrl,
-                                    size: 42,
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 30,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFE2E8E9)),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 21,
+                            backgroundColor: const Color(0xFFE7F2F0),
+                            backgroundImage: _pickedImage != null
+                                ? FileImage(File(_pickedImage!.path))
+                                : null,
+                            child: _pickedImage == null
+                                ? ClipOval(
+                                    child: ProfileAvatar(
+                                      imageUrl: imageUrl,
+                                      size: 42,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _nameController.text,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                )
-                              : null,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _nameController.text,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
                                 ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                location.isEmpty
-                                    ? 'Add your location'
-                                    : location,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textGrey,
+                                const SizedBox(height: 3),
+                                Text(
+                                  location.isEmpty
+                                      ? 'Add your location'
+                                      : location,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textGrey,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: _loading ? null : _showPhotoActions,
-                          icon: const Icon(
-                            Icons.image_outlined,
-                            color: Color(0xFF0D5865),
+                          IconButton(
+                            onPressed: isLoading ? null : _showPhotoActions,
+                            icon: const Icon(
+                              Icons.image_outlined,
+                              color: Color(0xFF0D5865),
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: isLoading ? null : _showPhotoActions,
+                        child: const Text('Change profile photo'),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    const Text(
+                      'Personal information',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 7),
+                    const Text(
+                      'Keep your name and home location up to date.',
+                      style: TextStyle(fontSize: 13, color: AppColors.textGrey),
+                    ),
+                    const SizedBox(height: 16),
+                    _field('Full name', _nameController),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: _field('City', _cityController)),
+                        const SizedBox(width: 10),
+                        Expanded(child: _field('Country', _countryController)),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: _loading ? null : _showPhotoActions,
-                      child: const Text('Change profile photo'),
+                    const SizedBox(height: 12),
+                    _field(
+                      'Bio (optional)',
+                      _bioController,
+                      maxLines: 4,
+                      hint: 'Tell other travelers a little about yourself...',
                     ),
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Personal information',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 7),
-                  const Text(
-                    'Keep your name and home location up to date.',
-                    style: TextStyle(fontSize: 13, color: AppColors.textGrey),
-                  ),
-                  const SizedBox(height: 16),
-                  _field('Full name', _nameController),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(child: _field('City', _cityController)),
-                      const SizedBox(width: 10),
-                      Expanded(child: _field('Country', _countryController)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _field(
-                    'Bio (optional)',
-                    _bioController,
-                    maxLines: 4,
-                    hint: 'Tell other travelers a little about yourself...',
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Your name, photo and bio appear on your profile.',
-                    style: TextStyle(
-                      fontSize: 11,
-                      height: 1.5,
-                      color: AppColors.textGrey,
+                    const SizedBox(height: 18),
+                    const Text(
+                      'Your name, photo and bio appear on your profile.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        height: 1.5,
+                        color: AppColors.textGrey,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: FilledButton(
-                      onPressed: _loading ? null : _save,
-                      child: _loading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text('Save changes'),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: FilledButton(
+                        onPressed: isLoading ? null : _save,
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text('Save changes'),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: OutlinedButton(
-                      onPressed: _loading
-                          ? null
-                          : () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 44,
+                      child: OutlinedButton(
+                        onPressed: isLoading
+                            ? null
+                            : () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

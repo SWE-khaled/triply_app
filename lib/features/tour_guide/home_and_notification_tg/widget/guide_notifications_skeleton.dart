@@ -40,7 +40,7 @@ class _NotificationRowSkeleton extends StatelessWidget {
                 children: const [
                   ShimmerLine(width: 150, height: 14),
                   SizedBox(height: 8),
-                  ShimmerLine(width: 230, height: 12),
+                  ShimmerLine(width: double.infinity, height: 12),
                   SizedBox(height: 6),
                   ShimmerLine(width: 90, height: 11),
                 ],

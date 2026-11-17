@@ -1,45 +1,29 @@
-part of 'place_detail_cubit.dart';
+import 'package:flutter/foundation.dart';
 
+import '../../map/model/place.dart';
+
+/// Explicit states for the place document itself.
 @immutable
-sealed class PlaceDetailState {
-  const PlaceDetailState();
+sealed class PlaceInfoState {
+  const PlaceInfoState();
 }
 
-final class PlaceDetailInitial extends PlaceDetailState {
-  const PlaceDetailInitial();
+final class PlaceInfoInitial extends PlaceInfoState {
+  const PlaceInfoInitial();
 }
 
-final class PlaceDetailLoadingState extends PlaceDetailState {
-  const PlaceDetailLoadingState();
+final class PlaceInfoLoading extends PlaceInfoState {
+  const PlaceInfoLoading();
 }
 
-final class PlaceDetailSuccessState extends PlaceDetailState {
-  /// The place the screen shows.
+final class PlaceInfoSuccess extends PlaceInfoState {
+  const PlaceInfoSuccess({required this.place});
+
   final Place place;
-
-  /// The guides of the place.
-  final List<Guide> guides;
-
-  /// The trips of the place.
-  final List<Trip> trips;
-
-  /// The stories of the place.
-  final List<Story> stories;
-
-  /// The tab that is open.
-  final int selectedTabIndex;
-
-  const PlaceDetailSuccessState({
-    required this.place,
-    required this.guides,
-    required this.trips,
-    required this.stories,
-    required this.selectedTabIndex,
-  });
 }
 
-final class PlaceDetailErrorState extends PlaceDetailState {
-  final String error;
+final class PlaceInfoError extends PlaceInfoState {
+  const PlaceInfoError({required this.error});
 
-  const PlaceDetailErrorState({required this.error});
+  final String error;
 }

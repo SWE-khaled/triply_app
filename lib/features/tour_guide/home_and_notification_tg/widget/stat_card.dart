@@ -48,17 +48,26 @@ class StatCard extends StatelessWidget {
             child: Icon(icon, size: 30, color: AppColors.title),
           ),
           const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-              color: valueTeal ? AppColors.priceTeal : AppColors.title,
+          // Long values (e.g. "EGP 12,345.67") scale down on narrow cards
+          // instead of overflowing; the 28px typography is kept when it fits.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                color: valueTeal ? AppColors.priceTeal : AppColors.title,
+              ),
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 12, color: AppColors.subtitle),
           ),
         ],

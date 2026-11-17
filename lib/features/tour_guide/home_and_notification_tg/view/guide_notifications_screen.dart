@@ -66,6 +66,8 @@ class _GuideNotificationsView extends StatelessWidget {
                   const Expanded(
                     child: Text(
                       'Notifications',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,

@@ -2,12 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/place_detail_cubit.dart';
+import '../cubit/place_detail_state.dart';
+import '../cubit/place_guides_cubit.dart';
+import '../cubit/place_guides_state.dart';
+import '../cubit/place_stories_cubit.dart';
+import '../cubit/place_stories_state.dart';
+import '../cubit/place_trips_cubit.dart';
+import '../cubit/place_trips_state.dart';
+import '../data/place_resolver.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
+import '../../map/model/place.dart';
 import '../../guides/view/guide_profile_screen.dart';
+import '../model/guide.dart';
+import '../model/story.dart';
+import '../model/trip.dart';
 import '../widget/about_tab.dart';
 import '../widget/guides_tab.dart';
 import '../widget/stories_tab.dart';
@@ -23,48 +35,121 @@ class PlaceDetailScreen extends StatefulWidget {
 }
 
 class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
-  late final PlaceDetailCubit controller;
-  final List<String> tabs = const ['About', 'Guides', 'Trips', 'Stories'];
+  static const List<String> tabs = ['About', 'Guides', 'Trips', 'Stories'];
+
+  late final PlaceResolver _resolver;
+  late final PlaceInfoCubit _infoCubit;
+  late final PlaceGuidesCubit _guidesCubit;
+  late final PlaceTripsCubit _tripsCubit;
+  late final PlaceStoriesCubit _storiesCubit;
+
+  /// Tab selection is pure UI state and stays in the View.
+  int _selectedTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // Owned here (like the old controller) so the body below keeps working
-    // unchanged; provided below for BlocBuilder rebuilds.
-    controller = PlaceDetailCubit(placeId: widget.placeId);
+    _resolver = PlaceResolver(placeId: widget.placeId);
+    _infoCubit = PlaceInfoCubit(
+      placeId: widget.placeId,
+      resolver: _resolver,
+    );
+    _guidesCubit = PlaceGuidesCubit(resolver: _resolver);
+    _tripsCubit = PlaceTripsCubit(resolver: _resolver);
+    _storiesCubit = PlaceStoriesCubit(resolver: _resolver);
   }
 
   @override
   void dispose() {
-    controller.close();
+    _infoCubit.close();
+    _guidesCubit.close();
+    _tripsCubit.close();
+    _storiesCubit.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: controller,
-      child: BlocBuilder<PlaceDetailCubit, PlaceDetailState>(
-        // Sealed states: only a resolved screen renders the content.
-        builder: (context, state) {
-          return switch (state) {
-            PlaceDetailSuccessState() => _buildSuccess(state),
-            PlaceDetailErrorState(:final error) => _buildError(error),
-            _ => const Scaffold(
-              backgroundColor: Colors.white,
-              body: Center(child: CircularProgressIndicator()),
-            ),
-          };
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _infoCubit),
+        BlocProvider.value(value: _guidesCubit),
+        BlocProvider.value(value: _tripsCubit),
+        BlocProvider.value(value: _storiesCubit),
+      ],
+      child: BlocBuilder<PlaceInfoCubit, PlaceInfoState>(
+        builder: (context, infoState) {
+          return BlocBuilder<PlaceGuidesCubit, PlaceGuidesState>(
+            builder: (context, guidesState) {
+              return BlocBuilder<PlaceTripsCubit, PlaceTripsState>(
+                builder: (context, tripsState) {
+                  return BlocBuilder<PlaceStoriesCubit, PlaceStoriesState>(
+                    builder: (context, storiesState) {
+                      return _buildForState(
+                        context,
+                        infoState,
+                        guidesState,
+                        tripsState,
+                        storiesState,
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
         },
       ),
     );
   }
 
-  /// The existing screen, unchanged — now fed from the success state.
-  Widget _buildSuccess(PlaceDetailSuccessState state) {
-    final place = state.place;
-    final selectedTabIndex = state.selectedTabIndex;
+  Widget _buildForState(
+    BuildContext context,
+    PlaceInfoState infoState,
+    PlaceGuidesState guidesState,
+    PlaceTripsState tripsState,
+    PlaceStoriesState storiesState,
+  ) {
+    final allLoaded =
+        infoState is PlaceInfoSuccess &&
+        guidesState is PlaceGuidesSuccess &&
+        tripsState is PlaceTripsSuccess &&
+        storiesState is PlaceStoriesSuccess;
 
+    if (!allLoaded) {
+      final errors = [
+        if (infoState is PlaceInfoError) infoState.error,
+        if (guidesState is PlaceGuidesError) guidesState.error,
+        if (tripsState is PlaceTripsError) tripsState.error,
+        if (storiesState is PlaceStoriesError) storiesState.error,
+      ];
+      final error = errors.isEmpty ? null : errors.first;
+      if (error != null) {
+        return _buildError(error, infoState, guidesState, tripsState, storiesState);
+      }
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    return _buildSuccess(
+      context,
+      infoState.place,
+      guidesState.guides,
+      tripsState.trips,
+      storiesState.stories,
+    );
+  }
+
+  /// The existing screen, unchanged — now fed by the four independent states.
+  Widget _buildSuccess(
+    BuildContext context,
+    Place place,
+    List<Guide> guides,
+    List<Trip> trips,
+    List<Story> stories,
+  ) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -179,7 +264,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: List.generate(tabs.length, (i) {
-                          final selected = selectedTabIndex == i;
+                          final selected = _selectedTabIndex == i;
                           return Padding(
                             padding: EdgeInsets.only(
                               right: i == tabs.length - 1 ? 0 : 8,
@@ -187,7 +272,8 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                             child: ChoiceChip(
                               label: Text(tabs[i]),
                               selected: selected,
-                              onSelected: (_) => controller.selectTab(i),
+                              onSelected: (_) =>
+                                  setState(() => _selectedTabIndex = i),
                               selectedColor: AppColors.primaryTeal,
                               backgroundColor: AppColors.chipGrey,
                               labelStyle: TextStyle(
@@ -209,11 +295,11 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    if (selectedTabIndex == 0)
+                    if (_selectedTabIndex == 0)
                       AboutTab(place: place)
-                    else if (selectedTabIndex == 1)
+                    else if (_selectedTabIndex == 1)
                       GuidesTab(
-                        guides: state.guides,
+                        guides: guides,
                         onGuideTap: (guide) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -223,13 +309,13 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                           );
                         },
                       )
-                    else if (selectedTabIndex == 2)
+                    else if (_selectedTabIndex == 2)
                       TripsTab(
-                        trips: state.trips,
+                        trips: trips,
                         onViewDetails: (trip) {
                           Navigator.of(context).push(
                             AppRoutes.tripDetails(
-                              controller.publicTripFor(trip),
+                              context.read<PlaceTripsCubit>().publicTripFor(trip),
                             ),
                           );
                         },
@@ -237,7 +323,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                       )
                     else
                       StoriesTab(
-                        stories: state.stories,
+                        stories: stories,
                         // Placeholder: no Story-detail in Figma.
                         onStoryTap: (_) {},
                       ),
@@ -251,8 +337,14 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
     );
   }
 
-  /// Catalog/load failure; [controller.retry] restarts the load.
-  Widget _buildError(String error) {
+  /// Any section can fail on its own; only the failed sections are retried.
+  Widget _buildError(
+    String error,
+    PlaceInfoState infoState,
+    PlaceGuidesState guidesState,
+    PlaceTripsState tripsState,
+    PlaceStoriesState storiesState,
+  ) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -270,7 +362,14 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
-                onPressed: controller.retry,
+                onPressed: () {
+                  if (infoState is PlaceInfoError) _infoCubit.retry();
+                  if (guidesState is PlaceGuidesError) _guidesCubit.retry();
+                  if (tripsState is PlaceTripsError) _tripsCubit.retry();
+                  if (storiesState is PlaceStoriesError) {
+                    _storiesCubit.retry();
+                  }
+                },
                 icon: const Icon(Icons.refresh),
                 label: const Text('Try again'),
               ),

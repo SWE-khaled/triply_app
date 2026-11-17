@@ -1,286 +1,88 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
-import '../../../../core/utils/page_load_error.dart';
+import 'package:triply/core/utils/page_load_error.dart';
+import 'package:triply/core/utils/safe_emit_mixin.dart';
 
 import '../data/community_posts_repository.dart';
-import '../data/community_stories_repository.dart';
 import '../model/community_post.dart';
-import '../model/community_story.dart';
 import 'community_state.dart';
 
-class CommunityCubit extends Cubit<CommunityState> {
-  CommunityCubit({
-    CommunityPostsRepository? postsRepository,
-    CommunityStoriesRepository? storiesRepository,
-    DateTime Function()? now,
-  }) : _postsRepository =
-           postsRepository ?? FirestoreCommunityPostsRepository(),
-       _storiesRepository =
-           storiesRepository ?? FirestoreCommunityStoriesRepository(),
-       _now = now ?? DateTime.now,
-       super(
-         CommunityState(
-           // Both feeds are Firestore-backed. Mock data must not appear while
-           // the first snapshot is loading or when a read is denied.
-           stories: const [],
-           myStories: const [],
-           posts: const [],
-           isLoadingStories: true,
-           isLoadingPosts: true,
-         ),
-       ) {
-    _listenToFeeds();
-    _expiryTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => pruneExpiredStories(),
-    );
+/// Owns only the Community posts feed.
+///
+/// This file was the old aggregate Community cubit. Stories, publishing and
+/// per-post actions now live in their own cubits so one failing operation
+/// cannot replace another feed's state.
+class CommunityPostsCubit extends Cubit<CommunityPostsState>
+    with SafeEmitMixin<CommunityPostsState> {
+  CommunityPostsCubit({CommunityPostsRepository? postsRepository})
+    : _repository = postsRepository ?? FirestoreCommunityPostsRepository(),
+      super(const CommunityPostsInitial()) {
+    safeEmit(const CommunityPostsLoading());
+    _listen();
   }
 
-  final CommunityPostsRepository _postsRepository;
-  final CommunityStoriesRepository _storiesRepository;
-  final DateTime Function() _now;
-  final Set<String> _likeRequestsInFlight = <String>{};
+  final CommunityPostsRepository _repository;
 
-  StreamSubscription<List<CommunityPost>>? _postsSubscription;
-  StreamSubscription<List<CommunityStory>>? _storiesSubscription;
-  Timer? _expiryTimer;
+  StreamSubscription<List<CommunityPost>>? _subscription;
+  List<CommunityPost> _posts = const [];
+  bool _hasLoaded = false;
 
-  /// Stories of a single user only — the viewer must never mix users.
-  /// Ordered oldest first, which is the natural Story playback order.
-  List<CommunityStory> storiesOf(String authorId) {
-    final stories =
-        [
-            ...state.myStories,
-            ...state.stories,
-          ].where((story) => story.authorId == authorId).toList()
-          ..sort((a, b) => _createdAt(a).compareTo(_createdAt(b)));
-    return stories;
-  }
+  /// Authoritative feed snapshot for derived reads.
+  List<CommunityPost> get posts => _posts;
 
-  /// One ring per user (newest Story is the cover), "mine" excluded.
-  List<CommunityStory> get userRings {
-    final seen = <String>{};
-    final rings = <CommunityStory>[];
-    for (final story in state.stories) {
-      if (seen.add(story.authorId)) rings.add(story);
-    }
-    return rings;
-  }
-
-  List<CommunityStory> get myStories => state.myStories;
-
-  List<CommunityPost> get posts => state.posts;
-
-  void _listenToFeeds() {
-    _postsSubscription = _postsRepository.watchPosts().listen(
+  void _listen() {
+    _subscription = _repository.watchPosts().listen(
       _onPosts,
       onError: _onPostsError,
     );
-    _storiesSubscription = _storiesRepository.watchStories().listen(
-      _onStories,
-      onError: _onStoriesError,
-    );
-  }
-
-  void retryInitialLoad() {
-    // Re-subscribe without resetting the loading flags: the error view stays
-    // on screen until the feeds answer, so the shimmer never restarts.
-    unawaited(_postsSubscription?.cancel());
-    unawaited(_storiesSubscription?.cancel());
-    _listenToFeeds();
   }
 
   void _onPosts(List<CommunityPost> posts) {
     if (isClosed) return;
-
-    emit(
-      state.copyWith(
-        posts: posts,
-        isLoadingPosts: false,
-        hasLoadedPosts: true,
-        clearPostsError: true,
-      ),
-    );
+    _posts = List.unmodifiable(posts);
+    _hasLoaded = true;
+    safeEmit(CommunityPostsSuccess(posts: _posts));
   }
 
   void _onPostsError(Object error, StackTrace stackTrace) {
     if (isClosed) return;
-
-    emit(
-      state.copyWith(
-        isLoadingPosts: false,
-        postsError: pageLoadErrorMessage(error),
+    // Keep the last successful feed on screen, as the aggregate cubit did.
+    safeEmit(
+      CommunityPostsError(
+        message: pageLoadErrorMessage(error),
+        posts: _posts,
+        hasLoaded: _hasLoaded,
       ),
     );
   }
 
-  void _onStories(List<CommunityStory> stories) {
+  /// Re-subscribes without restarting the shimmer: the error view stays until
+  /// the feed answers.
+  void retry() {
+    unawaited(_subscription?.cancel());
+    _listen();
+  }
+
+  /// Immediate optimistic insertion after a successful publish.
+  void addPost(CommunityPost post) {
     if (isClosed) return;
-
-    final at = _now();
-    final mine = <CommunityStory>[];
-    final others = <CommunityStory>[];
-    final seen = <String>{};
-
-    for (final story in stories) {
-      if (!story.isDisplayableAt(at)) continue;
-      // A newly published Story can reach the stream before/after the
-      // optimistic entry. Deduplicate defensively by document id.
-      if (!seen.add(story.id)) continue;
-      if (story.isMine) {
-        mine.add(story);
-      } else {
-        others.add(story);
-      }
-    }
-
-    mine.sort(_newestFirst);
-    others.sort(_newestFirst);
-
-    emit(
-      state.copyWith(
-        stories: others,
-        myStories: mine,
-        isLoadingStories: false,
-        hasLoadedStories: true,
-        clearStoriesError: true,
-      ),
-    );
+    final posts = _posts.where((item) => item.id != post.id).toList();
+    _posts = List.unmodifiable([post, ...posts]);
+    _hasLoaded = true;
+    safeEmit(CommunityPostsSuccess(posts: _posts));
   }
 
-  void _onStoriesError(Object error, StackTrace stackTrace) {
+  /// Immediate optimistic removal after the owning cubit deleted a post.
+  void removePost(CommunityPost post) {
     if (isClosed) return;
-
-    emit(
-      state.copyWith(
-        isLoadingStories: false,
-        storiesError: pageLoadErrorMessage(error),
-      ),
-    );
+    _posts = _posts.where((item) => item.id != post.id).toList(growable: false);
+    safeEmit(CommunityPostsSuccess(posts: _posts));
   }
-
-  /// Removes Stories whose authoritative `createdAt + 24h` has passed.
-  ///
-  /// Called by the Cubit timer and from the Community screen when the app
-  /// resumes from the background.
-  void pruneExpiredStories([DateTime? now]) {
-    if (isClosed) return;
-
-    final at = now ?? _now();
-    final mine = state.myStories
-        .where((story) => story.isDisplayableAt(at))
-        .toList(growable: false);
-    final others = state.stories
-        .where((story) => story.isDisplayableAt(at))
-        .toList(growable: false);
-
-    if (mine.length == state.myStories.length &&
-        others.length == state.stories.length) {
-      return;
-    }
-
-    emit(state.copyWith(stories: others, myStories: mine));
-  }
-
-  Future<void> toggleLike(CommunityPost post) async {
-    // Ignore extra taps while this post's transaction is in flight. The
-    // repository transaction also makes a repeated target a no-op.
-    if (!_likeRequestsInFlight.add(post.id)) return;
-    try {
-      await _postsRepository.toggleLike(postId: post.id, liked: !post.isLiked);
-      // The Firestore snapshot updates the count and isLiked state.
-    } finally {
-      _likeRequestsInFlight.remove(post.id);
-    }
-  }
-
-  /// Uploads the Story image, writes Firestore metadata, then updates state.
-  /// No local Story is created when either step fails.
-  Future<CommunityStory> publishStory(XFile image) async {
-    final story = await _storiesRepository.createStory(image);
-    if (isClosed) return story;
-
-    final activeMine = state.myStories
-        .where((item) => item.id != story.id && item.isDisplayableAt(_now()))
-        .toList();
-    final activeOthers = state.stories
-        .where((item) => item.id != story.id && item.isDisplayableAt(_now()))
-        .toList();
-
-    emit(
-      state.copyWith(myStories: [story, ...activeMine], stories: activeOthers),
-    );
-    return story;
-  }
-
-  /// Deletes a Story through Firestore. Ownership is enforced by the
-  /// repository as well as by the local [CommunityStory.isMine] flag.
-  Future<void> deleteStory(CommunityStory story) async {
-    if (!story.isMine) {
-      throw const CommunityStoriesException(
-        'You can only delete your own Stories.',
-      );
-    }
-    await _storiesRepository.deleteStory(story);
-    if (isClosed) return;
-
-    emit(
-      state.copyWith(
-        myStories: state.myStories
-            .where((item) => item.id != story.id)
-            .toList(),
-        stories: state.stories.where((item) => item.id != story.id).toList(),
-      ),
-    );
-  }
-
-  /// Uploads selected media, then creates the Firestore document. The UI only
-  /// reports success after both operations complete.
-  Future<void> publishPost({
-    required List<XFile> images,
-    required String text,
-    String? location,
-  }) async {
-    final post = await _postsRepository.createPost(
-      images: images,
-      text: text,
-      location: location,
-    );
-    if (isClosed) return;
-
-    final posts = state.posts.where((item) => item.id != post.id).toList();
-    emit(state.copyWith(posts: [post, ...posts]));
-  }
-
-  Future<void> deletePost(CommunityPost post) async {
-    if (!post.isMine) {
-      throw const CommunityPostsException(
-        'You can only delete your own posts.',
-      );
-    }
-    await _postsRepository.deletePost(post);
-    if (isClosed) return;
-
-    emit(
-      state.copyWith(
-        posts: state.posts.where((item) => item.id != post.id).toList(),
-      ),
-    );
-  }
-
-  static DateTime _createdAt(CommunityStory story) =>
-      story.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-
-  static int _newestFirst(CommunityStory a, CommunityStory b) =>
-      _createdAt(b).compareTo(_createdAt(a));
 
   @override
   Future<void> close() async {
-    _expiryTimer?.cancel();
-    await _postsSubscription?.cancel();
-    await _storiesSubscription?.cancel();
+    await _subscription?.cancel();
     return super.close();
   }
 }

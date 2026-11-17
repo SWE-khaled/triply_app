@@ -1,5 +1,9 @@
 import '../model/search_filter.dart';
 
+/// Immutable snapshot of the local search UI state.
+///
+/// Every instance is built from the SearchCubit's authoritative fields; there
+/// is deliberately no copyWith.
 class SearchState {
   final String query;
   final SearchFilter activeFilter;
@@ -12,18 +16,4 @@ class SearchState {
     required this.recentSearches,
     this.submitted = false,
   });
-
-  SearchState copyWith({
-    String? query,
-    SearchFilter? activeFilter,
-    List<String>? recentSearches,
-    bool? submitted,
-  }) {
-    return SearchState(
-      query: query ?? this.query,
-      activeFilter: activeFilter ?? this.activeFilter,
-      recentSearches: recentSearches ?? this.recentSearches,
-      submitted: submitted ?? this.submitted,
-    );
-  }
 }

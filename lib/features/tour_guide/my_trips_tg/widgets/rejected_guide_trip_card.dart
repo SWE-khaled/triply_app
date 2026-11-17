@@ -81,6 +81,8 @@ class RejectedGuideTripCard extends StatelessWidget {
               children: [
                 Text(
                   trip.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -90,6 +92,8 @@ class RejectedGuideTripCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   '${trip.location} · ${trip.duration ?? trip.scheduleLabel}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: AppColors.subtitle,

@@ -127,6 +127,9 @@ class _ProfileTourGuideView extends StatelessWidget {
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
+      // Keep the form at phone width on tablets instead of stretching every
+      // field across the whole viewport.
+      constraints: const BoxConstraints(maxWidth: 480),
       builder: (_) => EditProfileSheet(
         name: cubit.displayName,
         displayAvatar: cubit.displayAvatar,

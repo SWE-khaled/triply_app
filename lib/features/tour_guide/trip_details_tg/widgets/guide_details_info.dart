@@ -79,11 +79,13 @@ class GuideDetailsInfo extends StatelessWidget {
         const SizedBox(height: 10),
         Row(
           children: [
-            _meta(Icons.access_time, details.duration),
+            // All three slots flex so long duration/group/language values
+            // shrink and ellipsise instead of pushing the row past the card.
+            Flexible(child: _meta(Icons.access_time, details.duration)),
             const SizedBox(width: 14),
-            _meta(Icons.group_outlined, details.groupType),
+            Flexible(child: _meta(Icons.group_outlined, details.groupType)),
             const SizedBox(width: 14),
-            Expanded(child: _meta(Icons.translate, details.languages)),
+            Flexible(child: _meta(Icons.translate, details.languages)),
           ],
         ),
       ],
@@ -99,6 +101,7 @@ class GuideDetailsInfo extends StatelessWidget {
         Flexible(
           child: Text(
             label,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(fontSize: 11, color: AppColors.dateText),
           ),

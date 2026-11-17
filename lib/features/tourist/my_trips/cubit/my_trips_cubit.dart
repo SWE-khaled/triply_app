@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/data/models/public_trip.dart';
 import 'package:triply/core/data/models/tourist_booking.dart';
-import 'package:triply/core/data/my_bookings_public.dart';
 import 'package:triply/core/data/repositories/booking_repository.dart';
 import 'package:triply/core/data/repositories/public_trips_repository.dart';
 import 'package:triply/core/utils/page_load_error.dart';
@@ -36,6 +35,7 @@ class MyTripsCubit extends Cubit<MyTripsState>
   List<Trip> _booked = const [];
   bool _hasLoaded = false;
   bool _isLoading = false;
+  bool _reloadRequested = false;
 
   /// The status of every booking, by trip id — `pending`, `confirmed`…
   final Map<String, String> _statusByTrip = {};
@@ -46,7 +46,10 @@ class MyTripsCubit extends Cubit<MyTripsState>
 
   /// Reads the bookings and applies the current tab.
   Future<void> load() async {
-    if (_isLoading) return;
+    if (_isLoading) {
+      _reloadRequested = true;
+      return;
+    }
     _isLoading = true;
     // Only the very first read shows the shimmer; a retry after an error
     // keeps the error view instead of restarting the skeleton.
@@ -64,9 +67,13 @@ class MyTripsCubit extends Cubit<MyTripsState>
     } catch (error, stackTrace) {
       debugPrint('MyTripsCubit.load failed: $error');
       debugPrintStack(stackTrace: stackTrace);
-      safeEmit(MyTripsError(error: pageLoadErrorMessage(error)));
+      safeEmit(MyTripsError(error: pageLoadErrorDetail(error)));
     } finally {
       _isLoading = false;
+      if (_reloadRequested && !isClosed) {
+        _reloadRequested = false;
+        await load();
+      }
     }
   }
 
@@ -74,20 +81,16 @@ class MyTripsCubit extends Cubit<MyTripsState>
   void selectTab(TripStatus status) => _applyTab(status);
 
   /// Re-reads the bookings (call after returning from the booking flow).
-  void refresh() => load();
+  Future<void> refresh() => load();
 
-  /// Cancels the exact booking shown by a My Trips card.
-  Future<void> cancelBooking(Trip trip) async {
-    final bookingId = trip.bookingId;
-    if (bookingId == null) {
-      if (!MyBookingsPublic.isBooked(trip.id)) {
-        throw const BookingException('This booking is no longer available.');
-      }
-      MyBookingsPublic.cancelBooking(trip.id);
-    } else {
-      await _bookingRepository.cancelBooking(bookingId: bookingId);
-      MyBookingsPublic.cancelBooking(trip.id);
-    }
+  /// Re-reads the bookings for the Upcoming tab.
+  ///
+  /// Used after a successful payment: the cubit is app-session-scoped, so a
+  /// previously selected tab would otherwise keep a newly confirmed booking
+  /// out of the emitted list. The existing [load] guard keeps concurrent
+  /// refreshes to a single replay.
+  Future<void> refreshUpcoming() async {
+    _selectedTab = TripStatus.upcoming;
     await load();
   }
 

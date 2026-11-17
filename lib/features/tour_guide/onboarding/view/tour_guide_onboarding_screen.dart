@@ -145,9 +145,16 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(28),
-                            child: _buildImage(slide['image']!),
+                          // Cap the media width on tablets so a portrait
+                          // illustration is not cropped into a thin strip.
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 420),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(28),
+                                child: _buildImage(slide['image']!),
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),

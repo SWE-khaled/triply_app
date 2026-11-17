@@ -12,6 +12,7 @@ import 'features/common/auth/views/tourist/forgot_password/view/forgot_password_
 import 'features/common/auth/views/tourist/forgot_password/view/password_reset_success_screen.dart';
 import 'features/common/auth/views/tourist/sign_in_screen.dart';
 import 'features/common/role_selection/view/role_selection_screen.dart';
+import 'features/tourist/onboarding/cubit/onboarding_preference_cubit.dart';
 import 'features/tourist/onboarding/view/onboarding_screen.dart';
 import 'features/tourist/user_profile/view/emergency_screen.dart';
 import 'features/tourist/checkout/paymob_settings.dart';
@@ -28,10 +29,21 @@ import 'features/tourist/home/view/home_screen.dart';
 import 'features/tourist/notifications/view/notifications_screen.dart';
 import 'features/tourist/search/view/search_screen.dart';
 import 'features/tourist/home/cubit/home_cubit.dart';
+import 'features/tourist/home/cubit/home_guides_cubit.dart';
+import 'features/tourist/home/cubit/home_places_cubit.dart';
+import 'features/tourist/home/cubit/home_trips_cubit.dart';
 import 'features/tourist/map/cubit/map_cubit.dart';
 import 'features/tourist/community/cubit/community_cubit.dart';
+import 'features/tourist/community/cubit/community_stories_cubit.dart';
+import 'features/tourist/community/cubit/publish_content_cubit.dart';
+import 'features/tourist/my_trips/cubit/booking_cancellation_cubit.dart';
 import 'features/tourist/my_trips/cubit/my_trips_cubit.dart';
+import 'features/tourist/user_profile/cubit/logout_cubit.dart';
 import 'features/tourist/user_profile/cubit/profile_cubit.dart';
+import 'features/tourist/user_profile/cubit/profile_details_cubit.dart';
+import 'features/tourist/user_profile/cubit/profile_posts_cubit.dart';
+import 'features/tourist/user_profile/cubit/update_profile_cubit.dart';
+import 'features/tourist/trip_details/cubit/guide_phone_cubit.dart';
 import 'features/tourist/trip_details/cubit/trip_details_cubit.dart';
 import 'features/tourist/popular/cubit/popular_cubit.dart';
 import 'features/tourist/guides/cubit/guides_cubit.dart';
@@ -65,15 +77,56 @@ class MyApp extends StatelessWidget {
         // Tourist page Cubits live for this app session. They are created on
         // the first tourist page opening and keep their loaded data until
         // the process restarts, so revisiting a page never reloads it.
+        // The badge keeps its existing provider. The three content sections
+        // are independent so one section cannot overwrite another's state.
         BlocProvider(create: (_) => HomeCubit()),
+        BlocProvider(create: (_) => HomePlacesCubit()),
+        BlocProvider(create: (_) => HomeGuidesCubit()),
+        BlocProvider(create: (_) => HomeTripsCubit()),
+        // The badge/compatibility cubit keeps its original provider shape.
+        // Profile data, posts and writes are independent session cubits.
         BlocProvider(
           create: (context) =>
               ProfileCubit(userId: context.read<AuthCubit>().user?.uid),
         ),
-        BlocProvider(create: (_) => CommunityCubit()),
+        BlocProvider(
+          create: (context) => ProfileDetailsCubit(
+            userId: context.read<AuthCubit>().user?.uid,
+          ),
+        ),
+        BlocProvider(create: (_) => ProfilePostsCubit()),
+        BlocProvider(
+          create: (context) => UpdateProfileCubit(
+            onUpdated: () => context.read<AuthCubit>().refreshUser(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => LogoutCubit(
+            onSignOut: () => context.read<AuthCubit>().signOut(),
+          ),
+        ),
+        BlocProvider(create: (_) => OnboardingPreferenceCubit()),
+        // Community feeds and publishing are independent so a publishing
+        // failure can never replace either feed's state.
+        BlocProvider(create: (_) => CommunityPostsCubit()),
+        BlocProvider(create: (_) => CommunityStoriesCubit()),
+        BlocProvider(
+          create: (context) => PublishContentCubit(
+            onPostPublished: (post) =>
+                context.read<CommunityPostsCubit>().addPost(post),
+            onStoryPublished: (story) =>
+                context.read<CommunityStoriesCubit>().addStory(story),
+          ),
+        ),
         BlocProvider(create: (_) => MapCubit()),
         BlocProvider(create: (_) => MyTripsCubit()),
+        BlocProvider(
+          create: (context) => BookingCancellationCubit(
+            onCancelled: () => context.read<MyTripsCubit>().refresh(),
+          ),
+        ),
         BlocProvider(create: (_) => TripDetailsCubit()),
+        BlocProvider(create: (_) => GuidePhoneCubit()),
         BlocProvider(create: (_) => PopularCubit()),
         BlocProvider(create: (_) => GuidesCubit()),
         BlocProvider(create: (_) => TripsCubit()),

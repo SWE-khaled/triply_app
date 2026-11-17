@@ -7,8 +7,6 @@ import '../../../../core/widgets/circle_back_button.dart';
 import '../cubit/booking_cubit.dart';
 import '../cubit/booking_state.dart';
 import 'package:triply/features/tourist/booking/widgets/booking_widgets.dart';
-import '../../../../core/data/my_bookings_public.dart';
-import '../../../../core/data/repositories/booking_repository.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 
 class BookingScreen extends StatefulWidget {
@@ -44,31 +42,64 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _controller,
-      child: BlocBuilder<BookingCubit, BookingState>(
-        builder: (context, _) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Builder(
-                builder: (context) {
-                  if (_controller.stepIndex == 3) return _buildSuccess();
-                  return Column(
-                    children: [
-                      _buildHeader(),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                          child: _buildStep(),
-                        ),
-                      ),
-                      _buildBottomBar(),
-                    ],
-                  );
-                },
+      child: BlocListener<BookingCubit, BookingState>(
+        listener: (context, state) {
+          final request = state.request;
+          if (request is BookingRequestFailed) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(request.message)));
+            return;
+          }
+          if (request is BookingRequestCreated) {
+            final navigator = Navigator.of(context);
+            final messenger = ScaffoldMessenger.of(context);
+            navigator.push(
+              MaterialPageRoute(
+                builder: (_) => PaymentView(
+                  price: _controller.total,
+                  flow: PaymentFlow.privateBooking,
+                  onPaymentSuccess: () => _controller.completePrivatePayment(),
+                  onPaymentError: () => messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('The payment failed. Please try again.'),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          );
+            );
+            return;
+          }
+          if (request is BookingRequestConfirmed) {
+            AppRoutes.goToMyTrips(context);
+          }
         },
+        child: BlocBuilder<BookingCubit, BookingState>(
+          builder: (context, _) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: SafeArea(
+                child: Builder(
+                  builder: (context) {
+                    if (_controller.stepIndex == 3) return _buildSuccess();
+                    return Column(
+                      children: [
+                        _buildHeader(),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                            child: _buildStep(),
+                          ),
+                        ),
+                        _buildBottomBar(),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -92,25 +123,29 @@ class _BookingScreenState extends State<BookingScreen> {
                 }
               }),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Book Private Guide',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0E5261),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Book Private Guide',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0E5261),
+                      ),
                     ),
-                  ),
-                  Text(
-                    guide.name,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.subtitle,
+                    Text(
+                      guide.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.subtitle,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -714,6 +749,7 @@ class _BookingScreenState extends State<BookingScreen> {
     }
     // Step 3 confirm
     final totalLabel = _controller.guide.formatPrice(_controller.total);
+    final busy = _controller.request is BookingRequestLoading;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -742,8 +778,8 @@ class _BookingScreenState extends State<BookingScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                // Connected: forwards the live booking state to checkout.
-                onPressed: () => _openCheckout(context),
+                // Dispatches the booking write; the listener opens checkout.
+                onPressed: busy ? null : _openCheckout,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -824,98 +860,9 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  void _openCheckout(BuildContext context) {
-    final guideId = _controller.guideId;
-    final guideName = _controller.guide.name;
-    final guideImage = _controller.guide.coverUrl.isNotEmpty
-        ? _controller.guide.coverUrl
-        : _controller.guide.avatarUrl;
-    // Captured before the async gap (avoids BuildContext across awaits).
-    final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    _createPrivateThenPay(guideId, guideName, guideImage, navigator, messenger);
-  }
-
-  Future<void> _createPrivateThenPay(
-    String guideId,
-    String guideName,
-    String guideImage,
-    NavigatorState navigator,
-    ScaffoldMessengerState messenger,
-  ) async {
-    final startAt = _controller.startAt;
-    final endAt = _controller.endAt;
-    if (startAt == null) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Pick a date and time before paying.')),
-      );
-      return;
-    }
-
-    // Create the booking as pending/pending *before* payment, so an
-    // abandoned payment releases it via the lazy expiry after 30 min.
-    BookingReceipt? receipt;
-    try {
-      receipt = await BookingRepository().createPrivateBooking(
-        guideId: guideId,
-        guideName: guideName,
-        guideImageUrl: guideImage,
-        title: 'Private tour with $guideName',
-        travelers: _controller.travelers,
-        totalPrice: _controller.total,
-        paymentMethod: 'card',
-        startAt: startAt,
-        endAt: endAt,
-        meetingPoint: _controller.meetingPoint,
-        dateLabel: _controller.dateLabel,
-      );
-    } on BookingException catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(e.message)));
-      return;
-    }
-    final bookingId = receipt.bookingId;
-
-    // Session record so My Trips shows the booking (pending until paid).
-    MyBookingsPublic.recordPrivate(
-      guideId: guideId,
-      guideName: guideName,
-      title: 'Private tour with $guideName',
-      imageUrl: guideImage,
-      dateLabel: _controller.dateLabel,
-      travelers: _controller.travelers,
-      totalPaid: _controller.total,
-    );
-
-    navigator.push(
-      MaterialPageRoute(
-        builder: (_) => PaymentView(
-          price: _controller.total,
-          flow: PaymentFlow.privateBooking,
-          onPaymentSuccess: () async {
-            if (!mounted) return;
-            await BookingRepository().confirmPayment(
-              bookingId: bookingId,
-              // The PaymentView success callback does not expose the
-              // Paymob transaction id, so the booking id is recorded as
-              // the payment id (test-only demo; no real money moves).
-              paymentId: bookingId,
-            );
-            if (!mounted) return;
-            navigator.popUntil((route) => route.isFirst);
-            navigator.push(AppRoutes.myTrips());
-          },
-          onPaymentError: () {
-            messenger.showSnackBar(
-              const SnackBar(
-                content: Text('The payment failed. Please try again.'),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
+  /// UI-only: the write, validation and payment orchestration live in
+  /// [BookingCubit]; this just dispatches the action.
+  void _openCheckout() => _controller.startPrivateBooking();
 
   Widget _sectionLabel(String text) {
     return Text(

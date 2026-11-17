@@ -13,11 +13,14 @@ class BookingStepper extends StatelessWidget {
     final display = stepIndex >= 3 ? 2 : stepIndex;
     return Row(
       children: [
-        _dot(0, 'Date & Time', display),
+        // Loose dots keep their natural width when there is room and shrink
+        // (ellipsising the label) on narrow screens; the connectors flex
+        // around them. This avoids an overflow at 320-390px.
+        Flexible(child: _dot(0, 'Date & Time', display)),
         _line(display >= 1),
-        _dot(1, 'Details', display),
+        Flexible(child: _dot(1, 'Details', display)),
         _line(display >= 2),
-        _dot(2, 'Confirm', display),
+        Flexible(child: _dot(2, 'Confirm', display)),
       ],
     );
   }
@@ -49,12 +52,15 @@ class BookingStepper extends StatelessWidget {
                 ),
         ),
         const SizedBox(width: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: current ? FontWeight.w700 : FontWeight.w500,
-            color: active ? AppColors.primary : AppColors.hint,
+        Flexible(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: current ? FontWeight.w700 : FontWeight.w500,
+              color: active ? AppColors.primary : AppColors.hint,
+            ),
           ),
         ),
       ],
@@ -182,9 +188,15 @@ class SummaryRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          // Loose fit keeps short labels unchanged; long price-breakdown
+          // labels (e.g. rate x hours x travelers) ellipsise on narrow
+          // screens instead of overflowing the row at 320px.
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            ),
           ),
           const Spacer(),
           Text(

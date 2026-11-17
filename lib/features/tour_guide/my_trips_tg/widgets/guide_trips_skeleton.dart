@@ -11,7 +11,8 @@ class GuideTripsSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-      physics: const NeverScrollableScrollPhysics(),
+      // Keep the skeleton scrollable: on short viewports the lower cards
+      // would otherwise be clipped with no way to reveal them.
       itemCount: 3,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (_, _) => const _TripCardSkeleton(),

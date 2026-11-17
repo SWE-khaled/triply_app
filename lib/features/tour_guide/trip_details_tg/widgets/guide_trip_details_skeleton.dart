@@ -40,12 +40,16 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                     onTap: onBack ?? () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    'Trip Details',
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.priceTeal,
+                  Flexible(
+                    child: Text(
+                      'Trip Details',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.priceTeal,
+                      ),
                     ),
                   ),
                 ],
@@ -93,7 +97,7 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
-                              horizontal: 12,
+                              horizontal: 4,
                             ),
                             decoration: BoxDecoration(
                               color: i == 0
@@ -103,6 +107,8 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                             ),
                             child: Text(
                               _tabs[i],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,

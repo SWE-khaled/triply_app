@@ -79,17 +79,22 @@ class ProfileHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    GestureDetector(
-                      onTap: onEdit,
-                      behavior: HitTestBehavior.opaque,
-                      child: Text(
-                        displayName,
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                    // Long Firestore display names must shrink instead of
+                    // pushing the verified badge off the card.
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: onEdit,
+                        behavior: HitTestBehavior.opaque,
+                        child: Text(
+                          displayName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -123,7 +128,6 @@ class ProfileHeader extends StatelessWidget {
                 ],
                 const SizedBox(height: 10),
                 Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     if (reviewCount > 0) ...[
                       const Icon(
@@ -132,12 +136,16 @@ class ProfileHeader extends StatelessWidget {
                         color: AppColors.starGold,
                       ),
                       const SizedBox(width: 3),
-                      Text(
-                        '$rating ($reviewCount)',
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                      Flexible(
+                        child: Text(
+                          '$rating ($reviewCount)',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -150,11 +158,15 @@ class ProfileHeader extends StatelessWidget {
                         color: Colors.white,
                       ),
                       const SizedBox(width: 2),
-                      Text(
-                        displayLocation!,
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: Colors.white,
+                      Flexible(
+                        child: Text(
+                          displayLocation!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
@@ -163,15 +175,18 @@ class ProfileHeader extends StatelessWidget {
                 if (displayPhone != null && displayPhone!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.phone, size: 13, color: Colors.white),
                       const SizedBox(width: 4),
-                      Text(
-                        displayPhone!,
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: Colors.white,
+                      Flexible(
+                        child: Text(
+                          displayPhone!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],

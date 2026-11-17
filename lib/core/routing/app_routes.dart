@@ -104,8 +104,10 @@ class AppRoutes {
     );
   }
 
-  static Route<void> myTrips() {
-    return MaterialPageRoute(builder: (_) => const MyTripsScreen());
+  static Route<void> myTrips({bool resetToUpcoming = false}) {
+    return MaterialPageRoute(
+      builder: (_) => MyTripsScreen(resetToUpcoming: resetToUpcoming),
+    );
   }
 
   static Route<void> guideDashboard() {
@@ -233,11 +235,13 @@ class AppRoutes {
     );
   }
 
-  /// Post-booking destination: always lands on My Trips, where the
-  /// fresh cubit reads the booking store — the booked trip is visible.
+  /// Post-booking destination: always lands on My Trips with the Upcoming
+  /// tab selected, where the fresh cubit reads the booking store — the
+  /// newly confirmed trip is visible even if another tab was selected
+  /// before leaving the screen.
   static void goToMyTrips(BuildContext context) {
     Navigator.of(context).popUntil((route) => route.isFirst);
-    Navigator.of(context).push(myTrips());
+    Navigator.of(context).push(myTrips(resetToUpcoming: true));
   }
 
   static Route<void> bookingConfirmed({

@@ -5,18 +5,19 @@ import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_shimmer.dart';
-import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/profile_avatar.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
 import '../../community/view/community_view.dart';
-import '../../community/data/community_posts_repository.dart';
 import '../../home/view/home_screen.dart';
 import '../../map/view/map_view.dart';
 import '../../../tourist/community/model/community_post.dart';
 import '../../../tourist/community/widget/post_images.dart';
 import '../cubit/profile_cubit.dart';
-import '../cubit/profile_state.dart';
+import '../cubit/profile_details_cubit.dart';
+import '../cubit/profile_details_state.dart';
+import '../cubit/profile_posts_cubit.dart';
+import '../cubit/profile_posts_state.dart';
 import '../widget/edit_profile_sheet.dart';
 import 'my_posts_screen.dart';
 import 'settings_screen.dart';
@@ -42,247 +43,264 @@ class _ProfileBodyState extends State<_ProfileBody> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthCubit>().user;
-    return BlocConsumer<ProfileCubit, ProfileState>(
-      listenWhen: (a, b) => a.profileError != b.profileError,
+    return BlocListener<ProfileDetailsCubit, ProfileDetailsState>(
       listener: (context, state) {
-        if (state.profileError != null) _message(state.profileError!);
+        if (state.errorMessage != null) _message(state.errorMessage!);
       },
-      builder: (context, state) {
-        final cubit = context.read<ProfileCubit>();
-        final name = state.profileName?.trim().isNotEmpty == true
-            ? state.profileName!
-            : (user?.displayName?.trim().isNotEmpty == true
-                  ? user!.displayName!
-                  : 'Traveler');
-        final photo = state.profilePhotoUrl?.trim().isNotEmpty == true
-            ? state.profilePhotoUrl
-            : user?.photoURL;
-        final location = [state.city, state.country]
-            .whereType<String>()
-            .map((s) => s.trim())
-            .where((s) => s.isNotEmpty)
-            .join(', ');
-        final bio = state.bio?.trim() ?? '';
-        final posts = state.posts;
-        final mine = user == null
-            ? <CommunityPost>[]
-            : posts
-                  .where(
-                    (post) =>
-                        post.authorId.isNotEmpty && post.authorId == user.uid,
-                  )
-                  .toList();
-        final initialError = !state.hasLoadedProfile
-            ? state.profileError
-            : !state.hasLoadedPosts
-            ? state.postsError
-            : null;
-        return Scaffold(
-          extendBody: true,
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            leading: IconButton(
-              onPressed: () {
-                if (Navigator.canPop(context)) Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 19,
-                color: _teal,
-              ),
-            ),
-            title: const Text(
-              'My profile',
-              style: TextStyle(fontWeight: FontWeight.w700, color: _ink),
-            ),
-            actions: [
-              IconButton(
-                tooltip: 'Edit profile',
-                onPressed: () => _edit(context, state, name, photo),
-                icon: const Icon(Icons.edit_outlined, color: _teal),
-              ),
-              IconButton(
-                tooltip: 'Settings',
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: cubit,
-                      child: const SettingsScreen(),
+      child: BlocBuilder<ProfileDetailsCubit, ProfileDetailsState>(
+        builder: (context, detailsState) {
+          return BlocBuilder<ProfilePostsCubit, ProfilePostsState>(
+            builder: (context, postsState) {
+              final detailsCubit = context.read<ProfileDetailsCubit>();
+              final preferencesCubit = context.read<ProfileCubit>();
+              final name = detailsState.name.trim().isNotEmpty
+                  ? detailsState.name
+                  : (user?.displayName?.trim().isNotEmpty == true
+                        ? user!.displayName!
+                        : 'Traveler');
+              final photo = detailsState.photoUrlWithAuthFallback(
+                user?.photoURL,
+              );
+              final location = [detailsState.city, detailsState.country]
+                  .map((value) => value.trim())
+                  .where((value) => value.isNotEmpty)
+                  .join(', ');
+              final mine = context.read<ProfilePostsCubit>().myPosts(user?.uid);
+              final initialError = !detailsState.hasLoaded
+                  ? detailsState.errorMessage
+                  : !postsState.hasLoaded
+                  ? postsState.errorMessage
+                  : null;
+
+              return Scaffold(
+                extendBody: true,
+                backgroundColor: Colors.white,
+                appBar: AppBar(
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  leading: IconButton(
+                    onPressed: () {
+                      if (Navigator.canPop(context)) Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      size: 19,
+                      color: _teal,
                     ),
                   ),
-                ),
-                icon: const Icon(Icons.settings_outlined, color: _teal),
-              ),
-              const SizedBox(width: 4),
-            ],
-          ),
-          body: !state.hasLoadedProfile || !state.hasLoadedPosts
-              ? initialError != null
-                    ? AppErrorView(
-                        message: initialError,
-                        onRetry: cubit.retryInitialLoad,
-                      )
-                    : const _ProfileSkeleton()
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
-                  children: [
-                    Row(
-                      children: [
-                        ClipOval(
-                          child: ProfileAvatar(imageUrl: photo, size: 66),
+                  title: const Text(
+                    'My profile',
+                    style: TextStyle(fontWeight: FontWeight.w700, color: _ink),
+                  ),
+                  actions: [
+                    IconButton(
+                      tooltip: 'Edit profile',
+                      onPressed: () =>
+                          _edit(context, detailsState, name, photo),
+                      icon: const Icon(Icons.edit_outlined, color: _teal),
+                    ),
+                    IconButton(
+                      tooltip: 'Settings',
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider.value(
+                            value: preferencesCubit,
+                            child: const SettingsScreen(),
+                          ),
                         ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      icon: const Icon(Icons.settings_outlined, color: _teal),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                ),
+                body: !detailsState.hasLoaded || !postsState.hasLoaded
+                    ? initialError != null
+                          ? AppErrorView(
+                              message: initialError,
+                              onRetry: () {
+                                if (detailsState.errorMessage != null) {
+                                  detailsCubit.retry();
+                                }
+                                if (postsState.errorMessage != null) {
+                                  context.read<ProfilePostsCubit>().retry();
+                                }
+                              },
+                            )
+                          : const _ProfileSkeleton()
+                    : ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                        children: [
+                          Row(
                             children: [
-                              Text(
-                                name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: _ink,
-                                ),
+                              ClipOval(
+                                child: ProfileAvatar(imageUrl: photo, size: 66),
                               ),
-                              const SizedBox(height: 5),
-                              Text(
-                                location.isEmpty
-                                    ? 'Location not added'
-                                    : location,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: _muted,
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      name,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: _ink,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      location.isEmpty
+                                          ? 'Location not added'
+                                          : location,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: _muted,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    _stats(cubit.stats, postCount: mine.length),
-                    const SizedBox(height: 18),
-                    const Text(
-                      'Bio',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        color: _ink,
-                      ),
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      state.isLoadingProfile
-                          ? 'Loading bio…'
-                          : bio.isEmpty
-                          ? 'No bio added yet.'
-                          : bio,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        height: 1.5,
-                        color: _muted,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Text(
-                            'Published posts',
+                          const SizedBox(height: 20),
+                          _stats(
+                            preferencesCubit.stats,
+                            postCount: mine.length,
+                          ),
+                          const SizedBox(height: 18),
+                          const Text(
+                            'Bio',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
                               color: _ink,
                             ),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const MyPostsScreen(),
+                          const SizedBox(height: 7),
+                          Text(
+                            detailsState.isLoading
+                                ? 'Loading bio…'
+                                : detailsState.bio.isEmpty
+                                ? 'No bio added yet.'
+                                : detailsState.bio,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              height: 1.5,
+                              color: _muted,
                             ),
                           ),
-                          child: const Row(
+                          const SizedBox(height: 18),
+                          Row(
                             children: [
-                              Text(
-                                'View all',
-                                style: TextStyle(color: _teal, fontSize: 12),
+                              const Expanded(
+                                child: Text(
+                                  'Published posts',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                    color: _ink,
+                                  ),
+                                ),
                               ),
-                              SizedBox(width: 5),
-                              Icon(Icons.arrow_forward, color: _teal, size: 16),
+                              TextButton(
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const MyPostsScreen(),
+                                  ),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Text(
+                                      'View all',
+                                      style: TextStyle(
+                                        color: _teal,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      color: _teal,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    if (state.postsError != null)
-                      _info(state.postsError!)
-                    else if (mine.isEmpty)
-                      _info('You have no published posts yet.')
-                    else
-                      ProfilePostCard(
-                        post: mine.first,
-                        compact: true,
-                        authorAvatarUrl: photo ?? '',
-                        onDelete: null,
-                        onShare: () => shareProfilePost(context, mine.first),
+                          if (postsState.errorMessage != null)
+                            _info(postsState.errorMessage!)
+                          else if (mine.isEmpty)
+                            _info('You have no published posts yet.')
+                          else
+                            ProfilePostCard(
+                              post: mine.first,
+                              compact: true,
+                              authorAvatarUrl: photo ?? '',
+                              onDelete: null,
+                              onShare: () =>
+                                  shareProfilePost(context, mine.first),
+                            ),
+                        ],
                       ),
-                  ],
+                bottomNavigationBar: AppBottomNav(
+                  currentIndex: 4,
+                  onTap: (index) {
+                    if (index == 0) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      );
+                    } else if (index == 1) {
+                      Navigator.of(context).push(AppRoutes.myTrips());
+                    } else if (index == 2) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => MapScreen()),
+                      );
+                    } else if (index == 3) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const CommunityScreen(),
+                        ),
+                      );
+                    }
+                  },
                 ),
-          bottomNavigationBar: AppBottomNav(
-            currentIndex: 4,
-            onTap: (index) {
-              if (index == 0) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                );
-              } else if (index == 1) {
-                Navigator.of(context).push(AppRoutes.myTrips());
-              } else if (index == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => MapScreen()),
-                );
-              } else if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CommunityScreen()),
-                );
-              }
+              );
             },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
   Future<void> _edit(
     BuildContext context,
-    ProfileState state,
+    ProfileDetailsState state,
     String name,
     String? photo,
   ) async {
-    final profileCubit = context.read<ProfileCubit>();
-    final userId = context.read<AuthCubit>().user?.uid;
+    final detailsCubit = context.read<ProfileDetailsCubit>();
     final saved = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (_) => EditProfileSheet(
           name: name,
           photoUrl: photo,
-          city: state.city ?? '',
-          country: state.country ?? '',
-          bio: state.bio ?? '',
+          city: state.city,
+          country: state.country,
+          bio: state.bio,
         ),
       ),
     );
     if (saved == true && mounted) {
-      if (userId != null) profileCubit.loadUserProfile(userId);
+      detailsCubit.load();
     }
   }
 
@@ -322,6 +340,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
       ],
     ),
   );
+
   Widget _info(String text) => Container(
     padding: const EdgeInsets.all(28),
     decoration: BoxDecoration(
@@ -336,6 +355,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
       ),
     ),
   );
+
   void _message(String text) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 }
@@ -421,6 +441,7 @@ class ProfilePostCard extends StatelessWidget {
   final String? authorAvatarUrl;
   final VoidCallback? onDelete;
   final VoidCallback onShare;
+
   @override
   Widget build(BuildContext context) {
     final lines = post.text.split('\n');
@@ -575,28 +596,5 @@ Future<void> shareProfilePost(BuildContext context, CommunityPost post) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Post details copied to clipboard.')),
     );
-  }
-}
-
-Future<void> deleteCommunityPost(
-  BuildContext context,
-  CommunityPost post,
-) async {
-  if (!await ConfirmDeleteDialog.show(context)) {
-    return;
-  }
-  try {
-    await FirestoreCommunityPostsRepository().deletePost(post);
-    if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Post deleted.')));
-    }
-  } catch (error) {
-    if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('$error')));
-    }
   }
 }

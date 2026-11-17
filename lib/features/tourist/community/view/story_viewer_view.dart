@@ -4,15 +4,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../cubit/community_cubit.dart';
+import '../cubit/story_actions_cubit.dart';
+import '../cubit/story_actions_state.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
-import '../data/community_stories_repository.dart';
 import '../model/community_story.dart';
 import '../widget/story_progress_bars.dart';
 import '../widget/story_viewer_header.dart';
 
 /// Full-screen viewer for ONE user's stories only.
 class StoryViewerScreen extends StatefulWidget {
+  /// The author's stories captured when the viewer was opened. The live list
+  /// is owned by [StoryActionsCubit], which is provided above this widget.
   final List<CommunityStory> stories;
   final int initialIndex;
 
@@ -37,10 +39,11 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
 
   late final PageController _pageController;
   late final AnimationController _progressController;
-  late List<CommunityStory> _stories;
+  late final StoryActionsCubit _actions;
   late int _currentIndex;
   Timer? _expiryTimer;
   bool _pruning = false;
+  bool _closeRequested = false;
 
   DateTime get _now => widget.now?.call() ?? DateTime.now();
 
@@ -49,30 +52,26 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _stories = widget.stories
-        .where((story) => story.isDisplayableAt(_now))
-        .toList();
+    _actions = context.read<StoryActionsCubit>();
+    final stories = _actions.stories;
+    _currentIndex = stories.isEmpty
+        ? 0
+        : widget.initialIndex.clamp(0, stories.length - 1).toInt();
+    _pageController = PageController(initialPage: _currentIndex);
+    _progressController = AnimationController(
+      vsync: this,
+      duration: _storyDuration,
+    )..addStatusListener(_onProgressStatus);
 
-    if (_stories.isEmpty) {
-      _currentIndex = 0;
-      _pageController = PageController();
-      _progressController = AnimationController(
-        vsync: this,
-        duration: _storyDuration,
-      );
-      WidgetsBinding.instance.addPostFrameCallback((_) => _closeIfEmpty());
+    if (stories.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _requestClose());
     } else {
-      _currentIndex = widget.initialIndex.clamp(0, _stories.length - 1).toInt();
-      _pageController = PageController(initialPage: _currentIndex);
-      _progressController =
-          AnimationController(vsync: this, duration: _storyDuration)
-            ..addStatusListener(_onProgressStatus)
-            ..forward();
+      _progressController.forward();
     }
 
     _expiryTimer = Timer.periodic(
       _expiryCheckInterval,
-      (_) => _removeExpiredStories(),
+      (_) => _pruneExpired(),
     );
   }
 
@@ -88,14 +87,19 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _removeExpiredStories();
+      _pruneExpired();
     }
   }
 
-  void _closeIfEmpty() {
-    if (!mounted || _stories.isNotEmpty) return;
+  void _requestClose() {
+    if (_closeRequested || !mounted) return;
+    _closeRequested = true;
+    _expiryTimer?.cancel();
     _progressController.stop();
-    Navigator.of(context).maybePop();
+    setState(() {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Navigator.of(context).maybePop();
+    });
   }
 
   void _onProgressStatus(AnimationStatus status) {
@@ -105,8 +109,9 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   }
 
   void _goToNext() {
-    if (_stories.isEmpty) return;
-    if (_currentIndex < _stories.length - 1) {
+    final stories = _actions.stories;
+    if (stories.isEmpty) return;
+    if (_currentIndex < stories.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
@@ -130,9 +135,10 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   }
 
   void _onPageChanged(int index) {
-    if (index < 0 || index >= _stories.length) return;
-    if (!_stories[index].isDisplayableAt(_now)) {
-      _removeExpiredStories();
+    final stories = _actions.stories;
+    if (index < 0 || index >= stories.length) return;
+    if (!stories[index].isDisplayableAt(_now)) {
+      _pruneExpired();
       return;
     }
 
@@ -153,77 +159,77 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     _progressController.forward();
   }
 
-  /// Removes expired Stories from the snapshot list. If the current Story
-  /// expired, advance to the next active one or close the viewer.
-  void _removeExpiredStories() {
-    if (!mounted || _pruning || _stories.isEmpty) return;
+  /// Asks the cubit to drop expired stories, then reconciles the page index
+  /// with the new snapshot. The View never edits the story list itself.
+  void _pruneExpired() {
+    if (!mounted || _pruning || _closeRequested || _actions.stories.isEmpty) {
+      return;
+    }
     _pruning = true;
     try {
-      final active = _stories
-          .where((story) => story.isDisplayableAt(_now))
-          .toList(growable: false);
-      if (active.length == _stories.length) return;
-
-      if (active.isEmpty) {
-        _stories = active;
-        _expiryTimer?.cancel();
-        _progressController.stop();
-        setState(() {});
-        WidgetsBinding.instance.addPostFrameCallback((_) => _closeIfEmpty());
-        return;
-      }
-
-      final currentId = _stories[_currentIndex].id;
-      final currentIndexInActive = active.indexWhere(
-        (story) => story.id == currentId,
-      );
-
-      if (currentIndexInActive >= 0) {
-        // The viewed Story is still active; only older pages disappeared.
-        _stories = active;
-        _currentIndex = currentIndexInActive;
-        setState(() {});
-        if (_pageController.hasClients &&
-            _pageController.page?.round() != _currentIndex) {
-          _pageController.jumpToPage(_currentIndex);
-        }
-        return;
-      }
-
-      // The viewed Story expired. Find the next active Story that followed
-      // it; if there is none, close instead of falling back to an old Story.
-      CommunityStory? next;
-      for (var i = _currentIndex + 1; i < _stories.length; i++) {
-        final candidate = _stories[i];
-        if (active.any((story) => story.id == candidate.id)) {
-          next = candidate;
-          break;
-        }
-      }
-
-      if (next == null) {
-        // The viewed Story expired and there is no later active Story:
-        // close instead of falling back to an older page.
-        _stories = const [];
-        _expiryTimer?.cancel();
-        _progressController.stop();
-        setState(() {});
-        WidgetsBinding.instance.addPostFrameCallback((_) => _closeIfEmpty());
-        return;
-      }
-
-      _stories = active;
-      _currentIndex = active.indexWhere((story) => story.id == next!.id);
-      setState(() {});
-      if (_pageController.hasClients) {
-        _pageController.jumpToPage(_currentIndex);
-      }
-      _progressController
-        ..reset()
-        ..forward();
+      final before = List<CommunityStory>.of(_actions.stories);
+      _actions.pruneExpired(_now);
+      final active = _actions.stories;
+      if (active.length == before.length) return;
+      _reconcileAfterListChange(before, active);
     } finally {
       _pruning = false;
     }
+  }
+
+  /// Keeps the viewed story in focus when pages disappear, advances to the
+  /// next still-active story that followed it, or closes the viewer.
+  void _reconcileAfterListChange(
+    List<CommunityStory> before,
+    List<CommunityStory> active,
+  ) {
+    if (!mounted || _closeRequested) return;
+    if (active.isEmpty) {
+      _requestClose();
+      return;
+    }
+
+    final safeCurrent = before.isEmpty
+        ? 0
+        : _currentIndex.clamp(0, before.length - 1);
+    final currentId = before[safeCurrent].id;
+    final currentIndexInActive = active.indexWhere(
+      (story) => story.id == currentId,
+    );
+
+    if (currentIndexInActive >= 0) {
+      // The viewed story is still active; only older pages disappeared.
+      setState(() => _currentIndex = currentIndexInActive);
+      if (_pageController.hasClients &&
+          _pageController.page?.round() != _currentIndex) {
+        _pageController.jumpToPage(_currentIndex);
+      }
+      return;
+    }
+
+    // The viewed story expired. Find the next active story that followed it;
+    // if there is none, close instead of falling back to an older story.
+    CommunityStory? next;
+    for (var i = _currentIndex + 1; i < before.length; i++) {
+      final candidate = before[i];
+      if (active.any((story) => story.id == candidate.id)) {
+        next = candidate;
+        break;
+      }
+    }
+
+    if (next == null) {
+      _requestClose();
+      return;
+    }
+
+    setState(() => _currentIndex = active.indexWhere((s) => s.id == next!.id));
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(_currentIndex);
+    }
+    _progressController
+      ..reset()
+      ..forward();
   }
 
   Widget _imageError(
@@ -236,11 +242,6 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
       color: Colors.white54,
       size: 48,
     );
-  }
-
-  String _deleteErrorMessage(Object error) {
-    if (error is CommunityStoriesException) return error.message;
-    return 'Could not delete this Story. Please try again.';
   }
 
   Future<void> _confirmDelete(CommunityStory story) async {
@@ -258,121 +259,112 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     }
     if (!mounted) return;
 
-    try {
-      await context.read<CommunityCubit>().deleteStory(story);
-    } catch (error) {
-      if (!mounted) return;
+    final before = List<CommunityStory>.of(_actions.stories);
+    await _actions.delete(story);
+    if (!mounted) return;
+
+    final state = _actions.state;
+    if (state is StoryDeleteError) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(_deleteErrorMessage(error))));
+      ).showSnackBar(SnackBar(content: Text(state.message)));
       _resume();
       return;
     }
 
-    if (!mounted) return;
-
-    _stories.removeWhere((item) => item.id == story.id);
-
-    if (_stories.isEmpty) {
-      _progressController.stop();
-      Navigator.of(context).pop();
-      return;
-    }
-
-    if (_currentIndex >= _stories.length) {
-      _currentIndex = _stories.length - 1;
-    }
-
-    setState(() {});
-
-    _pageController.jumpToPage(_currentIndex);
-
-    _progressController
-      ..reset()
-      ..forward();
+    _reconcileAfterListChange(before, _actions.stories);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_stories.isEmpty) {
+    if (_closeRequested || _actions.stories.isEmpty) {
       return const Scaffold(backgroundColor: Colors.black);
     }
 
-    final story = _stories[_currentIndex];
+    return BlocBuilder<StoryActionsCubit, StoryActionsState>(
+      builder: (context, state) {
+        final stories = state.stories;
+        if (stories.isEmpty) {
+          return const Scaffold(backgroundColor: Colors.black);
+        }
+        final safeIndex = _currentIndex.clamp(0, stories.length - 1);
+        final story = stories[safeIndex];
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            PageView.builder(
-              controller: _pageController,
-              itemCount: _stories.length,
-              onPageChanged: _onPageChanged,
-              itemBuilder: (context, index) {
-                final item = _stories[index];
+        return Scaffold(
+          backgroundColor: Colors.black,
+          body: SafeArea(
+            child: Stack(
+              children: [
+                PageView.builder(
+                  controller: _pageController,
+                  itemCount: stories.length,
+                  onPageChanged: _onPageChanged,
+                  itemBuilder: (context, index) {
+                    final item = stories[index];
 
-                return GestureDetector(
-                  onTapDown: (_) => _pause(),
-                  onTapCancel: _resume,
-                  onLongPress: _pause,
-                  onLongPressUp: _resume,
-                  onTapUp: (details) {
-                    _resume();
+                    return GestureDetector(
+                      onTapDown: (_) => _pause(),
+                      onTapCancel: _resume,
+                      onLongPress: _pause,
+                      onLongPressUp: _resume,
+                      onTapUp: (details) {
+                        _resume();
 
-                    final width = MediaQuery.of(context).size.width;
+                        final width = MediaQuery.of(context).size.width;
 
-                    if (details.globalPosition.dx < width / 2) {
-                      _goToPrevious();
-                    } else {
-                      _goToNext();
-                    }
+                        if (details.globalPosition.dx < width / 2) {
+                          _goToPrevious();
+                        } else {
+                          _goToNext();
+                        }
+                      },
+                      child: Center(
+                        child: item.isLocalFile
+                            ? Image.file(
+                                File(item.imageUrl),
+                                fit: BoxFit.contain,
+                                errorBuilder: _imageError,
+                              )
+                            : Image.network(
+                                item.imageUrl,
+                                fit: BoxFit.contain,
+                                errorBuilder: _imageError,
+                              ),
+                      ),
+                    );
                   },
-                  child: Center(
-                    child: item.isLocalFile
-                        ? Image.file(
-                            File(item.imageUrl),
-                            fit: BoxFit.contain,
-                            errorBuilder: _imageError,
-                          )
-                        : Image.network(
-                            item.imageUrl,
-                            fit: BoxFit.contain,
-                            errorBuilder: _imageError,
-                          ),
+                ),
+
+                // Top progress bars
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                  child: StoryProgressBars(
+                    count: stories.length,
+                    currentIndex: safeIndex,
+                    progress: _progressController,
                   ),
-                );
-              },
-            ),
+                ),
 
-            // Top progress bars
-            Positioned(
-              top: 8,
-              left: 8,
-              right: 8,
-              child: StoryProgressBars(
-                count: _stories.length,
-                currentIndex: _currentIndex,
-                progress: _progressController,
-              ),
+                // Header
+                Positioned(
+                  top: 20,
+                  left: 12,
+                  right: 12,
+                  child: StoryViewerHeader(
+                    userName: story.userName,
+                    avatarUrl: story.authorAvatarUrl,
+                    isMine: story.isMine,
+                    onDelete: () => _confirmDelete(story),
+                    onClose: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ],
             ),
-
-            // Header
-            Positioned(
-              top: 20,
-              left: 12,
-              right: 12,
-              child: StoryViewerHeader(
-                userName: story.userName,
-                avatarUrl: story.authorAvatarUrl,
-                isMine: story.isMine,
-                onDelete: () => _confirmDelete(story),
-                onClose: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

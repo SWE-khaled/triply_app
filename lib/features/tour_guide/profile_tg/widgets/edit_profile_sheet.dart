@@ -253,11 +253,19 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                   EgyptCities.profileEgyptLocations,
               selectedItem: _selectedLocation,
               enabled: !_loading,
-              popupProps: const PopupProps.menu(
+              popupProps: PopupProps.menu(
                 showSearchBox: true,
                 fit: FlexFit.loose,
-                constraints: BoxConstraints(maxHeight: 300),
-                searchFieldProps: TextFieldProps(
+                // Keep the search menu inside the visible area when the
+                // keyboard is open on a short phone screen.
+                constraints: BoxConstraints(
+                  maxHeight:
+                      (MediaQuery.of(context).size.height * 0.4 -
+                              MediaQuery.of(context).viewInsets.bottom)
+                          .clamp(120.0, 300.0)
+                          .toDouble(),
+                ),
+                searchFieldProps: const TextFieldProps(
                   decoration: InputDecoration(
                     hintText: 'Search city...',
                     prefixIcon: Icon(Icons.search),
@@ -300,7 +308,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryTeal,
                   foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 48),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),

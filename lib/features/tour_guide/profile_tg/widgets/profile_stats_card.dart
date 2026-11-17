@@ -63,6 +63,8 @@ class _StatItem extends StatelessWidget {
         children: [
           Text(
             value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,

@@ -2,13 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/mock/tourist/mock_places.dart';
 import '../../../../core/utils/page_load_error.dart';
+import '../data/map_places_repository.dart';
 import '../model/place.dart';
 import 'map_state.dart';
 
 class MapCubit extends Cubit<MapState> {
-  MapCubit() : super(const MapInitial()) {
+  MapCubit({MapPlacesRepository? repository})
+    : _repository = repository ?? MapPlacesRepository(),
+      super(const MapInitial()) {
     _loadFromFirestore();
   }
+
+  final MapPlacesRepository _repository;
 
   /// The Firestore catalog once loaded; mock places are available only
   /// until the initial request completes.
@@ -32,12 +37,7 @@ class MapCubit extends Cubit<MapState> {
     // keeps the error view instead of restarting the skeleton.
     if (state is MapInitial) emit(const MapLoadingState());
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('places')
-          .get();
-      final remote = snapshot.docs
-          .map((doc) => Place.fromJson(doc.data()))
-          .toList();
+      final remote = await _repository.fetchPlaces();
       if (isClosed) return;
       _allPlaces = remote;
       _emitFiltered();
