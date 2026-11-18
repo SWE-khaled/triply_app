@@ -68,13 +68,25 @@ class BookingRepository {
 
   /// Books [seats] seats of a public trip.
   ///
-  /// Reserves the seats inside a transaction and tells the guide about
-  /// it. Throws a [BookingException] when the trip is full, not approved
-  /// or gone.
+  /// Reserves the seats inside a transaction. The guide is notified later,
+  /// from [confirmPayment], once the payment has actually been paid.
+  /// Throws a [BookingException] when the trip is full, not approved or gone.
   String _avatarFor(Map<String, dynamic>? guest) {
     final saved = guest?['photoUrl'];
     if (saved is String && saved.trim().isNotEmpty) return saved.trim();
     return _firebaseAuth.currentUser?.photoURL ?? '';
+  }
+
+  /// The actor name stored on the guide's notification. The booking's guest
+  /// profile is authoritative; Firebase Auth is the fallback.
+  String _guestName(Map<String, dynamic>? guest) {
+    final saved = guest?['name'] ?? guest?['fullName'];
+    if (saved is String && saved.trim().isNotEmpty) return saved.trim();
+    final user = _firebaseAuth.currentUser;
+    final name = user?.displayName?.trim() ?? '';
+    if (name.isNotEmpty) return name;
+    final emailName = user?.email?.split('@').first.trim() ?? '';
+    return emailName.isEmpty ? 'A traveler' : emailName;
   }
 
   Future<BookingReceipt> createPublicBooking({
@@ -175,21 +187,8 @@ class BookingRepository {
       });
     });
 
-    final trip = await _readTrip(tripId);
-    final guideId = trip?['guideId'] as String?;
-    final tripTitle = (trip?['title'] as String?) ?? 'your trip';
-    if (guideId != null && guideId.isNotEmpty) {
-      await _notifications.create(
-        userId: guideId,
-        title: 'New booking',
-        message:
-            'A tourist booked "$tripTitle" for $seats '
-            'traveler${seats == 1 ? '' : 's'}.',
-        type: 'booking',
-        relatedEntityId: bookingRef.id,
-        relatedCollection: 'bookings',
-      );
-    }
+    // The booking is only pending here. The guide notification is written
+    // by confirmPayment after this payment is really confirmed.
 
     return BookingReceipt(
       bookingId: bookingRef.id,
@@ -285,16 +284,8 @@ class BookingRepository {
       'createdAt': FieldValue.serverTimestamp(),
     });
 
-    await _notifications.create(
-      userId: guideId,
-      title: 'New private booking',
-      message:
-          'A tourist booked you privately for $travelers '
-          'traveler${travelers == 1 ? '' : 's'}.',
-      type: 'booking',
-      relatedEntityId: bookingRef.id,
-      relatedCollection: 'bookings',
-    );
+    // The booking is only pending here. The guide notification is written
+    // by confirmPayment after this payment is really confirmed.
 
     return BookingReceipt(
       bookingId: bookingRef.id,
@@ -308,7 +299,12 @@ class BookingRepository {
   ///
   /// Sets `status: 'confirmed'`, `paymentStatus: 'paid'` and records the
   /// `paymentId` returned by Paymob. Only the owning tourist may run this,
-  /// and only while the booking is still `pending`.
+  /// and only while the booking is still `pending`. The guide notification
+  /// is written after this transaction commits, never at creation time.
+  ///
+  /// Known limitation: if the tourist's app is killed after the gateway
+  /// charge but before `confirmPayment` runs, the booking stays pending and
+  /// the guide is not notified (no server).
   Future<void> confirmPayment({
     required String bookingId,
     required String paymentId,
@@ -338,6 +334,60 @@ class BookingRepository {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     });
+
+    // Re-read the committed state so the notification can only be written
+    // for a really confirmed and paid booking.
+    await _notifyGuideOfConfirmedBooking(bookingId, uid: uid);
+  }
+
+  /// Best-effort guide notification for a booking that is now confirmed.
+  ///
+  /// The id is deterministic (`booking_{bookingId}`), so a repeat write is
+  /// an UPDATE that rules deny; the shared writer ignores that silently.
+  /// Public and private bookings share this path — the persisted payload is
+  /// identical except for the title and message.
+  Future<void> _notifyGuideOfConfirmedBooking(
+    String bookingId, {
+    required String uid,
+  }) async {
+    try {
+      final booking = await _firestore.readDoc(bookingsCollection, bookingId);
+      if (booking == null ||
+          booking['touristId'] != uid ||
+          booking['status'] != 'confirmed' ||
+          booking['paymentStatus'] != 'paid') {
+        return;
+      }
+      final guideId = booking['guideId'];
+      if (guideId is! String || guideId.isEmpty) return;
+
+      final seats = (booking['seats'] as num?)?.toInt() ?? 0;
+      final tripId = (booking['tripId'] as String?) ?? '';
+      final isPrivate = booking['is_private'] == true;
+      final tripTitle = (booking['tour_title'] as String?) ?? 'your trip';
+      final guestName = (booking['guest_name'] as String?) ?? '';
+      final avatarUrl = (booking['avatar_url'] as String?) ?? '';
+      final title = isPrivate ? 'New private booking' : 'New booking';
+      final message = isPrivate
+          ? 'A tourist booked you privately for $seats '
+                'traveler${seats == 1 ? '' : 's'}.'
+          : 'A tourist booked "$tripTitle" for $seats '
+                'traveler${seats == 1 ? '' : 's'}.';
+
+      await _notifications.createBookingNotification(
+        userId: guideId,
+        bookingId: bookingId,
+        seats: seats,
+        tripId: tripId,
+        actorName: _guestName(<String, dynamic>{'name': guestName}),
+        actorAvatarUrl: avatarUrl.isNotEmpty ? avatarUrl : _avatarFor(null),
+        title: title,
+        message: message,
+      );
+    } catch (_) {
+      // Payment is already committed. A notification failure must never
+      // roll it back or make the successful checkout look like a failure.
+    }
   }
 
   /// Cancels a booking the tourist owns and releases its seats.
@@ -394,14 +444,6 @@ class BookingRepository {
         });
       }
     });
-  }
-
-  Future<Map<String, dynamic>?> _readTrip(String tripId) async {
-    try {
-      return await _firestore.readDoc(tripsCollection, tripId);
-    } catch (_) {
-      return null;
-    }
   }
 
   /// The profile of the tourist who books.

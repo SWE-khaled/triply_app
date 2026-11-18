@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/data/repositories/tourist_notifications_repository.dart';
 import '../model/community_post.dart';
 import 'community_cloudinary_uploader.dart';
 
@@ -39,9 +40,12 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
     CommunityCloudinaryUploader? imageUploader,
+    TouristNotificationsRepository? notifications,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
        _auth = auth ?? FirebaseAuth.instance,
-       _imageUploader = imageUploader ?? CommunityCloudinaryUploader();
+       _imageUploader = imageUploader ?? CommunityCloudinaryUploader(),
+       _notifications =
+           notifications ?? TouristNotificationsRepository.instance;
 
   static const collectionName = 'communityPosts';
   static const feedLimit = 30;
@@ -49,6 +53,7 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
   final CommunityCloudinaryUploader _imageUploader;
+  final TouristNotificationsRepository _notifications;
 
   CollectionReference<Map<String, dynamic>> get _posts =>
       _firestore.collection(collectionName);
@@ -152,6 +157,7 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
   Future<void> toggleLike({required String postId, required bool liked}) async {
     final uid = _requireUserId(message: 'Sign in to like Community posts.');
     final document = _posts.doc(postId);
+    String? authorId;
     try {
       await _firestore.runTransaction((transaction) async {
         final snapshot = await transaction.get(document);
@@ -161,11 +167,10 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
           );
         }
 
-        final next = nextLikeState(
-          data: snapshot.data() ?? const <String, dynamic>{},
-          uid: uid,
-          liked: liked,
-        );
+        final data = snapshot.data() ?? const <String, dynamic>{};
+        authorId = data['authorId'] as String?;
+
+        final next = nextLikeState(data: data, uid: uid, liked: liked);
         if (!next.changed) return;
 
         transaction.update(document, <String, dynamic>{
@@ -173,6 +178,19 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
           'likedBy': next.likedBy,
         });
       });
+
+      // Separate write AFTER the like committed: the rules verify likedBy with
+      // get(), which reads the pre-request state. Unlikes never write here,
+      // and a duplicate id is silently ignored by the shared repository.
+      if (liked && authorId != null && authorId!.isNotEmpty) {
+        final user = _auth.currentUser;
+        await _notifications.createLikeNotification(
+          recipientId: authorId!,
+          postId: postId,
+          actorName: user == null ? null : _displayName(user),
+          actorAvatarUrl: user?.photoURL ?? '',
+        );
+      }
     } on CommunityPostsException {
       rethrow;
     } on FirebaseException catch (error) {

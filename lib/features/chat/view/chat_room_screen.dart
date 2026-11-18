@@ -7,6 +7,7 @@ import 'package:triply/core/data/models/chat_message.dart';
 import 'package:triply/core/data/repositories/chat_repository.dart';
 import 'package:triply/core/data/repositories/firestore_chat_repository.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/utils/active_chat_tracker.dart';
 import 'package:triply/core/widgets/app_snackbar.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 
@@ -48,15 +49,20 @@ class ChatRoomScreen extends StatefulWidget {
   State<ChatRoomScreen> createState() => _ChatRoomScreenState();
 }
 
-class _ChatRoomScreenState extends State<ChatRoomScreen> {
+class _ChatRoomScreenState extends State<ChatRoomScreen>
+    with WidgetsBindingObserver {
   late final ChatRepository _repository;
   late final ChatRoomCubit _cubit;
   late final TextEditingController _composer;
   late final ScrollController _scroll;
+  StreamSubscription<ChatRoomState>? _stateSubscription;
+  String? _trackedChatId;
+  bool _appPaused = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _repository = widget.repository ?? FirestoreChatRepository();
     _cubit = ChatRoomCubit(
       repository: _repository,
@@ -65,13 +71,50 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       guideName: widget.guideName,
       guideAvatar: widget.guideAvatar,
     );
+    _trackChat(widget.chatId);
+    // A new room has no id until the first message creates it. Follow the
+    // cubit so the tracker is set as soon as the canonical id exists.
+    _stateSubscription = _cubit.stream.listen((_) {
+      _trackChat(_cubit.chatId);
+    });
     _composer = TextEditingController();
     _scroll = ScrollController()..addListener(_onScroll);
     unawaited(_load());
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        _appPaused = true;
+        ActiveChatTracker.instance.pause();
+      case AppLifecycleState.resumed:
+        _appPaused = false;
+        // The route may still be mounted after a background/resume cycle.
+        // Restore the marker so incoming messages stay silent in this room.
+        _trackChat(_cubit.chatId, force: true);
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        break;
+    }
+  }
+
+  void _trackChat(String? chatId, {bool force = false}) {
+    if (_appPaused || !mounted) return;
+    if (chatId == null || chatId.isEmpty) return;
+    if (!force && chatId == _trackedChatId) return;
+    _trackedChatId = chatId;
+    ActiveChatTracker.instance.open(chatId);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _stateSubscription?.cancel();
+    final tracked = _trackedChatId;
+    if (tracked != null) ActiveChatTracker.instance.close(tracked);
     _scroll
       ..removeListener(_onScroll)
       ..dispose();

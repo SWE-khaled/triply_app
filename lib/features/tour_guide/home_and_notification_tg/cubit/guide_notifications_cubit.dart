@@ -13,20 +13,45 @@ part 'guide_notifications_state.dart';
 
 /// The guide's notification centre.
 ///
-/// Reads the notifications from Firestore, with the mock dataset as
-/// fallback. The list is live: a new notification shows up without a
-/// refresh.
+/// Reads the shared session-wide notification repository through the guide
+/// adapter. The list is live: a new notification shows up without a refresh.
+/// One failed source is shown as a warning, never as a blank screen: the
+/// other sources keep feeding the list.
 class GuideNotificationsCubit extends Cubit<GuideNotificationsState>
     with SafeEmitMixin<GuideNotificationsState> {
   GuideNotificationsCubit({GuideNotificationsRepository? repository})
-    : _repository = repository ?? GuideNotificationsRepository(),
+    : _repository = repository ?? GuideNotificationsRepository.instance,
       super(const GuideNotificationsInitial()) {
+    _emit(const GuideNotificationsLoading());
     _subscription = _repository.watchNotifications().listen(
-      (items) => safeEmit(GuideNotificationsSuccess(items: items)),
-      onError: (Object error) =>
-          safeEmit(GuideNotificationsError(error: error.toString())),
+      _onNotifications,
+      onError: (Object error) => _onFatalError(error),
     );
+    _errorSubscription = _repository.watchSourceErrors().listen(
+      _onSourceErrors,
+    );
+    _firstSnapshotTimer = Timer(_loadingTimeout, () {
+      // A signed-out user or a source that never reports must not leave the
+      // page on its loading skeleton forever. Surface the wait as an empty,
+      // usable list with an explanatory warning.
+      if (!_hasDataEvent && !_repository.hasListSourceData && !isClosed) {
+        _emit(
+          GuideNotificationsSuccess(
+            items: const <GuideNotification>[],
+            warning: _warning ?? 'Notifications are taking too long to load.',
+          ),
+        );
+      }
+    });
   }
+
+  void _emit(GuideNotificationsState state) {
+    safeEmit(state);
+  }
+
+  /// Long enough to let a slow first Firestore snapshot arrive, short enough
+  /// that the page never sits on a shimmer forever.
+  static const Duration _loadingTimeout = Duration(seconds: 5);
 
   final GuideNotificationsRepository _repository;
 
@@ -34,15 +59,85 @@ class GuideNotificationsCubit extends Cubit<GuideNotificationsState>
   final GuideTripsRepository _trips = GuideTripsRepository();
 
   StreamSubscription<List<GuideNotification>>? _subscription;
+  StreamSubscription<List<String>>? _errorSubscription;
+  Timer? _firstSnapshotTimer;
+
+  List<GuideNotification> _items = const <GuideNotification>[];
+  bool _hasDataEvent = false;
+
+  String? get _warning {
+    final errors = _repository.sourceErrors;
+    if (errors.isEmpty) return null;
+    return errors.join(' • ');
+  }
+
+  /// The rows the list renders. Kept next to the state so the page can read
+  /// the freshest list even when a source-error event triggers the rebuild.
+  List<GuideNotification> get items =>
+      List<GuideNotification>.unmodifiable(_items);
+
+  void _onNotifications(List<GuideNotification> items) {
+    // The shared stream replays its cached list. Before `stored`/`chat` have
+    // reported, that list carries no rows; keep waiting for a real snapshot.
+    // Never store a list without emitting it, so state and rows stay in sync.
+    if (!_repository.hasListSourceData) {
+      return;
+    }
+    _items = items;
+    _hasDataEvent = true;
+    _firstSnapshotTimer?.cancel();
+    _emit(GuideNotificationsSuccess(items: _items, warning: _warning));
+  }
+
+  void _onSourceErrors(List<String> errors) {
+    if (isClosed) return;
+    if (errors.isEmpty) {
+      if (!_repository.hasListSourceData) return;
+      _firstSnapshotTimer?.cancel();
+      _emit(GuideNotificationsSuccess(items: _items, warning: null));
+      return;
+    }
+    if (!_repository.hasListSourceData) {
+      _firstSnapshotTimer?.cancel();
+      _emit(GuideNotificationsError(error: errors.join('\n')));
+      return;
+    }
+    // A failed source is visible, but the successful ones stay usable.
+    _emit(
+      GuideNotificationsSuccess(items: _items, warning: errors.join(' • ')),
+    );
+  }
+
+  void _onFatalError(Object error) {
+    if (isClosed) return;
+    _firstSnapshotTimer?.cancel();
+    if (_repository.hasListSourceData) {
+      _emit(
+        GuideNotificationsSuccess(items: _items, warning: error.toString()),
+      );
+    } else {
+      _emit(GuideNotificationsError(error: error.toString()));
+    }
+  }
 
   /// Re-reads the notifications (used by the retry button).
   Future<void> load() async {
-    safeEmit(const GuideNotificationsLoading());
+    _firstSnapshotTimer?.cancel();
+    _emit(const GuideNotificationsLoading());
     try {
       final items = await _repository.fetchNotifications();
-      safeEmit(GuideNotificationsSuccess(items: items));
+      if (!_repository.hasListSourceData) {
+        _emit(
+          GuideNotificationsError(
+            error: _warning ?? 'Notifications are unavailable. Try again.',
+          ),
+        );
+        return;
+      }
+      _items = items;
+      _emit(GuideNotificationsSuccess(items: _items, warning: _warning));
     } catch (e) {
-      safeEmit(GuideNotificationsError(error: e.toString()));
+      _emit(GuideNotificationsError(error: e.toString()));
     }
   }
 
@@ -75,7 +170,9 @@ class GuideNotificationsCubit extends Cubit<GuideNotificationsState>
 
   @override
   Future<void> close() {
+    _firstSnapshotTimer?.cancel();
     _subscription?.cancel();
+    _errorSubscription?.cancel();
     return super.close();
   }
 }

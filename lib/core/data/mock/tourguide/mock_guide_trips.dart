@@ -114,8 +114,9 @@ Map<String, dynamic>? mockGuideTripById(String tripId) {
 /// How many trips sit in one "My Trips" tab.
 ///
 /// The tab is derived the same way the model derives it: an approved
-/// trip is *completed* once its date has passed and *active* before —
-/// so counting by `approvalStatus` alone would be wrong.
+/// trip is *completed* once its `endAt` has passed and *active* before
+/// (or when there is no `endAt`) — so counting by `approvalStatus`
+/// alone would be wrong.
 int mockGuideTripsCountForTab(GuideTripStatus tab) => mockGuideTripsJson
     .map(GuideTrip.fromJson)
     .where((trip) => trip.status == tab)

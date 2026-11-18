@@ -73,4 +73,20 @@ class GuideTripsStore {
     if (_updated.isEmpty) return withoutDeleted;
     return withoutDeleted.map((t) => _updated[t.id] ?? t).toList();
   }
+
+  /// Applies a fresh Firestore snapshot.
+  ///
+  /// A trip that exists remotely has round-tripped, so its local pending copy
+  /// must no longer override it — otherwise an admin approval never reaches
+  /// the guide's tabs. Only trips that have not appeared in Firestore yet are
+  /// kept from [_created].
+  static List<GuideTrip> applyRemote(List<GuideTrip> remote) {
+    final remoteIds = remote.map((trip) => trip.id).toSet();
+    if (remoteIds.isNotEmpty) {
+      _created.removeWhere((trip) => remoteIds.contains(trip.id));
+      _updated.removeWhere((id, _) => remoteIds.contains(id));
+      _deleted.removeAll(remoteIds);
+    }
+    return applyUpdates(remote);
+  }
 }

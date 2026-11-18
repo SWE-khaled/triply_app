@@ -1,12 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../../features/tour_guide/my_trips_tg/model/guide_trip.dart';
 import '../../../features/tour_guide/trip_details_tg/model/guide_trip_details.dart';
-import '../mock/tourguide/mock_guide_notifications.dart';
 import '../mock/tourguide/mock_guide_trip_details.dart';
 import '../mock/tourguide/mock_guide_trips.dart';
 import '../remote/firestore_service.dart';
-import '../repositories/guide_notifications_repository.dart';
 import '../repositories/guide_trips_repository.dart';
 
 /// What a seeding run wrote.
@@ -14,7 +10,8 @@ class GuideSeedResult {
   /// The trips that were written.
   final int trips;
 
-  /// The notifications that were written.
+  /// Notification writes performed by the seed. Always 0 now: notifications
+  /// come from real events, never from mock data.
   final int notifications;
 
   const GuideSeedResult({required this.trips, required this.notifications});
@@ -39,15 +36,17 @@ class GuideSeed {
   final GuideTripsRepository _trips;
   final FirestoreService _firestore;
 
-  /// Seeds the trips and the notifications of the mock dataset.
+  /// Seeds the trips of the mock dataset.
+  ///
+  /// Mock notifications are no longer copied into Firestore: the guide's
+  /// notification list is driven by real bookings and real admin decisions.
   Future<GuideSeedResult> run() async {
     final guideId = _trips.currentGuideId;
     if (guideId == null) {
       throw StateError('Sign in before seeding the guide data.');
     }
     final trips = await seedTrips(guideId);
-    final notifications = await seedNotifications(guideId);
-    return GuideSeedResult(trips: trips, notifications: notifications);
+    return GuideSeedResult(trips: trips, notifications: 0);
   }
 
   /// Seeds the mock trips (and their details) for [guideId].
@@ -106,31 +105,5 @@ class GuideSeed {
     } catch (_) {
       return GuideTripApproval.pending;
     }
-  }
-
-  /// Seeds the mock notifications for [guideId].
-  Future<int> seedNotifications(String guideId) async {
-    var count = 0;
-    for (final raw in mockGuideNotificationsRaw) {
-      await _firestore.writeDoc(
-        GuideNotificationsRepository.notificationsCollection,
-        raw['id'] as String,
-        {
-          'userId': guideId,
-          'title': raw['title'],
-          'message': raw['message'],
-          'type': raw['type'],
-          'relatedEntityId': raw['relatedEntityId'],
-          'relatedCollection': raw['relatedCollection'],
-          'isRead': raw['isRead'],
-          'createdAt': Timestamp.fromDate(
-            DateTime.parse(raw['createdAt'] as String),
-          ),
-        },
-        merge: false,
-      );
-      count++;
-    }
-    return count;
   }
 }

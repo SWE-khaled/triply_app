@@ -91,8 +91,10 @@ class GuideTrip {
 
   /// The tab this trip belongs to.
   ///
-  /// Derived from the approval state: an approved trip is *active* until
-  /// its date has passed and *completed* afterwards.
+  /// Derived from the approval state: an approved trip stays *active* until
+  /// its `endAt` has passed and becomes *completed* afterwards. A trip
+  /// without an `endAt` stays active — a past `startAt` is not enough to
+  /// hide it from the guide.
   GuideTripStatus get status {
     switch (approval) {
       case GuideTripApproval.pending:
@@ -102,8 +104,8 @@ class GuideTrip {
       case GuideTripApproval.cancelled:
         return GuideTripStatus.cancelled;
       case GuideTripApproval.approved:
-        final start = startAt;
-        if (start != null && start.isBefore(DateTime.now())) {
+        final end = endAt;
+        if (end != null && end.isBefore(DateTime.now())) {
           return GuideTripStatus.completed;
         }
         return GuideTripStatus.active;

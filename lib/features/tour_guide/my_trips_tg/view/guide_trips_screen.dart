@@ -48,14 +48,15 @@ class _GuideTripsView extends StatefulWidget {
 class _GuideTripsViewState extends State<_GuideTripsView> {
   int bottomIndex = 1; // My Trips
 
-  /// The status tabs of the screen. `completed` and `cancelled` are not
-  /// shown as tabs (the guide cannot act on those trips anymore) — but
-  /// the filter itself still accepts them, so the dashboard's
-  /// "Completed Trips" card can open the completed list directly.
+  /// The status tabs of the screen. Completed trips remain visible so an
+  /// approved trip never looks like it disappeared; only `cancelled` is
+  /// left out (the guide cannot act on those trips anymore) — the filter
+  /// itself still accepts it for the dashboard's deep links.
   static const List<GuideTripStatus> tabValues = [
     GuideTripStatus.active,
     GuideTripStatus.pending,
     GuideTripStatus.rejected,
+    GuideTripStatus.completed,
   ];
 
   void _openDetails(BuildContext context, GuideTrip trip) {

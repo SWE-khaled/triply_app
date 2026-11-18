@@ -149,15 +149,16 @@ class AdminTripsRepository {
     final guideId = trip?['guideId'] as String?;
     final title = (trip?['title'] as String?) ?? 'Your trip';
     if (guideId == null || guideId.isEmpty) return true;
-    await _notifications.create(
+    final decision = approve ? 'approved' : 'rejected';
+    await _notifications.createTripDecisionNotification(
       userId: guideId,
-      title: approve ? 'Trip approved' : 'Trip rejected',
+      tripId: tripId,
+      decision: decision,
+      tripTitle: title,
+      actorName: _adminName(),
       message: approve
           ? '"$title" is now live and visible to tourists.'
           : '"$title" was rejected: $rejectionReason',
-      type: 'trip_decided',
-      relatedEntityId: tripId,
-      relatedCollection: 'trips',
     );
     return true;
   }
@@ -179,15 +180,24 @@ class AdminTripsRepository {
     final guideId = trip?['guideId'] as String?;
     final title = (trip?['title'] as String?) ?? 'Your trip';
     if (guideId == null || guideId.isEmpty) return true;
-    await _notifications.create(
+    await _notifications.createTripDecisionNotification(
       userId: guideId,
-      title: 'Trip cancelled',
+      tripId: tripId,
+      decision: 'cancelled',
+      tripTitle: title,
+      actorName: _adminName(),
       message: '"$title" was cancelled by the admin team.',
-      type: 'trip_decided',
-      relatedEntityId: tripId,
-      relatedCollection: 'trips',
     );
     return true;
+  }
+
+  /// Actor name on the guide's trip-decision notification.
+  String _adminName() {
+    final user = _firebaseAuth.currentUser;
+    final name = user?.displayName?.trim() ?? '';
+    if (name.isNotEmpty) return name;
+    final emailName = user?.email?.split('@').first.trim() ?? '';
+    return emailName.isEmpty ? 'Admin' : emailName;
   }
 
   Future<Map<String, dynamic>?> _fetchTrip(String tripId) async {

@@ -16,7 +16,10 @@ final class GuideNotificationsLoading extends GuideNotificationsState {
 final class GuideNotificationsSuccess extends GuideNotificationsState {
   final List<GuideNotification> items;
 
-  const GuideNotificationsSuccess({required this.items});
+  /// Short warnings for sources that failed. The list remains usable.
+  final String? warning;
+
+  const GuideNotificationsSuccess({required this.items, this.warning});
 }
 
 final class GuideNotificationsError extends GuideNotificationsState {

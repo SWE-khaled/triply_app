@@ -15,118 +15,120 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<ProfileCubit>();
     return BlocProvider(
-      create: (_) => LogoutCubit(
-        onSignOut: () => context.read<AuthCubit>().signOut(),
-      ),
-      child: BlocListener<LogoutCubit, LogoutState>(
-        listener: (context, state) {
-          if (state is LoggedOut) {
-            Navigator.of(
-              context,
-            ).pushNamedAndRemoveUntil(AppRoutes.signIn, (_) => false);
-          } else if (state is LogoutError && state.message != null) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message!)));
-          }
-        },
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
+      create: (_) =>
+          LogoutCubit(onSignOut: () => context.read<AuthCubit>().signOut()),
+      child: Builder(
+        builder: (context) => BlocListener<LogoutCubit, LogoutState>(
+          listener: (context, state) {
+            if (state is LoggedOut) {
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(AppRoutes.signIn, (_) => false);
+            } else if (state is LogoutError && state.message != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message!)));
+            }
+          },
+          child: Scaffold(
             backgroundColor: Colors.white,
-            elevation: 0,
-            leading: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                size: 18,
-                color: Color(0xFF0E5865),
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new,
+                  size: 18,
+                  color: Color(0xFF0E5865),
+                ),
+              ),
+              title: const Text(
+                'Settings',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF263A40),
+                ),
               ),
             ),
-            title: const Text(
-              'Settings',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF263A40),
-              ),
-            ),
-          ),
-          body: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(14, 14, 14, 10),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Account',
+            body: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(14, 14, 14, 10),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Account',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF263A40),
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFE6EAEB)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      BlocBuilder<ProfileCubit, ProfileState>(
+                        builder: (context, state) => AccountOptionTile(
+                          icon: Icons.notifications_outlined,
+                          title: 'Notifications',
+                          switchValue: state.notificationsEnabled,
+                          onSwitchChanged: cubit.toggleNotifications,
+                        ),
+                      ),
+                      AccountOptionTile(
+                        icon: Icons.shield_outlined,
+                        title: 'Privacy & security',
+                        onTap: () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRoutes.privacySecurity),
+                      ),
+                      AccountOptionTile(
+                        icon: Icons.info_outline,
+                        title: 'About Triply',
+                        showDivider: false,
+                        onTap: () => showDialog<void>(
+                          context: context,
+                          builder: (dialogContext) => AlertDialog(
+                            title: const Text('About Triply'),
+                            content: const Text(
+                              'Triply\nExplore. Experience. Egypt.\nVersion 1.0.0',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext),
+                                child: const Text('Close'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () => _logout(context),
+                  child: const Text(
+                    'Log out',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF263A40),
+                      color: Color(0xFF0E5865),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFE6EAEB)),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    BlocBuilder<ProfileCubit, ProfileState>(
-                      builder: (context, state) => AccountOptionTile(
-                        icon: Icons.notifications_outlined,
-                        title: 'Notifications',
-                        switchValue: state.notificationsEnabled,
-                        onSwitchChanged: cubit.toggleNotifications,
-                      ),
-                    ),
-                    AccountOptionTile(
-                      icon: Icons.shield_outlined,
-                      title: 'Privacy & security',
-                      onTap: () =>
-                          Navigator.of(context).pushNamed(AppRoutes.privacySecurity),
-                    ),
-                    AccountOptionTile(
-                      icon: Icons.info_outline,
-                      title: 'About Triply',
-                      showDivider: false,
-                      onTap: () => showDialog<void>(
-                        context: context,
-                        builder: (dialogContext) => AlertDialog(
-                          title: const Text('About Triply'),
-                          content: const Text(
-                            'Triply\nExplore. Experience. Egypt.\nVersion 1.0.0',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(dialogContext),
-                              child: const Text('Close'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () => _logout(context),
-                child: const Text(
-                  'Log out',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF0E5865),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-            ],
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),

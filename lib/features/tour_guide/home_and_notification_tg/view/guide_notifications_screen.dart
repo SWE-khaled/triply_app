@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -9,6 +11,7 @@ import '../widget/guide_notifications_skeleton.dart';
 import '../cubit/guide_notifications_cubit.dart';
 import '../model/guide_notification.dart';
 import '../widget/guide_notification_tile.dart';
+import 'booking_details_screen.dart';
 
 /// Cream tint from Figma (back button). Local const only — the global
 /// theme in `core/theme/` is left untouched.
@@ -37,9 +40,17 @@ class _GuideNotificationsView extends StatelessWidget {
     GuideNotification item,
   ) async {
     final cubit = context.read<GuideNotificationsCubit>();
-    cubit.markAsRead(item.id);
+    unawaited(cubit.markAsRead(item.id));
     final relatedId = item.relatedEntityId;
     if (relatedId == null || relatedId.isEmpty) return;
+    if (item.relatedCollection == 'bookings') {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BookingDetailsScreen(bookingId: relatedId),
+        ),
+      );
+      return;
+    }
     if (item.relatedCollection != 'trips') return;
     final trip = await cubit.fetchTrip(relatedId);
     if (trip == null || !context.mounted) return;
@@ -76,10 +87,14 @@ class _GuideNotificationsView extends StatelessWidget {
                     ),
                   ),
                   BlocBuilder<GuideNotificationsCubit, GuideNotificationsState>(
-                    builder: (context, state) {
-                      final unread = state is GuideNotificationsSuccess
-                          ? state.items.where((n) => n.isUnread).length
-                          : 0;
+                    builder: (context, _) {
+                      // Read the cubit's current rows, like the tourist page:
+                      // a source-error rebuild must not hide the unread count.
+                      final unread = context
+                          .read<GuideNotificationsCubit>()
+                          .items
+                          .where((n) => n.isUnread)
+                          .length;
                       if (unread == 0) return const SizedBox.shrink();
                       return TextButton(
                         onPressed: () => context
@@ -102,30 +117,44 @@ class _GuideNotificationsView extends StatelessWidget {
               child:
                   BlocBuilder<GuideNotificationsCubit, GuideNotificationsState>(
                     builder: (context, state) {
+                      // The rows come from the cubit, not the state snapshot:
+                      // a warning/error rebuild must keep showing the live
+                      // list (same pattern as the tourist page).
+                      final items = context
+                          .read<GuideNotificationsCubit>()
+                          .items;
                       return switch (state) {
-                        GuideNotificationsSuccess(:final items) =>
-                          items.isEmpty
-                              ? const _EmptyNotifications()
-                              : ListView.separated(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    16,
-                                    0,
-                                    16,
-                                    24,
-                                  ),
-                                  itemCount: items.length,
-                                  separatorBuilder: (_, _) => const Divider(
-                                    height: 1,
-                                    color: AppColors.cardBorder,
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    final item = items[index];
-                                    return GuideNotificationTile(
-                                      item: item,
-                                      onTap: () => _openRelated(context, item),
-                                    );
-                                  },
-                                ),
+                        GuideNotificationsSuccess(:final warning) => Column(
+                          children: [
+                            if (warning != null)
+                              _SourceWarning(message: warning),
+                            Expanded(
+                              child: items.isEmpty
+                                  ? const _EmptyNotifications()
+                                  : ListView.separated(
+                                      padding: const EdgeInsets.fromLTRB(
+                                        16,
+                                        0,
+                                        16,
+                                        24,
+                                      ),
+                                      itemCount: items.length,
+                                      separatorBuilder: (_, _) => const Divider(
+                                        height: 1,
+                                        color: AppColors.cardBorder,
+                                      ),
+                                      itemBuilder: (context, index) {
+                                        final item = items[index];
+                                        return GuideNotificationTile(
+                                          item: item,
+                                          onTap: () =>
+                                              _openRelated(context, item),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ],
+                        ),
                         GuideNotificationsInitial() ||
                         GuideNotificationsLoading() =>
                           const GuideNotificationsSkeleton(),
@@ -140,6 +169,39 @@ class _GuideNotificationsView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// A short, non-blocking note: some sources failed, but the rest of the
+/// list is still usable. The exact Firestore error stays in debug logs.
+class _SourceWarning extends StatelessWidget {
+  const _SourceWarning({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFDECEC),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline, size: 16, color: Colors.redAccent),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+            ),
+          ),
+        ],
       ),
     );
   }

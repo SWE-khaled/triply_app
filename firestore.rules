@@ -27,6 +27,32 @@ service cloud.firestore {
       return isSignedIn() && userRole() == 'admin';
     }
 
+    function notificationLikeOk(recipientId, notificationId) {
+      return request.resource.data.type == 'like'
+        && request.resource.data.postId is string
+        && exists(/databases/$(database)/documents/communityPosts/$(request.resource.data.postId))
+        && get(/databases/$(database)/documents/communityPosts/$(request.resource.data.postId)).data.authorId == recipientId
+        && get(/databases/$(database)/documents/communityPosts/$(request.resource.data.postId)).data.get('likedBy', {}).keys().hasAny([request.auth.uid])
+        && notificationId == 'like_' + request.resource.data.postId + '_' + request.auth.uid;
+    }
+
+    function notificationBookingOk(recipientId, notificationId) {
+      return request.resource.data.type == 'booking'
+        && request.resource.data.bookingId is string
+        && exists(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId))
+        && get(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.touristId == request.auth.uid
+        && get(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId)).data.guideId == recipientId
+        && notificationId == 'booking_' + request.resource.data.bookingId;
+    }
+
+    function notificationTripDecidedOk(recipientId) {
+      return request.resource.data.type == 'trip_decided'
+        && isAdmin()
+        && request.resource.data.tripId is string
+        && exists(/databases/$(database)/documents/trips/$(request.resource.data.tripId))
+        && get(/databases/$(database)/documents/trips/$(request.resource.data.tripId)).data.guideId == recipientId;
+    }
+
     // True while the project has no admin yet: the very first account may
     // claim the admin role itself. Once the bootstrap marker exists, only
     // a real admin can hand the role out.
@@ -63,6 +89,56 @@ service cloud.firestore {
             && request.resource.data.get('isApproved', false) == resource.data.get('isApproved', false));
 
       allow delete: if isAdmin();
+    }
+
+    // ── per-user notifications ──────────────────────────────────────────
+    // The ONLY persisted notification store used by the app.
+    match /users/{recipientId}/notifications/{notificationId} {
+      allow get, list: if isOwner(recipientId);
+
+      allow create: if isSignedIn()
+        && recipientId != request.resource.data.actorId
+        && request.resource.data.actorId == request.auth.uid
+        && request.resource.data.type in ['like', 'booking', 'trip_decided']
+        && request.resource.data.keys().hasOnly([
+             'type', 'actorId', 'actorName', 'actorAvatarUrl',
+             'createdAt', 'read', 'dedupeKey',
+             'postId', 'bookingId', 'tripId', 'tripTitle',
+             'seats', 'decision', 'title', 'message'
+           ])
+        && request.resource.data.type is string
+        && request.resource.data.actorId is string
+        && request.resource.data.actorName is string
+        && request.resource.data.actorName.size() > 0
+        && request.resource.data.actorName.size() <= 100
+        && request.resource.data.get('actorAvatarUrl', '') is string
+        && request.resource.data.get('actorAvatarUrl', '').size() <= 500
+        && request.resource.data.get('title', '') is string
+        && request.resource.data.get('title', '').size() <= 300
+        && request.resource.data.get('tripTitle', '') is string
+        && request.resource.data.get('tripTitle', '').size() <= 300
+        && request.resource.data.get('decision', '') is string
+        && request.resource.data.get('decision', '').size() <= 100
+        && request.resource.data.get('message', '') is string
+        && request.resource.data.get('message', '').size() <= 300
+        && request.resource.data.get('seats', 0) is int
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.read is bool
+        && request.resource.data.read == false
+        && request.resource.data.dedupeKey is string
+        && request.resource.data.dedupeKey == notificationId
+        && (
+          notificationLikeOk(recipientId, notificationId)
+          || notificationBookingOk(recipientId, notificationId)
+          || notificationTripDecidedOk(recipientId)
+        );
+
+      allow update: if isOwner(recipientId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['read']);
+
+      allow delete: if isOwner(recipientId);
     }
 
     // ── guideVerifications ───────────────────────────────────────────────

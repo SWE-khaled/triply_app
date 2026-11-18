@@ -1,8 +1,11 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/network/dio_helper.dart';
+import 'package:triply/core/notification_toruist/notification_service.dart';
+import 'package:triply/core/notification_toruist/notification_target.dart';
 import 'core/routing/app_routes.dart';
 import 'features/common/auth/views/tour_guide/tour_guide_login_screen.dart';
 import 'features/common/auth/views/tour_guide/tour_guide_signup_screen.dart';
@@ -20,6 +23,7 @@ import 'features/tourist/user_profile/view/privacy_security_screen.dart';
 import 'features/tourist/user_profile/view/profile_screen.dart';
 import 'firebase_options.dart';
 import 'features/splash/cubit/startup_cubit.dart';
+import 'features/splash/cubit/startup_state.dart';
 import 'features/splash/view/startup_gate.dart';
 import 'features/tour_guide/onboarding/view/tour_guide_onboarding_screen.dart';
 import 'features/admin_dashboard/d_auth/view/admin_login_view.dart';
@@ -52,6 +56,8 @@ import 'features/tourist/trips/cubit/trips_cubit.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  await NotificationService().initFCM();
   try {
     await dotenv.load(fileName: '.env');
   } catch (_) {}
@@ -90,9 +96,8 @@ class MyApp extends StatelessWidget {
               ProfileCubit(userId: context.read<AuthCubit>().user?.uid),
         ),
         BlocProvider(
-          create: (context) => ProfileDetailsCubit(
-            userId: context.read<AuthCubit>().user?.uid,
-          ),
+          create: (context) =>
+              ProfileDetailsCubit(userId: context.read<AuthCubit>().user?.uid),
         ),
         BlocProvider(create: (_) => ProfilePostsCubit()),
         BlocProvider(
@@ -101,9 +106,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
         BlocProvider(
-          create: (context) => LogoutCubit(
-            onSignOut: () => context.read<AuthCubit>().signOut(),
-          ),
+          create: (context) =>
+              LogoutCubit(onSignOut: () => context.read<AuthCubit>().signOut()),
         ),
         BlocProvider(create: (_) => OnboardingPreferenceCubit()),
         // Community feeds and publishing are independent so a publishing
@@ -131,36 +135,46 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => GuidesCubit()),
         BlocProvider(create: (_) => TripsCubit()),
       ],
-      child: MaterialApp(
-        title: 'Triply',
-        debugShowCheckedModeBanner: false,
-        theme: buildAppTheme(),
-        onGenerateInitialRoutes: (_) => [
-          AppRoutes.splash(nextPageBuilder: (_) => const StartupGate()),
-        ],
-        routes: {
-          AppRoutes.home: (context) => const HomeScreen(),
-          AppRoutes.search: (context) => const SearchScreen(),
-          AppRoutes.notifications: (context) => const NotificationsScreen(),
-          AppRoutes.onboarding: (context) => const OnboardingScreen(),
-          AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
-          AppRoutes.guideOnboarding: (context) =>
-              const TourGuideOnboardingScreen(),
-          AppRoutes.guideLogin: (context) => const TourGuideLoginScreen(),
-          AppRoutes.guideSignup: (context) => const TourGuideSignupScreen(),
-          AppRoutes.guideVerification: (context) =>
-              const TourGuideVerificationScreen(),
-          AdminRoutes.login: (context) => const AdminLoginView(),
-          AppRoutes.signIn: (context) => const SignInScreen(),
-          AppRoutes.createAccount: (context) => const CreateAccountScreen(),
-          ForgotPasswordScreen.routeName: (context) =>
-              const ForgotPasswordScreen(),
-          AppRoutes.passwordResetSuccess: (context) =>
-              const PasswordResetSuccessScreen(),
-          AppRoutes.profile: (context) => const ProfileScreen(),
-          AppRoutes.privacySecurity: (context) => const PrivacySecurityScreen(),
-          AppRoutes.emergency: (context) => const EmergencyScreen(),
+      child: BlocListener<StartupCubit, StartupState>(
+        listener: (context, state) {
+          // Notification taps on a cold start must wait for splash/auth.
+          if (state is StartupReady) {
+            NotificationNavigator.notifyReady();
+          }
         },
+        child: MaterialApp(
+          navigatorKey: NotificationNavigator.navigatorKey,
+          title: 'Triply',
+          debugShowCheckedModeBanner: false,
+          theme: buildAppTheme(),
+          onGenerateInitialRoutes: (_) => [
+            AppRoutes.splash(nextPageBuilder: (_) => const StartupGate()),
+          ],
+          routes: {
+            AppRoutes.home: (context) => const HomeScreen(),
+            AppRoutes.search: (context) => const SearchScreen(),
+            AppRoutes.notifications: (context) => const NotificationsScreen(),
+            AppRoutes.onboarding: (context) => const OnboardingScreen(),
+            AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
+            AppRoutes.guideOnboarding: (context) =>
+                const TourGuideOnboardingScreen(),
+            AppRoutes.guideLogin: (context) => const TourGuideLoginScreen(),
+            AppRoutes.guideSignup: (context) => const TourGuideSignupScreen(),
+            AppRoutes.guideVerification: (context) =>
+                const TourGuideVerificationScreen(),
+            AdminRoutes.login: (context) => const AdminLoginView(),
+            AppRoutes.signIn: (context) => const SignInScreen(),
+            AppRoutes.createAccount: (context) => const CreateAccountScreen(),
+            ForgotPasswordScreen.routeName: (context) =>
+                const ForgotPasswordScreen(),
+            AppRoutes.passwordResetSuccess: (context) =>
+                const PasswordResetSuccessScreen(),
+            AppRoutes.profile: (context) => const ProfileScreen(),
+            AppRoutes.privacySecurity: (context) =>
+                const PrivacySecurityScreen(),
+            AppRoutes.emergency: (context) => const EmergencyScreen(),
+          },
+        ),
       ),
     );
   }

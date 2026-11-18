@@ -49,16 +49,8 @@ class _UnreadBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (count <= 0) {
-      return Container(
-        width: 8,
-        height: 8,
-        decoration: const BoxDecoration(
-          color: AppColors.accentOrange,
-          shape: BoxShape.circle,
-        ),
-      );
-    }
+    // Zero unread means no badge at all — an idle orange dot was misleading.
+    if (count <= 0) return const SizedBox.shrink();
     return Container(
       constraints: const BoxConstraints(minWidth: 16),
       height: 16,
@@ -89,7 +81,7 @@ class _GuideDashboardView extends StatefulWidget {
 
 class _GuideDashboardViewState extends State<_GuideDashboardView> {
   final GuideNotificationsRepository _notifications =
-      GuideNotificationsRepository();
+      GuideNotificationsRepository.instance;
 
   /// Live — the badge follows the notifications without a refresh.
   late final Stream<List<GuideNotification>> _notificationsStream;

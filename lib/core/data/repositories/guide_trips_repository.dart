@@ -366,8 +366,10 @@ class GuideTripsRepository {
   /// Merges the Firestore list with the session cache, so a trip that was
   /// just created shows up before the write round-trips.
   List<GuideTrip> _merge(List<GuideTrip> remote) {
+    // Firestore is authoritative for anything that has round-tripped. The
+    // session cache only keeps locally created trips that are not yet remote.
     final byId = <String, GuideTrip>{
-      for (final trip in GuideTripsStore.applyUpdates(remote)) trip.id: trip,
+      for (final trip in GuideTripsStore.applyRemote(remote)) trip.id: trip,
     };
     for (final trip in GuideTripsStore.created) {
       byId.putIfAbsent(trip.id, () => trip);

@@ -1,150 +1,168 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../features/tour_guide/home_and_notification_tg/model/guide_notification.dart';
-import '../mock/tourguide/mock_guide_notifications.dart';
+import '../../../features/tourist/notifications/model/notification_item.dart';
 import '../remote/firestore_service.dart';
+import 'tourist_notifications_repository.dart';
 
-/// Reads the notifications of the signed-in tour guide.
+/// Adapter over the one session-wide notification repository.
 ///
-/// Firestore is the source of truth; the mock dataset is the fallback.
-///
-/// The notifications are written by whoever caused the event — the admin
-/// when it approves a trip, the tourist when it books one — so this
-/// repository also exposes [create] for the app that causes them.
+/// The guide app keeps its own [GuideNotification] model and cubit API, but
+/// there is no second Firestore listener and no mock fallback. When auth has
+/// not restored yet, the stream waits for the first signed-in user instead of
+/// completing with an empty snapshot.
 class GuideNotificationsRepository {
-  GuideNotificationsRepository({FirestoreService? firestore, this.auth})
-    : _firestore = firestore ?? FirestoreService();
+  GuideNotificationsRepository({
+    FirestoreService? firestore,
+    this.auth,
+    TouristNotificationsRepository? shared,
+  }) : _shared = shared ?? TouristNotificationsRepository.instance;
 
-  /// Firestore collection holding the notifications.
-  static const String notificationsCollection = 'notifications';
+  /// One adapter for the whole signed-in session.
+  static final GuideNotificationsRepository instance =
+      GuideNotificationsRepository();
 
-  final FirestoreService _firestore;
+  final TouristNotificationsRepository _shared;
 
-  /// The auth client to read the signed-in guide from. Null means the
-  /// default [FirebaseAuth] instance.
+  /// The auth client used only to resolve the signed-in guide's uid. Null means
+  /// the default [FirebaseAuth] instance.
   final FirebaseAuth? auth;
 
-  /// Resolved lazily so building the repository never requires a running
-  /// Firebase app (which keeps it usable in plain unit tests).
-  FirebaseAuth get _firebaseAuth => auth ?? FirebaseAuth.instance;
+  FirebaseAuth get _auth => auth ?? FirebaseAuth.instance;
 
-  /// The signed-in guide's uid, or null when signed out.
-  /// The signed-in guide's uid, or null when signed out.
-  ///
-  /// Returns null (instead of throwing) when there is no Firebase app,
-  /// so the repositories stay usable in plain unit tests.
+  /// The signed-in guide's uid, or null when signed out. Returns null instead
+  /// of throwing when no Firebase app exists (plain unit tests).
   String? get currentGuideId {
     try {
-      return _firebaseAuth.currentUser?.uid;
+      return _auth.currentUser?.uid;
     } catch (_) {
       return null;
     }
   }
 
-  /// The guide's notifications, live.
+  /// The guide's notifications, live. The badge follows this stream.
   ///
-  /// Emits again whenever a notification is written, read or deleted — so
-  /// the badge on the dashboard updates by itself.
-  Stream<List<GuideNotification>> watchNotifications() {
-    final uid = currentGuideId;
-    if (uid == null) return Stream.value(_mockNotifications());
+  /// Auth can still be restoring when the page is built. Waiting on
+  /// [FirebaseAuth.authStateChanges] here keeps this stream alive until a
+  /// guide is available, then hands over to the shared session repository.
+  Stream<List<GuideNotification>> watchNotifications() async* {
+    if (currentGuideId == null) {
+      final user = await _auth.authStateChanges().firstWhere(
+        (user) => user != null,
+        orElse: () => null,
+      );
+      if (user == null) return;
+    }
+    await _shared.ensureStarted(role: TouristNotificationsRepository.roleGuide);
+    await for (final items in _shared.watchNotifications()) {
+      // A snapshot before `stored`/`chat` report carries no rows. Forwarding
+      // it would end the guide page's loading state with a false empty list.
+      if (!_shared.hasListSourceData && items.isEmpty) continue;
+      yield _mapItems(items);
+    }
+  }
+
+  /// Short warnings from failed sources. The list page still works with
+  /// whichever sources succeeded.
+  Stream<List<String>> watchSourceErrors() => _shared.watchSourceErrors();
+
+  /// True once at least one real Firestore source has emitted.
+  bool get hasSourceData => _shared.hasSourceData;
+
+  /// True once `stored` or `chat` has produced a real snapshot.
+  ///
+  /// This is the gate used by the guide page; the profile doc alone does not
+  /// carry notifications and must not produce an empty list.
+  bool get hasListSourceData => _shared.hasListSourceData;
+
+  /// Current source warnings, newest first.
+  List<String> get sourceErrors => _shared.sourceErrors;
+
+  /// One-shot read used by the cubit's retry action.
+  Future<List<GuideNotification>> fetchNotifications() async {
+    if (currentGuideId == null) return const <GuideNotification>[];
+    await _shared.ensureStarted(role: TouristNotificationsRepository.roleGuide);
     try {
-      return _firestore.instance
-          .collection(notificationsCollection)
-          .where('userId', isEqualTo: uid)
-          .snapshots()
-          .map(
-            (snapshot) => snapshot.docs
-                .map((doc) => _toNotification(doc.data(), doc.id))
-                .toList(),
+      return await _shared
+          .watchNotifications()
+          .map(_mapItems)
+          .first
+          .timeout(
+            const Duration(seconds: 2),
+            onTimeout: () =>
+                _shared.currentItems.map(_toGuideNotification).toList(),
           );
     } catch (_) {
-      return Stream.value(_mockNotifications());
+      return _shared.currentItems.map(_toGuideNotification).toList();
     }
   }
 
-  /// The guide's notifications, newest first.
-  Future<List<GuideNotification>> fetchNotifications() async {
-    final uid = currentGuideId;
-    if (uid == null) return _mockNotifications();
-    try {
-      final snapshot = await _firestore
-          .collection(notificationsCollection)
-          .where('userId', isEqualTo: uid)
-          .get();
-      return snapshot.docs
-          .map((doc) => _toNotification(doc.data(), doc.id))
-          .toList();
-    } catch (_) {
-      return _mockNotifications();
-    }
-  }
-
-  /// Writes a notification for [userId].
-  ///
-  /// The rules allow a notification addressed to its own author, and an
-  /// admin may address anybody — that is how the admin dashboard tells a
-  /// guide that a trip was approved.
-  Future<String?> create({
+  /// Writes the persisted booking notification after the booking committed.
+  Future<void> createBookingNotification({
     required String userId,
-    required String title,
-    required String message,
-    String type = 'general',
-    String? relatedEntityId,
-    String? relatedCollection,
-  }) async {
-    try {
-      final ref = _firestore.collection(notificationsCollection).doc();
-      await ref.set({
-        'userId': userId,
-        'title': title,
-        'message': message,
-        'type': type,
-        'relatedEntityId': relatedEntityId,
-        'relatedCollection': relatedCollection,
-        'isRead': false,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      return ref.id;
-    } catch (_) {
-      return null;
-    }
+    required String bookingId,
+    required int seats,
+    String? tripId,
+    String? actorName,
+    String? actorAvatarUrl,
+    String? title,
+    String? message,
+  }) {
+    if (userId.isEmpty || bookingId.isEmpty) return Future<void>.value();
+    return _shared.createBookingNotification(
+      recipientId: userId,
+      bookingId: bookingId,
+      seats: seats,
+      tripId: tripId,
+      actorName: actorName,
+      actorAvatarUrl: actorAvatarUrl,
+      title: title,
+      message: message,
+    );
   }
 
-  /// Marks one notification as read.
-  Future<void> markAsRead(String notificationId) async {
-    await _firestore.writeDoc(notificationsCollection, notificationId, {
-      'isRead': true,
-    });
+  /// Writes the persisted admin trip-decision notification.
+  Future<void> createTripDecisionNotification({
+    required String userId,
+    required String tripId,
+    required String decision,
+    String? tripTitle,
+    String? actorName,
+    String? actorAvatarUrl,
+    String? message,
+  }) {
+    if (userId.isEmpty || tripId.isEmpty) return Future<void>.value();
+    return _shared.createTripDecisionNotification(
+      recipientId: userId,
+      tripId: tripId,
+      decision: decision,
+      tripTitle: tripTitle,
+      actorName: actorName,
+      actorAvatarUrl: actorAvatarUrl,
+      message: message,
+    );
   }
 
-  /// Marks every notification as read.
-  Future<void> markAllAsRead() async {
-    final uid = currentGuideId;
-    if (uid == null) return;
-    final snapshot = await _firestore
-        .collection(notificationsCollection)
-        .where('userId', isEqualTo: uid)
-        .get();
-    for (final doc in snapshot.docs) {
-      await markAsRead(doc.id);
-    }
-  }
+  /// Marks one notification by writing only the shared read-id map.
+  Future<void> markAsRead(String notificationId) =>
+      _shared.markOneRead(notificationId);
 
-  GuideNotification _toNotification(Map<String, dynamic>? data, String id) {
-    final merged = <String, dynamic>{
-      'id': id,
-      'type': 'general',
-      'title': '',
-      'message': '',
-      ...?data,
-    };
-    merged['id'] = id;
-    return GuideNotification.fromJson(merged);
-  }
+  /// Marks every notification in one atomic user-document write.
+  Future<void> markAllAsRead() => _shared.markAllAsRead();
 
-  List<GuideNotification> _mockNotifications() => mockGuideNotificationsRaw
-      .map(GuideNotification.fromJson)
-      .toList(growable: false);
+  List<GuideNotification> _mapItems(List<NotificationItem> items) =>
+      items.map(_toGuideNotification).toList(growable: false);
+
+  GuideNotification _toGuideNotification(NotificationItem item) {
+    return GuideNotification(
+      id: item.id,
+      type: item.type,
+      title: item.title,
+      body: item.body,
+      isRead: item.isRead,
+      createdAt: item.createdAt,
+      relatedEntityId: item.relatedEntityId ?? item.targetId,
+      relatedCollection: item.relatedCollection,
+    );
+  }
 }

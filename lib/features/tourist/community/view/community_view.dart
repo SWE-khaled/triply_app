@@ -29,7 +29,10 @@ import 'share_composer_view.dart';
 import 'story_viewer_view.dart';
 
 class CommunityScreen extends StatefulWidget {
-  const CommunityScreen({super.key});
+  /// Set by post notifications so the feed highlights and scrolls to a post.
+  final String? focusPostId;
+
+  const CommunityScreen({super.key, this.focusPostId});
 
   @override
   State<CommunityScreen> createState() => _CommunityScreenState();
@@ -38,6 +41,9 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen>
     with WidgetsBindingObserver {
   final ImagePicker _picker = ImagePicker();
+  final GlobalKey _focusedPostKey = GlobalKey();
+  int _focusAttempts = 0;
+  bool _didScrollToFocus = false;
   late final CommunityStoriesCubit _storiesCubit;
 
   @override
@@ -45,6 +51,25 @@ class _CommunityScreenState extends State<CommunityScreen>
     super.initState();
     _storiesCubit = context.read<CommunityStoriesCubit>();
     WidgetsBinding.instance.addObserver(this);
+    if (widget.focusPostId != null) _scheduleFocusScroll();
+  }
+
+  /// Posts may still be loading when the screen opens from a notification.
+  void _scheduleFocusScroll() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _didScrollToFocus) return;
+      final target = _focusedPostKey.currentContext;
+      if (target != null) {
+        _didScrollToFocus = true;
+        Scrollable.ensureVisible(
+          target,
+          duration: const Duration(milliseconds: 400),
+          alignment: 0.2,
+        );
+        return;
+      }
+      if (_focusAttempts++ < 180) _scheduleFocusScroll();
+    });
   }
 
   @override
@@ -175,12 +200,7 @@ class _CommunityScreenState extends State<CommunityScreen>
                       : Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                20,
-                                12,
-                                20,
-                                4,
-                              ),
+                              padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -224,7 +244,9 @@ class _CommunityScreenState extends State<CommunityScreen>
                                                 MyStoryBubble(
                                                   hasStory: hasMyStory,
                                                   onAddTap: () =>
-                                                      _pickMyStoryImage(context),
+                                                      _pickMyStoryImage(
+                                                        context,
+                                                      ),
                                                   onViewTap: () {
                                                     if (currentUserId
                                                         .isNotEmpty) {
@@ -235,9 +257,11 @@ class _CommunityScreenState extends State<CommunityScreen>
                                                     }
                                                   },
                                                 ),
-                                                for (var i = 0;
-                                                    i < rings.length;
-                                                    i++) ...[
+                                                for (
+                                                  var i = 0;
+                                                  i < rings.length;
+                                                  i++
+                                                ) ...[
                                                   const SizedBox(width: 14),
                                                   StoryRing(
                                                     story: rings[i],
@@ -260,13 +284,12 @@ class _CommunityScreenState extends State<CommunityScreen>
                                         const SizedBox(height: 8),
                                         if (storyState.errorMessage != null)
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.fromLTRB(
-                                                  16,
-                                                  4,
-                                                  16,
-                                                  0,
-                                                ),
+                                            padding: const EdgeInsets.fromLTRB(
+                                              16,
+                                              4,
+                                              16,
+                                              0,
+                                            ),
                                             child: Text(
                                               storyState.errorMessage!,
                                               style: const TextStyle(
@@ -277,13 +300,12 @@ class _CommunityScreenState extends State<CommunityScreen>
                                           ),
                                         if (postState.errorMessage != null)
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.fromLTRB(
-                                                  16,
-                                                  4,
-                                                  16,
-                                                  0,
-                                                ),
+                                            padding: const EdgeInsets.fromLTRB(
+                                              16,
+                                              4,
+                                              16,
+                                              0,
+                                            ),
                                             child: Text(
                                               postState.errorMessage!,
                                               style: const TextStyle(
@@ -314,28 +336,46 @@ class _CommunityScreenState extends State<CommunityScreen>
                                           index,
                                         ) {
                                           final post = postState.posts[index];
+                                          final isFocused =
+                                              widget.focusPostId == post.id;
                                           return Padding(
-                                            padding:
-                                                const EdgeInsets.fromLTRB(
-                                                  12,
-                                                  8,
-                                                  12,
-                                                  16,
-                                                ),
+                                            padding: const EdgeInsets.fromLTRB(
+                                              12,
+                                              8,
+                                              12,
+                                              16,
+                                            ),
                                             child: BlocProvider<PostActionsCubit>(
-                                              key: ValueKey(post.id),
+                                              key: isFocused
+                                                  ? _focusedPostKey
+                                                  : ValueKey(post.id),
                                               create: (_) => PostActionsCubit(
                                                 post: post,
                                                 onDeleted: () => context
                                                     .read<CommunityPostsCubit>()
                                                     .removePost(post),
                                               ),
-                                              child: PostCard(
-                                                post: post,
-                                                // Placeholders: no comments/share
-                                                // screens in Figma.
-                                                onComments: () {},
-                                                onShare: () {},
+                                              child: DecoratedBox(
+                                                decoration: isFocused
+                                                    ? BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              12,
+                                                            ),
+                                                        border: Border.all(
+                                                          color: AppColors
+                                                              .primaryTeal,
+                                                          width: 2,
+                                                        ),
+                                                      )
+                                                    : const BoxDecoration(),
+                                                child: PostCard(
+                                                  post: post,
+                                                  // Placeholders: no
+                                                  // comments/share screens.
+                                                  onComments: () {},
+                                                  onShare: () {},
+                                                ),
                                               ),
                                             ),
                                           );
@@ -354,9 +394,7 @@ class _CommunityScreenState extends State<CommunityScreen>
                     if (index == 0) {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const HomeScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
                       );
                     } else if (index == 1) {
                       Navigator.of(context).push(AppRoutes.myTrips());
