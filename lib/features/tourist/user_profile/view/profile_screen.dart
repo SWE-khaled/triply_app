@@ -176,25 +176,28 @@ class _ProfileBodyState extends State<_ProfileBody> {
                           const SizedBox(height: 18),
                           Container(
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceDefault,
                               border: Border.all(color: AppColors.borderSubtle),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: SwitchListTile(
-                              secondary: Icon(
-                                Icons.dark_mode_outlined,
-                                color: AppColors.guidesName,
-                              ),
-                              title: Text(
-                                'Dark mode',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
+                            clipBehavior: Clip.antiAlias,
+                            child: Material(
+                              color: AppColors.surfaceDefault,
+                              child: SwitchListTile(
+                                secondary: Icon(
+                                  Icons.dark_mode_outlined,
                                   color: AppColors.guidesName,
                                 ),
+                                title: Text(
+                                  'Dark mode',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.guidesName,
+                                  ),
+                                ),
+                                value: themeCubit.isDark,
+                                onChanged: (_) => themeCubit.toggle(),
                               ),
-                              value: themeCubit.isDark,
-                              onChanged: (_) => themeCubit.toggle(),
                             ),
                           ),
                           const SizedBox(height: 18),

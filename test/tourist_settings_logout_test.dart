@@ -36,7 +36,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Log out'));
+    await tester.tap(find.text('Log Out & Switch Role'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Logout'));
     await tester.pumpAndSettle();

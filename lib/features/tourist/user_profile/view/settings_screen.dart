@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
@@ -115,15 +116,28 @@ class SettingsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () => _logout(context),
-                  child: Text(
-                    'Log out',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.actionPrimary,
+                SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: GestureDetector(
+                    onTap: () => _logout(context),
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding:const  EdgeInsets.symmetric(vertical: 14,),
+                      margin: const EdgeInsets.symmetric(horizontal: 16,),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.accentOrange),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        'Log Out & Switch Role',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.accentOrange,
+                        ),
+                      ),
                     ),
                   ),
                 ),

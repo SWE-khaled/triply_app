@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/tourist_booking.dart';
 import '../remote/firestore_service.dart';
+import '../remote/safe_transaction.dart';
 import 'guide_notifications_repository.dart';
 
 /// Why a booking could not be created.
@@ -120,7 +121,7 @@ class BookingRepository {
     // who owns the trip.
     final guest = await _readGuestProfile(uid);
 
-    await db.runTransaction((tx) async {
+    await runSafeTransaction(db, (tx) async {
       final tripSnapshot = await tx.get(tripRef);
       if (!tripSnapshot.exists) {
         throw const BookingException('This trip is no longer available.');
@@ -315,7 +316,7 @@ class BookingRepository {
     }
     final db = _firestore.instance;
     final bookingRef = db.collection(bookingsCollection).doc(bookingId);
-    await db.runTransaction((tx) async {
+    await runSafeTransaction(db, (tx) async {
       final snapshot = await tx.get(bookingRef);
       if (!snapshot.exists) {
         throw const BookingException('This booking no longer exists.');
@@ -405,7 +406,7 @@ class BookingRepository {
     final db = _firestore.instance;
     final bookingRef = db.collection(bookingsCollection).doc(bookingId);
     final trips = db.collection(tripsCollection);
-    await db.runTransaction((tx) async {
+    await runSafeTransaction(db, (tx) async {
       final snapshot = await tx.get(bookingRef);
       if (!snapshot.exists) {
         throw const BookingException('This booking no longer exists.');

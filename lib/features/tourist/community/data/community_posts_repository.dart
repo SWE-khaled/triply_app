@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/data/remote/safe_transaction.dart';
 import '../../../../core/data/repositories/tourist_notifications_repository.dart';
 import '../model/community_post.dart';
 import 'community_cloudinary_uploader.dart';
@@ -159,7 +160,7 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
     final document = _posts.doc(postId);
     String? authorId;
     try {
-      await _firestore.runTransaction((transaction) async {
+      await runSafeTransaction(_firestore, (transaction) async {
         final snapshot = await transaction.get(document);
         if (!snapshot.exists) {
           throw const CommunityPostsException(

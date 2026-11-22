@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../features/tourist/notifications/model/notification_item.dart';
 import '../remote/firestore_service.dart';
+import '../remote/safe_transaction.dart';
 import '../../utils/active_chat_tracker.dart';
 
 /// The single notification source shared by the tourist and guide apps.
@@ -262,7 +263,7 @@ class TouristNotificationsRepository {
         item?.createdAt?.microsecondsSinceEpoch ??
         DateTime.now().microsecondsSinceEpoch;
     final ref = _db.collection(usersCollection).doc(uid);
-    await _db.runTransaction((transaction) async {
+    await runSafeTransaction(_db, (transaction) async {
       final snapshot = await transaction.get(ref);
       final raw = snapshot.data()?[readIdsField];
       final ids = _parseReadIds(raw);
@@ -555,7 +556,7 @@ class TouristNotificationsRepository {
     if (_accountCreatedAtWriteAttempted) return;
     _accountCreatedAtWriteAttempted = true;
     try {
-      await _db.runTransaction((transaction) async {
+      await runSafeTransaction(_db, (transaction) async {
         final snapshot = await transaction.get(ref);
         if (!snapshot.exists ||
             snapshot.data()?.containsKey(createdAtField) == true) {
