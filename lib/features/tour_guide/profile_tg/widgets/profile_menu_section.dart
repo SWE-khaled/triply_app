@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_cubit.dart';
 
 /// Languages + About + menu rows + log out button.
 class ProfileMenuSection extends StatelessWidget {
@@ -25,6 +27,8 @@ class ProfileMenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeCubit = context.watch<ThemeCubit>();
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       child: Column(
@@ -74,7 +78,14 @@ class ProfileMenuSection extends StatelessWidget {
               color: AppColors.dateText,
             ),
           ),
-          const SizedBox(height: 8),
+          _MenuRow(
+            icon: Icons.dark_mode_outlined,
+            label: 'Dark mode',
+            onTap: themeCubit.toggle,
+            trailing: IgnorePointer(
+              child: Switch(value: themeCubit.isDark, onChanged: (_) {}),
+            ),
+          ),
           _MenuRow(
             icon: Icons.calendar_today_outlined,
             label: 'Availability',
@@ -130,7 +141,15 @@ class _MenuRow extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
 
-  const _MenuRow({required this.icon, required this.label, this.onTap});
+  /// Defaults to the chevron. The theme row passes a visual [Switch] instead.
+  final Widget? trailing;
+
+  const _MenuRow({
+    required this.icon,
+    required this.label,
+    this.onTap,
+    this.trailing,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +164,7 @@ class _MenuRow extends StatelessWidget {
               width: 38,
               height: 38,
               alignment: Alignment.center,
-              decoration:  BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.surfaceElevated,
                 shape: BoxShape.circle,
               ),
@@ -162,11 +181,8 @@ class _MenuRow extends StatelessWidget {
                 ),
               ),
             ),
-             Icon(
-              Icons.chevron_right,
-              size: 18,
-              color: AppColors.subtitle,
-            ),
+            trailing ??
+                Icon(Icons.chevron_right, size: 18, color: AppColors.subtitle),
           ],
         ),
       ),

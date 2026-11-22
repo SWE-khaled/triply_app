@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/theme_cubit.dart';
 import '../../home_and_notification_tg/view/guide_notifications_screen.dart';
 import '../../home_and_notification_tg/widget/guide_bottom_nav.dart';
 import '../../../chat/widgets/chat_unread_builder.dart';
@@ -145,7 +144,6 @@ class _ProfileTourGuideView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeCubit = context.watch<ThemeCubit>();
     return Scaffold(
       backgroundColor: AppColors.background,
       body: BlocBuilder<ProfileTgCubit, ProfileTgState>(
@@ -179,31 +177,6 @@ class _ProfileTourGuideView extends StatelessWidget {
                   reviews: cubit.reviewCount.toString(),
                   languages: cubit.languages.length.toString(),
                   price: cubit.pricePerHourLabel,
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceDefault,
-                    border: Border.all(color: AppColors.cardBorder),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: SwitchListTile(
-                    secondary: Icon(
-                      Icons.dark_mode_outlined,
-                      color: AppColors.priceTeal,
-                    ),
-                    title: Text(
-                      'Dark mode',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.priceTeal,
-                      ),
-                    ),
-                    value: themeCubit.isDark,
-                    onChanged: (_) => themeCubit.toggle(),
-                  ),
                 ),
                 ProfileMenuSection(
                   languages: cubit.languages,
