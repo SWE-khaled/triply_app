@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
@@ -77,6 +78,29 @@ class GuideSettingsScreen extends StatelessWidget {
                       onTap: () => _resetPassword(context),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Help & Support',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.title,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.cardBorder),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: _SettingsRow(
+                  icon: Icons.contact_support_outlined,
+                  label: 'Contact Us',
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(AppRoutes.contactUs),
                 ),
               ),
               const SizedBox(height: 12),

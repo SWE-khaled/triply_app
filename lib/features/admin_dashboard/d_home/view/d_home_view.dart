@@ -14,6 +14,7 @@ import '../../d_user_posts/view/d_user_posts_view.dart';
 import '../../d_guides/view/d_guides_view.dart';
 import '../../d_trip_applications/view/d_trip_applications_view.dart';
 import '../../d_app_settings/view/d_app_settings_view.dart';
+import '../../d_support_center/view/d_support_center_view.dart';
 
 // ignore_for_file: unused_import
 
@@ -38,6 +39,7 @@ class _HomeViewState extends State<HomeView> {
     'Guides',
     'Trip Applications',
     'App Settings',
+    'Support Center',
   ];
 
   static const List<Widget> _bodies = [
@@ -50,6 +52,7 @@ class _HomeViewState extends State<HomeView> {
     GuidesView(),
     TripApplicationsView(),
     AppSettingsView(),
+    SupportCenterView(),
   ];
 
   Future<void> _confirmLogout(BuildContext context) async {

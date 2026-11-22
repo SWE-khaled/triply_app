@@ -19,6 +19,7 @@ const List<_NavItem> _navItems = [
   _NavItem('Guides', Icons.verified_user_outlined),
   _NavItem('Trip Applications', Icons.assignment_outlined),
   _NavItem('App Settings', Icons.settings_outlined),
+  _NavItem('Support Center', Icons.support_agent_outlined),
 ];
 
 /// The left sidebar of the Triply Admin Console.

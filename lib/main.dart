@@ -21,6 +21,7 @@ import 'features/tourist/user_profile/view/emergency_screen.dart';
 import 'features/tourist/checkout/paymob_settings.dart';
 import 'features/tourist/user_profile/view/privacy_security_screen.dart';
 import 'features/tourist/user_profile/view/profile_screen.dart';
+import 'features/support/contact_us/view/contact_us_screen.dart';
 import 'firebase_options.dart';
 import 'features/splash/cubit/startup_cubit.dart';
 import 'features/splash/cubit/startup_state.dart';
@@ -173,6 +174,7 @@ class MyApp extends StatelessWidget {
             AppRoutes.privacySecurity: (context) =>
                 const PrivacySecurityScreen(),
             AppRoutes.emergency: (context) => const EmergencyScreen(),
+            AppRoutes.contactUs: (context) => const ContactUsScreen(),
           },
         ),
       ),

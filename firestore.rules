@@ -747,5 +747,77 @@ allow update: if isSignedIn()
 
       allow delete: if isAdmin();
     }
+
+    // ── support contact messages ────────────────────────────────────────
+    // Sent from Tourist / Tour Guide settings. Identity is copied from the
+    // authenticated session and the trusted users/{uid} document; the role
+    // mapping below is the only one accepted for contact_messages.
+    match /contact_messages/{messageId} {
+      // `.get(key, '')` only replaces an ABSENT key. An existing null or
+      // wrong-typed field must not make a valid submission fail, so every
+      // trusted value is normalised to a string here.
+      function contactString(value) {
+        return value is string ? value : '';
+      }
+
+      function trustedContactName() {
+        return !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          ? ''
+          : (contactString(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('name', '')) != ''
+              ? contactString(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('name', ''))
+              : (contactString(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('fullName', '')) != ''
+                  ? contactString(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('fullName', ''))
+                  : contactString(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('displayName', ''))));
+      }
+
+      function trustedContactEmail() {
+        return contactString(request.auth.token.get('email', '')) != ''
+          ? contactString(request.auth.token.get('email', ''))
+          : (!exists(/databases/$(database)/documents/users/$(request.auth.uid))
+              ? ''
+              : contactString(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('email', '')));
+      }
+
+      function trustedContactRole() {
+        return !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          ? ''
+          : contactString(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', ''));
+      }
+
+      // Only the admin reviews support requests.
+      allow get, list: if isAdmin();
+
+      allow create: if isSignedIn()
+        && messageId == request.resource.data.id
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll(['id', 'userId', 'userName', 'userEmail', 'userRole', 'message', 'type', 'status', 'createdAt', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['id', 'userId', 'userName', 'userEmail', 'userRole', 'message', 'type', 'status', 'createdAt', 'updatedAt'])
+        && request.resource.data.userName is string
+        && request.resource.data.userName == trustedContactName()
+        && request.resource.data.userEmail is string
+        && request.resource.data.userEmail.size() > 0
+        && request.resource.data.userEmail.size() <= 254
+        && (trustedContactEmail() == ''
+            || request.resource.data.userEmail == trustedContactEmail())
+        && request.resource.data.userRole in ['tourist', 'tourGuide']
+        && ((request.resource.data.userRole == 'tourist' && trustedContactRole() == 'tourist')
+            || (request.resource.data.userRole == 'tourGuide' && trustedContactRole() == 'guide'))
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10
+        && request.resource.data.message.size() <= 1000
+        && request.resource.data.type in ['complaint', 'inquiry', 'general']
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      // Only the admin moves a request through the review workflow.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['pending', 'inProgress', 'resolved']
+        && request.resource.data.updatedAt == request.time;
+
+      // Support history is append-only; no client may delete a message.
+    }
   }
 }

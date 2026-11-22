@@ -53,6 +53,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String privacySecurity = '/privacy-security';
   static const String emergency = '/emergency';
+  static const String contactUs = '/contact-us';
 
   // ---- Route builders ----
   static Route<void> splash({required WidgetBuilder nextPageBuilder}) {
