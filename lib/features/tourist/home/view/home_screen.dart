@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             _buildTripsSection(context),
             const SizedBox(height: 24),
-            const Padding(
+             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 key: const Key('home-chat-button'),
                 tooltip: 'Messages',
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.textPrimary,
                 elevation: 8,
                 shape: const CircleBorder(),
                 onPressed: () =>
@@ -164,14 +164,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: unread > 99
                           ? BorderRadius.circular(13)
                           : null,
-                      border: Border.all(color: Colors.white, width: 3),
+                      border: Border.all(color: AppColors.borderStrong, width: 3),
                     ),
                     child: Text(
                       unread > 99 ? '99+' : '$unread',
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         height: 1,
                       ),
                     ),
@@ -446,7 +446,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 48, 16, 24),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.25),
+          color: AppColors.overlayScrim.withValues(alpha: 0.25),
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(24),
             bottomRight: Radius.circular(24),
@@ -481,9 +481,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         Navigator.pushNamed(context, AppRoutes.notifications);
                       },
-                      icon: const Icon(
+                      icon:  Icon(
                         Icons.notifications_none,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (unreadNotifications > 0)
@@ -503,10 +503,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             unreadNotifications > 9
                                 ? '9+'
                                 : '$unreadNotifications',
-                            style: const TextStyle(
+                            style:  TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -532,7 +532,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 10),
             Text('DISCOVER EGYPT YOUR WAY', style: AppTextStyles.heroSubtitle),
             const SizedBox(height: 4),
-            const Text(
+             Text(
               'Ready for your\nnext adventure?',
               style: AppTextStyles.heroTitle,
             ),
@@ -648,7 +648,7 @@ class _SectionEmpty extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.cardBorder),
       ),

@@ -44,7 +44,7 @@ class AccountOptionTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: AppColors.guidesName,
@@ -61,13 +61,13 @@ class AccountOptionTile extends StatelessWidget {
                   if (trailingText != null)
                     Text(
                       trailingText!,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 14,
                         color: AppColors.textGrey,
                       ),
                     ),
                   const SizedBox(width: 4),
-                  const Icon(
+                   Icon(
                     Icons.chevron_right,
                     size: 22,
                     color: AppColors.textGrey,
@@ -78,7 +78,7 @@ class AccountOptionTile extends StatelessWidget {
           ),
         ),
         if (showDivider)
-          const Divider(height: 1, indent: 72, color: Color(0xFFEEEEEE)),
+           Divider(height: 1, indent: 72, color: AppColors.borderSubtle),
       ],
     );
   }

@@ -6,7 +6,7 @@ class AppTextStyles {
   AppTextStyles._();
 
   // ================= Home (Tourist) =================
-  static const TextStyle heroTitle = TextStyle(
+  static TextStyle get heroTitle => TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
     color: AppColors.pureWhite,
@@ -18,39 +18,33 @@ class AppTextStyles {
     color: AppColors.pureWhite.withValues(alpha: 0.7),
     fontWeight: FontWeight.w500,
   );
-  static const TextStyle sectionTitle = TextStyle(
+  static TextStyle get sectionTitle => TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.bold,
     color: AppColors.textDark,
   );
-  static const TextStyle pageTitle = TextStyle(
+  static TextStyle get pageTitle => TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
     color: AppColors.textDark,
   );
-  static const TextStyle seeAll = TextStyle(
+  static TextStyle get seeAll => TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.primaryTeal,
   );
-  static const TextStyle cardTitle = TextStyle(
+  static TextStyle get cardTitle => TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.bold,
-    color: AppColors.pureWhite,
+    color: AppColors.onImage,
   );
-  static TextStyle get cardSubtitle => TextStyle(
-    fontSize: 12,
-    color: AppColors.pureWhite.withValues(alpha: 0.7),
-  );
-  static const TextStyle body = TextStyle(
-    fontSize: 14,
-    color: AppColors.textDark,
-  );
-  static const TextStyle bodyGrey = TextStyle(
-    fontSize: 13,
-    color: AppColors.textGrey,
-  );
-  static const TextStyle price = TextStyle(
+  static TextStyle get cardSubtitle =>
+      TextStyle(fontSize: 12, color: AppColors.onImage.withValues(alpha: 0.7));
+  static TextStyle get body =>
+      TextStyle(fontSize: 14, color: AppColors.textDark);
+  static TextStyle get bodyGrey =>
+      TextStyle(fontSize: 13, color: AppColors.textGrey);
+  static TextStyle get price => TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.bold,
     color: AppColors.accentOrange,
@@ -93,7 +87,7 @@ class AppTextStyles {
   static TextStyle button({double size = 14}) => GoogleFonts.poppins(
     fontSize: size,
     fontWeight: FontWeight.w600,
-    color: AppColors.pureWhite,
+    color: AppColors.onPrimary,
   );
 
   // =========================================================================
@@ -117,7 +111,7 @@ class AppTextStyles {
   static TextStyle get adminNavItemActive => GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w600,
-    color: Colors.white,
+    color: AppColors.textPrimary,
   );
 
   static TextStyle get adminNavItemInactive => GoogleFonts.inter(
@@ -230,7 +224,7 @@ class AppTextStyles {
   static TextStyle get adminButtonPrimary => GoogleFonts.inter(
     fontSize: 13,
     fontWeight: FontWeight.w600,
-    color: Colors.white,
+    color: AppColors.textPrimary,
   );
 
   static TextStyle get adminButtonDanger => GoogleFonts.inter(

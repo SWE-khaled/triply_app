@@ -20,12 +20,12 @@ class EmergencyContactCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding:  EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEEEEEE)),
-        boxShadow: const [
+        border: Border.all(color: AppColors.borderSubtle),
+        boxShadow: [
           BoxShadow(
             color: AppColors.cardShadow,
             blurRadius: 8,
@@ -51,7 +51,7 @@ class EmergencyContactCard extends StatelessWidget {
               children: [
                 Text(
                   contact.name,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: AppColors.guidesName,
@@ -60,7 +60,7 @@ class EmergencyContactCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   contact.number,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textDark,
@@ -72,14 +72,14 @@ class EmergencyContactCard extends StatelessWidget {
           IconButton(
             onPressed: onCopy,
             tooltip: 'Copy number',
-            icon: const Icon(Icons.copy_outlined, color: AppColors.textGrey),
+            icon:  Icon(Icons.copy_outlined, color: AppColors.textGrey),
           ),
           const SizedBox(width: 4),
           ElevatedButton.icon(
             onPressed: onCall,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.guidesName,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.textPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),

@@ -115,7 +115,7 @@ class _AppSettingsBodyState extends State<_AppSettingsBody> {
       Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           border: Border.all(color: AppColors.adminDivider),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -142,7 +142,7 @@ class _AppSettingsBodyState extends State<_AppSettingsBody> {
       Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           border: Border.all(color: AppColors.adminDivider),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -156,7 +156,7 @@ class _AppSettingsBodyState extends State<_AppSettingsBody> {
               initialValue: state.approvalMode,
               style: AppTextStyles.adminTableCell,
               decoration: const InputDecoration(),
-              icon: const Icon(
+              icon:  Icon(
                 Icons.keyboard_arrow_down_rounded,
                 color: AppColors.adminTextMuted,
               ),
@@ -212,11 +212,11 @@ class _AppSettingsBodyState extends State<_AppSettingsBody> {
           ),
         ),
         child: state.saving
-            ? const SizedBox(
+            ?  SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   strokeWidth: 2,
                 ),
               )
@@ -247,7 +247,7 @@ class _SettingsError extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.adminPrimary,
           ),
-          child: const Text('Retry', style: TextStyle(color: Colors.white)),
+          child:  Text('Retry', style: TextStyle(color: AppColors.textPrimary)),
         ),
       ],
     );

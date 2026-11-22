@@ -53,7 +53,7 @@ class StoryCard extends StatelessWidget {
                       ),
                       Text(
                         story.timeAgo,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                           letterSpacing: 0,
@@ -65,7 +65,7 @@ class StoryCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     story.text,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 0,

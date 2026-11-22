@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:triply/core/theme/app_colors.dart';
 
 import 'package:flutter/material.dart';
 import 'package:triply/features/tourist/checkout/paymob_mobile_viewport_js.dart';
@@ -43,7 +44,7 @@ class _VisaScreenState extends State<VisaScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)
+      ..setBackgroundColor(AppColors.surfaceDefault)
       ..setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (request) {
@@ -105,7 +106,7 @@ class _VisaScreenState extends State<VisaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(child: WebViewWidget(controller: _controller)),
     );
   }

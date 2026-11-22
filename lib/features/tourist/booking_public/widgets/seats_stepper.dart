@@ -88,7 +88,7 @@ class SeatsStepper extends StatelessWidget {
   Widget _stepBtn(
     IconData icon,
     VoidCallback onTap, {
-    Color iconColor = AppColors.dateText,
+    Color? iconColor,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -97,11 +97,11 @@ class SeatsStepper extends StatelessWidget {
         width: 48,
         height: 48,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: Color(0xFFF1F4F5),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceElevated,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 20, color: iconColor),
+        child: Icon(icon, size: 20, color: iconColor ?? AppColors.dateText),
       ),
     );
   }

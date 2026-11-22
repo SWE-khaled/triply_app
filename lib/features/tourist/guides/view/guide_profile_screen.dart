@@ -44,9 +44,9 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
     return BlocProvider.value(
       value: _controller,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceDefault,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surfaceDefault,
           scrolledUnderElevation: 0.0,
           elevation: 0,
           leading: IconButton(
@@ -114,7 +114,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                     alignment: Alignment.center,
                     child: Text(
                       guide.name.isNotEmpty ? guide.name[0] : '?',
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary,
@@ -135,19 +135,19 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                             guide.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style:  TextStyle(
                               fontSize: 21,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF263A40),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
                         if (guide.isVerified) ...[
                           const SizedBox(width: 5),
-                          const Icon(
+                           Icon(
                             Icons.verified,
                             size: 17,
-                            color: Color(0xFF4DA7A0),
+                            color: AppColors.actionSecondary,
                           ),
                         ],
                       ],
@@ -157,9 +157,9 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                       guide.specialty,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF526B72),
+                        color: AppColors.textSecondary,
                       ),
                     ),
                     if (guide.location.isNotEmpty) ...[
@@ -168,9 +168,9 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                         guide.location,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF71868B),
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -183,8 +183,8 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
           RatingRow(
             rating: guide.rating,
             reviewCount: guide.reviewCount,
-            ratingColor: const Color(0xFF263A40),
-            reviewCountColor: const Color(0xFF71868B),
+            ratingColor: AppColors.textPrimary,
+            reviewCountColor: AppColors.textSecondary,
           ),
         ],
       ),
@@ -196,7 +196,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
       margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        color: Color(0xFFFAF5EC),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -218,7 +218,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
   }
 
   Widget _divider() {
-    return Container(width: 1, height: 32, color: Color(0xFF8A9EA3));
+    return Container(width: 1, height: 32, color: AppColors.textTertiary);
   }
 
   Widget _buildLanguages(Guide guide) {
@@ -233,8 +233,8 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
             .map(
               (l) => LanguageChip(
                 label: l,
-                backgroundColor: Color(0xFFF5F5F5),
-                textColor: Color(0xFF526B72),
+                backgroundColor: AppColors.surfaceDefault,
+                textColor: AppColors.textSecondary,
               ),
             )
             .toList(),
@@ -254,7 +254,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1A1A),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -262,7 +262,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
             about.isNotEmpty ? about : 'No description yet.',
             style: TextStyle(
               fontSize: 14,
-              color: Color(0xFF526B72),
+              color: AppColors.textSecondary,
               height: 1.5,
             ),
           ),
@@ -309,14 +309,14 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF1A1A1A),
+              color: AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 14),
           if (trips.isEmpty)
-            const Text(
+             Text(
               'No trips available',
-              style: TextStyle(color: Color(0xFF1A1A1A), fontSize: 13),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
             )
           else
             ListView.separated(
@@ -352,7 +352,7 @@ class _GuideProfileScreenState extends State<GuideProfileScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.textPrimary,
                   minimumSize: const Size(0, 52),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
@@ -399,11 +399,11 @@ class _StatItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: Colors.black,
+              color: AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 2),
-          Text(label, style: TextStyle(fontSize: 12, color: Color(0xFF8A9EA3))),
+          Text(label, style: TextStyle(fontSize: 12, color: AppColors.textTertiary)),
         ],
       ),
     );

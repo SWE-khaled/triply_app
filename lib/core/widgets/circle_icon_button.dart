@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Circular icon button replacing `_CircleButton` (`place_detail_screen.dart:246`),
 /// composer back chevron (`new_share_screen.dart:161`), picker back chevron
@@ -7,8 +8,8 @@ import 'package:flutter/material.dart';
 class CircleIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  final Color backgroundColor;
-  final Color iconColor;
+  final Color? backgroundColor;
+  final Color? iconColor;
   final double size;
   final double iconSize;
 
@@ -16,8 +17,8 @@ class CircleIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     required this.onTap,
-    this.backgroundColor = Colors.white,
-    this.iconColor = Colors.black,
+    this.backgroundColor,
+    this.iconColor,
     this.size = 40,
     this.iconSize = 20,
   });
@@ -25,7 +26,7 @@ class CircleIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: backgroundColor,
+      color: backgroundColor ?? AppColors.surfaceElevated,
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -33,7 +34,11 @@ class CircleIconButton extends StatelessWidget {
         child: SizedBox(
           width: size,
           height: size,
-          child: Icon(icon, size: iconSize, color: iconColor),
+          child: Icon(
+            icon,
+            size: iconSize,
+            color: iconColor ?? AppColors.iconSecondary,
+          ),
         ),
       ),
     );

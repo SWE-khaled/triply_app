@@ -45,7 +45,7 @@ class PostCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.cardBorder),
         ),
@@ -63,7 +63,7 @@ class PostCard extends StatelessWidget {
                     onBackgroundImageError: hasAvatar ? (_, _) {} : null,
                     child: hasAvatar
                         ? null
-                        : const Icon(Icons.person, color: AppColors.textGrey),
+                        :  Icon(Icons.person, color: AppColors.textGrey),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -72,16 +72,16 @@ class PostCard extends StatelessWidget {
                       children: [
                         Text(
                           post.authorName,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0,
-                            color: Color(0xFF17343B),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         Text(
                           post.timeAgo,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w400,
                             letterSpacing: 0,
@@ -97,7 +97,7 @@ class PostCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     GestureDetector(
                       onTap: () => _confirmDelete(context),
-                      child: const Icon(
+                      child:  Icon(
                         Icons.delete_outline,
                         size: 20,
                         color: AppColors.textGrey,
@@ -117,7 +117,7 @@ class PostCard extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
                   child: Text(
                     '${post.imageUrls.length} photos',
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 11,
                       color: AppColors.textGrey,
                     ),
@@ -129,7 +129,7 @@ class PostCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
                 child: Text(
                   post.text,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
                     letterSpacing: 0,

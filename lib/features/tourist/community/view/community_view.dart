@@ -180,7 +180,7 @@ class _CommunityScreenState extends State<CommunityScreen>
 
               return Scaffold(
                 extendBody: true, // content extends under the glass nav
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.surfaceDefault,
                 body: SafeArea(
                   bottom:
                       false, // <-- let the content reach the bottom of the screen
@@ -216,7 +216,7 @@ class _CommunityScreenState extends State<CommunityScreen>
                                     icon: Icons.add,
                                     onTap: () => _openComposer(context),
                                     backgroundColor: AppColors.primaryTeal,
-                                    iconColor: Colors.white,
+                                    iconColor: AppColors.textPrimary,
                                     iconSize: 27,
                                   ),
                                 ],
@@ -292,7 +292,7 @@ class _CommunityScreenState extends State<CommunityScreen>
                                             ),
                                             child: Text(
                                               storyState.errorMessage!,
-                                              style: const TextStyle(
+                                              style:  TextStyle(
                                                 color: AppColors.textGrey,
                                                 fontSize: 12,
                                               ),
@@ -308,7 +308,7 @@ class _CommunityScreenState extends State<CommunityScreen>
                                             ),
                                             child: Text(
                                               postState.errorMessage!,
-                                              style: const TextStyle(
+                                              style:  TextStyle(
                                                 color: AppColors.textGrey,
                                                 fontSize: 12,
                                               ),

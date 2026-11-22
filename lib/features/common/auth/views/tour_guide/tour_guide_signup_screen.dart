@@ -83,7 +83,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(cubit.errorMessage ?? 'Registration failed'),
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: AppColors.statusError,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -117,11 +117,11 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
     return Container(
       height: 248,
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFF0E5566), Color(0xFF020B0D)],
+          colors: [AppColors.actionPrimary, AppColors.backgroundPrimary],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(48),
@@ -157,13 +157,13 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
               ),
             ),
           ),
-          const Align(
+           Align(
             alignment: Alignment.topCenter,
             child: Padding(
               padding: EdgeInsets.only(top: 168),
               child: Text(
                 'Create your professional guide account.',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
               ),
             ),
           ),
@@ -175,10 +175,10 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
   Widget _label(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style:  TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1F3238),
+        color: AppColors.textPrimary,
       ),
     );
   }
@@ -196,24 +196,24 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.darkTeal,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.textPrimary,
           disabledBackgroundColor: isSubmitting
               ? AppColors.darkTeal
-              : const Color(0xFFE8ECEC),
+              : AppColors.borderSubtle,
           disabledForegroundColor: isSubmitting
-              ? Colors.white
-              : const Color(0xFF7A8B8F),
+              ? AppColors.textPrimary
+              : AppColors.textSecondary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
         ),
         child: isSubmitting
-            ? const SizedBox(
+            ?  SizedBox(
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               )
             : const Text(
@@ -230,7 +230,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
       builder: (context, state) {
         final cubit = context.read<AuthCubit>();
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surfaceDefault,
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -243,12 +243,12 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                         Text(
                           'Become a Triply Guide',
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1F3238),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -274,7 +274,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(10),
                           ],
-                          prefix: const Padding(
+                          prefix:  Padding(
                             padding: EdgeInsets.only(right: 2),
                             child: Text(
                               '🇪🇬 +20',
@@ -359,7 +359,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                           child: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              const Text(
+                               Text(
                                 'Already have an account? ',
                                 style: TextStyle(
                                   color: AppColors.textGrey,
@@ -370,7 +370,7 @@ class _TourGuideSignupScreenState extends State<TourGuideSignupScreen> {
                                 onTap: () => Navigator.of(
                                   context,
                                 ).pushNamed(AppRoutes.guideLogin),
-                                child: const Text(
+                                child:  Text(
                                   'Log In',
                                   style: TextStyle(
                                     color: AppColors.signInDark,

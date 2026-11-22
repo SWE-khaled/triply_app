@@ -42,7 +42,7 @@ class _EarningsView extends StatelessWidget {
                   CircleBackButton(
                     icon: Icons.chevron_left,
                     iconColor: AppColors.titleDark,
-                    backgroundColor: const Color(0xFFF6F1E7),
+                    backgroundColor: AppColors.surfaceElevated,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
@@ -80,7 +80,7 @@ class _EarningsView extends StatelessWidget {
                                   'Available balance',
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
-                                    color: Colors.white.withValues(alpha: 0.7),
+                                    color: AppColors.textPrimary.withValues(alpha: 0.7),
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -93,7 +93,7 @@ class _EarningsView extends StatelessWidget {
                                     style: GoogleFonts.poppins(
                                       fontSize: 28,
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -111,7 +111,7 @@ class _EarningsView extends StatelessWidget {
                                       vertical: 10,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: AppColors.surfaceDefault,
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
@@ -150,7 +150,7 @@ class _EarningsView extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           if (summary.activities.isEmpty)
-                            const Padding(
+                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 28),
                               child: Center(
                                 child: Text(

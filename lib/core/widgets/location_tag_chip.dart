@@ -18,12 +18,12 @@ class LocationTagChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F0DF),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         withSparkle ? '$label ✨' : label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           letterSpacing: 0,

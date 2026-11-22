@@ -3,7 +3,7 @@ import 'package:triply/core/theme/app_colors.dart';
 
 /// Cream tint from Figma (active tab circle). Local const only — the global
 /// theme in `core/theme/` is left untouched.
-const Color _cream = Color(0xFFFAF5EA);
+Color get _cream => AppColors.surfaceElevated;
 
 /// 4-tab bottom bar from the guide Figma (Home / My Trips / Chats /
 /// Profile). Local to tour_guide: the shared `AppBottomNav` carries tourist
@@ -57,16 +57,16 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
             height: 16,
             padding: const EdgeInsets.symmetric(horizontal: 4),
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
+            decoration:  BoxDecoration(
               color: AppColors.accentOrange,
               shape: BoxShape.circle,
             ),
             child: Text(
               widget.chatUnread > 99 ? '99+' : '${widget.chatUnread}',
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               ),
             ),
           ),
@@ -97,8 +97,8 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration:  BoxDecoration(
+        color: AppColors.surfaceDefault,
         border: Border(top: BorderSide(color: AppColors.cardBorder)),
       ),
       child: SafeArea(

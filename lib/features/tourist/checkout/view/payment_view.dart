@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:triply/core/theme/app_colors.dart';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -557,7 +558,7 @@ class PaymentViewState extends State<PaymentView> {
       body: _loading
           ? Center(
               child: CircularProgressIndicator(
-                color: style?.circleProgressColor ?? Colors.blue,
+                color: style?.circleProgressColor ?? AppColors.actionPrimary,
               ),
             )
           : _buildOptions(),
@@ -595,12 +596,12 @@ class PaymentViewState extends State<PaymentView> {
                     controller: _walletNumber,
                     keyboardType: TextInputType.number,
                     maxLength: 11,
-                    cursorColor: style?.primaryColor ?? Colors.blue,
+                    cursorColor: style?.primaryColor ?? AppColors.actionPrimary,
                     decoration: InputDecoration(
                       counterText: '',
                       prefixIcon: Icon(
                         Icons.wallet,
-                        color: style?.primaryColor ?? Colors.blue,
+                        color: style?.primaryColor ?? AppColors.actionPrimary,
                       ),
                       hintText: 'Enter your mobile wallet number',
                       hintStyle: style?.textStyle,
@@ -622,8 +623,8 @@ class PaymentViewState extends State<PaymentView> {
   }) {
     final style = paymentData.style;
     final color = selected
-        ? style?.primaryColor ?? Colors.blue
-        : style?.unselectedColor ?? Colors.grey;
+        ? style?.primaryColor ?? AppColors.actionPrimary
+        : style?.unselectedColor ?? AppColors.textDisabled;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -647,7 +648,7 @@ class PaymentViewState extends State<PaymentView> {
     return OutlineInputBorder(
       borderRadius: const BorderRadius.all(Radius.circular(16)),
       borderSide: BorderSide(
-        color: paymentData.style?.primaryColor ?? Colors.blue,
+        color: paymentData.style?.primaryColor ?? AppColors.actionPrimary,
         width: 2,
       ),
     );
@@ -670,8 +671,8 @@ class PaymentViewState extends State<PaymentView> {
     return ElevatedButton.styleFrom(
       padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      backgroundColor: Colors.blue,
-      foregroundColor: Colors.white,
+      backgroundColor: AppColors.actionPrimary,
+      foregroundColor: AppColors.textPrimary,
     );
   }
 }

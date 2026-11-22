@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 import '../../../../core/widgets/app_shimmer.dart';
 
@@ -69,7 +70,7 @@ class _CheckedInCardSkeleton extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBF6EC),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(14),
       ),
       child: AppShimmer(

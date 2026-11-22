@@ -294,7 +294,7 @@ class _CreateTripViewState extends State<_CreateTripView> {
                   CircleBackButton(
                     icon: Icons.chevron_left,
                     iconColor: AppColors.titleDark,
-                    backgroundColor: const Color(0xFFF6F1E7),
+                    backgroundColor: AppColors.surfaceElevated,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
@@ -316,7 +316,7 @@ class _CreateTripViewState extends State<_CreateTripView> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEAF3F4),
+                  color: AppColors.surfaceSelected,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(

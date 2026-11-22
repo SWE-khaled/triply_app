@@ -26,18 +26,18 @@ class AppHeader extends StatelessWidget {
           icon: Icons.chevron_left,
           onTap: onBack,
           backgroundColor: AppColors.chipGrey,
-          iconColor: Colors.black,
+          iconColor: AppColors.iconSecondary,
           iconSize: 24,
         ),
         Expanded(
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 20,
               letterSpacing: 0,
-              color: Color(0xFF17343B),
+              color: AppColors.textPrimary,
             ),
           ),
         ),

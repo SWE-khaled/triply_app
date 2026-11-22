@@ -57,7 +57,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   Future<void> _showPhotoActions() async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -71,19 +71,19 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF83969A),
+                  color: AppColors.textSecondary,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(height: 18),
-              const Align(
+               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Change profile photo',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF263C42),
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -115,10 +115,10 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     });
                     Navigator.pop(sheetContext);
                   },
-                  child: const Text(
+                  child:  Text(
                     'Remove current photo',
                     style: TextStyle(
-                      color: Color(0xFFC33B25),
+                      color: AppColors.statusError,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -189,9 +189,9 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceDefault,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surfaceDefault,
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -217,14 +217,14 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFE2E8E9)),
+                        border: Border.all(color: AppColors.borderSubtle),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
                         children: [
                           CircleAvatar(
                             radius: 21,
-                            backgroundColor: const Color(0xFFE7F2F0),
+                            backgroundColor: AppColors.surfaceSelected,
                             backgroundImage: _pickedImage != null
                                 ? FileImage(File(_pickedImage!.path))
                                 : null,
@@ -253,7 +253,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                                   location.isEmpty
                                       ? 'Add your location'
                                       : location,
-                                  style: const TextStyle(
+                                  style:  TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textGrey,
                                   ),
@@ -263,9 +263,9 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                           ),
                           IconButton(
                             onPressed: isLoading ? null : _showPhotoActions,
-                            icon: const Icon(
+                            icon:  Icon(
                               Icons.image_outlined,
-                              color: Color(0xFF0D5865),
+                              color: AppColors.actionPrimary,
                             ),
                           ),
                         ],
@@ -285,7 +285,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 7),
-                    const Text(
+                     Text(
                       'Keep your name and home location up to date.',
                       style: TextStyle(fontSize: 13, color: AppColors.textGrey),
                     ),
@@ -307,7 +307,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       hint: 'Tell other travelers a little about yourself...',
                     ),
                     const SizedBox(height: 18),
-                    const Text(
+                     Text(
                       'Your name, photo and bio appear on your profile.',
                       style: TextStyle(
                         fontSize: 11,
@@ -322,12 +322,12 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       child: FilledButton(
                         onPressed: isLoading ? null : _save,
                         child: isLoading
-                            ? const SizedBox(
+                            ?  SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                 ),
                               )
                             : const Text('Save changes'),
@@ -376,11 +376,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
           contentPadding: const EdgeInsets.all(12),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Color(0xFF9AAEB1)),
+            borderSide:  BorderSide(color: AppColors.borderDefault),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Color(0xFF9AAEB1)),
+            borderSide:  BorderSide(color: AppColors.borderDefault),
           ),
         ),
       ),

@@ -41,13 +41,13 @@ class BookingStepper extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: done
-              ? const Icon(Icons.check, size: 14, color: Colors.white)
+              ?  Icon(Icons.check, size: 14, color: AppColors.textPrimary)
               : Text(
                   '${index + 1}',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: active ? Colors.white : AppColors.subtitle,
+                    color: active ? AppColors.textPrimary : AppColors.subtitle,
                   ),
                 ),
         ),
@@ -111,7 +111,7 @@ class SelectableChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.title,
+            color: selected ? AppColors.textPrimary : AppColors.title,
           ),
         ),
       ),
@@ -151,7 +151,7 @@ class MeetingPointTile extends StatelessWidget {
             Icon(
               Icons.location_on,
               size: 16,
-              color: selected ? const Color(0xFFF5C445) : AppColors.subtitle,
+              color: selected ? AppColors.statusWarning : AppColors.subtitle,
             ),
             const SizedBox(width: 8),
             Text(
@@ -159,7 +159,7 @@ class MeetingPointTile extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: selected ? Colors.white : AppColors.title,
+                color: selected ? AppColors.textPrimary : AppColors.title,
               ),
             ),
           ],
@@ -195,7 +195,7 @@ class SummaryRow extends StatelessWidget {
             child: Text(
               label,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+              style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
             ),
           ),
           const Spacer(),

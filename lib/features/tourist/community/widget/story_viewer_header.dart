@@ -41,25 +41,25 @@ class StoryViewerHeader extends StatelessWidget {
           backgroundColor: AppColors.chipGrey,
           foregroundImage: avatar,
           onForegroundImageError: avatar == null ? null : (_, _) {},
-          child: const Icon(Icons.person, size: 18, color: AppColors.textGrey),
+          child:  Icon(Icons.person, size: 18, color: AppColors.textGrey),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             userName,
-            style: const TextStyle(
-              color: Colors.white,
+            style:  TextStyle(
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
         if (isMine)
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.white),
+            icon:  Icon(Icons.delete_outline, color: AppColors.textPrimary),
             onPressed: onDelete,
           ),
         IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon:  Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: onClose,
         ),
       ],

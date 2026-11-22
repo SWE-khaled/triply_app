@@ -87,9 +87,9 @@ class _TripsBody extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.adminDanger,
             ),
-            child: const Text(
+            child:  Text(
               'Confirm Reject',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.textPrimary),
             ),
           ),
         ],
@@ -147,7 +147,7 @@ class _TripsBody extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const Divider(color: AppColors.adminDivider, height: 1),
+                     Divider(color: AppColors.adminDivider, height: 1),
                   ],
                 );
 
@@ -231,7 +231,7 @@ class _TripRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(color: AppColors.adminDivider, height: 1),
+         Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(

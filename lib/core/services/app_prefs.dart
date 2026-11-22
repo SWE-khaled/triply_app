@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Small persistent memory for the launch / onboarding flow.
@@ -22,6 +22,7 @@ class AppPrefs {
   static const String _guideOnboardingKey = 'onboarding_seen_guide';
   static const String _lastRoleKey = 'last_role';
   static const String _guideVerifiedKey = 'guide_verified';
+  static const String _themeModeKey = 'theme_mode';
 
   SharedPreferences? _cached;
   bool _unavailableLogged = false;
@@ -99,6 +100,35 @@ class AppPrefs {
       await prefs?.setBool(_guideVerifiedKey, value);
     } catch (error) {
       debugPrint('AppPrefs.setGuideVerified failed — $error');
+    }
+  }
+
+  /// The theme choice made by the user, or null to follow the system setting.
+  Future<ThemeMode?> themeMode() async {
+    final prefs = await _prefs;
+    try {
+      switch (prefs?.getString(_themeModeKey)) {
+        case 'light':
+          return ThemeMode.light;
+        case 'dark':
+          return ThemeMode.dark;
+        case 'system':
+          return ThemeMode.system;
+        default:
+          return null;
+      }
+    } catch (error) {
+      debugPrint('AppPrefs.themeMode failed — $error');
+      return null;
+    }
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    final prefs = await _prefs;
+    try {
+      await prefs?.setString(_themeModeKey, mode.name);
+    } catch (error) {
+      debugPrint('AppPrefs.setThemeMode failed — $error');
     }
   }
 

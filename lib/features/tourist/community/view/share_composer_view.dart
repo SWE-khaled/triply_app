@@ -136,7 +136,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
         : postImages.isNotEmpty || trimmedText.isNotEmpty;
     if (!hasContent) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+         SnackBar(
           content: Center(child: Text('Select at least one image.')),
           backgroundColor: AppColors.primaryTeal,
         ),
@@ -161,7 +161,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     final shareLabel = isStory ? 'Share Story' : 'Share Post';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),

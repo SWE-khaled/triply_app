@@ -23,8 +23,8 @@ class DetailsHeader extends StatelessWidget {
             imageUrl,
             fit: BoxFit.cover,
             errorBuilder: (_, _, _) => Container(
-              color: const Color(0xFFE6ECEF),
-              child: const Icon(
+              color: AppColors.borderSubtle,
+              child:  Icon(
                 Icons.image,
                 color: AppColors.subtitle,
                 size: 40,

@@ -21,7 +21,7 @@ class TripCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.cardBorder),
       ),
@@ -63,14 +63,14 @@ class TripCard extends StatelessWidget {
                         onTap: onChat,
                         child: Container(
                           padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
+                          decoration:  BoxDecoration(
                             color: AppColors.chipGrey,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child:  Icon(
                             Icons.chat_bubble_outline,
                             size: 14,
-                            color: Color(0xFF526B72),
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
@@ -79,7 +79,7 @@ class TripCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(
+                       Icon(
                         Icons.location_on,
                         size: 13,
                         color: AppColors.accentOrange,
@@ -87,7 +87,7 @@ class TripCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         trip.dateTime,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
                           letterSpacing: 0,
@@ -100,7 +100,7 @@ class TripCard extends StatelessWidget {
                     children: [
                       Text(
                         'Guide: ',
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontWeight: FontWeight.w400,
                           fontSize: 12,
                           letterSpacing: 0,
@@ -109,7 +109,7 @@ class TripCard extends StatelessWidget {
                       ),
                       Text(
                         trip.guideName,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
                           letterSpacing: 0,
@@ -121,7 +121,7 @@ class TripCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(
+                       Icon(
                         Icons.people,
                         size: 14,
                         color: AppColors.textGrey,
@@ -129,7 +129,7 @@ class TripCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '${trip.maxPeople}\nPeople',
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 11,
                           letterSpacing: 0,
@@ -139,7 +139,7 @@ class TripCard extends StatelessWidget {
                       const SizedBox(width: 7),
                       Text(
                         '${trip.currency}\n${trip.price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},')}',
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                           letterSpacing: 0,
@@ -151,7 +151,7 @@ class TripCard extends StatelessWidget {
                         onPressed: onViewDetails,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accentOrange,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.textPrimary,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
                             vertical: 8,

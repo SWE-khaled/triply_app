@@ -18,12 +18,12 @@ class ProfileHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 33, 16, 48),
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         //  image: DecorationImage(image: NetworkImage("https://hips.hearstapps.com/hmg-prod/images/horse-replace-002-64945a222f108.jpg?crop=0.670xw:1.00xh;0.114xw,0&resize=640:*"),fit:BoxFit.cover),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color.fromARGB(255, 39, 126, 121), AppColors.guidesName],
+          colors: [AppColors.actionSecondary, AppColors.guidesName],
         ),
       ),
       child: Column(
@@ -32,24 +32,24 @@ class ProfileHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+               Text(
                 'My profile',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
               Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white24,
+                decoration: BoxDecoration(
+                  color: AppColors.textPrimary.withValues(alpha: 0.24),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
                   onPressed: onEdit,
-                  icon: const Icon(
+                  icon:  Icon(
                     Icons.edit_outlined,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     size: 20,
                   ),
                 ),
@@ -62,7 +62,7 @@ class ProfileHeader extends StatelessWidget {
             height: 110,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
+              border: Border.all(color: AppColors.borderStrong, width: 3),
               image: photoUrl != null && photoUrl!.isNotEmpty
                   ? DecorationImage(
                       image: NetworkImage(photoUrl!),
@@ -74,10 +74,10 @@ class ProfileHeader extends StatelessWidget {
                 ? Center(
                     child: Text(
                       name.isNotEmpty ? name[0].toUpperCase() : '?',
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   )
@@ -86,10 +86,10 @@ class ProfileHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             name,
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ],

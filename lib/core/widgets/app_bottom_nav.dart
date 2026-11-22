@@ -43,7 +43,7 @@ class AppBottomNav extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surfaceDefault,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(color: AppColors.cardBorder, width: 1),
           ),

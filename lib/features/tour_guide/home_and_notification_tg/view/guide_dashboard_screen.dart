@@ -26,7 +26,7 @@ import 'guide_notifications_screen.dart';
 
 /// Cream tint from Figma (verification banner). Local const only — the
 /// global theme in `core/theme/` is left untouched.
-const Color _cream = Color(0xFFFAF5EA);
+Color get _cream => AppColors.surfaceElevated;
 
 /// Tour-guide home: header, verification banner, stat grid, new bookings.
 class GuideDashboardScreen extends StatelessWidget {
@@ -56,16 +56,16 @@ class _UnreadBadge extends StatelessWidget {
       height: 16,
       padding: const EdgeInsets.symmetric(horizontal: 4),
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         color: AppColors.accentOrange,
         shape: BoxShape.circle,
       ),
       child: Text(
         count > 9 ? '9+' : '$count',
-        style: const TextStyle(
+        style:  TextStyle(
           fontSize: 9,
           fontWeight: FontWeight.w700,
-          color: Colors.white,
+          color: AppColors.textPrimary,
         ),
       ),
     );
@@ -155,7 +155,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
         ? firebaseName
         : (_firestoreName.isNotEmpty ? _firestoreName : 'Guide');
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: Column(
           children: [
@@ -246,7 +246,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           const SizedBox(height: 20),
         ] else
           const SizedBox(height: 4),
-        const Text(
+         Text(
           'Dashboard',
           style: TextStyle(
             fontSize: 28,
@@ -259,7 +259,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           'Welcome back, $guideName',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
         ),
         const SizedBox(height: 16),
         Row(
@@ -346,7 +346,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           ],
         ),
         const SizedBox(height: 20),
-        const Text(
+         Text(
           'New bookings',
           style: TextStyle(
             fontSize: 22,
@@ -408,7 +408,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                 CircleIconButton(
                   icon: Icons.notifications_none_outlined,
                   onTap: () => _openNotifications(context),
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.surfaceDefault,
                   iconColor: AppColors.title,
                   size: 50,
                   iconSize: 24,
@@ -459,8 +459,8 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
             Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration:  BoxDecoration(
+                color: AppColors.surfaceDefault,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -494,7 +494,7 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, size: 20, color: AppColors.title),
+             Icon(Icons.chevron_right, size: 20, color: AppColors.title),
           ],
         ),
       ),

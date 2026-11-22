@@ -15,12 +15,12 @@ class GuideTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
+        padding:  EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFEEEEEE)),
-          boxShadow: const [
+          border: Border.all(color: AppColors.borderSubtle),
+          boxShadow: [
             BoxShadow(
               color: AppColors.cardShadow,
               blurRadius: 8,
@@ -40,11 +40,11 @@ class GuideTile extends StatelessWidget {
                 errorBuilder: (_, _, _) => Container(
                   width: 56,
                   height: 56,
-                  color: const Color(0xFFF0F3F3),
+                  color: AppColors.surfaceElevated,
                   alignment: Alignment.center,
                   child: Text(
                     guide.name.isNotEmpty ? guide.name[0].toUpperCase() : '?',
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryTeal,
@@ -63,7 +63,7 @@ class GuideTile extends StatelessWidget {
                       Flexible(
                         child: Text(
                           guide.name,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: AppColors.guidesName,
@@ -71,7 +71,7 @@ class GuideTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                       Icon(
                         Icons.verified,
                         size: 16,
                         color: AppColors.primaryTeal,
@@ -82,7 +82,7 @@ class GuideTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                       Icon(Icons.star, size: 14, color: AppColors.statusWarning),
                       Text(
                         ' ${guide.rating} (${guide.reviewCount})',
                         style: AppTextStyles.bodyGrey,
@@ -92,7 +92,7 @@ class GuideTile extends StatelessWidget {
                         'From EGP ${guide.pricePerHour.toInt()}',
                         style: AppTextStyles.price,
                       ),
-                      const Text('/hr', style: AppTextStyles.bodyGrey),
+                       Text('/hr', style: AppTextStyles.bodyGrey),
                     ],
                   ),
                 ],

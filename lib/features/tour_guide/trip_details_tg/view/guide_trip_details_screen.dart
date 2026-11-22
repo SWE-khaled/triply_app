@@ -81,7 +81,7 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                 CircleBackButton(
                                   icon: Icons.chevron_left,
                                   iconColor: AppColors.titleDark,
-                                  backgroundColor: const Color(0xFFF6F1E7),
+                                  backgroundColor: AppColors.surfaceElevated,
                                   onTap: () => Navigator.of(context).pop(),
                                 ),
                                 const SizedBox(width: 10),
@@ -112,8 +112,8 @@ class GuideTripDetailsScreen extends StatelessWidget {
                         Container(
                           width: double.infinity,
                           transform: Matrix4.translationValues(0, -24, 0),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration:  BoxDecoration(
+                            color: AppColors.surfaceDefault,
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(24),
                             ),
@@ -158,7 +158,7 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w600,
                                                 color: selected
-                                                    ? Colors.white
+                                                    ? AppColors.textPrimary
                                                     : AppColors.subtitle,
                                               ),
                                             ),
@@ -177,7 +177,7 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFBF6EC),
+                                    color: AppColors.surfaceElevated,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
@@ -208,7 +208,7 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Icon(
+                                     Icon(
                                       Icons.location_on,
                                       size: 16,
                                       color: AppColors.starGold,
@@ -301,7 +301,7 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                           style: GoogleFonts.poppins(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.white,
+                                            color: AppColors.textPrimary,
                                           ),
                                         ),
                                       ),
@@ -332,10 +332,8 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                                 Container(
                                                   width: 44,
                                                   height: 44,
-                                                  color: const Color(
-                                                    0xFFE6ECEF,
-                                                  ),
-                                                  child: const Icon(
+                                                  color: AppColors.surfaceElevated,
+                                                  child:  Icon(
                                                     Icons.person,
                                                     color: AppColors.subtitle,
                                                   ),
@@ -358,7 +356,7 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                               ),
                                               Row(
                                                 children: [
-                                                  const Icon(
+                                                   Icon(
                                                     Icons.star,
                                                     size: 12,
                                                     color: AppColors.starGold,
@@ -398,7 +396,7 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                     ).push(AppRoutes.travelers(trip)),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.tabSelectedBg,
-                                      foregroundColor: Colors.white,
+                                      foregroundColor: AppColors.textPrimary,
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 15,
                                       ),

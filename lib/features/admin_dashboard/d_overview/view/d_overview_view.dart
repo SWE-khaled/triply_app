@@ -224,7 +224,7 @@ class _OverviewBody extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.adminPrimary,
           ),
-          child: const Text('Retry', style: TextStyle(color: Colors.white)),
+          child:  Text('Retry', style: TextStyle(color: AppColors.textPrimary)),
         ),
       ],
     );
@@ -277,7 +277,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.adminBorderLight),
       ),
@@ -297,7 +297,7 @@ class _StatCard extends StatelessWidget {
                 child: Center(
                   child: Text(
                     '$index',
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.adminStatBadgeText,
@@ -360,7 +360,7 @@ class _PendingActionsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.adminBorderLight),
       ),
@@ -445,7 +445,7 @@ class _GuideApplicationsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.adminBorderLight),
       ),
@@ -498,7 +498,7 @@ class _GuideApplicationsCard extends StatelessWidget {
             child: Column(
               children: [
                 _MiniGuideTableHeader(),
-                const Divider(color: AppColors.adminDivider, height: 1),
+                 Divider(color: AppColors.adminDivider, height: 1),
                 if (guides.isEmpty)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
@@ -579,7 +579,7 @@ class _MiniGuideRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(color: AppColors.adminDivider, height: 1),
+         Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(
@@ -724,7 +724,7 @@ class _SmallBtn extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: danger ? AppColors.adminDangerLight : Colors.white,
+        color: danger ? AppColors.adminDangerLight : AppColors.surfaceDefault,
         border: danger ? null : Border.all(color: AppColors.adminDivider),
         borderRadius: BorderRadius.circular(7),
       ),
@@ -754,10 +754,10 @@ class _SmallFilledBtn extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style:  TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Colors.white,
+          color: AppColors.textPrimary,
         ),
       ),
     );

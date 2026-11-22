@@ -23,7 +23,7 @@ class RejectedGuideTripCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -40,8 +40,8 @@ class RejectedGuideTripCard extends StatelessWidget {
                   trip.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) => Container(
-                    color: const Color(0xFFE6ECEF),
-                    child: const Icon(
+                    color: AppColors.borderSubtle,
+                    child:  Icon(
                       Icons.image,
                       color: AppColors.subtitle,
                       size: 36,
@@ -58,7 +58,7 @@ class RejectedGuideTripCard extends StatelessWidget {
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDE8E0),
+                    color: AppColors.surfaceDefault,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -139,7 +139,7 @@ class RejectedGuideTripCard extends StatelessWidget {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF6F1E7),
+                            color: AppColors.surfaceElevated,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Text(
@@ -170,7 +170,7 @@ class RejectedGuideTripCard extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),

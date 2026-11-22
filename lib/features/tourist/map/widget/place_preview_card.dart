@@ -26,9 +26,9 @@ class PlacePreviewCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8)],
+          boxShadow: [BoxShadow(color: AppColors.overlayScrim.withValues(alpha: 0.26), blurRadius: 8)],
         ),
         child: Row(
           children: [
@@ -66,7 +66,7 @@ class PlacePreviewCard extends StatelessWidget {
                     place.shortDescription,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 0,
@@ -81,16 +81,16 @@ class PlacePreviewCard extends StatelessWidget {
                         place.category == 'Historical'
                             ? 'Historical Landmark'
                             : place.category,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0,
-                          color: Color(0xFF4DA7A0),
+                          color: AppColors.actionSecondary,
                         ),
                       ),
                       GestureDetector(
                         onTap: onViewDetails,
-                        child: const Text(
+                        child:  Text(
                           'View Details',
                           style: TextStyle(
                             fontSize: 13,

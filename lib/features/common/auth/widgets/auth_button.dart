@@ -5,48 +5,49 @@ class AuthButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   const AuthButton({
     super.key,
     required this.label,
     required this.onPressed,
     this.isLoading = false,
-    this.backgroundColor = AppColors.signInDark,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final buttonColor = backgroundColor ?? AppColors.signInDark;
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: Colors.white,
+          backgroundColor: buttonColor,
+          foregroundColor: AppColors.textPrimary,
           // Keep the brand colour while the button is disabled for loading,
           // so it does not flash grey before the navigation finishes.
-          disabledBackgroundColor: backgroundColor,
-          disabledForegroundColor: Colors.white,
+          disabledBackgroundColor: buttonColor,
+          disabledForegroundColor: AppColors.textPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
           ),
           elevation: 0,
         ),
         child: isLoading
-            ? const SizedBox(
+            ?  SizedBox(
                 height: 22,
                 width: 22,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                   strokeWidth: 2.5,
                 ),
               )
             : Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
+                style:  TextStyle(
+                  color: AppColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),

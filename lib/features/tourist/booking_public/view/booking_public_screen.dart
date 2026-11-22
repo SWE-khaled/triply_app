@@ -231,7 +231,7 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                         : _confirm,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.tabSelectedBg,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.textPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28),

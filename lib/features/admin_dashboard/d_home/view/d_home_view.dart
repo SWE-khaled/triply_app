@@ -176,7 +176,7 @@ class _PageHeader extends StatelessWidget {
           if (!isDesktop) ...[
             Builder(
               builder: (ctx) => IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.adminPrimary),
+                icon:  Icon(Icons.menu, color: AppColors.adminPrimary),
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -211,11 +211,11 @@ class _PageHeader extends StatelessWidget {
               vertical: 8,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surfaceDefault,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
+                  color: AppColors.overlayScrim.withValues(alpha: 0.06),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -227,15 +227,15 @@ class _PageHeader extends StatelessWidget {
                 Container(
                   width: 30,
                   height: 30,
-                  decoration: const BoxDecoration(
+                  decoration:  BoxDecoration(
                     color: AppColors.adminPrimary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Center(
+                  child:  Center(
                     child: Text(
                       'A',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                       ),
@@ -358,7 +358,7 @@ class SearchFilterRow extends StatelessWidget {
       style: AppTextStyles.adminTableCell,
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon: const Icon(
+        prefixIcon:  Icon(
           Icons.search,
           size: 18,
           color: AppColors.adminTextMuted,

@@ -60,10 +60,10 @@ class _AdminLoginViewState extends State<AdminLoginView> {
   }
 
   BoxDecoration _gradient({BorderRadius? radius}) => BoxDecoration(
-    gradient: const LinearGradient(
+    gradient:  LinearGradient(
       begin: Alignment.topRight,
       end: Alignment.bottomLeft,
-      colors: [Color(0xFF0E5566), Color(0xFF020B0D)],
+      colors: [AppColors.actionPrimary, AppColors.backgroundPrimary],
     ),
     borderRadius: radius,
   );
@@ -111,7 +111,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
               child: _logo(),
             ),
           ),
-          const Align(
+           Align(
             alignment: Alignment.topCenter,
             child: Padding(
               padding: EdgeInsets.only(top: 158),
@@ -121,7 +121,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                   Text(
                     'Admin Console',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -129,7 +129,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                   SizedBox(height: 4),
                   Text(
                     'Manage Triply from one place',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
                   ),
                 ],
               ),
@@ -149,18 +149,18 @@ class _AdminLoginViewState extends State<AdminLoginView> {
           children: [
             _logo(scale: 1.8),
             const SizedBox(height: 32),
-            const Text(
+             Text(
               'Admin Console',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 26,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Manage Triply from one place',
-              style: TextStyle(color: Colors.white70, fontSize: 18),
+              style: TextStyle(color: AppColors.textPrimary.withValues(alpha: 0.7), fontSize: 18),
             ),
           ],
         ),
@@ -171,10 +171,10 @@ class _AdminLoginViewState extends State<AdminLoginView> {
   Widget _label(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style:  TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1F3238),
+        color: AppColors.textPrimary,
       ),
     );
   }
@@ -185,16 +185,16 @@ class _AdminLoginViewState extends State<AdminLoginView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+           Text(
             'Welcome back, Admin',
             style: TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1F3238),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+           Text(
             'Sign in with your admin identifier',
             style: TextStyle(color: AppColors.textGrey, fontSize: 16),
           ),
@@ -240,7 +240,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
               onPressed: () => Navigator.of(
                 context,
               ).pushNamedAndRemoveUntil(AppRoutes.roleSelection, (_) => false),
-              child: const Text(
+              child:  Text(
                 'Back to Triply',
                 style: TextStyle(color: AppColors.textGrey, fontSize: 14),
               ),
@@ -277,7 +277,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
           final cubit = context.read<AdminAuthCubit>();
 
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.surfaceDefault,
             body: LayoutBuilder(
               builder: (context, constraints) {
                 final isWeb = constraints.maxWidth >= _webBreakpoint;

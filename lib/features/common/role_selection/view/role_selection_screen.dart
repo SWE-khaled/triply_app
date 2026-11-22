@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/constants/app_asset.dart';
 import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/services/app_prefs.dart';
@@ -26,12 +27,7 @@ class RoleSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(
-        255,
-        234,
-        232,
-        226,
-      ), // sand/beige background matching Figma
+      backgroundColor: AppColors.backgroundSecondary, // sand/beige background matching Figma
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
@@ -44,7 +40,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.asset(
-                      'assets/images/edits/Frame 1.png',
+                      AppAsset.roleFrame1,
                       width: 27,
                       height: 44,
                       fit: BoxFit.cover,
@@ -52,7 +48,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Image.asset(
-                    'assets/images/edits/Frame 2.png',
+                    AppAsset.roleFrame2,
                     height: 28,
                     width: 64,
                     fit: BoxFit.contain,
@@ -60,7 +56,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 28),
-              const Text(
+               Text(
                 'How will you\nuse Triply?',
                 style: TextStyle(
                   fontSize: 34,
@@ -69,9 +65,9 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
+               Text(
                 'Choose your experience to get started.',
-                style: TextStyle(fontSize: 15, color: Color(0xFF7A9B9F)),
+                style: TextStyle(fontSize: 15, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 24),
               // Tourist Card
@@ -108,7 +104,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'Triply Admin Portal',
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                    style: TextStyle(color: AppColors.textDisabled, fontSize: 13),
                   ),
                 ),
               ),
@@ -171,7 +167,7 @@ class _RoleCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
+                    color: AppColors.overlayScrim.withValues(alpha: 0.15),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -194,12 +190,12 @@ class _RoleCard extends StatelessWidget {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.20),
+                      color: AppColors.surfaceDefault.withValues(alpha: 0.20),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child:  Icon(
                       Icons.chevron_right,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       size: 22,
                     ),
                   ),
@@ -214,8 +210,8 @@ class _RoleCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style:  TextStyle(
+                            color: AppColors.textPrimary,
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                           ),
@@ -223,8 +219,8 @@ class _RoleCard extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           description,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style:  TextStyle(
+                            color: AppColors.textPrimary,
                             fontSize: 13,
                             height: 1.4,
                           ),
@@ -232,8 +228,8 @@ class _RoleCard extends StatelessWidget {
                         const SizedBox(height: 12),
                         Text(
                           buttonText,
-                          style: const TextStyle(
-                            color: Color(0xFFE6A15C),
+                          style:  TextStyle(
+                            color: AppColors.statusWarning,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),

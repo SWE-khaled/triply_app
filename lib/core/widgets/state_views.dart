@@ -18,7 +18,7 @@ class AppLoadingView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CircularProgressIndicator(
+          CircularProgressIndicator(
             color: AppColors.priceTeal,
             strokeWidth: 2.5,
           ),
@@ -53,11 +53,7 @@ class AppErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.cloud_off_outlined,
-              size: 40,
-              color: AppColors.subtitle,
-            ),
+            Icon(Icons.cloud_off_outlined, size: 40, color: AppColors.subtitle),
             const SizedBox(height: 12),
             Text(
               message,
@@ -87,7 +83,7 @@ class AppErrorView extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),

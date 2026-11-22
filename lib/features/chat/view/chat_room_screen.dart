@@ -211,7 +211,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
     final action = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -222,7 +222,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
             const SizedBox(height: 8),
             ListTile(
               key: const Key('chat-action-edit'),
-              leading: const Icon(
+              leading:  Icon(
                 Icons.edit_outlined,
                 color: AppColors.primary,
               ),
@@ -231,11 +231,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
             ),
             ListTile(
               key: const Key('chat-action-delete'),
-              leading: const Icon(
+              leading:  Icon(
                 Icons.delete_outline,
                 color: AppColors.accentOrange,
               ),
-              title: const Text(
+              title:  Text(
                 'Delete message',
                 style: TextStyle(color: AppColors.accentOrange),
               ),
@@ -292,7 +292,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
           TextButton(
             key: const Key('chat-delete-confirm'),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
+            child:  Text(
               'Delete',
               style: TextStyle(color: AppColors.accentOrange),
             ),
@@ -358,8 +358,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     final typing = state != null && _cubit.isOtherTyping;
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 8, 16, 10),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration:  BoxDecoration(
+        color: AppColors.surfaceDefault,
         border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
       ),
       child: Row(
@@ -377,7 +377,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: AppColors.title,
@@ -407,9 +407,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     return Container(
       key: const Key('chat-read-only-banner'),
       width: double.infinity,
-      color: const Color(0xFFFAF5EC),
+      color: AppColors.surfaceElevated,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-      child: const Row(
+      child:  Row(
         children: [
           Icon(Icons.lock_outline, size: 17, color: AppColors.primary),
           SizedBox(width: 8),
@@ -430,7 +430,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
 
   Widget _body(ChatRoomState state) {
     return switch (state) {
-      ChatRoomInitial() || ChatRoomLoading() => const Center(
+      ChatRoomInitial() || ChatRoomLoading() =>  Center(
         child: CircularProgressIndicator(
           color: AppColors.priceTeal,
           strokeWidth: 2.5,
@@ -448,7 +448,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+             Icon(
               Icons.cloud_off_outlined,
               size: 42,
               color: AppColors.subtitle,
@@ -457,7 +457,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 13,
                 height: 1.5,
                 color: AppColors.subtitle,
@@ -495,11 +495,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                     Container(
                       width: 82,
                       height: 82,
-                      decoration: const BoxDecoration(
+                      decoration:  BoxDecoration(
                         color: AppColors.primaryLight,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child:  Icon(
                         Icons.waving_hand_outlined,
                         size: 34,
                         color: AppColors.primary,
@@ -509,7 +509,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                     Text(
                       'Start the conversation with ${_otherName(state)}.',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 14,
                         height: 1.5,
                         color: AppColors.subtitle,
@@ -546,7 +546,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
         ),
         if (_cubit.isOtherTyping) _typingRow(),
         if (state.isLoadingMore)
-          const Padding(
+           Padding(
             padding: EdgeInsets.only(bottom: 6),
             child: SizedBox(
               width: 18,
@@ -588,13 +588,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
         margin: const EdgeInsets.symmetric(vertical: 10),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.cardBorder),
         ),
         child: Text(
           chatDayLabel(at),
-          style: const TextStyle(
+          style:  TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
             color: AppColors.subtitle,
@@ -622,7 +622,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
           margin: const EdgeInsets.symmetric(vertical: 3),
           padding: const EdgeInsets.fromLTRB(13, 9, 13, 7),
           decoration: BoxDecoration(
-            color: mine ? AppColors.primary : Colors.white,
+            color: mine ? AppColors.primary : AppColors.surfaceDefault,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(18),
               topRight: const Radius.circular(18),
@@ -640,7 +640,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.4,
-                  color: mine ? Colors.white : AppColors.textDark,
+                  color: mine ? AppColors.textPrimary : AppColors.textDark,
                 ),
               ),
               const SizedBox(height: 4),
@@ -652,7 +652,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                       chatClockLabel(createdAt),
                       style: TextStyle(
                         fontSize: 10,
-                        color: mine ? Colors.white70 : AppColors.guideLabel,
+                        color: mine ? AppColors.textPrimary.withValues(alpha: 0.7) : AppColors.guideLabel,
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -663,7 +663,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                       style: TextStyle(
                         fontSize: 10,
                         fontStyle: FontStyle.italic,
-                        color: mine ? Colors.white70 : AppColors.guideLabel,
+                        color: mine ? AppColors.textPrimary.withValues(alpha: 0.7) : AppColors.guideLabel,
                       ),
                     ),
                     const SizedBox(width: 5),
@@ -672,7 +672,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                     Icon(
                       seen ? Icons.done_all : Icons.done,
                       size: 13,
-                      color: seen ? Colors.white : Colors.white70,
+                      color: seen ? AppColors.textPrimary : AppColors.textPrimary.withValues(alpha: 0.7),
                     ),
                     const SizedBox(width: 3),
                     Text(
@@ -680,7 +680,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: seen ? FontWeight.w600 : FontWeight.w400,
-                        color: seen ? Colors.white : Colors.white70,
+                        color: seen ? AppColors.textPrimary : AppColors.textPrimary.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -701,7 +701,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
         margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.cardBorder),
         ),
@@ -723,19 +723,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
     return Container(
       key: const Key('chat-action-error'),
       width: double.infinity,
-      color: const Color(0xFFFDECEC),
+      color: AppColors.surfaceDefault,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
       child: Text(
         error,
-        style: const TextStyle(fontSize: 12, color: AppColors.accentOrange),
+        style:  TextStyle(fontSize: 12, color: AppColors.accentOrange),
       ),
     );
   }
 
   Widget _composerBar(ChatRoomSuccess state) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration:  BoxDecoration(
+        color: AppColors.surfaceDefault,
         border: Border(top: BorderSide(color: AppColors.cardBorder)),
       ),
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -754,7 +754,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
               onChanged: (_) => unawaited(_cubit.notifyTyping()),
               decoration: InputDecoration(
                 hintText: 'Type a message...',
-                hintStyle: const TextStyle(fontSize: 13, color: AppColors.hint),
+                hintStyle:  TextStyle(fontSize: 13, color: AppColors.hint),
                 filled: true,
                 fillColor: AppColors.searchBg,
                 contentPadding: const EdgeInsets.symmetric(
@@ -787,18 +787,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen>
                   shape: const CircleBorder(),
                 ),
                 child: state.isSending
-                    ? const SizedBox(
+                    ?  SizedBox(
                         width: 17,
                         height: 17,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                       )
                     : Icon(
                         Icons.send_rounded,
                         size: 20,
-                        color: canSend ? Colors.white : AppColors.subtitle,
+                        color: canSend ? AppColors.textPrimary : AppColors.subtitle,
                       ),
               );
             },
@@ -923,7 +923,7 @@ class _ReportDialogState extends State<_ReportDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+               Text(
                 'Why are you reporting this message?',
                 style: TextStyle(fontSize: 13, color: AppColors.subtitle),
               ),

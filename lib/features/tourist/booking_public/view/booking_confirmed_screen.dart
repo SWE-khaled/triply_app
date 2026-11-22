@@ -59,7 +59,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                 height: 80,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4DA7A0).withValues(alpha: 0.15),
+                  color: AppColors.actionSecondary.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: SvgPicture.asset(AppAsset.iconConfirm),
@@ -104,11 +104,11 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surfaceDefault,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.09),
+                      color: AppColors.overlayScrim.withValues(alpha: 0.09),
                       blurRadius: 16,
                       offset: const Offset(0, 4),
                     ),
@@ -128,8 +128,8 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                             errorBuilder: (_, _, _) => Container(
                               width: 56,
                               height: 56,
-                              color: const Color(0xFFE6ECEF),
-                              child: const Icon(
+                              color: AppColors.borderSubtle,
+                              child:  Icon(
                                 Icons.image,
                                 color: AppColors.subtitle,
                               ),
@@ -204,7 +204,7 @@ class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
                   onPressed: () => AppRoutes.goToMyTrips(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.tabSelectedBg,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.textPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),

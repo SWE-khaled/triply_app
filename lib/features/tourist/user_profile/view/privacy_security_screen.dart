@@ -18,7 +18,7 @@ class PrivacySecurityScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+               Row(
                 children: [
                   CircleBackButton(),
                   SizedBox(width: 12),
@@ -28,7 +28,7 @@ class PrivacySecurityScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: .1),
+                  color: AppColors.textDisabled.withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -47,7 +47,7 @@ class PrivacySecurityScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: .1),
+                  color: AppColors.textDisabled.withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Column(

@@ -26,10 +26,10 @@ class SearchInput extends StatelessWidget {
           onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontSize: 14, color: AppColors.textGrey),
-            prefixIcon: const Icon(Icons.search, color: AppColors.textDark),
+            hintStyle:  TextStyle(fontSize: 14, color: AppColors.textGrey),
+            prefixIcon:  Icon(Icons.search, color: AppColors.textDark),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: AppColors.surfaceDefault,
             contentPadding: const EdgeInsets.symmetric(vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),

@@ -15,7 +15,7 @@ import 'booking_details_screen.dart';
 
 /// Cream tint from Figma (back button). Local const only — the global
 /// theme in `core/theme/` is left untouched.
-const Color _cream = Color(0xFFFAF5EA);
+Color get _cream => AppColors.surfaceElevated;
 
 /// Tour-guide notifications list.
 class GuideNotificationsScreen extends StatelessWidget {
@@ -60,7 +60,7 @@ class _GuideNotificationsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,12 +69,12 @@ class _GuideNotificationsView extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
-                  const CircleBackButton(
+                   CircleBackButton(
                     backgroundColor: _cream,
                     iconColor: AppColors.title,
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                   Expanded(
                     child: Text(
                       'Notifications',
                       maxLines: 1,
@@ -139,7 +139,7 @@ class _GuideNotificationsView extends StatelessWidget {
                                         24,
                                       ),
                                       itemCount: items.length,
-                                      separatorBuilder: (_, _) => const Divider(
+                                      separatorBuilder: (_, _) =>  Divider(
                                         height: 1,
                                         color: AppColors.cardBorder,
                                       ),
@@ -188,17 +188,17 @@ class _SourceWarning extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDECEC),
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 16, color: Colors.redAccent),
+           Icon(Icons.info_outline, size: 16, color: AppColors.statusError),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+              style:  TextStyle(fontSize: 11, color: AppColors.statusError),
             ),
           ),
         ],
@@ -212,7 +212,7 @@ class _EmptyNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return  Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

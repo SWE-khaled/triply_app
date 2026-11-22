@@ -52,9 +52,9 @@ class _UserPostsBody extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.adminDanger,
               ),
-              child: const Text(
+              child:  Text(
                 'Delete',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.textPrimary),
               ),
             ),
           ],
@@ -125,7 +125,7 @@ class _UserPostsBody extends StatelessWidget {
     return Container(
       height: height,
       color: AppColors.adminStatBadgeBg,
-      child: const Center(
+      child:  Center(
         child: Icon(
           Icons.image_outlined,
           size: 48,
@@ -251,12 +251,12 @@ class _PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         border: Border.all(color: AppColors.adminBorderLight),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: AppColors.overlayScrim.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -299,7 +299,7 @@ class _PostCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.surfaceDefault,
                             border: Border.all(color: AppColors.adminDivider),
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -434,7 +434,7 @@ class _ViewUserPostDialog extends StatelessWidget {
               _buildDetailRow('Likes:', '${post.likesCount}'),
               _buildDetailRow('Comments:', '${post.commentsCount}'),
               const SizedBox(height: 6),
-              const Divider(color: AppColors.adminDivider),
+               Divider(color: AppColors.adminDivider),
               const SizedBox(height: 10),
 
               // Content text
@@ -506,9 +506,9 @@ class _ViewUserPostDialog extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.adminDanger,
                               ),
-                              child: const Text(
+                              child:  Text(
                                 'Delete',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: AppColors.textPrimary),
                               ),
                             ),
                           ],
@@ -521,14 +521,14 @@ class _ViewUserPostDialog extends StatelessWidget {
                         Navigator.of(context).pop(true);
                       }
                     },
-                    icon: const Icon(
+                    icon:  Icon(
                       Icons.delete_outline,
                       size: 16,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
-                    label: const Text(
+                    label:  Text(
                       'Delete Post',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.textPrimary),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.adminDanger,

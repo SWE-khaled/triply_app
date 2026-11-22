@@ -31,9 +31,9 @@ class MapFilterChips extends StatelessWidget {
             selected: isSelected,
             onSelected: (_) => onFilterSelected(filter),
             selectedColor: AppColors.primaryTeal,
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.surfaceDefault,
             labelStyle: TextStyle(
-              color: isSelected ? Colors.white : AppColors.textGrey,
+              color: isSelected ? AppColors.textPrimary : AppColors.textGrey,
               fontWeight: FontWeight.w600,
               fontSize: 13,
             ),

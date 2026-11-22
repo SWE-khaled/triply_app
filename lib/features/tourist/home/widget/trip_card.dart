@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../model/trip.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -29,7 +30,7 @@ class TripCard extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.6)],
+              colors: [Colors.transparent, AppColors.overlayScrim.withValues(alpha: 0.6)],
             ),
           ),
           child: Column(

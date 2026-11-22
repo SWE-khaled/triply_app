@@ -111,11 +111,11 @@ class _SignInScreenState extends State<SignInScreen> {
     return Container(
       height: 248,
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFF0E5566), Color(0xFF020B0D)],
+          colors: [AppColors.actionPrimary, AppColors.backgroundPrimary],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(48),
@@ -151,13 +151,13 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
             ),
           ),
-          const Align(
+           Align(
             alignment: Alignment.topCenter,
             child: Padding(
               padding: EdgeInsets.only(top: 168),
               child: Text(
                 'Discover Egypt with expert guides',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
               ),
             ),
           ),
@@ -177,7 +177,7 @@ class _SignInScreenState extends State<SignInScreen> {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: AppColors.textGrey, width: 1.5),
+          side:  BorderSide(color: AppColors.textGrey, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -189,7 +189,7 @@ class _SignInScreenState extends State<SignInScreen> {
             const SizedBox(width: 10),
             Text(
               label,
-              style: const TextStyle(
+              style:  TextStyle(
                 color: AppColors.signInDark,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -207,7 +207,7 @@ class _SignInScreenState extends State<SignInScreen> {
     final isSubmitting = _isSubmitting || authCubit.isLoading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -221,16 +221,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                       Text(
                         'Welcome back',
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F3238),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                       Text(
                         'Sign in to continue your journey',
                         style: TextStyle(
                           color: AppColors.textGrey,
@@ -238,12 +238,12 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      const Text(
+                       Text(
                         'Email',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF1F3238),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -258,12 +258,12 @@ class _SignInScreenState extends State<SignInScreen> {
                             : null,
                       ),
                       const SizedBox(height: 22),
-                      const Text(
+                       Text(
                         'Password',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF1F3238),
+                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -289,7 +289,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           onPressed: () => Navigator.of(
                             context,
                           ).pushNamed(ForgotPasswordScreen.routeName),
-                          child: const Text(
+                          child:  Text(
                             'Forgot password?',
                             style: TextStyle(
                               color: AppColors.signInDark,
@@ -310,7 +310,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      const Center(
+                       Center(
                         child: Text(
                           'or continue with',
                           style: TextStyle(
@@ -350,7 +350,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         child: Wrap(
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            const Text(
+                             Text(
                               "Don't have an account? ",
                               style: TextStyle(
                                 color: AppColors.textGrey,
@@ -361,7 +361,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               onTap: () => Navigator.of(
                                 context,
                               ).pushNamed(CreateAccountScreen.routeName),
-                              child: const Text(
+                              child:  Text(
                                 'Sign up',
                                 style: TextStyle(
                                   color: AppColors.signInDark,
@@ -383,7 +383,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               onPressed: () => Navigator.of(
                                 context,
                               ).pushNamed(AppRoutes.guideLogin),
-                              child: const Text(
+                              child:  Text(
                                 'Are you a tour guide? Sign in',
                                 style: TextStyle(
                                   color: AppColors.signInDark,
@@ -396,7 +396,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               onPressed: () => Navigator.of(
                                 context,
                               ).pushNamed(AdminRoutes.login),
-                              child: const Text(
+                              child:  Text(
                                 'Admin portal',
                                 style: TextStyle(
                                   color: AppColors.textGrey,

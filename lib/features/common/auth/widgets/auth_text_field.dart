@@ -43,10 +43,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       validator: widget.validator,
-      style: const TextStyle(color: AppColors.textDark, fontSize: 15),
+      style:  TextStyle(color: AppColors.textDark, fontSize: 15),
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: const TextStyle(color: AppColors.textGrey),
+        hintStyle:  TextStyle(color: AppColors.textGrey),
         prefixIcon: Icon(widget.icon, color: AppColors.iconGrey),
         prefix: widget.prefix,
         suffixIcon: widget.isPassword
@@ -68,15 +68,15 @@ class _AuthTextFieldState extends State<AuthTextField> {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.fieldBorder),
+          borderSide:  BorderSide(color: AppColors.fieldBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.fieldBorder),
+          borderSide:  BorderSide(color: AppColors.fieldBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.signInDark, width: 1.5),
+          borderSide:  BorderSide(color: AppColors.signInDark, width: 1.5),
         ),
       ),
     );

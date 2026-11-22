@@ -16,7 +16,7 @@ Widget postImage(String path, bool isLocal, double height) {
       errorBuilder: (context, error, stackTrace) => Container(
         height: height,
         color: AppColors.chipGrey,
-        child: const Icon(Icons.broken_image, color: Colors.grey),
+        child:  Icon(Icons.broken_image, color: AppColors.textDisabled),
       ),
     );
   }
@@ -28,7 +28,7 @@ Widget postImage(String path, bool isLocal, double height) {
     errorBuilder: (context, error, stackTrace) => Container(
       height: height,
       color: AppColors.chipGrey,
-      child: const Icon(Icons.image, color: Colors.grey),
+      child:  Icon(Icons.image, color: AppColors.textDisabled),
     ),
   );
 }
@@ -91,12 +91,12 @@ class PostImages extends StatelessWidget {
                   children: [
                     postImage(rest[i], isLocal, double.infinity),
                     Container(
-                      color: Colors.black54,
+                      color: AppColors.overlayScrim.withValues(alpha: 0.54),
                       alignment: Alignment.center,
                       child: Text(
                         '+$overflow',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style:  TextStyle(
+                          color: AppColors.textPrimary,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                         ),

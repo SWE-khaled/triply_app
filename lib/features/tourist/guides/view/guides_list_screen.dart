@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/widgets/app_shimmer.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
@@ -38,7 +39,7 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: BlocProvider.value(
           value: _controller,
@@ -112,12 +113,12 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: Colors.black,
+                  color: AppColors.textPrimary,
                 ),
               ),
               Text(
                 '${_controller.totalCount} guides available',
-                style: TextStyle(fontSize: 12, color: Color(0xFF8A9EA3)),
+                style: TextStyle(fontSize: 12, color: AppColors.textTertiary),
               ),
             ],
           ),
@@ -135,10 +136,10 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
         onSubmitted: (_) {},
         decoration: InputDecoration(
           hintText: 'Search guides by name or specialty...',
-          hintStyle: TextStyle(fontSize: 13, color: Color(0xFFAAB8BC)),
-          prefixIcon: Icon(Icons.search, color: Color(0xFF8A9EA3), size: 20),
+          hintStyle: TextStyle(fontSize: 13, color: AppColors.textDisabled),
+          prefixIcon: Icon(Icons.search, color: AppColors.textTertiary, size: 20),
           filled: true,
-          fillColor: Color(0xFFF5F5F5),
+          fillColor: AppColors.surfaceDefault,
           contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -175,19 +176,19 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
                 ? Icon(
                     Icons.translate,
                     size: 15,
-                    color: selected ? Colors.white : Color(0xFF526B72),
+                    color: selected ? AppColors.textPrimary : AppColors.textSecondary,
                   )
                 : null,
             labelStyle: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: selected ? Colors.white : Color(0xFF526B72),
+              color: selected ? AppColors.textPrimary : AppColors.textSecondary,
             ),
-            backgroundColor: Color(0xFFF5F5F5),
-            selectedColor: Color(0xFF0E5261),
+            backgroundColor: AppColors.surfaceDefault,
+            selectedColor: AppColors.actionPrimary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
-              side: BorderSide(color: Color(0xFFF5F5F5)),
+              side: BorderSide(color: AppColors.surfaceDefault),
             ),
           );
         },
@@ -325,7 +326,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    return  Padding(
       padding: EdgeInsets.all(32),
       child: Center(
         child: Column(
@@ -338,14 +339,14 @@ class _EmptyState extends StatelessWidget {
             Text(
               'No guides found',
               style: TextStyle(
-                color: Color(0xFF0E5261),
+                color: AppColors.actionPrimary,
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               "Try a different keyword or filter",
-              style: TextStyle(color: Color(0xFF8A9EA3), fontSize: 13),
+              style: TextStyle(color: AppColors.textTertiary, fontSize: 13),
             ),
           ],
         ),

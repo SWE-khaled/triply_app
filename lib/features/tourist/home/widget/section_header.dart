@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class SectionHeader extends StatelessWidget {
@@ -15,11 +16,11 @@ class SectionHeader extends StatelessWidget {
         Text(title, style: AppTextStyles.sectionTitle),
         GestureDetector(
           onTap: onSeeAllTap,
-          child: const Row(
+          child:  Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('See all', style: AppTextStyles.seeAll),
-              Icon(Icons.chevron_right, size: 16, color: Color(0xFF0E5560)),
+              Icon(Icons.chevron_right, size: 16, color: AppColors.iconPrimary),
             ],
           ),
         ),

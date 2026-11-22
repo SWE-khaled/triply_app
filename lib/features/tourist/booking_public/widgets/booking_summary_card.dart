@@ -34,8 +34,8 @@ class BookingSummaryCard extends StatelessWidget {
                   details.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) => Container(
-                    color: const Color(0xFFE6ECEF),
-                    child: const Icon(
+                    color: AppColors.borderSubtle,
+                    child:  Icon(
                       Icons.image,
                       color: AppColors.subtitle,
                       size: 36,
@@ -51,7 +51,7 @@ class BookingSummaryCard extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.55),
+                        AppColors.overlayScrim.withValues(alpha: 0.55),
                       ],
                     ),
                   ),
@@ -66,7 +66,7 @@ class BookingSummaryCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     height: 1.25,
                   ),
                 ),
@@ -113,7 +113,7 @@ class BookingSummaryCard extends StatelessWidget {
       height: 44,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7F8),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(12),
       ),
       child: child,
@@ -167,7 +167,7 @@ class BookingSummaryCard extends StatelessWidget {
             AppAsset.iconPeople,
             width: 14,
             height: 14,
-            colorFilter: const ColorFilter.mode(
+            colorFilter:  ColorFilter.mode(
               AppColors.guidedTourText,
               BlendMode.srcIn,
             ),

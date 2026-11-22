@@ -15,7 +15,7 @@ class GuideNotificationsSkeleton extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 5,
       separatorBuilder: (_, _) =>
-          const Divider(height: 1, color: AppColors.cardBorder),
+           Divider(height: 1, color: AppColors.cardBorder),
       itemBuilder: (_, _) => const _NotificationRowSkeleton(),
     );
   }

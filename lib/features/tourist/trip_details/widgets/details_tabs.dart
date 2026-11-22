@@ -42,7 +42,7 @@ class DetailsTabs extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: selected ? Colors.white : AppColors.subtitle,
+                    color: selected ? AppColors.textPrimary : AppColors.subtitle,
                   ),
                 ),
               ),

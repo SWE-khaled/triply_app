@@ -95,7 +95,7 @@ class _EmergencyBody extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              const Text(
+               Text(
                 'Egypt emergency numbers. Calling opens the phone dialer.',
                 style: TextStyle(fontSize: 13, color: AppColors.textGrey),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:latlong2/latlong.dart' as latlng;
@@ -104,7 +105,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true, // map extends under the glass nav
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         bottom: false, // <-- let the map reach the bottom of the screen
         child: BlocBuilder<MapCubit, MapState>(
@@ -258,7 +259,7 @@ class _MapSkeleton extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
             borderRadius: BorderRadius.zero,
-            color: const Color(0xFFE7EDED),
+            color: AppColors.borderSubtle,
           ),
         ),
       ],

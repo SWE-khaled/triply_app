@@ -22,18 +22,18 @@ class CommunityBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+           Text(
             'Join 2,400+ travelers exploring Egypt',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Luxor · 6 hours · Private',
-            style: TextStyle(fontSize: 12, color: Colors.white70),
+            style: TextStyle(fontSize: 12, color: AppColors.textPrimary.withValues(alpha: 0.7)),
           ),
           const SizedBox(height: 12),
           Align(
@@ -47,7 +47,7 @@ class CommunityBanner extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accentOrange,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.textPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

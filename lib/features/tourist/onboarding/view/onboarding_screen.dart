@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/constants/app_asset.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../cubit/onboarding_preference_cubit.dart';
@@ -12,7 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreen extends State<OnboardingScreen> {
-  static const Color _primary = Color.fromARGB(255, 8, 64, 76);
+  static Color get _primary => AppColors.actionPrimary;
 
   final PageController _pageController = PageController();
   int _currentPage = 0;
@@ -24,19 +26,19 @@ class _OnboardingScreen extends State<OnboardingScreen> {
       'title': 'Discover Egypt Your Way',
       'subtitle':
           'Explore Egypt, discover amazing places, and create unforgettable memories along the way.',
-      'image': 'assets/images/choice_role/onboardingTourist1.jpg',
+      'image': AppAsset.onboardingTourist1,
     },
     {
       'title': 'Find & Book Experiences',
       'subtitle':
           'Discover unique trips, local guides, and experiences made for the way you want to travel.',
-      'image': 'assets/images/choice_role/onboardingTourist2.jpg',
+      'image': AppAsset.onboardingTourist2,
     },
     {
       'title': 'Enjoy Your Journey',
       'subtitle':
           'Manage your bookings, connect with guides, explore new places and enjoy every moment of your trip.',
-      'image': 'assets/images/choice_role/onboardingTourist3.jpg',
+      'image': AppAsset.onboardingTourist3,
     },
   ];
 
@@ -76,9 +78,9 @@ class _OnboardingScreen extends State<OnboardingScreen> {
       height: double.infinity,
       filterQuality: FilterQuality.high,
       errorBuilder: (context, error, stack) => Container(
-        color: const Color(0xFFEAE8E2),
+        color: AppColors.backgroundTertiary,
         alignment: Alignment.center,
-        child: const Icon(Icons.broken_image, color: _primary, size: 48),
+        child:  Icon(Icons.broken_image, color: _primary, size: 48),
       ),
     );
   }
@@ -94,7 +96,7 @@ class _OnboardingScreen extends State<OnboardingScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surfaceDefault,
         body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -127,7 +129,7 @@ class _OnboardingScreen extends State<OnboardingScreen> {
                   ),
                   TextButton(
                     onPressed: _goToSignIn,
-                    child: const Text(
+                    child:  Text(
                       'Skip',
                       style: TextStyle(
                         color: _primary,
@@ -160,7 +162,7 @@ class _OnboardingScreen extends State<OnboardingScreen> {
                         const SizedBox(height: 24),
                         Text(
                           'EXPLORE EGYPT · 0${index + 1} / 0${_slides.length}',
-                          style: const TextStyle(
+                          style:  TextStyle(
                             color: _primary,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -170,19 +172,19 @@ class _OnboardingScreen extends State<OnboardingScreen> {
                         const SizedBox(height: 12),
                         Text(
                           slide['title']!,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF1F2D33),
+                            color: AppColors.textPrimary,
                             height: 1.2,
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           slide['subtitle']!,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 15,
-                            color: Color(0xFF6B7478),
+                            color: AppColors.textSecondary,
                             height: 1.5,
                           ),
                         ),
@@ -207,7 +209,7 @@ class _OnboardingScreen extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? _primary
-                              : const Color(0xFFD5DADC),
+                              : AppColors.borderSubtle,
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -216,7 +218,7 @@ class _OnboardingScreen extends State<OnboardingScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.textPrimary,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 56,

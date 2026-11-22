@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
+import 'package:triply/core/theme/theme_cubit.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_shimmer.dart';
@@ -22,9 +24,9 @@ import '../widget/edit_profile_sheet.dart';
 import 'my_posts_screen.dart';
 import 'settings_screen.dart';
 
-const _ink = Color(0xFF263A40);
-const _teal = Color(0xFF0E5865);
-const _muted = Color(0xFF62777D);
+Color get _ink => AppColors.textPrimary;
+Color get _teal => AppColors.actionPrimary;
+Color get _muted => AppColors.textSecondary;
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -43,6 +45,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthCubit>().user;
+    final themeCubit = context.watch<ThemeCubit>();
     return BlocListener<ProfileDetailsCubit, ProfileDetailsState>(
       listener: (context, state) {
         if (state.errorMessage != null) _message(state.errorMessage!);
@@ -74,21 +77,21 @@ class _ProfileBodyState extends State<_ProfileBody> {
 
               return Scaffold(
                 extendBody: true,
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.surfaceDefault,
                 appBar: AppBar(
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.surfaceDefault,
                   elevation: 0,
                   leading: IconButton(
                     onPressed: () {
                       if (Navigator.canPop(context)) Navigator.pop(context);
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_back_ios_new,
                       size: 19,
                       color: _teal,
                     ),
                   ),
-                  title: const Text(
+                  title: Text(
                     'My profile',
                     style: TextStyle(fontWeight: FontWeight.w700, color: _ink),
                   ),
@@ -97,7 +100,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
                       tooltip: 'Edit profile',
                       onPressed: () =>
                           _edit(context, detailsState, name, photo),
-                      icon: const Icon(Icons.edit_outlined, color: _teal),
+                      icon: Icon(Icons.edit_outlined, color: _teal),
                     ),
                     IconButton(
                       tooltip: 'Settings',
@@ -110,7 +113,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
                           ),
                         ),
                       ),
-                      icon: const Icon(Icons.settings_outlined, color: _teal),
+                      icon: Icon(Icons.settings_outlined, color: _teal),
                     ),
                     const SizedBox(width: 4),
                   ],
@@ -144,7 +147,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
                                   children: [
                                     Text(
                                       name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                         color: _ink,
@@ -155,7 +158,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
                                       location.isEmpty
                                           ? 'Location not added'
                                           : location,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 13,
                                         color: _muted,
                                       ),
@@ -171,7 +174,31 @@ class _ProfileBodyState extends State<_ProfileBody> {
                             postCount: mine.length,
                           ),
                           const SizedBox(height: 18),
-                          const Text(
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceDefault,
+                              border: Border.all(color: AppColors.borderSubtle),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: SwitchListTile(
+                              secondary: Icon(
+                                Icons.dark_mode_outlined,
+                                color: AppColors.guidesName,
+                              ),
+                              title: Text(
+                                'Dark mode',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.guidesName,
+                                ),
+                              ),
+                              value: themeCubit.isDark,
+                              onChanged: (_) => themeCubit.toggle(),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
                             'Bio',
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
@@ -186,7 +213,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
                                 : detailsState.bio.isEmpty
                                 ? 'No bio added yet.'
                                 : detailsState.bio,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               height: 1.5,
                               color: _muted,
@@ -195,7 +222,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
                           const SizedBox(height: 18),
                           Row(
                             children: [
-                              const Expanded(
+                              Expanded(
                                 child: Text(
                                   'Published posts',
                                   style: TextStyle(
@@ -212,7 +239,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
                                     builder: (_) => const MyPostsScreen(),
                                   ),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   children: [
                                     Text(
                                       'View all',
@@ -307,7 +334,7 @@ class _ProfileBodyState extends State<_ProfileBody> {
   Widget _stats(Map<String, int> stats, {required int? postCount}) => Container(
     padding: const EdgeInsets.symmetric(vertical: 14),
     decoration: BoxDecoration(
-      color: const Color(0xFFFAF9F6),
+      color: AppColors.backgroundTertiary,
       borderRadius: BorderRadius.circular(16),
     ),
     child: Row(
@@ -323,17 +350,14 @@ class _ProfileBodyState extends State<_ProfileBody> {
               children: [
                 Text(
                   entry.$2 == null ? '—' : '${entry.$2}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: _ink,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  entry.$1,
-                  style: const TextStyle(fontSize: 10, color: _muted),
-                ),
+                Text(entry.$1, style: TextStyle(fontSize: 10, color: _muted)),
               ],
             ),
           ),
@@ -344,14 +368,14 @@ class _ProfileBodyState extends State<_ProfileBody> {
   Widget _info(String text) => Container(
     padding: const EdgeInsets.all(28),
     decoration: BoxDecoration(
-      border: Border.all(color: const Color(0xFFE5EAEB)),
+      border: Border.all(color: AppColors.borderSubtle),
       borderRadius: BorderRadius.circular(14),
     ),
     child: Center(
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(color: _muted, fontSize: 13),
+        style: TextStyle(color: _muted, fontSize: 13),
       ),
     ),
   );
@@ -450,7 +474,7 @@ class ProfilePostCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE5EAEB)),
+        border: Border.all(color: AppColors.borderSubtle),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -469,12 +493,10 @@ class ProfilePostCard extends StatelessWidget {
             Container(
               height: compact ? 120 : 150,
               decoration: BoxDecoration(
-                color: const Color(0xFFF7F6F2),
+                color: AppColors.backgroundTertiary,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Center(
-                child: Icon(Icons.image_outlined, color: _teal),
-              ),
+              child: Center(child: Icon(Icons.image_outlined, color: _teal)),
             ),
           const SizedBox(height: 10),
           Row(
@@ -492,7 +514,7 @@ class ProfilePostCard extends StatelessWidget {
                   children: [
                     Text(
                       post.authorName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                         color: _ink,
@@ -502,7 +524,7 @@ class ProfilePostCard extends StatelessWidget {
                       post.createdAt == null
                           ? 'Published post'
                           : 'Published ${_date(post.createdAt!)} · Public',
-                      style: const TextStyle(fontSize: 10, color: _muted),
+                      style: TextStyle(fontSize: 10, color: _muted),
                     ),
                   ],
                 ),
@@ -516,7 +538,7 @@ class ProfilePostCard extends StatelessWidget {
                 title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: _ink,
@@ -530,27 +552,23 @@ class ProfilePostCard extends StatelessWidget {
                 description,
                 maxLines: compact ? 3 : 4,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  height: 1.5,
-                  color: _muted,
-                ),
+                style: TextStyle(fontSize: 12, height: 1.5, color: _muted),
               ),
             ),
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.favorite_border, size: 20, color: _teal),
+              Icon(Icons.favorite_border, size: 20, color: _teal),
               const SizedBox(width: 4),
               Text(
                 '${post.likesCount}',
-                style: const TextStyle(fontSize: 11, color: _muted),
+                style: TextStyle(fontSize: 11, color: _muted),
               ),
               const Spacer(),
               TextButton.icon(
                 onPressed: onShare,
-                icon: const Icon(Icons.share_outlined, size: 16, color: _teal),
-                label: const Text(
+                icon: Icon(Icons.share_outlined, size: 16, color: _teal),
+                label: Text(
                   'Share',
                   style: TextStyle(fontSize: 11, color: _muted),
                 ),
@@ -558,9 +576,12 @@ class ProfilePostCard extends StatelessWidget {
               if (onDelete != null && compact)
                 TextButton(
                   onPressed: onDelete,
-                  child: const Text(
+                  child: Text(
                     'Delete',
-                    style: TextStyle(color: Color(0xFFC33B25), fontSize: 11),
+                    style: TextStyle(
+                      color: AppColors.statusError,
+                      fontSize: 11,
+                    ),
                   ),
                 ),
             ],

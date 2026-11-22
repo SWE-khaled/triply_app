@@ -92,9 +92,9 @@ class _TourGuideVerificationScreenState
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+         SnackBar(
           content: Text('Documents submitted successfully!'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.statusSuccess,
         ),
       );
 
@@ -108,7 +108,7 @@ class _TourGuideVerificationScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Upload failed: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.statusError,
         ),
       );
     } finally {
@@ -126,7 +126,7 @@ class _TourGuideVerificationScreenState
         _idFile != null && _licenseFile != null && !_isLoading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: Column(
           children: [
@@ -169,11 +169,11 @@ class _TourGuideVerificationScreenState
                         color: Colors.transparent,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFFE0E0E0),
+                          color: AppColors.borderSubtle,
                           width: 1,
                         ),
                       ),
-                      child: const Icon(
+                      child:  Icon(
                         Icons.arrow_back,
                         color: AppColors.deepNile,
                         size: 20,
@@ -198,12 +198,12 @@ class _TourGuideVerificationScreenState
                         horizontal: 16,
                         vertical: 10,
                       ),
-                      backgroundColor: const Color(0xFFF5F5F5),
+                      backgroundColor: AppColors.surfaceDefault,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
+                    child:  Text(
                       'Skip for now',
                       style: TextStyle(
                         color: AppColors.deepNile,
@@ -226,19 +226,19 @@ class _TourGuideVerificationScreenState
                     const SizedBox(height: 8),
 
                     // "FINAL STEP" label
-                    const Text(
+                     Text(
                       'FINAL STEP',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFFD4923A), // warm orange/gold
+                        color: AppColors.statusWarning, // warm orange/gold
                         letterSpacing: 1.2,
                       ),
                     ),
                     const SizedBox(height: 10),
 
                     // Title
-                    const Text(
+                     Text(
                       'Verify your guide identity',
                       style: TextStyle(
                         fontSize: 28,
@@ -250,11 +250,11 @@ class _TourGuideVerificationScreenState
                     const SizedBox(height: 10),
 
                     // Subtitle
-                    const Text(
+                     Text(
                       'Upload your identity document and a separate official document proving that you\'re a licensed guide.',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Color(0xFF7A9B9F),
+                        color: AppColors.textSecondary,
                         height: 1.5,
                       ),
                     ),
@@ -265,17 +265,17 @@ class _TourGuideVerificationScreenState
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surfaceDefault,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFFE8E8E8),
+                          color: AppColors.borderSubtle,
                           width: 1,
                         ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                           Text(
                             'Accepted documents',
                             style: TextStyle(
                               fontSize: 14,
@@ -299,19 +299,17 @@ class _TourGuideVerificationScreenState
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(
-                          0xFFEDF6F8,
-                        ), // very light teal background
+                        color: AppColors.surfaceDefault,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: const Color(0xFFB8D8DF),
+                          color: AppColors.textSecondary,
                           width: 1,
                         ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                           Text(
                             'Review time: 3–6 working days',
                             style: TextStyle(
                               fontSize: 13,
@@ -343,7 +341,7 @@ class _TourGuideVerificationScreenState
                         if (status == null) return const SizedBox.shrink();
                         if (status == 'approved') {
                           return _buildStatusCard(
-                            color: Colors.green,
+                            color: AppColors.statusSuccess,
                             icon: Icons.verified,
                             title: 'Documents approved',
                             message:
@@ -354,7 +352,7 @@ class _TourGuideVerificationScreenState
                           final reason =
                               (data?['rejectionReason'] as String?) ?? '';
                           return _buildStatusCard(
-                            color: Colors.red,
+                            color: AppColors.statusError,
                             icon: Icons.cancel_outlined,
                             title: 'Documents rejected',
                             message: reason.isEmpty
@@ -363,7 +361,7 @@ class _TourGuideVerificationScreenState
                           );
                         }
                         return _buildStatusCard(
-                          color: const Color(0xFF2E7D8F),
+                          color: AppColors.actionSecondary,
                           icon: Icons.hourglass_top,
                           title: 'Documents under review',
                           message:
@@ -434,7 +432,7 @@ class _TourGuideVerificationScreenState
                             style: ElevatedButton.styleFrom(
                               backgroundColor: canSubmitNow
                                   ? AppColors.deepNile
-                                  : const Color(0xFF7A9B9F),
+                                  : AppColors.textSecondary,
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
@@ -443,11 +441,11 @@ class _TourGuideVerificationScreenState
                             ),
                             onPressed: canSubmitNow ? _submitForReview : null,
                             child: _isLoading
-                                ? const SizedBox(
+                                ?  SizedBox(
                                     height: 20,
                                     width: 20,
                                     child: CircularProgressIndicator(
-                                      color: Colors.white,
+                                      color: AppColors.textPrimary,
                                       strokeWidth: 2.5,
                                     ),
                                   )
@@ -459,10 +457,10 @@ class _TourGuideVerificationScreenState
                                         : status == 'rejected'
                                         ? 'Re-upload documents'
                                         : 'Submit for Review',
-                                    style: const TextStyle(
+                                    style:  TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                           );
@@ -484,14 +482,14 @@ class _TourGuideVerificationScreenState
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+         Text(
           '• ',
           style: TextStyle(color: AppColors.deepNile, fontSize: 13),
         ),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.deepNile,
               fontSize: 13,
               height: 1.3,
@@ -566,11 +564,11 @@ class _TourGuideVerificationScreenState
         padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
         decoration: BoxDecoration(
           color: hasFile
-              ? const Color(0xFFF0F8F5)
-              : Colors.white, // Subtle green tint if selected
+              ? AppColors.surfaceDefault
+              : AppColors.surfaceDefault, // Subtle green tint if selected
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: hasFile ? Colors.green : const Color(0xFFD8D8D8),
+            color: hasFile ? AppColors.statusSuccess : AppColors.borderSubtle,
             width: hasFile ? 1.5 : 1.5,
           ),
         ),
@@ -580,7 +578,7 @@ class _TourGuideVerificationScreenState
               hasFile ? Icons.check_circle : Icons.upload_outlined,
               size: 32,
               color: hasFile
-                  ? Colors.green
+                  ? AppColors.statusSuccess
                   : AppColors.deepNile.withValues(alpha: 0.70),
             ),
             const SizedBox(height: 12),
@@ -592,7 +590,7 @@ class _TourGuideVerificationScreenState
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: hasFile ? Colors.green[800] : AppColors.deepNile,
+                color: hasFile ? AppColors.statusSuccess : AppColors.deepNile,
               ),
             ),
             if (!hasFile) ...[
@@ -600,15 +598,15 @@ class _TourGuideVerificationScreenState
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13, color: Color(0xFF7A9B9F)),
+                style:  TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
             ] else ...[
               const SizedBox(height: 6),
-              const Text(
+               Text(
                 'Tap to change file',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey,
+                  color: AppColors.textDisabled,
                   decoration: TextDecoration.underline,
                 ),
               ),

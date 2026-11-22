@@ -123,7 +123,7 @@ class _NavTile extends StatelessWidget {
                 icon,
                 size: 18,
                 color: isActive
-                    ? Colors.white
+                    ? AppColors.textPrimary
                     : AppColors.adminSidebarInactiveText,
               ),
               const SizedBox(width: 10),
@@ -152,7 +152,7 @@ class _SidebarFooter extends StatelessWidget {
       margin: const EdgeInsets.all(12),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F4EF),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -164,15 +164,15 @@ class _SidebarFooter extends StatelessWidget {
               Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.adminPrimary,
                   shape: BoxShape.circle,
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'A',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                     ),

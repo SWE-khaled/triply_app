@@ -67,7 +67,7 @@ class _SegmentOption extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: selected ? Colors.white : AppColors.primaryTeal,
+              color: selected ? AppColors.textPrimary : AppColors.primaryTeal,
             ),
           ),
         ),

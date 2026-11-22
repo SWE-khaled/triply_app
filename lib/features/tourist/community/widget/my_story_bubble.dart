@@ -46,7 +46,7 @@ class MyStoryBubble extends StatelessWidget {
                   onBackgroundImageError: hasPhoto ? (_, _) {} : null,
                   child: hasPhoto
                       ? null
-                      : const Icon(
+                      :  Icon(
                           Icons.person,
                           color: AppColors.textGrey,
                           size: 28,
@@ -64,9 +64,9 @@ class MyStoryBubble extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.primaryTeal,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: AppColors.borderStrong, width: 2),
                     ),
-                    child: const Icon(Icons.add, color: Colors.white, size: 14),
+                    child:  Icon(Icons.add, color: AppColors.surfaceDefault, size: 14),
                   ),
                 ),
               ),

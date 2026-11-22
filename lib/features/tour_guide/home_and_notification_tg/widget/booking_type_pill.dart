@@ -4,8 +4,8 @@ import '../../../../../core/theme/app_colors.dart';
 
 /// Cream/tan tints from Figma (public pill). Local consts only — the global
 /// theme in `core/theme/` is left untouched.
-const Color _cream = Color(0xFFFAF5EA);
-const Color _tanText = Color(0xFF9A7B2D);
+Color get _cream => AppColors.surfaceElevated;
+Color get _tanText => AppColors.statusWarning;
 
 /// Uppercase booking-type pill (PRIVATE/PUBLIC BOOKING), same look as the
 /// Dashboard booking cards.

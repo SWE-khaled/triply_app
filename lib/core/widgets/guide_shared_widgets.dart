@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 class LanguageChip extends StatelessWidget {
   final String label;
@@ -51,7 +52,7 @@ class RatingRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.star, size: 14, color: Color(0xFFD8B66A)),
+        Icon(Icons.star, size: 14, color: AppColors.statusWarning),
         SizedBox(width: 4),
         Text(
           rating.toString(),

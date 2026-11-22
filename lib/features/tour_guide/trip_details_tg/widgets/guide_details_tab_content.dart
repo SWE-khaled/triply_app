@@ -32,7 +32,7 @@ class GuideDetailsTabContent extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 5),
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
+                      decoration:  BoxDecoration(
                         color: AppColors.priceTeal,
                         shape: BoxShape.circle,
                       ),
@@ -72,7 +72,7 @@ class GuideDetailsTabContent extends StatelessWidget {
                             width: 8,
                             height: 8,
                             margin: const EdgeInsets.only(top: 4),
-                            decoration: const BoxDecoration(
+                            decoration:  BoxDecoration(
                               color: AppColors.priceTeal,
                               shape: BoxShape.circle,
                             ),
@@ -138,7 +138,7 @@ class GuideDetailsTabContent extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 5),
                         width: 6,
                         height: 6,
-                        decoration: const BoxDecoration(
+                        decoration:  BoxDecoration(
                           color: AppColors.accentOrange,
                           shape: BoxShape.circle,
                         ),

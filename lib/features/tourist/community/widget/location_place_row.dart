@@ -21,7 +21,7 @@ class LocationPlaceRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(
+             Icon(
               Icons.location_on_outlined,
               color: AppColors.primaryTeal,
             ),
@@ -29,14 +29,14 @@ class LocationPlaceRow extends StatelessWidget {
             Expanded(
               child: Text(
                 place,
-                style: const TextStyle(
+                style:  TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
-                  color: Color(0xFF17343B),
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
-            const Icon(
+             Icon(
               Icons.chevron_right,
               size: 20,
               color: AppColors.textGrey,

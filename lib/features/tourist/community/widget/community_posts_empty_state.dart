@@ -10,10 +10,10 @@ class CommunityPostsEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding:  EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Text(
               'No posts yet',
               textAlign: TextAlign.center,

@@ -20,7 +20,7 @@ class AuthHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 60, 24, 40),
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -37,17 +37,17 @@ class AuthHeader extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: AppColors.surfaceDefault.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Icon(icon, color: Colors.white, size: 34),
+            child: Icon(icon, color: AppColors.surfaceDefault, size: 34),
           ),
           const SizedBox(height: 20),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
+            style:  TextStyle(
+              color: AppColors.textPrimary,
               fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
@@ -57,7 +57,7 @@ class AuthHeader extends StatelessWidget {
             subtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: AppColors.textPrimary.withValues(alpha: 0.8),
               fontSize: 15,
             ),
           ),

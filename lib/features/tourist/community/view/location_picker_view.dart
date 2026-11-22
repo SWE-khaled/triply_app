@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 import '../../../../core/widgets/app_header.dart';
 import '../widget/location_category_chip.dart';
@@ -85,7 +86,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     final places = egyptLocations[selectedCategory] ?? const [];
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: Column(
           children: [

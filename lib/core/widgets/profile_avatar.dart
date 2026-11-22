@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 import '../constants/app_asset.dart';
 
@@ -56,9 +57,9 @@ class ProfileAvatar extends StatelessWidget {
     errorBuilder: (_, _, _) => Container(
       width: w,
       height: h,
-      color: const Color(0xFFE6ECEF),
+      color: AppColors.borderSubtle,
       alignment: Alignment.center,
-      child: Icon(fallbackIcon, color: const Color(0xFF8FA8AE)),
+      child: Icon(fallbackIcon, color: AppColors.iconSecondary),
     ),
   );
 }

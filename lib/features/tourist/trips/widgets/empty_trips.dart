@@ -28,11 +28,11 @@ class EmptyTrips extends StatelessWidget {
               width: 72,
               height: 72,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF1F4F5),
+              decoration:  BoxDecoration(
+                color: AppColors.surfaceElevated,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child:  Icon(
                 Icons.map_outlined,
                 size: 30,
                 color: AppColors.subtitle,

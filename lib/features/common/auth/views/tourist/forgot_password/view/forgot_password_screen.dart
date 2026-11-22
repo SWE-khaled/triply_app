@@ -111,13 +111,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: Wrap(
                       children: [
-                        const Text(
+                         Text(
                           'Remember it? ',
                           style: TextStyle(color: AppColors.textGrey),
                         ),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
-                          child: const Text(
+                          child:  Text(
                             'Sign in',
                             style: TextStyle(
                               color: AppColors.signInDark,

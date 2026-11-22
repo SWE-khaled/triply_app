@@ -106,9 +106,9 @@ class _TripApplicationsBody extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.adminDanger,
             ),
-            child: const Text(
+            child:  Text(
               'Confirm Reject',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.textPrimary),
             ),
           ),
         ],
@@ -144,9 +144,9 @@ class _TripApplicationsBody extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 200,
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(Icons.image, size: 50, color: Colors.grey),
+                    color: AppColors.surfaceElevated,
+                    child:  Center(
+                      child: Icon(Icons.image, size: 50, color: AppColors.textDisabled),
                     ),
                   ),
                 ),
@@ -161,8 +161,8 @@ class _TripApplicationsBody extends StatelessWidget {
               Text('Location: ${application.location}'),
             Text(
               'Price: ${application.price}',
-              style: const TextStyle(
-                color: Colors.green,
+              style:  TextStyle(
+                color: AppColors.statusSuccess,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -310,13 +310,13 @@ class _ApplicationItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: app.type == 'private'
-                    ? Colors.purple.withValues(alpha: 0.1)
-                    : Colors.blue.withValues(alpha: 0.1),
+                    ? AppColors.actionSecondary.withValues(alpha: 0.1)
+                    : AppColors.actionPrimary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: app.type == 'private'
-                      ? Colors.purple.withValues(alpha: 0.3)
-                      : Colors.blue.withValues(alpha: 0.3),
+                      ? AppColors.actionSecondary.withValues(alpha: 0.3)
+                      : AppColors.actionPrimary.withValues(alpha: 0.3),
                 ),
               ),
               child: Text(
@@ -324,7 +324,7 @@ class _ApplicationItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: app.type == 'private' ? Colors.purple : Colors.blue,
+                  color: app.type == 'private' ? AppColors.actionSecondary : AppColors.actionPrimary,
                 ),
               ),
             ),
@@ -341,7 +341,7 @@ class _ApplicationItem extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'Reason for rejection: ${app.rejectionReason}',
-            style: const TextStyle(
+            style:  TextStyle(
               color: AppColors.adminDanger,
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -374,7 +374,7 @@ class _ApplicationItem extends StatelessWidget {
 
     return Column(
       children: [
-        if (!isFirst) const Divider(color: AppColors.adminDivider, height: 1),
+        if (!isFirst)  Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 18),
           child: LayoutBuilder(

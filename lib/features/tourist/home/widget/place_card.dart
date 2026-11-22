@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/place_favorite_cubit.dart';
 import '../cubit/place_favorite_state.dart';
@@ -41,14 +42,14 @@ class PlaceCard extends StatelessWidget {
                     onTap: () => context.read<PlaceFavoriteCubit>().toggle(),
                     child: Container(
                       padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Colors.white70,
+                      decoration: BoxDecoration(
+                        color: AppColors.textPrimary.withValues(alpha: 0.7),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         isFavorite ? Icons.favorite : Icons.favorite_border,
                         size: 16,
-                        color: isFavorite ? Colors.red : Colors.black54,
+                        color: isFavorite ? AppColors.statusError : AppColors.overlayScrim.withValues(alpha: 0.54),
                       ),
                     ),
                   ),

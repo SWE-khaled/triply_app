@@ -37,7 +37,7 @@ class GuideNotificationTile extends StatelessWidget {
                     item.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.title,
@@ -48,7 +48,7 @@ class GuideNotificationTile extends StatelessWidget {
                     item.body,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 13,
                       height: 1.4,
                       color: AppColors.subtitle,
@@ -58,7 +58,7 @@ class GuideNotificationTile extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       item.timeLabel,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 11,
                         color: AppColors.subtitle,
                       ),
@@ -72,7 +72,7 @@ class GuideNotificationTile extends StatelessWidget {
                 width: 8,
                 height: 8,
                 margin: const EdgeInsets.only(top: 6, left: 8),
-                decoration: const BoxDecoration(
+                decoration:  BoxDecoration(
                   color: AppColors.accentOrange,
                   shape: BoxShape.circle,
                 ),
@@ -87,40 +87,40 @@ class GuideNotificationTile extends StatelessWidget {
   (Color, IconData, Color) _styleForType(String type) {
     switch (type) {
       case 'booking':
-        return (const Color(0xFFE3F3E7), Icons.check, const Color(0xFF2E9E5B));
+        return (AppColors.surfaceDefault, Icons.check, AppColors.statusSuccess);
       case 'trip_decided':
         return (
-          const Color(0xFFE6F3F3),
+          AppColors.surfaceSelected,
           Icons.verified_outlined,
           AppColors.priceTeal,
         );
       case 'approval':
         return (
-          const Color(0xFFE6F3F3),
+          AppColors.surfaceSelected,
           Icons.verified_outlined,
           AppColors.priceTeal,
         );
       case 'payment':
         return (
-          const Color(0xFFFFEBDC),
+          AppColors.surfaceElevated,
           Icons.credit_card_outlined,
           AppColors.accentOrange,
         );
       case 'like':
         return (
-          const Color(0xFFFFE8E8),
+          AppColors.surfaceDefault,
           Icons.favorite_border,
-          const Color(0xFFE86A6A),
+          AppColors.statusError,
         );
       case 'message':
         return (
-          const Color(0xFFE6F3F3),
+          AppColors.surfaceSelected,
           Icons.chat_bubble_outline,
           AppColors.priceTeal,
         );
       default:
         return (
-          const Color(0xFFF2F2F2),
+          AppColors.surfaceDefault,
           Icons.notifications_none,
           AppColors.subtitle,
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/core/widgets/guide_shared_widgets.dart';
 import 'package:triply/features/tourist/guides/model/guide.dart';
 
@@ -22,9 +23,9 @@ class GuideCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Color(0xFFAAB8BC).withValues(alpha: .6)),
+          border: Border.all(color: AppColors.textDisabled.withValues(alpha: .6)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,14 +40,14 @@ class GuideCard extends StatelessWidget {
                 errorBuilder: (_, _, _) => Container(
                   width: 56,
                   height: 56,
-                  color: Color(0xFF0E5261).withValues(alpha: .2),
+                  color: AppColors.actionPrimary.withValues(alpha: .2),
                   alignment: Alignment.center,
                   child: Text(
                     guide.name.isNotEmpty ? guide.name[0] : '?',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0E5261),
+                      color: AppColors.actionPrimary,
                     ),
                   ),
                 ),
@@ -64,7 +65,7 @@ class GuideCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF0E5261),
+                          color: AppColors.actionPrimary,
                         ),
                       ),
                       SizedBox(width: 4),
@@ -72,14 +73,14 @@ class GuideCard extends StatelessWidget {
                         Icon(
                           Icons.verified,
                           size: 14,
-                          color: Color(0xFF4DA7A0),
+                          color: AppColors.actionSecondary,
                         ),
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
                     guide.specialty,
-                    style: TextStyle(fontSize: 12, color: Color(0xFF8A9EA3)),
+                    style: TextStyle(fontSize: 12, color: AppColors.textTertiary),
                   ),
                   const SizedBox(height: 6),
                   Wrap(
@@ -89,10 +90,8 @@ class GuideCard extends StatelessWidget {
                         .map(
                           (l) => LanguageChip(
                             label: l,
-                            backgroundColor: Color(
-                              0xFF4DA7A0,
-                            ).withValues(alpha: .1),
-                            textColor: Color(0xFF4DA7A0),
+                            backgroundColor: AppColors.actionSecondary.withValues(alpha: .1),
+                            textColor: AppColors.actionSecondary,
                           ),
                         )
                         .toList(),
@@ -103,8 +102,8 @@ class GuideCard extends StatelessWidget {
                       RatingRow(
                         rating: guide.rating,
                         reviewCount: guide.reviewCount,
-                        ratingColor: Color(0xFF0E5261),
-                        reviewCountColor: Color(0xFFAAB8BC),
+                        ratingColor: AppColors.actionPrimary,
+                        reviewCountColor: AppColors.textDisabled,
                       ),
                       const Spacer(),
                       Text.rich(
@@ -115,7 +114,7 @@ class GuideCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFFE07A4F),
+                                color: AppColors.statusErrorPressed,
                               ),
                             ),
                             TextSpan(
@@ -123,14 +122,14 @@ class GuideCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFFE07A4F),
+                                color: AppColors.statusErrorPressed,
                               ),
                             ),
-                            const TextSpan(
+                             TextSpan(
                               text: '/hr',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Color(0xFFAAB8BC),
+                                color: AppColors.textDisabled,
                               ),
                             ),
                           ],
@@ -149,11 +148,11 @@ class GuideCard extends StatelessWidget {
             //     width: 32,
             //     height: 32,
             //     decoration:  BoxDecoration(
-            //       color: Color(0xFF4DA7A0).withOpacity(.15),
+            //       color: AppColors.actionSecondary.withOpacity(.15),
             //       shape: BoxShape.circle,
             //     ),
             //     child:  Icon(Icons.chat_outlined,
-            //         size: 16, color: Color(0xFF4DA7A0)),
+            //         size: 16, color: AppColors.actionSecondary),
             //   ),
             // ),
           ],

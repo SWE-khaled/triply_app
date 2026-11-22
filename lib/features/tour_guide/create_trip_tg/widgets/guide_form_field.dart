@@ -46,7 +46,7 @@ class GuideFormField extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBF6EC),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(14),
       ),
       child: TextField(
@@ -154,11 +154,11 @@ class GuideRemoveButton extends StatelessWidget {
         width: 32,
         height: 32,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFDE8E0),
+        decoration:  BoxDecoration(
+          color: AppColors.surfaceDefault,
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.close, size: 15, color: AppColors.accentOrange),
+        child:  Icon(Icons.close, size: 15, color: AppColors.accentOrange),
       ),
     );
   }

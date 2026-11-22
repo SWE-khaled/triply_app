@@ -47,7 +47,7 @@ class GuideDetailsInfo extends StatelessWidget {
             ...List.generate(
               5,
               (_) =>
-                  const Icon(Icons.star, size: 13, color: AppColors.starGold),
+                   Icon(Icons.star, size: 13, color: AppColors.starGold),
             ),
             const SizedBox(width: 4),
             Text(
@@ -66,7 +66,7 @@ class GuideDetailsInfo extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 6),
-            const Icon(Icons.location_on, size: 13, color: AppColors.pin),
+             Icon(Icons.location_on, size: 13, color: AppColors.pin),
             Text(
               details.location,
               style: GoogleFonts.poppins(

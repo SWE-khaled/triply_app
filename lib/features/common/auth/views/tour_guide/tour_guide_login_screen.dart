@@ -58,7 +58,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(cubit.errorMessage ?? 'Login failed'),
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: AppColors.statusError,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -103,11 +103,11 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
     return Container(
       height: 248,
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration:  BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFF0E5566), Color(0xFF020B0D)],
+          colors: [AppColors.actionPrimary, AppColors.backgroundPrimary],
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(48),
@@ -143,13 +143,13 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
               ),
             ),
           ),
-          const Align(
+           Align(
             alignment: Alignment.topCenter,
             child: Padding(
               padding: EdgeInsets.only(top: 168),
               child: Text(
                 'Sign in to manage your trips and travelers.',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 16),
               ),
             ),
           ),
@@ -161,10 +161,10 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
   Widget _label(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style:  TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1F3238),
+        color: AppColors.textPrimary,
       ),
     );
   }
@@ -175,7 +175,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
       builder: (context, state) {
         final cubit = context.read<AuthCubit>();
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surfaceDefault,
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -188,16 +188,16 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                         Text(
                           'Welcome back, Guide',
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF1F3238),
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                         Text(
                           'Sign in to manage your trips and travelers.',
                           style: TextStyle(
                             color: AppColors.textGrey,
@@ -255,7 +255,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                           child: Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              const Text(
+                               Text(
                                 "Don't have an account? ",
                                 style: TextStyle(
                                   color: AppColors.textGrey,
@@ -266,7 +266,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                 onTap: () => Navigator.of(
                                   context,
                                 ).pushNamed(AppRoutes.guideSignup),
-                                child: const Text(
+                                child:  Text(
                                   'Create Guide Account',
                                   style: TextStyle(
                                     color: AppColors.signInDark,
@@ -290,7 +290,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                       AppRoutes.signIn,
                                       (_) => false,
                                     ),
-                                child: const Text(
+                                child:  Text(
                                   'Are you a tourist? Sign in',
                                   style: TextStyle(
                                     color: AppColors.signInDark,
@@ -303,7 +303,7 @@ class _TourGuideLoginScreenState extends State<TourGuideLoginScreen> {
                                 onPressed: () => Navigator.of(
                                   context,
                                 ).pushNamed(AdminRoutes.login),
-                                child: const Text(
+                                child:  Text(
                                   'Admin portal',
                                   style: TextStyle(
                                     color: AppColors.textGrey,

@@ -20,7 +20,7 @@ class ProfileSkeleton extends StatelessWidget {
         children: [
           Container(
             width: double.infinity,
-            color: const Color(0xFF0E5261),
+            color: AppColors.actionPrimary,
             padding: EdgeInsets.fromLTRB(16, topInset + 16, 16, 20),
             child: AppShimmer(
               child: Column(
@@ -46,11 +46,11 @@ class ProfileSkeleton extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xffFAF5EC),
+              color: AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
+                  color: AppColors.overlayScrim.withValues(alpha: 0.06),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),

@@ -78,13 +78,13 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.surfaceDefault,
                             border: Border.all(color: AppColors.cardBorder),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                               Icon(
                                 Icons.calendar_today_outlined,
                                 size: 20,
                                 color: AppColors.priceTeal,

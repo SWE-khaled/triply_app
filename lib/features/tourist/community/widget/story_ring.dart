@@ -35,7 +35,7 @@ class StoryRing extends StatelessWidget {
               onForegroundImageError: (_, _) {},
               child: Text(
                 story.userName.isEmpty ? '?' : story.userName[0].toUpperCase(),
-                style: const TextStyle(
+                style:  TextStyle(
                   color: AppColors.textGrey,
                   fontWeight: FontWeight.w700,
                 ),
@@ -50,7 +50,7 @@ class StoryRing extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
                 letterSpacing: 0,

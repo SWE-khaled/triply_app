@@ -32,7 +32,7 @@ class FormBottomBar extends StatelessWidget {
                   // no `alignment` here, it makes the Container expand
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF6F1E7),
+                    color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(

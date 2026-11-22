@@ -1,4 +1,5 @@
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/egypt_cities.dart';
 import 'guide_form_field.dart';
@@ -54,7 +55,7 @@ class BasicsSection extends StatelessWidget {
               fit: FlexFit.loose,
               constraints: const BoxConstraints(maxHeight: 300),
               menuProps: MenuProps(
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.surfaceDefault,
                 surfaceTintColor: Colors.transparent,
                 borderRadius: BorderRadius.circular(14),
                 elevation: 4,
@@ -62,13 +63,13 @@ class BasicsSection extends StatelessWidget {
               searchFieldProps: TextFieldProps(
                 decoration: InputDecoration(
                   hintText: 'Search city',
-                  hintStyle: const TextStyle(
+                  hintStyle:  TextStyle(
                     fontSize: 13,
-                    color: Color(0xFFB8B2A5),
+                    color: AppColors.textTertiary,
                   ),
                   prefixIcon: const Icon(Icons.search, size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFFBF6EA),
+                  fillColor: AppColors.surfaceElevated,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -85,12 +86,12 @@ class BasicsSection extends StatelessWidget {
               baseStyle: const TextStyle(fontSize: 13),
               decoration: InputDecoration(
                 hintText: 'Select city',
-                hintStyle: const TextStyle(
+                hintStyle:  TextStyle(
                   fontSize: 13,
-                  color: Color(0xFFB8B2A5),
+                  color: AppColors.textTertiary,
                 ),
                 filled: true,
-                fillColor: const Color(0xFFFBF6EA),
+                fillColor: AppColors.surfaceElevated,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,

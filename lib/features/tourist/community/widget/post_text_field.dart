@@ -21,7 +21,7 @@ class PostTextField extends StatelessWidget {
         maxLines: 4,
         minLines: 3,
         onChanged: (_) {},
-        decoration: const InputDecoration(
+        decoration:  InputDecoration(
           border: InputBorder.none,
           hintText:
               "What's on your mind? Share your magical travel moment... ✨🇪🇬",

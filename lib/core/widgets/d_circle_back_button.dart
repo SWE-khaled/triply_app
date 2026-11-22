@@ -94,7 +94,7 @@ class OutlineActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.adminDivider, width: 1),
           borderRadius: BorderRadius.circular(8),
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
         ),
         child: Text(label, style: AppTextStyles.adminButtonSecondary),
       ),

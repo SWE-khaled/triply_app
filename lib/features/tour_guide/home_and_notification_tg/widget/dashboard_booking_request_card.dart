@@ -6,8 +6,8 @@ import '../model/guide_dashboard_booking_request.dart';
 
 /// Cream tint from Figma (public badge). Local const only — the global
 /// theme in `core/theme/` is left untouched.
-const Color _cream = Color(0xFFFAF5EA);
-const Color _tanText = Color(0xFF9A7B2D);
+Color get _cream => AppColors.surfaceElevated;
+Color get _tanText => AppColors.statusWarning;
 
 /// One row of the "New bookings" list: guest avatar, names, detail lines
 /// and a PRIVATE/PUBLIC pill.
@@ -25,7 +25,7 @@ class BookingRequestCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.cardBorder),
         ),
@@ -49,7 +49,7 @@ class BookingRequestCard extends StatelessWidget {
                     booking.guestName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColors.title,
@@ -60,7 +60,7 @@ class BookingRequestCard extends StatelessWidget {
                     booking.tourTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 12,
                       color: AppColors.subtitle,
                     ),
@@ -69,7 +69,7 @@ class BookingRequestCard extends StatelessWidget {
                     booking.detailLabel,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 12,
                       color: AppColors.subtitle,
                     ),

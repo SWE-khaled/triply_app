@@ -24,7 +24,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                   color: AppColors.lightCircleBg,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(
+                child:  Icon(
                   Icons.check,
                   color: AppColors.successTeal,
                   size: 44,
@@ -36,7 +36,7 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
+               Text(
                 'Your password has been updated successfully. Sign in with your new password.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.textGrey, fontSize: 15),

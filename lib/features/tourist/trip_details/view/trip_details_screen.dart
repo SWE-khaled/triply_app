@@ -50,7 +50,7 @@ class TripDetailsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(14),
       ),
@@ -59,7 +59,7 @@ class TripDetailsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text(
+               Text(
                 'Your booking',
                 style: TextStyle(
                   fontSize: 15,
@@ -81,7 +81,7 @@ class TripDetailsScreen extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Text(
+               Text(
                 'Status',
                 style: TextStyle(fontSize: 13, color: AppColors.subtitle),
               ),
@@ -91,7 +91,7 @@ class TripDetailsScreen extends StatelessWidget {
               else
                 Text(
                   entry.status,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.title,
@@ -109,12 +109,12 @@ class TripDetailsScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
+          style:  TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.title,
@@ -163,8 +163,8 @@ class TripDetailsScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   transform: Matrix4.translationValues(0, -24, 0),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration:  BoxDecoration(
+                    color: AppColors.surfaceDefault,
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(24),
                     ),

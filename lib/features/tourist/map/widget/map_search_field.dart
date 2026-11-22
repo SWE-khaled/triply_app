@@ -28,7 +28,7 @@ class MapSearchField extends StatelessWidget {
       onSubmitted: onSubmitted,
       decoration: InputDecoration(
         hintText: 'Search this area...',
-        hintStyle: const TextStyle(
+        hintStyle:  TextStyle(
           color: AppColors.chipTextGrey,
           fontSize: 14,
           fontWeight: FontWeight.w400,
@@ -42,15 +42,15 @@ class MapSearchField extends StatelessWidget {
               )
             : null,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.surfaceDefault,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(color: AppColors.cardBorder),
+          borderSide:  BorderSide(color: AppColors.cardBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(color: AppColors.cardBorder),
+          borderSide:  BorderSide(color: AppColors.cardBorder),
         ),
       ),
     );

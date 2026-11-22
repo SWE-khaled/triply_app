@@ -45,10 +45,10 @@ class CoverUploadBox extends StatelessWidget {
                   height: 30,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.45),
+                    color: AppColors.overlayScrim.withValues(alpha: 0.45),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close, size: 16, color: Colors.white),
+                  child:  Icon(Icons.close, size: 16, color: AppColors.surfaceDefault),
                 ),
               ),
             ),
@@ -84,7 +84,7 @@ class CoverUploadBox extends StatelessWidget {
                     border: Border.all(color: AppColors.priceTeal),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child:  Icon(
                     Icons.add,
                     size: 20,
                     color: AppColors.priceTeal,
@@ -118,8 +118,8 @@ class CoverUploadBox extends StatelessWidget {
   /// trip already has.
   Widget _coverImage(String image) {
     final placeholder = Container(
-      color: const Color(0xFFE6ECEF),
-      child: const Icon(Icons.image, color: AppColors.subtitle),
+      color: AppColors.borderSubtle,
+      child:  Icon(Icons.image, color: AppColors.subtitle),
     );
     if (image.startsWith('http')) {
       return Image.network(

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:triply/core/theme/app_colors.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -237,9 +238,9 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     Object error,
     StackTrace? stackTrace,
   ) {
-    return const Icon(
+    return Icon(
       Icons.broken_image_outlined,
-      color: Colors.white54,
+      color: AppColors.textPrimary.withValues(alpha: 0.54),
       size: 48,
     );
   }
@@ -278,20 +279,20 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   @override
   Widget build(BuildContext context) {
     if (_closeRequested || _actions.stories.isEmpty) {
-      return const Scaffold(backgroundColor: Colors.black);
+      return  Scaffold(backgroundColor: AppColors.backgroundPrimary);
     }
 
     return BlocBuilder<StoryActionsCubit, StoryActionsState>(
       builder: (context, state) {
         final stories = state.stories;
         if (stories.isEmpty) {
-          return const Scaffold(backgroundColor: Colors.black);
+          return  Scaffold(backgroundColor: AppColors.backgroundPrimary);
         }
         final safeIndex = _currentIndex.clamp(0, stories.length - 1);
         final story = stories[safeIndex];
 
         return Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: AppColors.backgroundPrimary,
           body: SafeArea(
             child: Stack(
               children: [

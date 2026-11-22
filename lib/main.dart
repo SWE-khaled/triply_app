@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,6 +29,8 @@ import 'features/splash/view/startup_gate.dart';
 import 'features/tour_guide/onboarding/view/tour_guide_onboarding_screen.dart';
 import 'features/admin_dashboard/d_auth/view/admin_login_view.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/app_palette.dart';
+import 'core/theme/theme_cubit.dart';
 import 'features/common/auth/cubit/auth_cubit.dart';
 import 'features/tourist/home/view/home_screen.dart';
 import 'features/tourist/notifications/view/notifications_screen.dart';
@@ -73,6 +76,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        // Theme choice is app-wide and must be ready before the first frame.
+        BlocProvider(lazy: false, create: (_) => ThemeCubit()..load()),
         // One session cubit for both roles. Not lazy: it starts listening
         // to Firebase at launch, so the restored user is ready by the time
         // any screen reads it (and the profile self-heal can run).
@@ -142,37 +147,66 @@ class MyApp extends StatelessWidget {
             NotificationNavigator.notifyReady();
           }
         },
-        child: MaterialApp(
-          navigatorKey: NotificationNavigator.navigatorKey,
-          title: 'Triply',
-          debugShowCheckedModeBanner: false,
-          theme: buildAppTheme(),
-          onGenerateInitialRoutes: (_) => [
-            AppRoutes.splash(nextPageBuilder: (_) => const StartupGate()),
-          ],
-          routes: {
-            AppRoutes.home: (context) => const HomeScreen(),
-            AppRoutes.search: (context) => const SearchScreen(),
-            AppRoutes.notifications: (context) => const NotificationsScreen(),
-            AppRoutes.onboarding: (context) => const OnboardingScreen(),
-            AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
-            AppRoutes.guideOnboarding: (context) =>
-                const TourGuideOnboardingScreen(),
-            AppRoutes.guideLogin: (context) => const TourGuideLoginScreen(),
-            AppRoutes.guideSignup: (context) => const TourGuideSignupScreen(),
-            AppRoutes.guideVerification: (context) =>
-                const TourGuideVerificationScreen(),
-            AdminRoutes.login: (context) => const AdminLoginView(),
-            AppRoutes.signIn: (context) => const SignInScreen(),
-            AppRoutes.createAccount: (context) => const CreateAccountScreen(),
-            ForgotPasswordScreen.routeName: (context) =>
-                const ForgotPasswordScreen(),
-            AppRoutes.passwordResetSuccess: (context) =>
-                const PasswordResetSuccessScreen(),
-            AppRoutes.profile: (context) => const ProfileScreen(),
-            AppRoutes.privacySecurity: (context) =>
-                const PrivacySecurityScreen(),
-            AppRoutes.emergency: (context) => const EmergencyScreen(),
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            final isDark = AppPalette.forMode(
+              themeMode,
+              WidgetsBinding.instance.platformDispatcher.platformBrightness,
+            ).isDark;
+            final overlayStyle = SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+              statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+              systemNavigationBarColor: AppPalette.current.backgroundPrimary,
+              systemNavigationBarIconBrightness: isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+            );
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: overlayStyle,
+              child: MaterialApp(
+                navigatorKey: NotificationNavigator.navigatorKey,
+                title: 'Triply',
+                debugShowCheckedModeBanner: false,
+                theme: buildAppTheme(brightness: Brightness.light),
+                darkTheme: buildAppTheme(brightness: Brightness.dark),
+                themeMode: themeMode,
+                onGenerateInitialRoutes: (_) => [
+                  AppRoutes.splash(nextPageBuilder: (_) => const StartupGate()),
+                ],
+                routes: {
+                  AppRoutes.home: (context) => const HomeScreen(),
+                  AppRoutes.search: (context) => const SearchScreen(),
+                  AppRoutes.notifications: (context) =>
+                      const NotificationsScreen(),
+                  AppRoutes.onboarding: (context) => const OnboardingScreen(),
+                  AppRoutes.roleSelection: (context) =>
+                      const RoleSelectionScreen(),
+                  AppRoutes.guideOnboarding: (context) =>
+                      const TourGuideOnboardingScreen(),
+                  AppRoutes.guideLogin: (context) =>
+                      const TourGuideLoginScreen(),
+                  AppRoutes.guideSignup: (context) =>
+                      const TourGuideSignupScreen(),
+                  AppRoutes.guideVerification: (context) =>
+                      const TourGuideVerificationScreen(),
+                  AdminRoutes.login: (context) => const AdminLoginView(),
+                  AppRoutes.signIn: (context) => const SignInScreen(),
+                  AppRoutes.createAccount: (context) =>
+                      const CreateAccountScreen(),
+                  ForgotPasswordScreen.routeName: (context) =>
+                      const ForgotPasswordScreen(),
+                  AppRoutes.passwordResetSuccess: (context) =>
+                      const PasswordResetSuccessScreen(),
+                  AppRoutes.profile: (context) => const ProfileScreen(),
+                  AppRoutes.privacySecurity: (context) =>
+                      const PrivacySecurityScreen(),
+                  AppRoutes.emergency: (context) => const EmergencyScreen(),
+                },
+              ),
+            );
           },
         ),
       ),

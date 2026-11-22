@@ -82,7 +82,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
+            child:  Text(
               'Cancel booking',
               style: TextStyle(color: AppColors.accentOrange),
             ),
@@ -274,7 +274,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                                           ),
                                         ),
                                       ],
-                                      icon: const Icon(
+                                      icon:  Icon(
                                         Icons.more_vert,
                                         size: 20,
                                         color: AppColors.textDark,

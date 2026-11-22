@@ -65,7 +65,7 @@ class GuideSettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surfaceDefault,
                   border: Border.all(color: AppColors.cardBorder),
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -79,7 +79,7 @@ class GuideSettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               Text(
                 'Triply for Guides · Version 1.0.0',
                 style: GoogleFonts.poppins(
@@ -123,11 +123,7 @@ class _SettingsRow extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              size: 18,
-              color: AppColors.subtitle,
-            ),
+            Icon(Icons.chevron_right, size: 18, color: AppColors.subtitle),
           ],
         ),
       ),

@@ -8,7 +8,7 @@ class AuthStepIcon extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback? onBack;
-  final Color iconColor;
+  final Color? iconColor;
 
   const AuthStepIcon({
     super.key,
@@ -16,7 +16,7 @@ class AuthStepIcon extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.onBack,
-    this.iconColor = AppColors.signInDark,
+    this.iconColor,
   });
 
   @override
@@ -44,14 +44,14 @@ class AuthStepIcon extends StatelessWidget {
               color: AppColors.lightCircleBg,
               borderRadius: BorderRadius.circular(24),
             ),
-            child: Icon(icon, color: iconColor, size: 40),
+            child: Icon(icon, color: iconColor ?? AppColors.signInDark, size: 40),
           ),
         ),
         const SizedBox(height: 24),
         Center(
           child: Text(
             title,
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
               color: AppColors.textDark,
@@ -63,7 +63,7 @@ class AuthStepIcon extends StatelessWidget {
           child: Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 15, color: AppColors.textGrey),
+            style:  TextStyle(fontSize: 15, color: AppColors.textGrey),
           ),
         ),
       ],

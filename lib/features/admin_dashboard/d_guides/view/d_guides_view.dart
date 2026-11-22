@@ -31,7 +31,7 @@ class _GuidesBody extends StatelessWidget {
     final ok = await context.read<GuidesCubit>().approve(guide);
     if (ok) return;
     messenger.showSnackBar(
-      const SnackBar(
+       SnackBar(
         content: Text('Could not approve the guide.'),
         backgroundColor: AppColors.adminDanger,
       ),
@@ -47,7 +47,7 @@ class _GuidesBody extends StatelessWidget {
     final ok = await context.read<GuidesCubit>().reject(guide, reason);
     if (ok) return;
     messenger.showSnackBar(
-      const SnackBar(
+       SnackBar(
         content: Text('Could not reject the guide.'),
         backgroundColor: AppColors.adminDanger,
       ),
@@ -60,7 +60,7 @@ class _GuidesBody extends StatelessWidget {
     final ok = await context.read<GuidesCubit>().suspend(guide);
     if (ok) return;
     messenger.showSnackBar(
-      const SnackBar(
+       SnackBar(
         content: Text('Could not suspend the guide.'),
         backgroundColor: AppColors.adminDanger,
       ),
@@ -106,9 +106,9 @@ class _GuidesBody extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.adminDanger,
             ),
-            child: const Text(
+            child:  Text(
               'Confirm Reject',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.textPrimary),
             ),
           ),
         ],
@@ -201,7 +201,7 @@ class _GuidesBody extends StatelessWidget {
             ],
           ),
         ),
-        const Divider(color: AppColors.adminDivider, height: 1),
+         Divider(color: AppColors.adminDivider, height: 1),
       ],
     );
 
@@ -288,7 +288,7 @@ class _GuideRow extends StatelessWidget {
 
     return Column(
       children: [
-        const Divider(color: AppColors.adminDivider, height: 1),
+         Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(
@@ -510,7 +510,7 @@ class _GuideDetailsDialog extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         border: Border.all(color: AppColors.adminDivider),
         borderRadius: BorderRadius.circular(12),
       ),
@@ -548,7 +548,7 @@ class _GuideDetailsDialog extends StatelessWidget {
                   label: const Text('View'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.adminPrimary,
-                    side: const BorderSide(color: AppColors.adminPrimary),
+                    side:  BorderSide(color: AppColors.adminPrimary),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -562,14 +562,14 @@ class _GuideDetailsDialog extends StatelessWidget {
               ],
               ElevatedButton.icon(
                 onPressed: () => _handleDownload(context, url, fileName),
-                icon: const Icon(
+                icon:  Icon(
                   Icons.download_rounded,
                   size: 16,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
-                label: const Text(
+                label:  Text(
                   'Download',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppColors.textPrimary),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.adminPrimary,

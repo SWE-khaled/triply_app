@@ -30,7 +30,7 @@ class TripCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           border: Border.all(color: AppColors.cardBorder),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -46,8 +46,8 @@ class TripCard extends StatelessWidget {
                   trip.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) => Container(
-                    color: const Color(0xFFE6ECEF),
-                    child: const Icon(Icons.image, color: AppColors.subtitle),
+                    color: AppColors.borderSubtle,
+                    child:  Icon(Icons.image, color: AppColors.subtitle),
                   ),
                 ),
               ),
@@ -83,7 +83,7 @@ class TripCard extends StatelessWidget {
                           const SizedBox(height: 3),
                           Row(
                             children: [
-                              const Icon(
+                               Icon(
                                 Icons.location_on,
                                 size: 13,
                                 color: AppColors.pin,
@@ -194,7 +194,7 @@ class TripCard extends StatelessWidget {
                             onPressed: onViewDetails,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.accentOrange,
-                              foregroundColor: Colors.white,
+                              foregroundColor: AppColors.textPrimary,
                               minimumSize: const Size(0, 28),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,

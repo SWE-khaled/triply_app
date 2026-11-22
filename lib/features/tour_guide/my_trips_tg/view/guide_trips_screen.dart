@@ -117,7 +117,7 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surfaceDefault,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -152,8 +152,8 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.statusError,
+                foregroundColor: AppColors.textPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -227,7 +227,7 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                               style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 5),
@@ -235,7 +235,7 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                               'Add details, itinerary, availability and pricing',
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
-                                color: Colors.white.withValues(alpha: 0.75),
+                                color: AppColors.textPrimary.withValues(alpha: 0.75),
                               ),
                             ),
                           ],
@@ -248,13 +248,13 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                           height: 36,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
+                            color: AppColors.surfaceDefault.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child:  Icon(
                             Icons.add,
                             size: 20,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -300,7 +300,7 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: selected
-                                    ? Colors.white
+                                    ? AppColors.textPrimary
                                     : AppColors.primary,
                               ),
                             ),

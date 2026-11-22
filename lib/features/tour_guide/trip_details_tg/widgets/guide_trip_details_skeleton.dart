@@ -36,7 +36,7 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                   CircleBackButton(
                     icon: Icons.chevron_left,
                     iconColor: AppColors.titleDark,
-                    backgroundColor: const Color(0xFFF6F1E7),
+                    backgroundColor: AppColors.surfaceElevated,
                     onTap: onBack ?? () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
@@ -66,8 +66,8 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
           Container(
             width: double.infinity,
             transform: Matrix4.translationValues(0, -24, 0),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration:  BoxDecoration(
+              color: AppColors.surfaceDefault,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Padding(
@@ -113,7 +113,7 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: i == 0
-                                    ? Colors.white
+                                    ? AppColors.textPrimary
                                     : AppColors.subtitle,
                               ),
                             ),
@@ -142,7 +142,7 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFBF6EC),
+                      color: AppColors.surfaceElevated,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AppShimmer(

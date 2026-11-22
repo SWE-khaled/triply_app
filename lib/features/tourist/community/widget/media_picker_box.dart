@@ -26,17 +26,17 @@ class MediaPickerBox extends StatelessWidget {
               Container(
                 width: 56,
                 height: 56,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration:  BoxDecoration(
+                  color: AppColors.surfaceDefault,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child:  Icon(
                   Icons.camera_alt_outlined,
                   color: AppColors.primaryTeal,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
+               Text(
                 'Add Photo',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
@@ -46,7 +46,7 @@ class MediaPickerBox extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
+               Text(
                 'Supports JPG, PNG up to 10MB',
                 style: TextStyle(
                   fontWeight: FontWeight.w400,

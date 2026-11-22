@@ -25,7 +25,7 @@ class TripImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fallback = Container(
-      color: const Color(0xFFE6ECEF),
+      color: AppColors.borderSubtle,
       alignment: Alignment.center,
       child: Icon(
         Icons.image,

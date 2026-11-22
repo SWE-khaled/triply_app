@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 class Style {
   final Color? primaryColor,
@@ -12,12 +13,12 @@ class Style {
   // final bool? showMobileWalletIcons;
 
   Style({
-    this.circleProgressColor = Colors.blue,
-    this.primaryColor = Colors.blue,
-    this.appBarBackgroundColor = Colors.blue,
-    this.appBarForegroundColor = Colors.white,
-    this.unselectedColor = Colors.grey,
-    this.scaffoldColor = Colors.white,
+    this.circleProgressColor,
+    this.primaryColor,
+    this.appBarBackgroundColor,
+    this.appBarForegroundColor,
+    this.unselectedColor,
+    this.scaffoldColor,
     this.textStyle,
     this.buttonStyle,
     // this.showMobileWalletIcons = true,
@@ -32,7 +33,7 @@ class Style {
             ), // Moved here to prevent constant expression error
           ),
           backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.textPrimary,
         );
   }
 }

@@ -81,7 +81,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ),
                               Text(
                                 unread > 0 ? '$unread new' : 'All caught up',
-                                style: const TextStyle(
+                                style:  TextStyle(
                                   fontSize: 12,
                                   color: AppColors.textGrey,
                                 ),
@@ -99,7 +99,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         onRetry: controller.load,
                       ),
                       NotificationsInitial() ||
-                      NotificationsLoading() => const Center(
+                      NotificationsLoading() =>  Center(
                         child: CircularProgressIndicator(
                           color: AppColors.primaryTeal,
                         ),
@@ -114,7 +114,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                 Text(
                                   'Today',
                                   style: TextStyle(
                                     fontSize: 15,
@@ -124,7 +124,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 ),
                                 GestureDetector(
                                   onTap: controller.markAllRead,
-                                  child: const Text(
+                                  child:  Text(
                                     'Mark all read',
                                     style: TextStyle(
                                       fontSize: 12,
@@ -138,7 +138,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             for (final n in controller.today)
                               NotificationTile(item: n, onTap: () => _open(n)),
                             const SizedBox(height: 8),
-                            const Text(
+                             Text(
                               'Earlier',
                               style: TextStyle(
                                 fontSize: 15,
@@ -177,17 +177,17 @@ class _SourceWarning extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDECEC),
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 16, color: Colors.redAccent),
+           Icon(Icons.info_outline, size: 16, color: AppColors.statusError),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+              style:  TextStyle(fontSize: 11, color: AppColors.statusError),
             ),
           ),
         ],

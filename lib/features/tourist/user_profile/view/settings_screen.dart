@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
@@ -31,30 +32,30 @@ class SettingsScreen extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.surfaceDefault,
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.surfaceDefault,
               elevation: 0,
               leading: IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_ios_new,
                   size: 18,
-                  color: Color(0xFF0E5865),
+                  color: AppColors.actionPrimary,
                 ),
               ),
-              title: const Text(
+              title: Text(
                 'Settings',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF263A40),
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
             body: Column(
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.fromLTRB(14, 14, 14, 10),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -63,7 +64,7 @@ class SettingsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF263A40),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -71,7 +72,7 @@ class SettingsScreen extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFE6EAEB)),
+                    border: Border.all(color: AppColors.borderSubtle),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -117,12 +118,12 @@ class SettingsScreen extends StatelessWidget {
                 const Spacer(),
                 TextButton(
                   onPressed: () => _logout(context),
-                  child: const Text(
+                  child: Text(
                     'Log out',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0E5865),
+                      color: AppColors.actionPrimary,
                     ),
                   ),
                 ),

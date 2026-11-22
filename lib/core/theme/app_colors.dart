@@ -1,163 +1,184 @@
 import 'package:flutter/material.dart';
 
+import 'app_palette.dart';
+
 /// Central palette for the Triply app.
 ///
-/// Use these in code as `AppColors.<name>` so every screen shares one
-/// source of truth for colors.
+/// Every member delegates to [AppPalette], which resolves the active light or
+/// dark token set. Call sites keep using `AppColors.<name>` unchanged; the
+/// theme cubit swaps the palette when the user toggles the theme.
 class AppColors {
   AppColors._();
 
   // =========================================================================
+  // Theme tokens
+  // =========================================================================
+  static Color get backgroundPrimary => AppPalette.current.backgroundPrimary;
+  static Color get backgroundSecondary =>
+      AppPalette.current.backgroundSecondary;
+  static Color get backgroundTertiary => AppPalette.current.backgroundTertiary;
+  static Color get surfaceDefault => AppPalette.current.surfaceDefault;
+  static Color get surfaceElevated => AppPalette.current.surfaceElevated;
+  static Color get surfaceSelected => AppPalette.current.surfaceSelected;
+  static Color get surfacePressed => AppPalette.current.surfacePressed;
+  static Color get borderDefault => AppPalette.current.borderDefault;
+  static Color get borderSubtle => AppPalette.current.borderSubtle;
+  static Color get borderStrong => AppPalette.current.borderStrong;
+  static Color get actionPrimary => AppPalette.current.actionPrimary;
+  static Color get actionPrimaryHover => AppPalette.current.actionPrimaryHover;
+  static Color get actionPrimaryPressed =>
+      AppPalette.current.actionPrimaryPressed;
+  static Color get actionSecondary => AppPalette.current.actionSecondary;
+  static Color get actionDisabled => AppPalette.current.actionDisabled;
+  static Color get statusSuccess => AppPalette.current.statusSuccess;
+  static Color get statusWarning => AppPalette.current.statusWarning;
+  static Color get statusError => AppPalette.current.statusError;
+  static Color get statusInfo => AppPalette.current.statusInfo;
+  static Color get statusErrorHover => AppPalette.current.statusErrorHover;
+  static Color get statusErrorPressed => AppPalette.current.statusErrorPressed;
+  static Color get iconPrimary => AppPalette.current.iconPrimary;
+  static Color get iconSecondary => AppPalette.current.iconSecondary;
+  static Color get textPrimary => AppPalette.current.textPrimary;
+  static Color get textSecondary => AppPalette.current.textSecondary;
+  static Color get textTertiary => AppPalette.current.textTertiary;
+  static Color get textInverse => AppPalette.current.textInverse;
+  static Color get textDisabled => AppPalette.current.textDisabled;
+  static Color get overlayScrim => AppPalette.current.overlayScrim;
+  static Color get onPrimary => AppPalette.current.onPrimary;
+  static Color get onImage => AppPalette.current.onImage;
+
+  // =========================================================================
   // Primary
   // =========================================================================
-  static const Color primary = Color(0xFF0C4A56);
-  static const Color primaryLight = Color(0xFFEAF3F4);
-  static const Color primaryText = Color(0xFF0C4A56);
-  static const Color primaryTeal = Color(0xFF0E5261);
-  static const Color guidesName = Color.fromARGB(255, 35, 93, 89);
-  static const Color deepNile = Color(0xFF0E5261);
-  static const Color nileCyan = Color(0xFF196B7D);
+  static Color get primary => AppPalette.current.actionPrimary;
+  static Color get primaryLight => AppPalette.current.surfaceSelected;
+  static Color get primaryText => AppPalette.current.actionPrimary;
+  static Color get primaryTeal => AppPalette.current.primaryTeal;
+  static Color get guidesName => AppPalette.current.guidesName;
+  static Color get deepNile => AppPalette.current.actionPrimary;
+  static Color get nileCyan => AppPalette.current.actionSecondary;
 
   // =========================================================================
   // auth
   // =========================================================================
-
-  static const Color darkTeal = Color(0xFF0E4A56);
-  static const Color darkTealEnd = Color(0xFF1C6670);
-  static const Color mutedTeal = Color(0xFF7FA8AC);
-  static const Color signInDark = Color(0xFF14555F);
-  static const Color fieldBackground = Color(0xFFF4F5F6);
-  static const Color fieldBorder = Color(0xFFE3E6E8);
-  static const Color iconGrey = Color(0xFF9AA5A9);
-  static const Color successTeal = Color(0xFF3FAE9A);
-  static const Color lightCircleBg = Color(0xFFEFF3F3);
+  static Color get darkTeal => AppPalette.current.actionPrimary;
+  static Color get darkTealEnd => AppPalette.current.darkTealEnd;
+  static Color get mutedTeal => AppPalette.current.mutedTeal;
+  static Color get signInDark => AppPalette.current.signInDark;
+  static Color get fieldBackground => AppPalette.current.fieldBackground;
+  static Color get fieldBorder => AppPalette.current.borderDefault;
+  static Color get iconGrey => AppPalette.current.iconGrey;
+  static Color get successTeal => AppPalette.current.successTeal;
+  static Color get lightCircleBg => AppPalette.current.lightCircleBg;
 
   // =========================================================================
   // Backgrounds & surfaces
   // =========================================================================
-  static const Color pureWhite = Color(0xFFFFFFFF);
-  static const Color softSand = Color(0xFFF9F8F3);
-  static const Color warmCream = Color(0xFFF4F1EA);
-  static const Color background = Colors.white;
-  static const Color pageBackground = Color(0xFFF7F8F8);
-  static const Color searchBg = Color(0xFFF2F4F4);
-  static const Color chatIconBg = Color(0xFFF2F4F4);
-  static const Color inputFill = Color(0xFFF2F2F2);
-  static const Color storyBg = Color(0xFFFFF8ED);
+  static Color get pureWhite => AppPalette.current.onImage;
+  static Color get softSand => AppPalette.current.backgroundSecondary;
+  static Color get warmCream => AppPalette.current.backgroundSecondary;
+  static Color get background => AppPalette.current.backgroundPrimary;
+  static Color get pageBackground => AppPalette.current.backgroundSecondary;
+  static Color get searchBg => AppPalette.current.backgroundTertiary;
+  static Color get chatIconBg => AppPalette.current.surfaceElevated;
+  static Color get inputFill => AppPalette.current.inputFill;
+  static Color get storyBg => AppPalette.current.storyBg;
 
   // =========================================================================
   // Text
   // =========================================================================
-  static const Color textPrimary = Color(0xFF0E5261);
-  static const Color textSecondary = Color(0xFF6E8B90);
-  static const Color textDark = Color(0xFF111827);
-  static const Color textGrey = Color(0xFF8A8A8A);
-  static const Color subtitle = Color(0xFF7A8A8E);
-  static const Color hint = Color(0xFF9AA9AD);
-  static const Color dateText = Color(0xFF526B72);
-  static const Color guideLabel = Color(0xFF8A9EA3);
-  static const Color title = Color(0xFF0E5261);
-  static const Color titleDark = Color(0xFF111111);
-  static const Color titleDetails = Color(0xFF0E5261);
+  static Color get textDark => AppPalette.current.textPrimary;
+  static Color get textGrey => AppPalette.current.textTertiary;
+  static Color get subtitle => AppPalette.current.textSecondary;
+  static Color get hint => AppPalette.current.textDisabled;
+  static Color get dateText => AppPalette.current.dateText;
+  static Color get guideLabel => AppPalette.current.textTertiary;
+  static Color get title => AppPalette.current.textPrimary;
+  static Color get titleDark => AppPalette.current.textPrimary;
+  static Color get titleDetails => AppPalette.current.textPrimary;
 
   // =========================================================================
   // Borders & dividers
   // =========================================================================
-  static const Color borderColor = Color(0x1A0E5261);
-  static const Color cardBorder = Color(0xFFE5EAEA);
-  static const Color cardShadow = Color(0x1A000000);
+  static Color get borderColor => AppPalette.current.borderSubtle;
+  static Color get cardBorder => AppPalette.current.borderSubtle;
+  static Color get cardShadow => AppPalette.current.overlayScrim;
 
   // =========================================================================
   // Accent
   // =========================================================================
-  static const Color price = Color(0xFFE07B39);
-  static const Color priceTeal = Color(0xFF0E5261);
-  static const Color accentOrange = Color(0xFFE86A2C);
-  static const Color pin = Color(0xFFE2703A);
-  static const Color star = Color(0xFFF5A623);
-  static const Color starGold = Color(0xFFD8B66A);
-  static const Color iconDetails = Color(0xFF86A8B0);
+  static Color get price => AppPalette.current.price;
+  static Color get priceTeal => AppPalette.current.actionSecondary;
+  static Color get accentOrange => AppPalette.current.statusErrorPressed;
+  static Color get pin => AppPalette.current.statusErrorPressed;
+  static Color get star => AppPalette.current.star;
+  static Color get starGold => AppPalette.current.statusWarning;
+  static Color get iconDetails => AppPalette.current.iconSecondary;
 
   // =========================================================================
   // Tabs
   // =========================================================================
-  static const Color tabSelectedBg = Color(0xFF0E5261);
-  static final Color tabUnselectedBg = Colors.black.withValues(alpha: 0.06);
-  static const Color tabUnselected = Color(0xffFBF7EF);
+  static Color get tabSelectedBg => AppPalette.current.actionPrimary;
+  static Color get tabUnselectedBg => AppPalette.current.surfaceElevated;
+  static Color get tabUnselected => AppPalette.current.tabUnselected;
 
   // =========================================================================
   // Bottom nav
   // =========================================================================
-  static const Color bottomNavSelected = Color(0xFF0E4B4A);
-  static const Color bottomNavUnselected = Color(0xFFB0BEC5);
+  static Color get bottomNavSelected => AppPalette.current.iconPrimary;
+  static Color get bottomNavUnselected =>
+      AppPalette.current.bottomNavUnselected;
 
   // =========================================================================
   // Guided tour
   // =========================================================================
-  static const Color guidedTourText = Color(0xFF4DA7A0);
-  static final Color guidedTourBg = const Color(
-    0xFF4DA7A0,
-  ).withValues(alpha: 0.15);
-  static const Color bulletGold = Color(0xFFD8B66A);
-  static const Color chipGrey = Color(0xFFF0F3F3);
-  static const Color chipTextGrey = Color(0xFF526B72);
+  static Color get guidedTourText => AppPalette.current.guidedTourText;
+  static Color get guidedTourBg => AppPalette.current.guidedTourBg;
+  static Color get bulletGold => AppPalette.current.statusWarning;
+  static Color get chipGrey => AppPalette.current.surfaceElevated;
+  static Color get chipTextGrey => AppPalette.current.dateText;
 
   // =========================================================================
   // Admin Dashboard (prefix: admin)
   // =========================================================================
+  static Color get adminPrimary => AppPalette.current.actionPrimary;
+  static Color get adminPrimaryLight => AppPalette.current.adminPrimaryLight;
 
-  // Primary teal palette
-  static const Color adminPrimary = Color(0xFF1B4F5C);
-  static const Color adminPrimaryLight = Color(0xFFDEF0EE);
+  static Color get adminBackground => AppPalette.current.adminBackground;
+  static Color get adminCardBg => AppPalette.current.surfaceDefault;
+  static Color get adminSidebarBg => AppPalette.current.backgroundSecondary;
+  static Color get adminInputBg => AppPalette.current.surfaceDefault;
+  static Color get adminDocumentPreviewBg => AppPalette.current.surfaceElevated;
 
-  // Backgrounds
-  static const Color adminBackground = Color(0xFFECF0F5);
-  static const Color adminCardBg = Color(0xFFFFFFFF);
-  static const Color adminSidebarBg = Color(0xFFFFFFFF);
-  static const Color adminInputBg = Color(0xFFF5F6F8);
-  static const Color adminDocumentPreviewBg = Color(0xFFF7F4EF);
+  static Color get adminTextPrimary => AppPalette.current.textPrimary;
+  static Color get adminTextSecondary => AppPalette.current.textSecondary;
+  static Color get adminTextMuted => AppPalette.current.textDisabled;
+  static Color get adminTextLink => AppPalette.current.actionSecondary;
 
-  // Text
-  static const Color adminTextPrimary = Color(0xFF1A3344);
-  static const Color adminTextSecondary = Color(0xFF6B7280);
-  static const Color adminTextMuted = Color(0xFF9CA3AF);
-  static const Color adminTextLink = Color(0xFF1B4F5C);
+  static Color get adminStatusActiveBg => AppPalette.current.surfaceDefault;
+  static Color get adminStatusActiveText => AppPalette.current.statusSuccess;
+  static Color get adminStatusPendingBg => AppPalette.current.surfaceElevated;
+  static Color get adminStatusPendingText => AppPalette.current.statusWarning;
+  static Color get adminStatusSuspendedBg => AppPalette.current.surfaceElevated;
+  static Color get adminStatusSuspendedText => AppPalette.current.textSecondary;
+  static Color get adminStatusCancelledBg => AppPalette.current.surfaceDefault;
+  static Color get adminStatusCancelledText => AppPalette.current.statusError;
 
-  // Status — Active / Approved / Confirmed
-  static const Color adminStatusActiveBg = Color(0xFFDEF2EE);
-  static const Color adminStatusActiveText = Color(0xFF0E7B6B);
+  static Color get adminDanger => AppPalette.current.statusError;
+  static Color get adminDangerLight => AppPalette.current.surfaceDefault;
 
-  // Status — Pending
-  static const Color adminStatusPendingBg = Color(0xFFF5EDD8);
-  static const Color adminStatusPendingText = Color(0xFF7A5A20);
+  static Color get adminDivider => AppPalette.current.borderSubtle;
+  static Color get adminBorderLight => AppPalette.current.borderSubtle;
 
-  // Status — Suspended / Inactive
-  static const Color adminStatusSuspendedBg = Color(0xFFE5E7EB);
-  static const Color adminStatusSuspendedText = Color(0xFF374151);
+  static Color get adminSidebarActiveBg => AppPalette.current.actionPrimary;
+  static Color get adminSidebarActiveText => AppPalette.current.textPrimary;
+  static Color get adminSidebarInactiveText => AppPalette.current.textSecondary;
 
-  // Status — Cancelled
-  static const Color adminStatusCancelledBg = Color(0xFFFEE2E2);
-  static const Color adminStatusCancelledText = Color(0xFFDC2626);
-
-  // Danger / Destructive
-  static const Color adminDanger = Color(0xFFD4504A);
-  static const Color adminDangerLight = Color(0xFFFDECEA);
-
-  // Divider & borders
-  static const Color adminDivider = Color(0xFFE5E7EB);
-  static const Color adminBorderLight = Color(0xFFEDF0F5);
-
-  // Sidebar active item
-  static const Color adminSidebarActiveBg = Color(0xFF1B4F5C);
-  static const Color adminSidebarActiveText = Colors.white;
-  static const Color adminSidebarInactiveText = Color(0xFF1B4F5C);
-
-  // Misc
-  static const Color adminLogoutRed = Color(0xFFD4504A);
-  static const Color adminManageAllGreen = Color(0xFF1B4F5C);
-  static const Color adminPendingChipBg = Color(0xFFF5EDD8);
-  static const Color adminPendingChipText = Color(0xFF7A5A20);
-  static const Color adminPositiveGreen = Color(0xFF0E7B6B);
-  static const Color adminStatBadgeBg = Color(0xFFF0F3F6);
-  static const Color adminStatBadgeText = Color(0xFF6B7280);
+  static Color get adminLogoutRed => AppPalette.current.statusError;
+  static Color get adminManageAllGreen => AppPalette.current.statusSuccess;
+  static Color get adminPendingChipBg => AppPalette.current.surfaceElevated;
+  static Color get adminPendingChipText => AppPalette.current.statusWarning;
+  static Color get adminPositiveGreen => AppPalette.current.statusSuccess;
+  static Color get adminStatBadgeBg => AppPalette.current.surfaceElevated;
+  static Color get adminStatBadgeText => AppPalette.current.textSecondary;
 }

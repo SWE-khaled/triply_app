@@ -12,11 +12,11 @@ import '../widget/booking_type_pill.dart';
 
 /// Cream tint from Figma (back button). Local const only — the global
 /// theme in `core/theme/` is left untouched.
-const Color _cream = Color(0xFFFAF5EA);
+Color get _cream => AppColors.surfaceElevated;
 
 /// Hairline card border from Figma (near-white on white). Local const only —
 /// the global theme in `core/theme/` is left untouched.
-const Color _hairline = Color(0xFFF7F9FA);
+Color get _hairline => AppColors.surfaceElevated;
 
 /// Traveler profile + trip booking details for one New Booking.
 /// Opened from [DashboardScreen] with a booking id.
@@ -40,12 +40,12 @@ class _BookingDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
+             Padding(
               padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
@@ -66,7 +66,7 @@ class _BookingDetailsView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            const Divider(height: 1, thickness: 1, color: _hairline),
+             Divider(height: 1, thickness: 1, color: _hairline),
             const SizedBox(height: 18),
             // The builder sits outside the scroll view, so the loading
             // skeleton fills the same area the cards will occupy.
@@ -107,7 +107,7 @@ class _BookingDetailsView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _hairline),
       ),
@@ -125,7 +125,7 @@ class _BookingDetailsView extends StatelessWidget {
           Text(
             details.guestName,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
               color: AppColors.title,
@@ -134,7 +134,7 @@ class _BookingDetailsView extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             '${details.country} · ${details.travelerLabel}',
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
           const SizedBox(height: 12),
           BookingTypePill(isPrivate: details.isPrivate),
@@ -148,7 +148,7 @@ class _BookingDetailsView extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _hairline),
       ),
@@ -157,7 +157,7 @@ class _BookingDetailsView extends StatelessWidget {
         children: [
           Text(
             details.tourTitle,
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
               color: AppColors.title,
@@ -166,17 +166,17 @@ class _BookingDetailsView extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             details.datetimeLabel,
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
           const SizedBox(height: 4),
           Text(
             details.location,
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
           const SizedBox(height: 4),
           Text(
             'Booking #${details.bookingCode} · ${details.priceLabel}',
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
         ],
       ),

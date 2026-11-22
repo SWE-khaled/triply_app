@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../common/auth/cubit/auth_cubit.dart';
@@ -14,38 +15,38 @@ class MyPostsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.white,
+    backgroundColor: AppColors.surfaceDefault,
     appBar: AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       scrolledUnderElevation: 0.0,
       elevation: 0,
       leading: IconButton(
         onPressed: () => Navigator.pop(context),
-        icon: const Icon(
+        icon:  Icon(
           Icons.arrow_back_ios_new,
           size: 18,
-          color: Color(0xFF0E5865),
+          color: AppColors.actionPrimary,
         ),
       ),
-      title: const Text(
+      title:  Text(
         'My posts',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF263A40),
+          color: AppColors.textPrimary,
         ),
       ),
     ),
     body: Column(
       children: [
-        const Padding(
+         Padding(
           padding: EdgeInsets.fromLTRB(10, 8, 10, 14),
           child: Text(
             'Your published travel moments, all in one place. View or remove a post.',
             style: TextStyle(
               fontSize: 11,
               height: 1.5,
-              color: Color(0xFF62777D),
+              color: AppColors.textSecondary,
             ),
           ),
         ),
@@ -70,13 +71,13 @@ class MyPostsScreen extends StatelessWidget {
                 context.read<AuthCubit>().user?.uid,
               );
               if (posts.isEmpty) {
-                return const Center(
+                return  Center(
                   child: Padding(
                     padding: EdgeInsets.all(28),
                     child: Text(
                       'You have no published travel moments yet.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFF62777D)),
+                      style: TextStyle(color: AppColors.textSecondary),
                     ),
                   ),
                 );
@@ -95,14 +96,14 @@ class MyPostsScreen extends StatelessWidget {
                       child: _MyPostItem(post: post),
                     ),
                   ],
-                  const Center(
+                   Center(
                     child: Padding(
                       padding: EdgeInsets.only(top: 8),
                       child: Text(
                         "You're all caught up with your travel moments.",
                         style: TextStyle(
                           fontSize: 10,
-                          color: Color(0xFF62777D),
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ),
@@ -158,21 +159,21 @@ class _MyPostItem extends StatelessWidget {
                 Expanded(
                   child: Text(
                     post.location,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 10,
-                      color: Color(0xFF62777D),
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () => context.read<PostActionsCubit>().delete(),
-                  child: const Text(
+                  child:  Text(
                     'Delete',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0E5865),
+                      color: AppColors.actionPrimary,
                     ),
                   ),
                 ),

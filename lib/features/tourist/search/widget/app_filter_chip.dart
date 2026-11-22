@@ -21,7 +21,7 @@ class AppFilterChip extends StatelessWidget {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.guidesName : const Color(0xFFF2F2F2),
+          color: selected ? AppColors.guidesName : AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -29,7 +29,7 @@ class AppFilterChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.textGrey,
+            color: selected ? AppColors.textPrimary : AppColors.textGrey,
           ),
         ),
       ),

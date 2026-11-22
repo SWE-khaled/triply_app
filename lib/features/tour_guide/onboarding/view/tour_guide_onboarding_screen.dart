@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/constants/app_asset.dart';
+import 'package:triply/core/theme/app_colors.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/services/app_prefs.dart';
 
@@ -11,7 +13,7 @@ class TourGuideOnboardingScreen extends StatefulWidget {
 }
 
 class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
-  static const Color _primary = Color.fromARGB(255, 8, 64, 76);
+  static Color get _primary => AppColors.actionPrimary;
 
   final PageController _pageController = PageController();
   int _currentPage = 0;
@@ -22,19 +24,19 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
       'title': 'Share Egypt Your Way',
       'subtitle':
           'Turn your knowledge of Egypt into unforgettable experiences for travelers.',
-      'image': 'assets/images/choice_role/onboardingTour1.png',
+      'image': AppAsset.onboardingTour1,
     },
     {
       'title': 'Create Experiences',
       'subtitle':
           'Create trips and guide services that travelers can discover and book.',
-      'image': 'assets/images/choice_role/onboardingTour2.jpg',
+      'image': AppAsset.onboardingTour2,
     },
     {
       'title': 'Grow Your Guide Business',
       'subtitle':
           'Manage bookings, communicate with travelers, host your trips and track your earnings, all in one place.',
-      'image': 'assets/images/choice_role/onboardingTour3.jpg',
+      'image': AppAsset.onboardingTour3,
     },
   ];
 
@@ -75,9 +77,9 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
       height: double.infinity,
       filterQuality: FilterQuality.high,
       errorBuilder: (context, error, stack) => Container(
-        color: const Color(0xFFEAE8E2),
+        color: AppColors.backgroundTertiary,
         alignment: Alignment.center,
-        child: const Icon(Icons.broken_image, color: _primary, size: 48),
+        child:  Icon(Icons.broken_image, color: _primary, size: 48),
       ),
     );
   }
@@ -87,7 +89,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
     final isLast = _currentPage == _slides.length - 1;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceDefault,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -120,7 +122,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                   ),
                   TextButton(
                     onPressed: _goToLogin,
-                    child: const Text(
+                    child:  Text(
                       'Skip',
                       style: TextStyle(
                         color: _primary,
@@ -160,7 +162,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                         const SizedBox(height: 24),
                         Text(
                           'FOR TOUR GUIDES · 0${index + 1} / 0${_slides.length}',
-                          style: const TextStyle(
+                          style:  TextStyle(
                             color: _primary,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -170,19 +172,19 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                         const SizedBox(height: 12),
                         Text(
                           slide['title']!,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF1F2D33),
+                            color: AppColors.textPrimary,
                             height: 1.2,
                           ),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           slide['subtitle']!,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontSize: 15,
-                            color: Color(0xFF6B7478),
+                            color: AppColors.textSecondary,
                             height: 1.5,
                           ),
                         ),
@@ -207,7 +209,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? _primary
-                              : const Color(0xFFD5DADC),
+                              : AppColors.borderSubtle,
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -216,7 +218,7 @@ class _TourGuideOnboardingScreenState extends State<TourGuideOnboardingScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.textPrimary,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 56,

@@ -16,7 +16,7 @@ void showAppSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(icon, size: 18, color: Colors.white),
+            Icon(icon, size: 18, color: AppColors.textPrimary),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -24,7 +24,7 @@ void showAppSnackBar(
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),

@@ -33,7 +33,7 @@ class LocationCategoryChip extends StatelessWidget {
             Icon(
               icon,
               size: 16,
-              color: selected ? Colors.white : AppColors.primaryTeal,
+              color: selected ? AppColors.textPrimary : AppColors.primaryTeal,
             ),
             const SizedBox(width: 6),
             Text(
@@ -41,7 +41,7 @@ class LocationCategoryChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: selected ? Colors.white : AppColors.primaryTeal,
+                color: selected ? AppColors.textPrimary : AppColors.primaryTeal,
               ),
             ),
           ],

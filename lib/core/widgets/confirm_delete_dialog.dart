@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Delete confirmation replacing post dialog (`community_screen.dart:498`)
 /// and story dialog (`story_viewer_screen.dart:111`). Fixes the 'Cancle' typo.
@@ -47,7 +48,10 @@ class ConfirmDeleteDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text(deleteLabel, style: const TextStyle(color: Colors.red)),
+          child: Text(
+            deleteLabel,
+            style: TextStyle(color: AppColors.statusError),
+          ),
         ),
       ],
     );

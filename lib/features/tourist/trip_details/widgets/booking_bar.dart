@@ -26,7 +26,7 @@ class BookingBar extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.location_on, size: 16, color: AppColors.starGold),
+             Icon(Icons.location_on, size: 16, color: AppColors.starGold),
             const SizedBox(width: 6),
             Expanded(
               child: Column(
@@ -84,7 +84,7 @@ class BookingBar extends StatelessWidget {
                 onPressed: onBookNow,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accentOrange,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.textPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 12,

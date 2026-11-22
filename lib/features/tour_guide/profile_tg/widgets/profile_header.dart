@@ -54,7 +54,7 @@ class ProfileHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFF0E5261),
+      color: AppColors.actionPrimary,
       padding: EdgeInsets.fromLTRB(16, topInset + 16, 16, 20),
       child: Stack(
         children: [
@@ -68,7 +68,7 @@ class ProfileHeader extends StatelessWidget {
                   height: 88,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
+                    border: Border.all(color: AppColors.borderStrong, width: 3),
                   ),
                   child: ClipOval(
                     child: ProfileAvatar(
@@ -93,7 +93,7 @@ class ProfileHeader extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -104,14 +104,14 @@ class ProfileHeader extends StatelessWidget {
                         width: 20,
                         height: 20,
                         alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF4DA7A0),
+                        decoration:  BoxDecoration(
+                          color: AppColors.actionSecondary,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child:  Icon(
                           Icons.check,
                           size: 13,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                   ],
@@ -122,7 +122,7 @@ class ProfileHeader extends StatelessWidget {
                     specialty,
                     style: GoogleFonts.poppins(
                       fontSize: 12,
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: AppColors.textPrimary.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -130,7 +130,7 @@ class ProfileHeader extends StatelessWidget {
                 Row(
                   children: [
                     if (reviewCount > 0) ...[
-                      const Icon(
+                       Icon(
                         Icons.star,
                         size: 13,
                         color: AppColors.starGold,
@@ -144,7 +144,7 @@ class ProfileHeader extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -152,10 +152,10 @@ class ProfileHeader extends StatelessWidget {
                     ],
                     if (displayLocation != null &&
                         displayLocation!.isNotEmpty) ...[
-                      const Icon(
+                       Icon(
                         Icons.location_on,
                         size: 13,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                       const SizedBox(width: 2),
                       Flexible(
@@ -165,7 +165,7 @@ class ProfileHeader extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.poppins(
                             fontSize: 11,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -176,7 +176,7 @@ class ProfileHeader extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.phone, size: 13, color: Colors.white),
+                       Icon(Icons.phone, size: 13, color: AppColors.textPrimary),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
@@ -185,7 +185,7 @@ class ProfileHeader extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.poppins(
                             fontSize: 11,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -208,13 +208,13 @@ class ProfileHeader extends StatelessWidget {
                 height: 34,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.3),
+                  color: AppColors.overlayScrim.withValues(alpha: 0.3),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child:  Icon(
                   Icons.edit_outlined,
                   size: 20,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),

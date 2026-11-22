@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:triply/core/theme/app_colors.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -38,11 +39,11 @@ class SelectedImagePreview extends StatelessWidget {
               onTap: onRemove,
               child: Container(
                 padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.black54,
+                decoration: BoxDecoration(
+                  color: AppColors.overlayScrim.withValues(alpha: 0.54),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.close, size: 18, color: Colors.white),
+                child:  Icon(Icons.close, size: 18, color: AppColors.surfaceDefault),
               ),
             ),
           ),

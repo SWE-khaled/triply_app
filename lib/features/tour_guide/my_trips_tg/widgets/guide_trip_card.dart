@@ -24,7 +24,7 @@ class GuideTripCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -77,7 +77,7 @@ class GuideTripCard extends StatelessWidget {
                                       size: 20,
                                       color: onDelete == null
                                           ? AppColors.subtitle
-                                          : Colors.redAccent,
+                                          : AppColors.statusError,
                                     ),
                                   ),
                                 ),
@@ -86,7 +86,7 @@ class GuideTripCard extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(
+                                 Icon(
                                   Icons.location_on,
                                   size: 12,
                                   color: AppColors.subtitle,
@@ -158,7 +158,7 @@ class GuideTripCard extends StatelessWidget {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF6F1E7),
+                        color: AppColors.surfaceElevated,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
@@ -189,7 +189,7 @@ class GuideTripCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ),

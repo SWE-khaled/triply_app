@@ -12,7 +12,7 @@ class MapPlaceMarker extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: const Icon(
+      child:  Icon(
         Icons.location_on,
         color: AppColors.primaryTeal,
         size: 40,

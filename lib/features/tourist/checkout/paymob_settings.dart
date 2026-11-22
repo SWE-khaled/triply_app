@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:triply/features/tourist/checkout/style.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -60,9 +59,9 @@ class PaymobSettings {
       style: Style(
         primaryColor: AppColors.primary,
         appBarBackgroundColor: AppColors.primary,
-        appBarForegroundColor: Colors.white,
+        appBarForegroundColor: AppColors.textPrimary,
         unselectedColor: AppColors.subtitle,
-        scaffoldColor: Colors.white,
+        scaffoldColor: AppColors.backgroundPrimary,
         circleProgressColor: AppColors.primary,
       ),
     );

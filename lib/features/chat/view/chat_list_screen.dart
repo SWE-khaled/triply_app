@@ -106,7 +106,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: BlocBuilder<ChatListCubit, ChatListState>(
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.surfaceDefault,
             body: SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,7 +140,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       children: [
         Text(
           widget.audience.listTitle,
-          style: const TextStyle(
+          style:  TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.6,
@@ -150,7 +150,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         const SizedBox(height: 3),
         Text(
           widget.audience.listSubtitle,
-          style: const TextStyle(
+          style:  TextStyle(
             fontSize: 13.5,
             height: 1.3,
             color: AppColors.subtitle,
@@ -185,8 +185,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
         // style: const TextStyle(fontSize: 14, color: AppColors.title),
         decoration: InputDecoration(
           hintText: 'Search by name or message...',
-          hintStyle: const TextStyle(fontSize: 13.5, color: AppColors.hint),
-          prefixIcon: const Icon(
+          hintStyle:  TextStyle(fontSize: 13.5, color: AppColors.hint),
+          prefixIcon:  Icon(
             Icons.search_rounded,
             color: AppColors.guideLabel,
             size: 22,
@@ -195,7 +195,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ? null
               : IconButton(
                   tooltip: 'Clear search',
-                  icon: const Icon(
+                  icon:  Icon(
                     Icons.close_rounded,
                     size: 19,
                     color: AppColors.guideLabel,
@@ -268,7 +268,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
+          color: selected ? AppColors.primary : AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: selected ? AppColors.primary : AppColors.cardBorder,
@@ -282,7 +282,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : AppColors.primary,
+                color: selected ? AppColors.textPrimary : AppColors.primary,
               ),
             ),
             if (count > 0) ...[
@@ -293,7 +293,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: selected ? Colors.white : AppColors.accentOrange,
+                  color: selected ? AppColors.surfaceDefault : AppColors.accentOrange,
                   borderRadius: BorderRadius.circular(9),
                 ),
                 child: Text(
@@ -302,7 +302,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     fontSize: 10,
                     height: 1,
                     fontWeight: FontWeight.w800,
-                    color: selected ? AppColors.primary : Colors.white,
+                    color: selected ? AppColors.primary : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -315,7 +315,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   Widget _body(ChatListState state) {
     return switch (state) {
-      ChatListInitial() || ChatListLoading() => const Center(
+      ChatListInitial() || ChatListLoading() =>  Center(
         child: CircularProgressIndicator(
           color: AppColors.priceTeal,
           strokeWidth: 2.5,
@@ -333,7 +333,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+             Icon(
               Icons.cloud_off_outlined,
               size: 42,
               color: AppColors.subtitle,
@@ -342,7 +342,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 13,
                 height: 1.5,
                 color: AppColors.subtitle,
@@ -415,11 +415,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
               child: Container(
                 width: 92,
                 height: 92,
-                decoration: const BoxDecoration(
+                decoration:  BoxDecoration(
                   color: AppColors.primaryLight,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child:  Icon(
                   Icons.forum_outlined,
                   size: 40,
                   color: AppColors.primary,
@@ -427,7 +427,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
             ),
             const SizedBox(height: 22),
-            const Text(
+             Text(
               'No conversations found',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -440,7 +440,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 13.5,
                 height: 1.5,
                 color: AppColors.subtitle,
@@ -486,13 +486,13 @@ class _ChatTile extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        // : Colors.white,
+        color: AppColors.surfaceDefault,
+        // : AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: AppColors.overlayScrim.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -588,11 +588,11 @@ class _ChatTile extends StatelessWidget {
                               ),
                               child: Text(
                                 unread > 99 ? '99+' : '$unread',
-                                style: const TextStyle(
+                                style:  TextStyle(
                                   fontSize: 11,
                                   height: 1,
                                   fontWeight: FontWeight.w800,
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                 ),
                               ),
                             ),

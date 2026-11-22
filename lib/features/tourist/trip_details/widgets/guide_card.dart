@@ -41,8 +41,8 @@ class GuideCard extends StatelessWidget {
                     errorBuilder: (_, _, _) => Container(
                       width: 44,
                       height: 44,
-                      color: const Color(0xFFE6ECEF),
-                      child: const Icon(
+                      color: AppColors.borderSubtle,
+                      child:  Icon(
                         Icons.person,
                         color: AppColors.subtitle,
                       ),
@@ -56,9 +56,9 @@ class GuideCard extends StatelessWidget {
                     width: 12,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF25C05D),
+                      color: AppColors.statusSuccess,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: AppColors.borderStrong, width: 2),
                     ),
                   ),
                 ),
@@ -98,7 +98,7 @@ class GuideCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      const Icon(
+                       Icon(
                         Icons.star,
                         size: 12,
                         color: AppColors.starGold,
@@ -134,7 +134,7 @@ class GuideCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
+                         Icon(
                           Icons.phone,
                           size: 12,
                           color: AppColors.starGold,
@@ -154,7 +154,7 @@ class GuideCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+             Icon(
               Icons.chevron_right,
               color: AppColors.subtitle,
               size: 18,

@@ -19,7 +19,7 @@ class TripCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Color(0xFFFAF5EC),
+          color: AppColors.surfaceElevated,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,9 +39,9 @@ class TripCard extends StatelessWidget {
                   height: 82,
                   color: AppColors.primaryLight,
                   alignment: Alignment.center,
-                  child: const Icon(
+                  child:  Icon(
                     Icons.landscape,
-                    color: Color(0xFF0E5261),
+                    color: AppColors.actionPrimary,
                     size: 28,
                   ),
                 ),
@@ -58,7 +58,7 @@ class TripCard extends StatelessWidget {
                   children: [
                     Text(
                       trip.title,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppColors.title,
@@ -67,7 +67,7 @@ class TripCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${trip.dateLabel} - ${trip.durationLabel}',
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 12,
                         color: AppColors.subtitle,
                       ),
@@ -75,7 +75,7 @@ class TripCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       ' ${trip.price.toStringAsFixed(0)} ${trip.currency}',
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         color: AppColors.price,

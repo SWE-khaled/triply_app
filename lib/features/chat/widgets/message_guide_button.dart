@@ -77,7 +77,7 @@ class MessageGuideButton extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primary,
             minimumSize: const Size(0, 52),
-            side: const BorderSide(color: AppColors.primary),
+            side:  BorderSide(color: AppColors.primary),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(26),
             ),
@@ -99,11 +99,11 @@ class MessageGuideButton extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: const Color(0xFFFAF5EC),
+              color: AppColors.surfaceElevated,
               border: Border.all(color: AppColors.guideLabel),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child:  Icon(
               Icons.chat_bubble_outline,
               color: AppColors.primary,
             ),

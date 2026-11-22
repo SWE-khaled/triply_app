@@ -196,7 +196,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: const Color(0xFFE6ECEF),
+                    backgroundColor: AppColors.borderSubtle,
                     child: picked != null
                         ? ClipOval(
                             child: Image.file(
@@ -220,10 +220,10 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     child: CircleAvatar(
                       radius: 16,
                       backgroundColor: Theme.of(context).primaryColor,
-                      child: const Icon(
+                      child:  Icon(
                         Icons.camera_alt,
                         size: 16,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -307,7 +307,7 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryTeal,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.textPrimary,
                   minimumSize: const Size(double.infinity, 48),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

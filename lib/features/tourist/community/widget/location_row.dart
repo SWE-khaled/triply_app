@@ -22,18 +22,18 @@ class LocationRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(
+             Icon(
               Icons.location_on_outlined,
               color: AppColors.primaryTeal,
             ),
             const SizedBox(width: 8),
-            const Text(
+             Text(
               'Add Location',
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 14,
                 letterSpacing: 0,
-                color: Color(0xFF17343B),
+                color: AppColors.textPrimary,
               ),
             ),
             const Spacer(),

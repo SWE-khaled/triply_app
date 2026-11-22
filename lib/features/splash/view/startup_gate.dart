@@ -67,8 +67,8 @@ class _StartupLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFFF8F4E9),
+    return  Scaffold(
+      backgroundColor: AppColors.backgroundSecondary,
       body: Center(
         child: SizedBox(
           width: 32,
@@ -96,7 +96,7 @@ class _StartupErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4E9),
+      backgroundColor: AppColors.backgroundSecondary,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -113,13 +113,13 @@ class _StartupErrorView extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                         Icon(
                           Icons.cloud_off_outlined,
                           size: 56,
                           color: AppColors.deepNile,
                         ),
                         const SizedBox(height: 16),
-                        const Text(
+                         Text(
                           'Could not start Triply',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -132,7 +132,7 @@ class _StartupErrorView extends StatelessWidget {
                         Text(
                           _displayMessage,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Color(0xFF6B7478)),
+                          style:  TextStyle(color: AppColors.textSecondary),
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
@@ -140,7 +140,7 @@ class _StartupErrorView extends StatelessWidget {
                               context.read<StartupCubit>().resolve(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.deepNile,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.textPrimary,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 32,
                               vertical: 14,

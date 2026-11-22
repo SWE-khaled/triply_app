@@ -24,12 +24,12 @@ class AboutTab extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           place.about,
-          style: const TextStyle(
+          style:  TextStyle(
             fontWeight: FontWeight.w400,
             fontSize: 14,
             letterSpacing: 0,
             height: 1.6,
-            color: Color(0xFF374151),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -47,16 +47,16 @@ class AboutTab extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               children: [
-                const Icon(Icons.circle, size: 10, color: AppColors.bulletGold),
+                 Icon(Icons.circle, size: 10, color: AppColors.bulletGold),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     h,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                       letterSpacing: 0,
-                      color: Color(0xFF526B72),
+                      color: AppColors.textSecondary,
                     ),
                   ),
                 ),

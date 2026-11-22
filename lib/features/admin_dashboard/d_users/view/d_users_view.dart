@@ -87,7 +87,7 @@ class _UsersBody extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const Divider(color: AppColors.adminDivider, height: 1),
+                     Divider(color: AppColors.adminDivider, height: 1),
                   ],
                 );
 
@@ -179,7 +179,7 @@ class _UserRow extends StatelessWidget {
     final isSuspended = tourist.status == 'suspended';
     return Column(
       children: [
-        const Divider(color: AppColors.adminDivider, height: 1),
+         Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(

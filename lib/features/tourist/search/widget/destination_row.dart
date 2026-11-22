@@ -24,7 +24,7 @@ class DestinationRow extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFFF7F7F7),
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -45,7 +45,7 @@ class DestinationRow extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryTeal,
@@ -54,7 +54,7 @@ class DestinationRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 12,
                       color: AppColors.textGrey,
                     ),
@@ -62,7 +62,7 @@ class DestinationRow extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+             Icon(
               Icons.chevron_right,
               size: 18,
               color: AppColors.textGrey,

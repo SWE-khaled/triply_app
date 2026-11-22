@@ -12,10 +12,10 @@ class AppShimmer extends StatelessWidget {
 
   const AppShimmer({super.key, required this.child});
 
-  /// Base/highlight match the app's light surfaces, so the sweep stays subtle
-  /// on white cards.
-  static const Color _base = Color(0xFFEDF2F2);
-  static const Color _highlight = Color(0xFFF9FBFB);
+  /// Base/highlight match the app's surfaces, so the sweep stays subtle on
+  /// cards in both themes.
+  static Color get _base => AppColors.surfaceDefault;
+  static Color get _highlight => AppColors.surfaceElevated;
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +38,14 @@ class ShimmerBox extends StatelessWidget {
   final double? width;
   final double? height;
   final BorderRadius borderRadius;
-  final Color color;
+  final Color? color;
 
   const ShimmerBox({
     super.key,
     this.width,
     this.height,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
-    this.color = const Color(0xFFE7EDED),
+    this.color,
   });
 
   @override
@@ -53,7 +53,10 @@ class ShimmerBox extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      decoration: BoxDecoration(color: color, borderRadius: borderRadius),
+      decoration: BoxDecoration(
+        color: color ?? AppColors.borderSubtle,
+        borderRadius: borderRadius,
+      ),
     );
   }
 }
@@ -61,20 +64,19 @@ class ShimmerBox extends StatelessWidget {
 /// Circular placeholder (avatars, icon bubbles).
 class ShimmerCircle extends StatelessWidget {
   final double size;
-  final Color color;
+  final Color? color;
 
-  const ShimmerCircle({
-    super.key,
-    required this.size,
-    this.color = const Color(0xFFE7EDED),
-  });
+  const ShimmerCircle({super.key, required this.size, this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: color ?? AppColors.borderSubtle,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }
@@ -85,14 +87,14 @@ class ShimmerLine extends StatelessWidget {
   final double? width;
   final double height;
   final double radius;
-  final Color color;
+  final Color? color;
 
   const ShimmerLine({
     super.key,
     this.width,
     this.height = 12,
     this.radius = 6,
-    this.color = const Color(0xFFE7EDED),
+    this.color,
   });
 
   @override
@@ -101,7 +103,7 @@ class ShimmerLine extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: color,
+        color: color ?? AppColors.borderSubtle,
         borderRadius: BorderRadius.circular(radius),
       ),
     );
@@ -128,7 +130,7 @@ class ShimmerCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(radius),
       ),

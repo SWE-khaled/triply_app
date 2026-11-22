@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_colors.dart';
 
 /// Top progress bars extracted from `story_viewer_view.dart:236`.
 class StoryProgressBars extends StatelessWidget {
@@ -22,7 +23,7 @@ class StoryProgressBars extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 2),
             height: 3,
             decoration: BoxDecoration(
-              color: Colors.white30,
+              color: AppColors.textPrimary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
             child: AnimatedBuilder(
@@ -41,7 +42,7 @@ class StoryProgressBars extends StatelessWidget {
                   widthFactor: value,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surfaceDefault,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

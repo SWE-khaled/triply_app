@@ -144,7 +144,7 @@ class _BookingsBody extends StatelessWidget {
             ],
           ),
         ),
-        const Divider(color: AppColors.adminDivider, height: 1),
+         Divider(color: AppColors.adminDivider, height: 1),
       ],
     );
 
@@ -216,7 +216,7 @@ class _BookingRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(color: AppColors.adminDivider, height: 1),
+         Divider(color: AppColors.adminDivider, height: 1),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 13),
           child: Row(
@@ -345,7 +345,7 @@ class _ViewBookingDialog extends StatelessWidget {
               _row('Status:', booking.status.toUpperCase()),
               _row('Type:', booking.type),
               const SizedBox(height: 16),
-              const Divider(color: AppColors.adminDivider),
+               Divider(color: AppColors.adminDivider),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -359,9 +359,9 @@ class _ViewBookingDialog extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.adminPrimary,
                       ),
-                      child: const Text(
+                      child:  Text(
                         'Confirm',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.textPrimary),
                       ),
                     ),
                   if (booking.status != 'confirmed') const SizedBox(width: 8),
@@ -373,7 +373,7 @@ class _ViewBookingDialog extends StatelessWidget {
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.adminDanger,
-                        side: const BorderSide(color: AppColors.adminDanger),
+                        side:  BorderSide(color: AppColors.adminDanger),
                       ),
                       child: const Text('Cancel Booking'),
                     ),

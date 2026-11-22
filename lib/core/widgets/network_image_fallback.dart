@@ -11,7 +11,7 @@ class NetworkImageFallback extends StatelessWidget {
   final double? height;
   final BoxFit fit;
   final IconData fallbackIcon;
-  final Color fallbackColor;
+  final Color? fallbackColor;
 
   const NetworkImageFallback({
     super.key,
@@ -20,7 +20,7 @@ class NetworkImageFallback extends StatelessWidget {
     this.height,
     this.fit = BoxFit.cover,
     this.fallbackIcon = Icons.image,
-    this.fallbackColor = AppColors.chipGrey,
+    this.fallbackColor,
   });
 
   @override
@@ -30,9 +30,9 @@ class NetworkImageFallback extends StatelessWidget {
       return Container(
         width: width,
         height: height,
-        color: fallbackColor,
+        color: fallbackColor ?? AppColors.chipGrey,
         alignment: Alignment.center,
-        child: Icon(fallbackIcon, color: Colors.grey),
+        child: Icon(fallbackIcon, color: AppColors.textDisabled),
       );
     }
     return Image.network(
@@ -43,9 +43,9 @@ class NetworkImageFallback extends StatelessWidget {
       errorBuilder: (_, _, _) => Container(
         width: width,
         height: height,
-        color: fallbackColor,
+        color: fallbackColor ?? AppColors.chipGrey,
         alignment: Alignment.center,
-        child: Icon(fallbackIcon, color: Colors.grey),
+        child: Icon(fallbackIcon, color: AppColors.textDisabled),
       ),
     );
   }

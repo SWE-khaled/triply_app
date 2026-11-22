@@ -13,7 +13,7 @@ class TravelerCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceDefault,
         border: Border.all(color: AppColors.cardBorder),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -30,8 +30,8 @@ class TravelerCard extends StatelessWidget {
                   errorBuilder: (_, _, _) => Container(
                     width: 44,
                     height: 44,
-                    color: const Color(0xFFE6ECEF),
-                    child: const Icon(Icons.person, color: AppColors.subtitle),
+                    color: AppColors.borderSubtle,
+                    child:  Icon(Icons.person, color: AppColors.subtitle),
                   ),
                 ),
               ),
@@ -64,7 +64,7 @@ class TravelerCard extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFBF6EC),
+                  color: AppColors.surfaceElevated,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(

@@ -25,7 +25,7 @@ class BookingKindIcon extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: const TextStyle(
+            style:  TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: AppColors.primaryTeal,
@@ -43,7 +43,7 @@ class PendingApprovalLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return  Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.schedule_outlined, size: 14, color: AppColors.accentOrange),

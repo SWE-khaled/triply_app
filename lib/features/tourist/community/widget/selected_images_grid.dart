@@ -38,7 +38,7 @@ class SelectedImagesGrid extends StatelessWidget {
                 color: AppColors.chipGrey,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child:  Icon(
                 Icons.add_photo_alternate_outlined,
                 color: AppColors.primaryTeal,
               ),
@@ -63,11 +63,11 @@ class SelectedImagesGrid extends StatelessWidget {
                 onTap: () => onRemove(index),
                 child: Container(
                   padding: const EdgeInsets.all(3),
-                  decoration: const BoxDecoration(
-                    color: Colors.black54,
+                  decoration: BoxDecoration(
+                    color: AppColors.overlayScrim.withValues(alpha: 0.54),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close, size: 14, color: Colors.white),
+                  child:  Icon(Icons.close, size: 14, color: AppColors.surfaceDefault),
                 ),
               ),
             ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:triply/core/theme/app_colors.dart';
 import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
@@ -21,8 +22,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  static const Color _bg = Color(0xFFF8F4E9);
-  static const Color _holeColor = Color(0xFFF1D6C3);
+  static Color get _bg => AppColors.backgroundSecondary;
+  static Color get _holeColor => AppColors.backgroundTertiary;
 
   static const double _peakScale = 1.35;
   static const String _word = 'Triply';
@@ -161,7 +162,7 @@ class _SplashScreenState extends State<SplashScreen>
                       opacity: holeOpacity.clamp(0.0, 1.0).toDouble(),
                       child: Transform.scale(
                         scaleX: holeScaleX,
-                        child: const DecoratedBox(
+                        child:  DecoratedBox(
                           decoration: BoxDecoration(
                             color: _holeColor,
                             shape: BoxShape.rectangle,

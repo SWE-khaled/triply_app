@@ -18,7 +18,7 @@ class GuideCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.cardBorder),
         ),
@@ -44,27 +44,27 @@ class GuideCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           guide.name,
-                          style: const TextStyle(
+                          style:  TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                             letterSpacing: 0,
-                            color: Color(0xFF0E5261),
+                            color: AppColors.actionPrimary,
                           ),
                         ),
                       ),
                       if (guide.verified) ...[
                         const SizedBox(width: 4),
-                        const Icon(
+                         Icon(
                           Icons.verified,
                           size: 14,
-                          color: Color(0xFF4DA7A0),
+                          color: AppColors.actionSecondary,
                         ),
                       ],
                     ],
                   ),
                   Text(
                     guide.specialty,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 12,
                       letterSpacing: 0,
@@ -78,7 +78,7 @@ class GuideCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                           Icon(
                             Icons.star,
                             size: 14,
                             color: AppColors.starGold,
@@ -86,16 +86,16 @@ class GuideCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             guide.rating.toStringAsFixed(2),
-                            style: const TextStyle(
+                            style:  TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
                               letterSpacing: 0,
-                              color: Color(0xFF0E5261),
+                              color: AppColors.actionPrimary,
                             ),
                           ),
                           Text(
                             ' (${guide.reviewsCount})',
-                            style: const TextStyle(
+                            style:  TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 12,
                               letterSpacing: 0,
@@ -110,14 +110,14 @@ class GuideCard extends StatelessWidget {
                             TextSpan(
                               text:
                                   'From \$${guide.pricePerHour.toStringAsFixed(0)}',
-                              style: const TextStyle(
+                              style:  TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
                                 letterSpacing: 0,
                                 color: AppColors.accentOrange,
                               ),
                             ),
-                            const TextSpan(
+                             TextSpan(
                               text: '/hr',
                               style: TextStyle(
                                 fontWeight: FontWeight.w400,

@@ -77,7 +77,7 @@ class _BookingScreenState extends State<BookingScreen> {
         child: BlocBuilder<BookingCubit, BookingState>(
           builder: (context, _) {
             return Scaffold(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.surfaceDefault,
               body: SafeArea(
                 child: Builder(
                   builder: (context) {
@@ -127,19 +127,19 @@ class _BookingScreenState extends State<BookingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                     Text(
                       'Book Private Guide',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF0E5261),
+                        color: AppColors.actionPrimary,
                       ),
                     ),
                     Text(
                       guide.name,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 12,
                         color: AppColors.subtitle,
                       ),
@@ -159,8 +159,8 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget _backButton(VoidCallback onTap) {
     return CircleBackButton(
       icon: Icons.chevron_left,
-      iconColor: const Color(0xFF0E5261),
-      backgroundColor: const Color(0xFFF3F4F6),
+      iconColor: AppColors.actionPrimary,
+      backgroundColor: AppColors.surfaceElevated,
       onTap: onTap,
     );
   }
@@ -193,7 +193,7 @@ class _BookingScreenState extends State<BookingScreen> {
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _controller.selectedPlace?.id,
-              hint: const Text(
+              hint:  Text(
                 'Choose a place to visit',
                 style: TextStyle(fontSize: 14, color: AppColors.title),
               ),
@@ -205,7 +205,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       child: Text(
                         '${p.name} · ${p.city}',
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontSize: 14,
                           color: AppColors.title,
                         ),
@@ -226,7 +226,7 @@ class _BookingScreenState extends State<BookingScreen> {
           const SizedBox(height: 8),
           Text(
             'Guide rate: ${_controller.guide.formatPrice(_controller.guide.pricePerHour)}/hr · ${_controller.selectedPlace!.name}',
-            style: const TextStyle(fontSize: 12, color: AppColors.subtitle),
+            style:  TextStyle(fontSize: 12, color: AppColors.subtitle),
           ),
         ],
         const SizedBox(height: 16),
@@ -255,13 +255,13 @@ class _BookingScreenState extends State<BookingScreen> {
                 Expanded(
                   child: Text(
                     _controller.date == null ? '' : _controller.dateLabel,
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontSize: 14,
                       color: AppColors.title,
                     ),
                   ),
                 ),
-                const Icon(
+                 Icon(
                   Icons.calendar_today,
                   size: 18,
                   color: AppColors.hint,
@@ -333,7 +333,7 @@ class _BookingScreenState extends State<BookingScreen> {
               child: Center(
                 child: Text(
                   '${_controller.travelers}',
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: AppColors.title,
@@ -371,14 +371,14 @@ class _BookingScreenState extends State<BookingScreen> {
           decoration: InputDecoration(
             hintText:
                 'Any special requests, accessibility needs, or things we should know...',
-            hintStyle: const TextStyle(fontSize: 13, color: AppColors.hint),
+            hintStyle:  TextStyle(fontSize: 13, color: AppColors.hint),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.cardBorder),
+              borderSide:  BorderSide(color: AppColors.cardBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.cardBorder),
+              borderSide:  BorderSide(color: AppColors.cardBorder),
             ),
             contentPadding: const EdgeInsets.all(14),
           ),
@@ -394,7 +394,7 @@ class _BookingScreenState extends State<BookingScreen> {
       child: Container(
         width: 36,
         height: 36,
-        decoration: const BoxDecoration(
+        decoration:  BoxDecoration(
           color: AppColors.searchBg,
           shape: BoxShape.circle,
         ),
@@ -426,7 +426,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   alignment: Alignment.center,
                   child: Text(
                     guide.name.isNotEmpty ? guide.name[0] : '?',
-                    style: const TextStyle(
+                    style:  TextStyle(
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
                     ),
@@ -440,7 +440,7 @@ class _BookingScreenState extends State<BookingScreen> {
               children: [
                 Text(
                   guide.name,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.title,
@@ -448,7 +448,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 ),
                 Text(
                   guide.specialty,
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontSize: 12,
                     color: AppColors.subtitle,
                   ),
@@ -458,7 +458,7 @@ class _BookingScreenState extends State<BookingScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        const Text(
+         Text(
           'Booking Summary',
           style: TextStyle(
             fontSize: 14,
@@ -473,7 +473,7 @@ class _BookingScreenState extends State<BookingScreen> {
         SummaryRow(label: 'Travelers', value: _controller.travelersLabel),
         SummaryRow(label: 'Meeting Point', value: _controller.meetingPoint),
         const SizedBox(height: 12),
-        const Text(
+         Text(
           'Price Breakdown',
           style: TextStyle(
             fontSize: 14,
@@ -491,7 +491,7 @@ class _BookingScreenState extends State<BookingScreen> {
           label: 'Service fee (5%)',
           value: guide.formatPrice(_controller.serviceFee),
         ),
-        const Divider(color: AppColors.cardBorder),
+         Divider(color: AppColors.cardBorder),
         SummaryRow(
           label: 'Total',
           value: guide.formatPrice(_controller.total),
@@ -515,18 +515,18 @@ class _BookingScreenState extends State<BookingScreen> {
           Container(
             width: 72,
             height: 72,
-            decoration: const BoxDecoration(
+            decoration:  BoxDecoration(
               color: AppColors.primaryLight,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child:  Icon(
               Icons.check_circle,
               color: AppColors.primary,
               size: 40,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+           Text(
             'Booking Confirmed!',
             style: TextStyle(
               fontSize: 20,
@@ -538,7 +538,7 @@ class _BookingScreenState extends State<BookingScreen> {
           Text(
             'Your private tour with ${guide.name} is confirmed. A confirmation email has been sent to your inbox.',
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style:  TextStyle(fontSize: 13, color: AppColors.subtitle),
           ),
           const SizedBox(height: 20),
           Container(
@@ -565,7 +565,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           alignment: Alignment.center,
                           child: Text(
                             guide.name.isNotEmpty ? guide.name[0] : '?',
-                            style: const TextStyle(
+                            style:  TextStyle(
                               fontWeight: FontWeight.w700,
                               color: AppColors.primary,
                             ),
@@ -580,7 +580,7 @@ class _BookingScreenState extends State<BookingScreen> {
                         children: [
                           Text(
                             guide.name,
-                            style: const TextStyle(
+                            style:  TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: AppColors.title,
@@ -588,7 +588,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                           Text(
                             guide.specialty,
-                            style: const TextStyle(
+                            style:  TextStyle(
                               fontSize: 12,
                               color: AppColors.subtitle,
                             ),
@@ -632,7 +632,7 @@ class _BookingScreenState extends State<BookingScreen> {
               onPressed: () => Navigator.of(context).pop(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.textPrimary,
                 minimumSize: const Size(0, 52),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(26),
@@ -655,7 +655,7 @@ class _BookingScreenState extends State<BookingScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.subtitle),
+          style:  TextStyle(fontSize: 11, color: AppColors.subtitle),
         ),
         const SizedBox(height: 2),
         Text(
@@ -683,7 +683,7 @@ class _BookingScreenState extends State<BookingScreen> {
               onPressed: _controller.canContinueStep1 ? _controller.next : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.textPrimary,
                 minimumSize: const Size(0, 52),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(26),
@@ -712,9 +712,9 @@ class _BookingScreenState extends State<BookingScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
                     ),
-                    side: const BorderSide(color: AppColors.cardBorder),
+                    side:  BorderSide(color: AppColors.cardBorder),
                   ),
-                  child: const Text(
+                  child:  Text(
                     'Back',
                     style: TextStyle(
                       fontSize: 15,
@@ -730,7 +730,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   onPressed: _controller.next,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.textPrimary,
                     minimumSize: const Size(0, 52),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
@@ -763,9 +763,9 @@ class _BookingScreenState extends State<BookingScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
                   ),
-                  side: const BorderSide(color: AppColors.cardBorder),
+                  side:  BorderSide(color: AppColors.cardBorder),
                 ),
-                child: const Text(
+                child:  Text(
                   'Back',
                   style: TextStyle(
                     fontSize: 15,
@@ -782,7 +782,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 onPressed: busy ? null : _openCheckout,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.textPrimary,
                   minimumSize: const Size(0, 52),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(26),
@@ -812,18 +812,18 @@ class _BookingScreenState extends State<BookingScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.credit_card, color: AppColors.primary, size: 26),
+           Icon(Icons.credit_card, color: AppColors.primary, size: 26),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                 Text(
                   'Payment Method',
                   style: TextStyle(fontSize: 12, color: AppColors.subtitle),
                 ),
                 const SizedBox(height: 2),
-                const Text(
+                 Text(
                   'Credit / Debit Card',
                   style: TextStyle(
                     fontSize: 14,
@@ -832,7 +832,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
                 ),
                 const SizedBox(height: 2),
-                const Text(
+                 Text(
                   'Card details are entered securely in the next step.',
                   style: TextStyle(fontSize: 12, color: AppColors.subtitle),
                 ),
@@ -845,7 +845,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Widget _termsNote() {
-    return const Row(
+    return  Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(Icons.verified_user_outlined, size: 18, color: AppColors.primary),
@@ -867,7 +867,7 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget _sectionLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style:  TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w700,
         color: AppColors.subtitle,

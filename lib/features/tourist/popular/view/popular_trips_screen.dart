@@ -78,7 +78,7 @@ class PopularTripsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: selected
                                   ? AppColors.tabSelectedBg
-                                  : Colors.white,
+                                  : AppColors.surfaceDefault,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: selected
@@ -92,7 +92,7 @@ class PopularTripsScreen extends StatelessWidget {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: selected
-                                    ? Colors.white
+                                    ? AppColors.textPrimary
                                     : AppColors.subtitle,
                               ),
                             ),
@@ -111,7 +111,7 @@ class PopularTripsScreen extends StatelessWidget {
                   return switch (state) {
                     PopularSuccess(:final trips) =>
                       trips.isEmpty
-                          ? const Center(
+                          ?  Center(
                               child: Text(
                                 'No trips here yet',
                                 style: TextStyle(
