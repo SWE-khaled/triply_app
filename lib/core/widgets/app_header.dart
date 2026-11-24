@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../theme/app_theme_colors.dart';
+import '../theme/app_theme_dark.dart';
 import 'circle_icon_button.dart';
 
 /// Centered-title header row: back circle + title + trailing spacer.
@@ -25,19 +27,31 @@ class AppHeader extends StatelessWidget {
         CircleIconButton(
           icon: Icons.chevron_left,
           onTap: onBack,
-          backgroundColor: AppColors.chipGrey,
-          iconColor: Colors.black,
+          backgroundColor: AppThemeColors.resolve(
+            context,
+            light: AppColors.chipGrey,
+            dark: AppThemeDark.surfaceElevated,
+          ),
+          iconColor: AppThemeColors.resolve(
+            context,
+            light: Colors.black,
+            dark: AppThemeDark.textPrimary,
+          ),
           iconSize: 24,
         ),
         Expanded(
           child: Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 20,
               letterSpacing: 0,
-              color: Color(0xFF17343B),
+              color: AppThemeColors.resolve(
+                context,
+                light: const Color(0xFF17343B),
+                dark: AppThemeDark.textPrimary,
+              ),
             ),
           ),
         ),

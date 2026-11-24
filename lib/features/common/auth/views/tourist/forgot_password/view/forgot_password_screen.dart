@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import '../../../../cubit/auth_cubit.dart';
 import '../../../../widgets/auth_button.dart';
 import '../../../../widgets/auth_step_icon.dart';
@@ -68,6 +70,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final authCubit = context.watch<AuthCubit>();
 
     return Scaffold(
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
@@ -95,6 +102,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     hintText: 'your@email.com',
                     icon: Icons.mail_outline,
                     keyboardType: TextInputType.emailAddress,
+                    themeAware: true,
                     validator: (value) =>
                         (value == null || !value.contains('@'))
                         ? 'Enter a valid email'
@@ -103,7 +111,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const SizedBox(height: 28),
                   AuthButton(
                     label: 'Send ',
-                    backgroundColor: AppColors.signInDark,
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.signInDark,
+                      dark: AppThemeDark.actionPrimary,
+                    ),
                     isLoading: _isSubmitting || authCubit.isLoading,
                     onPressed: () => _handleSendCode(authCubit),
                   ),
@@ -111,16 +123,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: Wrap(
                       children: [
-                        const Text(
+                        Text(
                           'Remember it? ',
-                          style: TextStyle(color: AppColors.textGrey),
+                          style: TextStyle(
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.textGrey,
+                              dark: AppThemeDark.homeGuideSecondary,
+                            ),
+                          ),
                         ),
                         GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
-                          child: const Text(
+                          child: Text(
                             'Sign in',
                             style: TextStyle(
-                              color: AppColors.signInDark,
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.signInDark,
+                                dark: AppThemeDark.homeSeeAll,
+                              ),
                               fontWeight: FontWeight.bold,
                             ),
                           ),

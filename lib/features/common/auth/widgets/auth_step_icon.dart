@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 
 /// Light circle icon + title + subtitle, used on Forgot Password,
 /// New Password and Password Reset Success screens.
@@ -21,6 +23,17 @@ class AuthStepIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.textDark,
+      dark: AppThemeDark.homeSectionTitle,
+    );
+    final subtitleColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.textGrey,
+      dark: AppThemeDark.homeGuideSecondary,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -29,7 +42,11 @@ class AuthStepIcon extends StatelessWidget {
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back_ios_new, size: 18),
             style: IconButton.styleFrom(
-              backgroundColor: AppColors.fieldBackground,
+              backgroundColor: AppThemeColors.resolve(
+                context,
+                light: AppColors.fieldBackground,
+                dark: AppThemeDark.surfaceElevated,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -41,20 +58,32 @@ class AuthStepIcon extends StatelessWidget {
             width: 90,
             height: 90,
             decoration: BoxDecoration(
-              color: AppColors.lightCircleBg,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.lightCircleBg,
+                dark: AppThemeDark.surfaceElevated,
+              ),
               borderRadius: BorderRadius.circular(24),
             ),
-            child: Icon(icon, color: iconColor, size: 40),
+            child: Icon(
+              icon,
+              color: AppThemeColors.resolve(
+                context,
+                light: iconColor,
+                dark: AppThemeDark.homeSeeAll,
+              ),
+              size: 40,
+            ),
           ),
         ),
         const SizedBox(height: 24),
         Center(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+              color: titleColor,
             ),
           ),
         ),
@@ -63,7 +92,7 @@ class AuthStepIcon extends StatelessWidget {
           child: Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 15, color: AppColors.textGrey),
+            style: TextStyle(fontSize: 15, color: subtitleColor),
           ),
         ),
       ],

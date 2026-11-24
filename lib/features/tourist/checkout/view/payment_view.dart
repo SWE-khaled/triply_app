@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import 'package:triply/features/tourist/checkout/view/visa_view.dart';
 import '../../../../core/network/dio_helper.dart';
 import '../model/payment_data.dart';
@@ -544,10 +546,22 @@ class PaymentViewState extends State<PaymentView> {
   Widget build(BuildContext context) {
     final style = paymentData.style;
     return Scaffold(
-      backgroundColor: style?.scaffoldColor,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: style?.scaffoldColor ?? Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       appBar: AppBar(
-        backgroundColor: style?.appBarBackgroundColor,
-        foregroundColor: style?.appBarForegroundColor,
+        backgroundColor: AppThemeColors.resolve(
+          context,
+          light: style?.appBarBackgroundColor ?? Colors.white,
+          dark: AppThemeDark.backgroundPrimary,
+        ),
+        foregroundColor: AppThemeColors.resolve(
+          context,
+          light: style?.appBarForegroundColor ?? Colors.black,
+          dark: AppThemeDark.textPrimary,
+        ),
         title: const Text('Select Payment Method'),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -557,7 +571,11 @@ class PaymentViewState extends State<PaymentView> {
       body: _loading
           ? Center(
               child: CircularProgressIndicator(
-                color: style?.circleProgressColor ?? Colors.blue,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: style?.circleProgressColor ?? Colors.blue,
+                  dark: AppThemeDark.homeSeeAll,
+                ),
               ),
             )
           : _buildOptions(),
@@ -595,15 +613,27 @@ class PaymentViewState extends State<PaymentView> {
                     controller: _walletNumber,
                     keyboardType: TextInputType.number,
                     maxLength: 11,
-                    cursorColor: style?.primaryColor ?? Colors.blue,
+                    cursorColor: _paymentColor(
+                      context,
+                      style?.primaryColor ?? Colors.blue,
+                      AppThemeDark.homeSeeAll,
+                    ),
                     decoration: InputDecoration(
                       counterText: '',
                       prefixIcon: Icon(
                         Icons.wallet,
-                        color: style?.primaryColor ?? Colors.blue,
+                        color: _paymentColor(
+                          context,
+                          style?.primaryColor ?? Colors.blue,
+                          AppThemeDark.homeSeeAll,
+                        ),
                       ),
                       hintText: 'Enter your mobile wallet number',
-                      hintStyle: style?.textStyle,
+                      hintStyle: Theme.of(context).brightness == Brightness.dark
+                          ? (style?.textStyle ?? const TextStyle()).copyWith(
+                              color: AppThemeDark.textDisabled,
+                            )
+                          : style?.textStyle,
                       border: _inputBorder(),
                       focusedBorder: _inputBorder(),
                     ),
@@ -622,13 +652,27 @@ class PaymentViewState extends State<PaymentView> {
   }) {
     final style = paymentData.style;
     final color = selected
-        ? style?.primaryColor ?? Colors.blue
-        : style?.unselectedColor ?? Colors.grey;
+        ? _paymentColor(
+            context,
+            style?.primaryColor ?? Colors.blue,
+            AppThemeDark.homeSeeAll,
+          )
+        : _paymentColor(
+            context,
+            style?.unselectedColor ?? Colors.grey,
+            AppThemeDark.homeGuideSecondary,
+          );
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
+          color: isDark
+              ? selected
+                    ? AppThemeDark.surfaceElevated
+                    : AppThemeDark.surfaceDefault
+              : Colors.transparent,
           border: Border.all(color: color, width: 2),
           borderRadius: BorderRadius.circular(10),
         ),
@@ -636,7 +680,16 @@ class PaymentViewState extends State<PaymentView> {
           children: [
             Icon(icon, color: color),
             const SizedBox(width: 10),
-            Text(label, style: style?.textStyle),
+            Text(
+              label,
+              style: isDark
+                  ? (style?.textStyle ?? const TextStyle()).copyWith(
+                      color: selected
+                          ? AppThemeDark.homeGuideName
+                          : AppThemeDark.homeGuideSecondary,
+                    )
+                  : style?.textStyle,
+            ),
           ],
         ),
       ),
@@ -647,7 +700,11 @@ class PaymentViewState extends State<PaymentView> {
     return OutlineInputBorder(
       borderRadius: const BorderRadius.all(Radius.circular(16)),
       borderSide: BorderSide(
-        color: paymentData.style?.primaryColor ?? Colors.blue,
+        color: _paymentColor(
+          context,
+          paymentData.style?.primaryColor ?? Colors.blue,
+          AppThemeDark.homeSeeAll,
+        ),
         width: 2,
       ),
     );
@@ -659,7 +716,7 @@ class PaymentViewState extends State<PaymentView> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: ElevatedButton(
           onPressed: _confirmPayment,
-          style: paymentData.style?.buttonStyle ?? _defaultButtonStyle(),
+          style: _confirmButtonStyle(),
           child: const Text('Confirm Payment', style: TextStyle(fontSize: 18)),
         ),
       ),
@@ -674,4 +731,18 @@ class PaymentViewState extends State<PaymentView> {
       foregroundColor: Colors.white,
     );
   }
+
+  ButtonStyle _confirmButtonStyle() {
+    final style = paymentData.style?.buttonStyle ?? _defaultButtonStyle();
+    if (Theme.of(context).brightness != Brightness.dark) return style;
+    return style.copyWith(
+      backgroundColor: const WidgetStatePropertyAll(AppThemeDark.homeSeeAll),
+      foregroundColor: const WidgetStatePropertyAll(
+        AppThemeDark.backgroundPrimary,
+      ),
+    );
+  }
+
+  Color _paymentColor(BuildContext context, Color light, Color dark) =>
+      AppThemeColors.resolve(context, light: light, dark: dark);
 }

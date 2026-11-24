@@ -6,6 +6,8 @@ import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/tour_guide/home_and_notification_tg/view/guide_dashboard_screen.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import '../../../../../core/services/cloudinary_service.dart';
 import '../../../../tour_guide/profile_tg/data/tour_guide_profile_service.dart';
 
@@ -126,7 +128,11 @@ class _TourGuideVerificationScreenState
         _idFile != null && _licenseFile != null && !_isLoading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -169,13 +175,21 @@ class _TourGuideVerificationScreenState
                         color: Colors.transparent,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFFE0E0E0),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFFE0E0E0),
+                            dark: AppThemeDark.borderSubtle,
+                          ),
                           width: 1,
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back,
-                        color: AppColors.deepNile,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.deepNile,
+                          dark: AppThemeDark.textPrimary,
+                        ),
                         size: 20,
                       ),
                     ),
@@ -198,15 +212,23 @@ class _TourGuideVerificationScreenState
                         horizontal: 16,
                         vertical: 10,
                       ),
-                      backgroundColor: const Color(0xFFF5F5F5),
+                      backgroundColor: AppThemeColors.resolve(
+                        context,
+                        light: const Color(0xFFF5F5F5),
+                        dark: AppThemeDark.surfaceElevated,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Skip for now',
                       style: TextStyle(
-                        color: AppColors.deepNile,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.deepNile,
+                          dark: AppThemeDark.textPrimary,
+                        ),
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
                       ),
@@ -238,23 +260,31 @@ class _TourGuideVerificationScreenState
                     const SizedBox(height: 10),
 
                     // Title
-                    const Text(
+                    Text(
                       'Verify your guide identity',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.deepNile,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.deepNile,
+                          dark: AppThemeDark.homeSectionTitle,
+                        ),
                         height: 1.2,
                       ),
                     ),
                     const SizedBox(height: 10),
 
                     // Subtitle
-                    const Text(
+                    Text(
                       'Upload your identity document and a separate official document proving that you\'re a licensed guide.',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Color(0xFF7A9B9F),
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: const Color(0xFF7A9B9F),
+                          dark: AppThemeDark.textSecondary,
+                        ),
                         height: 1.5,
                       ),
                     ),
@@ -265,30 +295,48 @@ class _TourGuideVerificationScreenState
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: Colors.white,
+                          dark: AppThemeDark.surfaceDefault,
+                        ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFFE8E8E8),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFFE8E8E8),
+                            dark: AppThemeDark.borderSubtle,
+                          ),
                           width: 1,
                         ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Accepted documents',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.deepNile,
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.deepNile,
+                                dark: AppThemeDark.homeSectionTitle,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 10),
-                          _buildBullet('Ministry of Tourism guide ID'),
+                          _buildBullet(context, 'Ministry of Tourism guide ID'),
                           const SizedBox(height: 6),
-                          _buildBullet('Tour guide syndicate membership'),
+                          _buildBullet(
+                            context,
+                            'Tour guide syndicate membership',
+                          ),
                           const SizedBox(height: 6),
-                          _buildBullet('Valid professional guide license'),
+                          _buildBullet(
+                            context,
+                            'Valid professional guide license',
+                          ),
                         ],
                       ),
                     ),
@@ -299,24 +347,34 @@ class _TourGuideVerificationScreenState
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(
-                          0xFFEDF6F8,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: const Color(0xFFEDF6F8),
+                          dark: AppThemeDark.surfaceElevated,
                         ), // very light teal background
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: const Color(0xFFB8D8DF),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFFB8D8DF),
+                            dark: AppThemeDark.borderSubtle,
+                          ),
                           width: 1,
                         ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Review time: 3–6 working days',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.deepNile,
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.deepNile,
+                                dark: AppThemeDark.homeSectionTitle,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -324,7 +382,13 @@ class _TourGuideVerificationScreenState
                             'You can use your dashboard while your documents are being reviewed, but you can\'t publish trips yet.',
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.deepNile.withValues(alpha: 0.70),
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.deepNile.withValues(
+                                  alpha: 0.70,
+                                ),
+                                dark: AppThemeDark.textSecondary,
+                              ),
                               height: 1.4,
                             ),
                           ),
@@ -363,7 +427,11 @@ class _TourGuideVerificationScreenState
                           );
                         }
                         return _buildStatusCard(
-                          color: const Color(0xFF2E7D8F),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFF2E7D8F),
+                            dark: AppThemeDark.homeSeeAll,
+                          ),
                           icon: Icons.hourglass_top,
                           title: 'Documents under review',
                           message:
@@ -386,6 +454,7 @@ class _TourGuideVerificationScreenState
                         return Column(
                           children: [
                             _buildUploadBox(
+                              context: context,
                               number: '1',
                               title: 'Upload your ID',
                               subtitle: 'JPG, PNG or PDF · max 10 MB',
@@ -398,6 +467,7 @@ class _TourGuideVerificationScreenState
 
                             // Upload Guide License Box
                             _buildUploadBox(
+                              context: context,
                               number: '2',
                               title: 'Upload guide license',
                               subtitle:
@@ -434,7 +504,11 @@ class _TourGuideVerificationScreenState
                             style: ElevatedButton.styleFrom(
                               backgroundColor: canSubmitNow
                                   ? AppColors.deepNile
-                                  : const Color(0xFF7A9B9F),
+                                  : AppThemeColors.resolve(
+                                      context,
+                                      light: const Color(0xFF7A9B9F),
+                                      dark: AppThemeDark.actionDisabled,
+                                    ),
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
@@ -480,19 +554,30 @@ class _TourGuideVerificationScreenState
     );
   }
 
-  Widget _buildBullet(String text) {
+  Widget _buildBullet(BuildContext context, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '• ',
-          style: TextStyle(color: AppColors.deepNile, fontSize: 13),
+          style: TextStyle(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.deepNile,
+              dark: AppThemeDark.homeSeeAll,
+            ),
+            fontSize: 13,
+          ),
         ),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              color: AppColors.deepNile,
+            style: TextStyle(
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.deepNile,
+                dark: AppThemeDark.textPrimary,
+              ),
               fontSize: 13,
               height: 1.3,
             ),
@@ -551,6 +636,7 @@ class _TourGuideVerificationScreenState
   }
 
   Widget _buildUploadBox({
+    required BuildContext context,
     required String number,
     required String title,
     required String subtitle,
@@ -566,11 +652,29 @@ class _TourGuideVerificationScreenState
         padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
         decoration: BoxDecoration(
           color: hasFile
-              ? const Color(0xFFF0F8F5)
-              : Colors.white, // Subtle green tint if selected
+              ? AppThemeColors.resolve(
+                  context,
+                  light: const Color(0xFFF0F8F5),
+                  dark: AppThemeDark.surfaceElevated,
+                )
+              : AppThemeColors.resolve(
+                  context,
+                  light: Colors.white,
+                  dark: AppThemeDark.surfaceDefault,
+                ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: hasFile ? Colors.green : const Color(0xFFD8D8D8),
+            color: hasFile
+                ? AppThemeColors.resolve(
+                    context,
+                    light: Colors.green,
+                    dark: AppThemeDark.statusSuccess,
+                  )
+                : AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFFD8D8D8),
+                    dark: AppThemeDark.borderSubtle,
+                  ),
             width: hasFile ? 1.5 : 1.5,
           ),
         ),
@@ -580,8 +684,16 @@ class _TourGuideVerificationScreenState
               hasFile ? Icons.check_circle : Icons.upload_outlined,
               size: 32,
               color: hasFile
-                  ? Colors.green
-                  : AppColors.deepNile.withValues(alpha: 0.70),
+                  ? AppThemeColors.resolve(
+                      context,
+                      light: Colors.green,
+                      dark: AppThemeDark.statusSuccess,
+                    )
+                  : AppThemeColors.resolve(
+                      context,
+                      light: AppColors.deepNile.withValues(alpha: 0.70),
+                      dark: AppThemeDark.homeSeeAll,
+                    ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -592,7 +704,17 @@ class _TourGuideVerificationScreenState
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: hasFile ? Colors.green[800] : AppColors.deepNile,
+                color: hasFile
+                    ? AppThemeColors.resolve(
+                        context,
+                        light: Colors.green[800]!,
+                        dark: AppThemeDark.statusSuccess,
+                      )
+                    : AppThemeColors.resolve(
+                        context,
+                        light: AppColors.deepNile,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
               ),
             ),
             if (!hasFile) ...[
@@ -600,7 +722,14 @@ class _TourGuideVerificationScreenState
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13, color: Color(0xFF7A9B9F)),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFF7A9B9F),
+                    dark: AppThemeDark.textSecondary,
+                  ),
+                ),
               ),
             ] else ...[
               const SizedBox(height: 6),

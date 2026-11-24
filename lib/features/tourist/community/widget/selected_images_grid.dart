@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Multi-photo grid extracted from `_SelectedImagesGrid`.
 class SelectedImagesGrid extends StatelessWidget {
@@ -35,12 +37,20 @@ class SelectedImagesGrid extends StatelessWidget {
             onTap: onAddMore,
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.chipGrey,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.chipGrey,
+                  dark: AppThemeDark.surfaceElevated,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.add_photo_alternate_outlined,
-                color: AppColors.primaryTeal,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.primaryTeal,
+                  dark: AppThemeDark.actionSecondary,
+                ),
               ),
             ),
           );

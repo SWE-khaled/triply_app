@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../model/notification_item.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 class NotificationTile extends StatelessWidget {
   final NotificationItem item;
@@ -10,7 +12,8 @@ class NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (bg, icon, iconColor) = _styleForType(item.type);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final (bg, icon, iconColor) = _styleForType(item.type, isDark: isDark);
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -31,9 +34,16 @@ class NotificationTile extends StatelessWidget {
                 children: [
                   Text(
                     item.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light:
+                            Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.black87,
+                        dark: AppThemeDark.homeGuideName,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -41,17 +51,25 @@ class NotificationTile extends StatelessWidget {
                     item.body,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textGrey,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.textGrey,
+                        dark: AppThemeDark.homeGuideSecondary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     item.timeLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textGrey,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.textGrey,
+                        dark: AppThemeDark.homeGuideSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -73,34 +91,64 @@ class NotificationTile extends StatelessWidget {
     );
   }
 
-  (Color, IconData, Color) _styleForType(String type) {
+  (Color, IconData, Color) _styleForType(String type, {required bool isDark}) {
     switch (type) {
       case 'booking':
-        return (const Color(0xFFE3F3E7), Icons.check, const Color(0xFF2E9E5B));
+        return isDark
+            ? (
+                AppThemeDark.homeGuideSurface,
+                Icons.check,
+                AppThemeDark.statusSuccess,
+              )
+            : (const Color(0xFFE3F3E7), Icons.check, const Color(0xFF2E9E5B));
       case 'reminder':
-        return (
-          const Color(0xFFFFEBDC),
-          Icons.access_time,
-          AppColors.accentOrange,
-        );
+        return isDark
+            ? (
+                AppThemeDark.surfaceElevated,
+                Icons.access_time,
+                AppThemeDark.homeGuidePrice,
+              )
+            : (
+                const Color(0xFFFFEBDC),
+                Icons.access_time,
+                AppColors.accentOrange,
+              );
       case 'message':
-        return (
-          const Color(0xFFE6F3F3),
-          Icons.chat_bubble_outline,
-          AppColors.primaryTeal,
-        );
+        return isDark
+            ? (
+                AppThemeDark.surfaceElevated,
+                Icons.chat_bubble_outline,
+                AppThemeDark.homeSeeAll,
+              )
+            : (
+                const Color(0xFFE6F3F3),
+                Icons.chat_bubble_outline,
+                AppColors.primaryTeal,
+              );
       case 'like':
-        return (
-          const Color(0xFFFFE8E8),
-          Icons.favorite_border,
-          const Color(0xFFE86A6A),
-        );
+        return isDark
+            ? (
+                AppThemeDark.surfaceElevated,
+                Icons.favorite_border,
+                AppThemeDark.statusError,
+              )
+            : (
+                const Color(0xFFFFE8E8),
+                Icons.favorite_border,
+                const Color(0xFFE86A6A),
+              );
       default:
-        return (
-          const Color(0xFFF2F2F2),
-          Icons.notifications_none,
-          AppColors.textGrey,
-        );
+        return isDark
+            ? (
+                AppThemeDark.surfaceElevated,
+                Icons.notifications_none,
+                AppThemeDark.textSecondary,
+              )
+            : (
+                const Color(0xFFF2F2F2),
+                Icons.notifications_none,
+                AppColors.textGrey,
+              );
     }
   }
 }

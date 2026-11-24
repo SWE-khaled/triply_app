@@ -4,6 +4,8 @@ import 'package:triply/core/data/models/chat.dart';
 import 'package:triply/core/data/repositories/chat_repository.dart';
 import 'package:triply/core/data/repositories/firestore_chat_repository.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import 'package:triply/core/widgets/app_snackbar.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
@@ -14,6 +16,9 @@ import '../cubit/chat_list_state.dart';
 import '../model/chat_audience.dart';
 import '../util/chat_time.dart';
 import '../widgets/chat_avatar.dart';
+
+Color _chatListColor(BuildContext context, Color light, Color dark) =>
+    AppThemeColors.resolve(context, light: light, dark: dark);
 
 class ChatListScreen extends StatefulWidget {
   final ChatRepository? repository;
@@ -106,7 +111,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
       child: BlocBuilder<ChatListCubit, ChatListState>(
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: _chatListColor(
+              context,
+              Colors.white,
+              AppThemeDark.backgroundPrimary,
+            ),
             body: SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,20 +149,28 @@ class _ChatListScreenState extends State<ChatListScreen> {
       children: [
         Text(
           widget.audience.listTitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.6,
-            color: AppColors.title,
+            color: _chatListColor(
+              context,
+              AppColors.title,
+              AppThemeDark.homeSectionTitle,
+            ),
           ),
         ),
         const SizedBox(height: 3),
         Text(
           widget.audience.listSubtitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             height: 1.3,
-            color: AppColors.subtitle,
+            color: _chatListColor(
+              context,
+              AppColors.subtitle,
+              AppThemeDark.homeGuideSecondary,
+            ),
           ),
         ),
       ],
@@ -165,7 +182,19 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ? title
           : Row(
               children: [
-                CircleBackButton(onTap: () => Navigator.maybePop(context)),
+                CircleBackButton(
+                  onTap: () => Navigator.maybePop(context),
+                  backgroundColor: _chatListColor(
+                    context,
+                    Colors.white,
+                    AppThemeDark.surfaceElevated,
+                  ),
+                  iconColor: _chatListColor(
+                    context,
+                    Colors.black,
+                    AppThemeDark.iconPrimary,
+                  ),
+                ),
                 const SizedBox(width: 14),
                 Expanded(child: title),
               ],
@@ -185,20 +214,35 @@ class _ChatListScreenState extends State<ChatListScreen> {
         // style: const TextStyle(fontSize: 14, color: AppColors.title),
         decoration: InputDecoration(
           hintText: 'Search by name or message...',
-          hintStyle: const TextStyle(fontSize: 13.5, color: AppColors.hint),
-          prefixIcon: const Icon(
+          hintStyle: TextStyle(
+            fontSize: 13.5,
+            color: _chatListColor(
+              context,
+              AppColors.hint,
+              AppThemeDark.textDisabled,
+            ),
+          ),
+          prefixIcon: Icon(
             Icons.search_rounded,
-            color: AppColors.guideLabel,
+            color: _chatListColor(
+              context,
+              AppColors.guideLabel,
+              AppThemeDark.textSecondary,
+            ),
             size: 22,
           ),
           suffixIcon: query.trim().isEmpty
               ? null
               : IconButton(
                   tooltip: 'Clear search',
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.close_rounded,
                     size: 19,
-                    color: AppColors.guideLabel,
+                    color: _chatListColor(
+                      context,
+                      AppColors.guideLabel,
+                      AppThemeDark.textSecondary,
+                    ),
                   ),
                   onPressed: () {
                     _searchController.clear();
@@ -206,7 +250,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   },
                 ),
           filled: true,
-          fillColor: AppColors.searchBg,
+          fillColor: _chatListColor(
+            context,
+            AppColors.searchBg,
+            AppThemeDark.backgroundSecondary,
+          ),
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(18),
@@ -268,10 +316,30 @@ class _ChatListScreenState extends State<ChatListScreen> {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
+          color: selected
+              ? _chatListColor(
+                  context,
+                  AppColors.primary,
+                  AppThemeDark.actionPrimary,
+                )
+              : _chatListColor(
+                  context,
+                  Colors.white,
+                  AppThemeDark.surfaceElevated,
+                ),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.cardBorder,
+            color: selected
+                ? _chatListColor(
+                    context,
+                    AppColors.primary,
+                    AppThemeDark.actionPrimary,
+                  )
+                : _chatListColor(
+                    context,
+                    AppColors.cardBorder,
+                    AppThemeDark.borderSubtle,
+                  ),
           ),
         ),
         child: Row(
@@ -282,7 +350,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : AppColors.primary,
+                color: selected
+                    ? Colors.white
+                    : _chatListColor(
+                        context,
+                        AppColors.primary,
+                        AppThemeDark.homeSeeAll,
+                      ),
               ),
             ),
             if (count > 0) ...[
@@ -302,7 +376,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     fontSize: 10,
                     height: 1,
                     fontWeight: FontWeight.w800,
-                    color: selected ? AppColors.primary : Colors.white,
+                    color: selected
+                        ? _chatListColor(
+                            context,
+                            AppColors.primary,
+                            AppThemeDark.actionPrimary,
+                          )
+                        : Colors.white,
                   ),
                 ),
               ),
@@ -315,9 +395,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   Widget _body(ChatListState state) {
     return switch (state) {
-      ChatListInitial() || ChatListLoading() => const Center(
+      ChatListInitial() || ChatListLoading() => Center(
         child: CircularProgressIndicator(
-          color: AppColors.priceTeal,
+          color: _chatListColor(
+            context,
+            AppColors.priceTeal,
+            AppThemeDark.iconPrimary,
+          ),
           strokeWidth: 2.5,
         ),
       ),
@@ -333,26 +417,38 @@ class _ChatListScreenState extends State<ChatListScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off_outlined,
               size: 42,
-              color: AppColors.subtitle,
+              color: _chatListColor(
+                context,
+                AppColors.subtitle,
+                AppThemeDark.homeGuideSecondary,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 height: 1.5,
-                color: AppColors.subtitle,
+                color: _chatListColor(
+                  context,
+                  AppColors.subtitle,
+                  AppThemeDark.homeGuideSecondary,
+                ),
               ),
             ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _cubit.load,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.tabSelectedBg,
+                backgroundColor: _chatListColor(
+                  context,
+                  AppColors.tabSelectedBg,
+                  AppThemeDark.actionPrimary,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -408,42 +504,62 @@ class _ChatListScreenState extends State<ChatListScreen> {
               width: 128,
               height: 128,
               decoration: BoxDecoration(
-                color: AppColors.primaryLight.withValues(alpha: 0.5),
+                color: _chatListColor(
+                  context,
+                  AppColors.primaryLight.withValues(alpha: 0.5),
+                  AppThemeDark.backgroundTertiary,
+                ),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: Container(
                 width: 92,
                 height: 92,
-                decoration: const BoxDecoration(
-                  color: AppColors.primaryLight,
+                decoration: BoxDecoration(
+                  color: _chatListColor(
+                    context,
+                    AppColors.primaryLight,
+                    AppThemeDark.surfaceElevated,
+                  ),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.forum_outlined,
                   size: 40,
-                  color: AppColors.primary,
+                  color: _chatListColor(
+                    context,
+                    AppColors.primary,
+                    AppThemeDark.iconPrimary,
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 22),
-            const Text(
+            Text(
               'No conversations found',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 19,
                 fontWeight: FontWeight.w800,
-                color: AppColors.title,
+                color: _chatListColor(
+                  context,
+                  AppColors.title,
+                  AppThemeDark.homeSectionTitle,
+                ),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13.5,
                 height: 1.5,
-                color: AppColors.subtitle,
+                color: _chatListColor(
+                  context,
+                  AppColors.subtitle,
+                  AppThemeDark.homeGuideSecondary,
+                ),
               ),
             ),
           ],
@@ -486,10 +602,19 @@ class _ChatTile extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        // : Colors.white,
+        color: _chatListColor(
+          context,
+          Colors.white,
+          AppThemeDark.homeGuideSurface,
+        ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: _chatListColor(
+            context,
+            AppColors.cardBorder,
+            AppThemeDark.homeGuideBorder,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -533,7 +658,11 @@ class _ChatTile extends StatelessWidget {
                                 fontWeight: hasUnread
                                     ? FontWeight.w800
                                     : FontWeight.w700,
-                                color: AppColors.title,
+                                color: _chatListColor(
+                                  context,
+                                  AppColors.title,
+                                  AppThemeDark.homeGuideName,
+                                ),
                               ),
                             ),
                           ),
@@ -546,8 +675,16 @@ class _ChatTile extends StatelessWidget {
                                   ? FontWeight.w700
                                   : FontWeight.w400,
                               color: hasUnread
-                                  ? AppColors.accentOrange
-                                  : AppColors.guideLabel,
+                                  ? _chatListColor(
+                                      context,
+                                      AppColors.accentOrange,
+                                      AppThemeDark.homeGuidePrice,
+                                    )
+                                  : _chatListColor(
+                                      context,
+                                      AppColors.guideLabel,
+                                      AppThemeDark.homeGuideSecondary,
+                                    ),
                             ),
                           ),
                         ],
@@ -566,8 +703,16 @@ class _ChatTile extends StatelessWidget {
                                     ? FontWeight.w600
                                     : FontWeight.w400,
                                 color: hasUnread
-                                    ? AppColors.textDark
-                                    : AppColors.subtitle,
+                                    ? _chatListColor(
+                                        context,
+                                        AppColors.textDark,
+                                        AppThemeDark.homeGuideName,
+                                      )
+                                    : _chatListColor(
+                                        context,
+                                        AppColors.subtitle,
+                                        AppThemeDark.homeGuideSecondary,
+                                      ),
                               ),
                             ),
                           ),

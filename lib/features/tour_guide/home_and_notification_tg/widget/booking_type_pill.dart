@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 
 /// Cream/tan tints from Figma (public pill). Local consts only — the global
 /// theme in `core/theme/` is left untouched.
@@ -19,7 +21,17 @@ class BookingTypePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isPrivate ? AppColors.guidedTourBg : _cream,
+        color: isPrivate
+            ? AppThemeColors.resolve(
+                context,
+                light: AppColors.guidedTourBg,
+                dark: AppThemeDark.surfaceElevated,
+              )
+            : AppThemeColors.resolve(
+                context,
+                light: _cream,
+                dark: AppThemeDark.surfaceElevated,
+              ),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -27,7 +39,17 @@ class BookingTypePill extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          color: isPrivate ? AppColors.guidedTourText : _tanText,
+          color: isPrivate
+              ? AppThemeColors.resolve(
+                  context,
+                  light: AppColors.guidedTourText,
+                  dark: AppThemeDark.homeSeeAll,
+                )
+              : AppThemeColors.resolve(
+                  context,
+                  light: _tanText,
+                  dark: AppThemeDark.statusWarning,
+                ),
         ),
       ),
     );

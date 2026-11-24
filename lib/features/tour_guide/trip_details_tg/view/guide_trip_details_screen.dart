@@ -5,6 +5,8 @@ import '../../../../core/helper/price_format.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
@@ -64,7 +66,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
       create: (_) => GuideTripDetailsCubit()..loadTrip(trip),
       child: Builder(
         builder: (context) => Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppThemeColors.resolve(
+            context,
+            light: AppColors.background,
+            dark: AppThemeDark.backgroundPrimary,
+          ),
           body: BlocBuilder<GuideTripDetailsCubit, GuideTripDetailsState>(
             builder: (context, state) {
               return switch (state) {
@@ -80,8 +86,16 @@ class GuideTripDetailsScreen extends StatelessWidget {
                               children: [
                                 CircleBackButton(
                                   icon: Icons.chevron_left,
-                                  iconColor: AppColors.titleDark,
-                                  backgroundColor: const Color(0xFFF6F1E7),
+                                  iconColor: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.titleDark,
+                                    dark: AppThemeDark.textPrimary,
+                                  ),
+                                  backgroundColor: AppThemeColors.resolve(
+                                    context,
+                                    light: const Color(0xFFF6F1E7),
+                                    dark: AppThemeDark.surfaceElevated,
+                                  ),
                                   onTap: () => Navigator.of(context).pop(),
                                 ),
                                 const SizedBox(width: 10),
@@ -93,7 +107,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                     style: GoogleFonts.poppins(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.priceTeal,
+                                      color: AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.priceTeal,
+                                        dark: AppThemeDark.homeSeeAll,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -112,8 +130,12 @@ class GuideTripDetailsScreen extends StatelessWidget {
                         Container(
                           width: double.infinity,
                           transform: Matrix4.translationValues(0, -24, 0),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: Colors.white,
+                              dark: AppThemeDark.surfaceDefault,
+                            ),
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(24),
                             ),
@@ -159,7 +181,13 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                                 fontWeight: FontWeight.w600,
                                                 color: selected
                                                     ? Colors.white
-                                                    : AppColors.subtitle,
+                                                    : AppThemeColors.resolve(
+                                                        context,
+                                                        light:
+                                                            AppColors.subtitle,
+                                                        dark: AppThemeDark
+                                                            .textSecondary,
+                                                      ),
                                               ),
                                             ),
                                           ),
@@ -177,7 +205,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFBF6EC),
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: const Color(0xFFFBF6EC),
+                                      dark: AppThemeDark.homeGuideSurface,
+                                    ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Column(
@@ -189,7 +221,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                         style: GoogleFonts.poppins(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.title,
+                                          color: AppThemeColors.resolve(
+                                            context,
+                                            light: AppColors.title,
+                                            dark: AppThemeDark.homeSectionTitle,
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -198,7 +234,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                         style: GoogleFonts.poppins(
                                           fontSize: 13,
                                           height: 1.5,
-                                          color: AppColors.dateText,
+                                          color: AppThemeColors.resolve(
+                                            context,
+                                            light: AppColors.dateText,
+                                            dark: AppThemeDark.textSecondary,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -223,7 +263,12 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                             'Meeting Point',
                                             style: GoogleFonts.poppins(
                                               fontSize: 11,
-                                              color: AppColors.subtitle,
+                                              color: AppThemeColors.resolve(
+                                                context,
+                                                light: AppColors.subtitle,
+                                                dark:
+                                                    AppThemeDark.textSecondary,
+                                              ),
                                             ),
                                           ),
                                           Text(
@@ -231,7 +276,12 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                             style: GoogleFonts.poppins(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
-                                              color: AppColors.titleDetails,
+                                              color: AppThemeColors.resolve(
+                                                context,
+                                                light: AppColors.titleDetails,
+                                                dark: AppThemeDark
+                                                    .homeSectionTitle,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -253,14 +303,23 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                               style: GoogleFonts.poppins(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w700,
-                                                color: AppColors.priceTeal,
+                                                color: AppThemeColors.resolve(
+                                                  context,
+                                                  light: AppColors.priceTeal,
+                                                  dark: AppThemeDark.homeSeeAll,
+                                                ),
                                               ),
                                             ),
                                             TextSpan(
                                               text: ' / person',
                                               style: GoogleFonts.poppins(
                                                 fontSize: 12,
-                                                color: AppColors.subtitle,
+                                                color: AppThemeColors.resolve(
+                                                  context,
+                                                  light: AppColors.subtitle,
+                                                  dark: AppThemeDark
+                                                      .textSecondary,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -291,7 +350,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                           vertical: 12,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.accentOrange,
+                                          color: AppThemeColors.resolve(
+                                            context,
+                                            light: AppColors.accentOrange,
+                                            dark: AppThemeDark.homeGuidePrice,
+                                          ),
                                           borderRadius: BorderRadius.circular(
                                             14,
                                           ),
@@ -316,7 +379,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                        color: AppColors.cardBorder,
+                                        color: AppThemeColors.resolve(
+                                          context,
+                                          light: AppColors.cardBorder,
+                                          dark: AppThemeDark.borderSubtle,
+                                        ),
                                       ),
                                       borderRadius: BorderRadius.circular(14),
                                     ),
@@ -332,12 +399,24 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                                 Container(
                                                   width: 44,
                                                   height: 44,
-                                                  color: const Color(
-                                                    0xFFE6ECEF,
+                                                  color: AppThemeColors.resolve(
+                                                    context,
+                                                    light: const Color(
+                                                      0xFFE6ECEF,
+                                                    ),
+                                                    dark: AppThemeDark
+                                                        .surfaceElevated,
                                                   ),
-                                                  child: const Icon(
+                                                  child: Icon(
                                                     Icons.person,
-                                                    color: AppColors.subtitle,
+                                                    color:
+                                                        AppThemeColors.resolve(
+                                                          context,
+                                                          light: AppColors
+                                                              .subtitle,
+                                                          dark: AppThemeDark
+                                                              .textSecondary,
+                                                        ),
                                                   ),
                                                 ),
                                           ),
@@ -353,7 +432,12 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                                 style: GoogleFonts.poppins(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w600,
-                                                  color: AppColors.title,
+                                                  color: AppThemeColors.resolve(
+                                                    context,
+                                                    light: AppColors.title,
+                                                    dark: AppThemeDark
+                                                        .homeSectionTitle,
+                                                  ),
                                                 ),
                                               ),
                                               Row(
@@ -368,7 +452,14 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                                     '${details.guideRating} (${details.guideReviews})',
                                                     style: GoogleFonts.poppins(
                                                       fontSize: 11,
-                                                      color: AppColors.subtitle,
+                                                      color:
+                                                          AppThemeColors.resolve(
+                                                            context,
+                                                            light: AppColors
+                                                                .subtitle,
+                                                            dark: AppThemeDark
+                                                                .textSecondary,
+                                                          ),
                                                     ),
                                                   ),
                                                 ],
@@ -397,7 +488,11 @@ class GuideTripDetailsScreen extends StatelessWidget {
                                       context,
                                     ).push(AppRoutes.travelers(trip)),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.tabSelectedBg,
+                                      backgroundColor: AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.tabSelectedBg,
+                                        dark: AppThemeDark.actionPrimary,
+                                      ),
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 15,

@@ -29,6 +29,8 @@ import 'features/splash/view/startup_gate.dart';
 import 'features/tour_guide/onboarding/view/tour_guide_onboarding_screen.dart';
 import 'features/admin_dashboard/d_auth/view/admin_login_view.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
+import 'core/services/app_prefs.dart';
 import 'features/common/auth/cubit/auth_cubit.dart';
 import 'features/tourist/home/view/home_screen.dart';
 import 'features/tourist/notifications/view/notifications_screen.dart';
@@ -78,6 +80,7 @@ class MyApp extends StatelessWidget {
         // to Firebase at launch, so the restored user is ready by the time
         // any screen reads it (and the profile self-heal can run).
         BlocProvider(lazy: false, create: (_) => AuthCubit()),
+        BlocProvider(lazy: false, create: (_) => ThemeCubit()),
         // Resolves the restored Firebase session while the splash animates.
         // Not lazy: the work must start at launch, not when the gate mounts.
         BlocProvider(lazy: false, create: (_) => StartupCubit()..resolve()),
@@ -136,46 +139,66 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => GuidesCubit()),
         BlocProvider(create: (_) => TripsCubit()),
       ],
-      child: BlocListener<StartupCubit, StartupState>(
-        listener: (context, state) {
-          // Notification taps on a cold start must wait for splash/auth.
-          if (state is StartupReady) {
-            NotificationNavigator.notifyReady();
-          }
+      child: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) async {
+          final accountId = state is AuthSuccess ? state.user.uid : null;
+          final role = state is AuthSuccess
+              ? state.role?.value ?? await AppPrefs.instance.lastRole()
+              : null;
+          if (!context.mounted) return;
+          await context.read<ThemeCubit>().loadForAccount(
+            accountId,
+            role: role,
+          );
         },
-        child: MaterialApp(
-          navigatorKey: NotificationNavigator.navigatorKey,
-          title: 'Triply',
-          debugShowCheckedModeBanner: false,
-          theme: buildAppTheme(),
-          onGenerateInitialRoutes: (_) => [
-            AppRoutes.splash(nextPageBuilder: (_) => const StartupGate()),
-          ],
-          routes: {
-            AppRoutes.home: (context) => const HomeScreen(),
-            AppRoutes.search: (context) => const SearchScreen(),
-            AppRoutes.notifications: (context) => const NotificationsScreen(),
-            AppRoutes.onboarding: (context) => const OnboardingScreen(),
-            AppRoutes.roleSelection: (context) => const RoleSelectionScreen(),
-            AppRoutes.guideOnboarding: (context) =>
-                const TourGuideOnboardingScreen(),
-            AppRoutes.guideLogin: (context) => const TourGuideLoginScreen(),
-            AppRoutes.guideSignup: (context) => const TourGuideSignupScreen(),
-            AppRoutes.guideVerification: (context) =>
-                const TourGuideVerificationScreen(),
-            AdminRoutes.login: (context) => const AdminLoginView(),
-            AppRoutes.signIn: (context) => const SignInScreen(),
-            AppRoutes.createAccount: (context) => const CreateAccountScreen(),
-            ForgotPasswordScreen.routeName: (context) =>
-                const ForgotPasswordScreen(),
-            AppRoutes.passwordResetSuccess: (context) =>
-                const PasswordResetSuccessScreen(),
-            AppRoutes.profile: (context) => const ProfileScreen(),
-            AppRoutes.privacySecurity: (context) =>
-                const PrivacySecurityScreen(),
-            AppRoutes.emergency: (context) => const EmergencyScreen(),
-            AppRoutes.contactUs: (context) => const ContactUsScreen(),
+        child: BlocListener<StartupCubit, StartupState>(
+          listener: (context, state) {
+            if (state is StartupReady) {
+              NotificationNavigator.notifyReady();
+            }
           },
+          child: BlocBuilder<ThemeCubit, bool>(
+            builder: (context, isDark) => MaterialApp(
+              navigatorKey: NotificationNavigator.navigatorKey,
+              title: 'Triply',
+              debugShowCheckedModeBanner: false,
+              theme: buildAppTheme(),
+              darkTheme: buildAppDarkTheme(),
+              themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+              onGenerateInitialRoutes: (_) => [
+                AppRoutes.splash(nextPageBuilder: (_) => const StartupGate()),
+              ],
+              routes: {
+                AppRoutes.home: (context) => const HomeScreen(),
+                AppRoutes.search: (context) => const SearchScreen(),
+                AppRoutes.notifications: (context) =>
+                    const NotificationsScreen(),
+                AppRoutes.onboarding: (context) => const OnboardingScreen(),
+                AppRoutes.roleSelection: (context) =>
+                    const RoleSelectionScreen(),
+                AppRoutes.guideOnboarding: (context) =>
+                    const TourGuideOnboardingScreen(),
+                AppRoutes.guideLogin: (context) => const TourGuideLoginScreen(),
+                AppRoutes.guideSignup: (context) =>
+                    const TourGuideSignupScreen(),
+                AppRoutes.guideVerification: (context) =>
+                    const TourGuideVerificationScreen(),
+                AdminRoutes.login: (context) => const AdminLoginView(),
+                AppRoutes.signIn: (context) => const SignInScreen(),
+                AppRoutes.createAccount: (context) =>
+                    const CreateAccountScreen(),
+                ForgotPasswordScreen.routeName: (context) =>
+                    const ForgotPasswordScreen(),
+                AppRoutes.passwordResetSuccess: (context) =>
+                    const PasswordResetSuccessScreen(),
+                AppRoutes.profile: (context) => const ProfileScreen(),
+                AppRoutes.privacySecurity: (context) =>
+                    const PrivacySecurityScreen(),
+                AppRoutes.emergency: (context) => const EmergencyScreen(),
+                AppRoutes.contactUs: (context) => const ContactUsScreen(),
+              },
+            ),
+          ),
         ),
       ),
     );

@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/profile_avatar.dart';
 import '../cubit/update_profile_cubit.dart';
 import '../cubit/update_profile_state.dart';
@@ -45,6 +47,9 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   XFile? _pickedImage;
   bool _removePhoto = false;
 
+  Color _profileColor(BuildContext context, Color light, Color dark) =>
+      AppThemeColors.resolve(context, light: light, dark: dark);
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -57,7 +62,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
   Future<void> _showPhotoActions() async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: _profileColor(
+        context,
+        Colors.white,
+        AppThemeDark.backgroundPrimary,
+      ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -71,19 +80,27 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF83969A),
+                  color: _profileColor(
+                    sheetContext,
+                    const Color(0xFF83969A),
+                    AppThemeDark.homeGuideSecondary,
+                  ),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
               const SizedBox(height: 18),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Change profile photo',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF263C42),
+                    color: _profileColor(
+                      sheetContext,
+                      const Color(0xFF263C42),
+                      AppThemeDark.homeSectionTitle,
+                    ),
                   ),
                 ),
               ),
@@ -115,10 +132,14 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     });
                     Navigator.pop(sheetContext);
                   },
-                  child: const Text(
+                  child: Text(
                     'Remove current photo',
                     style: TextStyle(
-                      color: Color(0xFFC33B25),
+                      color: _profileColor(
+                        sheetContext,
+                        const Color(0xFFC33B25),
+                        AppThemeDark.statusError,
+                      ),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -189,9 +210,22 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: _profileColor(
+          context,
+          Colors.white,
+          AppThemeDark.backgroundPrimary,
+        ),
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: _profileColor(
+            context,
+            Colors.white,
+            AppThemeDark.backgroundPrimary,
+          ),
+          foregroundColor: _profileColor(
+            context,
+            Colors.black,
+            AppThemeDark.textPrimary,
+          ),
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -217,14 +251,24 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFE2E8E9)),
+                        border: Border.all(
+                          color: _profileColor(
+                            context,
+                            const Color(0xFFE2E8E9),
+                            AppThemeDark.homeGuideBorder,
+                          ),
+                        ),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
                         children: [
                           CircleAvatar(
                             radius: 21,
-                            backgroundColor: const Color(0xFFE7F2F0),
+                            backgroundColor: _profileColor(
+                              context,
+                              const Color(0xFFE7F2F0),
+                              AppThemeDark.surfaceElevated,
+                            ),
                             backgroundImage: _pickedImage != null
                                 ? FileImage(File(_pickedImage!.path))
                                 : null,
@@ -253,9 +297,13 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                                   location.isEmpty
                                       ? 'Add your location'
                                       : location,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: AppColors.textGrey,
+                                    color: _profileColor(
+                                      context,
+                                      AppColors.textGrey,
+                                      AppThemeDark.homeGuideSecondary,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -263,9 +311,13 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                           ),
                           IconButton(
                             onPressed: isLoading ? null : _showPhotoActions,
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.image_outlined,
-                              color: Color(0xFF0D5865),
+                              color: _profileColor(
+                                context,
+                                const Color(0xFF0D5865),
+                                AppThemeDark.homeSeeAll,
+                              ),
                             ),
                           ),
                         ],
@@ -282,12 +334,22 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                     const SizedBox(height: 18),
                     const Text(
                       'Personal information',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 7),
-                    const Text(
+                    Text(
                       'Keep your name and home location up to date.',
-                      style: TextStyle(fontSize: 13, color: AppColors.textGrey),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: _profileColor(
+                          context,
+                          AppColors.textGrey,
+                          AppThemeDark.homeGuideSecondary,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     _field('Full name', _nameController),
@@ -307,12 +369,16 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                       hint: 'Tell other travelers a little about yourself...',
                     ),
                     const SizedBox(height: 18),
-                    const Text(
+                    Text(
                       'Your name, photo and bio appear on your profile.',
                       style: TextStyle(
                         fontSize: 11,
                         height: 1.5,
-                        color: AppColors.textGrey,
+                        color: _profileColor(
+                          context,
+                          AppColors.textGrey,
+                          AppThemeDark.homeGuideSecondary,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -376,11 +442,23 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
           contentPadding: const EdgeInsets.all(12),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Color(0xFF9AAEB1)),
+            borderSide: BorderSide(
+              color: _profileColor(
+                context,
+                const Color(0xFF9AAEB1),
+                AppThemeDark.borderSubtle,
+              ),
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(11),
-            borderSide: const BorderSide(color: Color(0xFF9AAEB1)),
+            borderSide: BorderSide(
+              color: _profileColor(
+                context,
+                const Color(0xFF9AAEB1),
+                AppThemeDark.borderSubtle,
+              ),
+            ),
           ),
         ),
       ),

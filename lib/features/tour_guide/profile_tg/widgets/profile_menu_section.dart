@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Languages + About + menu rows + log out button.
 class ProfileMenuSection extends StatelessWidget {
@@ -40,14 +42,22 @@ class ProfileMenuSection extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFBF6EC),
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: const Color(0xFFFBF6EC),
+                        dark: AppThemeDark.surfaceElevated,
+                      ),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Text(
                       l,
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     ),
                   ),
@@ -60,7 +70,11 @@ class ProfileMenuSection extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: AppColors.title,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           const SizedBox(height: 4),
@@ -71,7 +85,11 @@ class ProfileMenuSection extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 13,
               height: 1.6,
-              color: AppColors.dateText,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.dateText,
+                dark: AppThemeDark.textSecondary,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -105,7 +123,13 @@ class ProfileMenuSection extends StatelessWidget {
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.accentOrange),
+                  border: Border.all(
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.accentOrange,
+                      dark: AppThemeDark.homeGuidePrice,
+                    ),
+                  ),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
@@ -113,7 +137,11 @@ class ProfileMenuSection extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.accentOrange,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.accentOrange,
+                      dark: AppThemeDark.homeGuidePrice,
+                    ),
                   ),
                 ),
               ),
@@ -145,11 +173,23 @@ class _MenuRow extends StatelessWidget {
               width: 38,
               height: 38,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF6F1E7),
+              decoration: BoxDecoration(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: const Color(0xFFFBF6EC),
+                  dark: AppThemeDark.surfaceElevated,
+                ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 18, color: AppColors.priceTeal),
+              child: Icon(
+                icon,
+                size: 18,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.priceTeal,
+                  dark: AppThemeDark.homeSeeAll,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -158,14 +198,22 @@ class _MenuRow extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.priceTeal,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.priceTeal,
+                    dark: AppThemeDark.textPrimary,
+                  ),
                 ),
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 18,
-              color: AppColors.subtitle,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
             ),
           ],
         ),

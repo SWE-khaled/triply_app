@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 
 /// Skeleton for the guide profile loading state.
@@ -46,7 +48,11 @@ class ProfileSkeleton extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xffFAF5EC),
+              color: AppThemeColors.resolve(
+                context,
+                light: const Color(0xffFAF5EC),
+                dark: AppThemeDark.homeGuideSurface,
+              ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -60,9 +66,9 @@ class ProfileSkeleton extends StatelessWidget {
               child: Row(
                 children: [
                   const _StatSkeleton(),
-                  _divider(),
+                  _divider(context),
                   const _StatSkeleton(),
-                  _divider(),
+                  _divider(context),
                   const _StatSkeleton(),
                 ],
               ),
@@ -114,8 +120,16 @@ class ProfileSkeleton extends StatelessWidget {
     );
   }
 
-  Widget _divider() {
-    return Container(width: 1, height: 32, color: AppColors.cardBorder);
+  Widget _divider(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 32,
+      color: AppThemeColors.resolve(
+        context,
+        light: AppColors.cardBorder,
+        dark: AppThemeDark.borderDefault,
+      ),
+    );
   }
 }
 

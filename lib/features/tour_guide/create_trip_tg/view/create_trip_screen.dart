@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
@@ -282,7 +284,11 @@ class _CreateTripViewState extends State<_CreateTripView> {
   Widget build(BuildContext context) {
     final isEditing = widget.isEditing;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -293,8 +299,16 @@ class _CreateTripViewState extends State<_CreateTripView> {
                 children: [
                   CircleBackButton(
                     icon: Icons.chevron_left,
-                    iconColor: AppColors.titleDark,
-                    backgroundColor: const Color(0xFFF6F1E7),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.titleDark,
+                      dark: AppThemeDark.textPrimary,
+                    ),
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFF6F1E7),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
@@ -306,7 +320,11 @@ class _CreateTripViewState extends State<_CreateTripView> {
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.priceTeal,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.priceTeal,
+                          dark: AppThemeDark.homeSeeAll,
+                        ),
                       ),
                     ),
                   ),
@@ -316,7 +334,11 @@ class _CreateTripViewState extends State<_CreateTripView> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEAF3F4),
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFFEAF3F4),
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
@@ -327,7 +349,11 @@ class _CreateTripViewState extends State<_CreateTripView> {
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.priceTeal,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.priceTeal,
+                          dark: AppThemeDark.homeSeeAll,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -336,7 +362,11 @@ class _CreateTripViewState extends State<_CreateTripView> {
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         height: 1.5,
-                        color: AppColors.dateText,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.dateText,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     ),
                   ],

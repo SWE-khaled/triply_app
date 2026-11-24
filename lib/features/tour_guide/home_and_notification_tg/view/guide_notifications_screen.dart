@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 import '../../../../../core/widgets/circle_back_button.dart';
 import '../../../../../core/widgets/state_views.dart';
 import '../widget/guide_notifications_skeleton.dart';
@@ -60,7 +62,11 @@ class _GuideNotificationsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,12 +75,20 @@ class _GuideNotificationsView extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
-                  const CircleBackButton(
-                    backgroundColor: _cream,
-                    iconColor: AppColors.title,
+                  CircleBackButton(
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: _cream,
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.title,
+                      dark: AppThemeDark.textPrimary,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Notifications',
                       maxLines: 1,
@@ -82,7 +96,11 @@ class _GuideNotificationsView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.title,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.title,
+                          dark: AppThemeDark.homeSectionTitle,
+                        ),
                       ),
                     ),
                   ),
@@ -130,7 +148,7 @@ class _GuideNotificationsView extends StatelessWidget {
                               _SourceWarning(message: warning),
                             Expanded(
                               child: items.isEmpty
-                                  ? const _EmptyNotifications()
+                                  ? _EmptyNotifications()
                                   : ListView.separated(
                                       padding: const EdgeInsets.fromLTRB(
                                         16,
@@ -139,9 +157,13 @@ class _GuideNotificationsView extends StatelessWidget {
                                         24,
                                       ),
                                       itemCount: items.length,
-                                      separatorBuilder: (_, _) => const Divider(
+                                      separatorBuilder: (_, _) => Divider(
                                         height: 1,
-                                        color: AppColors.cardBorder,
+                                        color: AppThemeColors.resolve(
+                                          context,
+                                          light: AppColors.cardBorder,
+                                          dark: AppThemeDark.borderSubtle,
+                                        ),
                                       ),
                                       itemBuilder: (context, index) {
                                         final item = items[index];
@@ -188,17 +210,36 @@ class _SourceWarning extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDECEC),
+        color: AppThemeColors.resolve(
+          context,
+          light: const Color(0xFFFDECEC),
+          dark: AppThemeDark.surfaceElevated,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 16, color: Colors.redAccent),
+          Icon(
+            Icons.info_outline,
+            size: 16,
+            color: AppThemeColors.resolve(
+              context,
+              light: Colors.redAccent,
+              dark: AppThemeDark.statusError,
+            ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+              style: TextStyle(
+                fontSize: 11,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: Colors.redAccent,
+                  dark: AppThemeDark.statusError,
+                ),
+              ),
             ),
           ),
         ],
@@ -212,15 +253,20 @@ class _EmptyNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final muted = AppThemeColors.resolve(
+      context,
+      light: AppColors.subtitle,
+      dark: AppThemeDark.textSecondary,
+    );
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.notifications_none, size: 44, color: AppColors.subtitle),
+          Icon(Icons.notifications_none, size: 44, color: muted),
           SizedBox(height: 12),
           Text(
             'No notifications yet.',
-            style: TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style: TextStyle(fontSize: 13, color: muted),
           ),
         ],
       ),

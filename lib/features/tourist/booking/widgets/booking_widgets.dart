@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Step indicator from Figma: 1 Date & Time — 2 Details — 3 Confirm.
 class BookingStepper extends StatelessWidget {
@@ -11,21 +13,32 @@ class BookingStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final display = stepIndex >= 3 ? 2 : stepIndex;
+    final activeColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.primary,
+      dark: AppThemeDark.homeSeeAll,
+    );
     return Row(
       children: [
         // Loose dots keep their natural width when there is room and shrink
         // (ellipsising the label) on narrow screens; the connectors flex
         // around them. This avoids an overflow at 320-390px.
-        Flexible(child: _dot(0, 'Date & Time', display)),
-        _line(display >= 1),
-        Flexible(child: _dot(1, 'Details', display)),
-        _line(display >= 2),
-        Flexible(child: _dot(2, 'Confirm', display)),
+        Flexible(child: _dot(context, 0, 'Date & Time', display, activeColor)),
+        _line(context, display >= 1),
+        Flexible(child: _dot(context, 1, 'Details', display, activeColor)),
+        _line(context, display >= 2),
+        Flexible(child: _dot(context, 2, 'Confirm', display, activeColor)),
       ],
     );
   }
 
-  Widget _dot(int index, String label, int display) {
+  Widget _dot(
+    BuildContext context,
+    int index,
+    String label,
+    int display,
+    Color activeColor,
+  ) {
     final done = index < display;
     final current = index == display;
     final active = done || current;
@@ -36,18 +49,42 @@ class BookingStepper extends StatelessWidget {
           width: 22,
           height: 22,
           decoration: BoxDecoration(
-            color: active ? AppColors.primary : AppColors.searchBg,
+            color: active
+                ? activeColor
+                : AppThemeColors.resolve(
+                    context,
+                    light: AppColors.searchBg,
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
           child: done
-              ? const Icon(Icons.check, size: 14, color: Colors.white)
+              ? Icon(
+                  Icons.check,
+                  size: 14,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: Colors.white,
+                    dark: AppThemeDark.backgroundPrimary,
+                  ),
+                )
               : Text(
                   '${index + 1}',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: active ? Colors.white : AppColors.subtitle,
+                    color: active
+                        ? AppThemeColors.resolve(
+                            context,
+                            light: Colors.white,
+                            dark: AppThemeDark.backgroundPrimary,
+                          )
+                        : AppThemeColors.resolve(
+                            context,
+                            light: AppColors.subtitle,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                   ),
                 ),
         ),
@@ -59,7 +96,13 @@ class BookingStepper extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: current ? FontWeight.w700 : FontWeight.w500,
-              color: active ? AppColors.primary : AppColors.hint,
+              color: active
+                  ? activeColor
+                  : AppThemeColors.resolve(
+                      context,
+                      light: AppColors.hint,
+                      dark: AppThemeDark.textDisabled,
+                    ),
             ),
           ),
         ),
@@ -67,12 +110,22 @@ class BookingStepper extends StatelessWidget {
     );
   }
 
-  Widget _line(bool filled) {
+  Widget _line(BuildContext context, bool filled) {
     return Expanded(
       child: Container(
         height: 1,
         margin: const EdgeInsets.symmetric(horizontal: 6),
-        color: filled ? AppColors.primary : AppColors.cardBorder,
+        color: filled
+            ? AppThemeColors.resolve(
+                context,
+                light: AppColors.primary,
+                dark: AppThemeDark.homeSeeAll,
+              )
+            : AppThemeColors.resolve(
+                context,
+                light: AppColors.cardBorder,
+                dark: AppThemeDark.borderSubtle,
+              ),
       ),
     );
   }
@@ -93,6 +146,21 @@ class SelectableChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.primary,
+      dark: AppThemeDark.homeSeeAll,
+    );
+    final surfaceColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.background,
+      dark: AppThemeDark.surfaceDefault,
+    );
+    final borderColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.cardBorder,
+      dark: AppThemeDark.borderSubtle,
+    );
     return InkWell(
       onTap: onSelected == null ? null : () => onSelected!(label),
       borderRadius: BorderRadius.circular(10),
@@ -100,18 +168,26 @@ class SelectableChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.background,
+          color: selected ? selectedColor : surfaceColor,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: selected ? AppColors.primary : AppColors.cardBorder,
-          ),
+          border: Border.all(color: selected ? selectedColor : borderColor),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : AppColors.title,
+            color: selected
+                ? AppThemeColors.resolve(
+                    context,
+                    light: Colors.white,
+                    dark: AppThemeDark.backgroundPrimary,
+                  )
+                : AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.textSecondary,
+                  ),
           ),
         ),
       ),
@@ -134,16 +210,32 @@ class MeetingPointTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.primary,
+      dark: AppThemeDark.homeSeeAll,
+    );
+    final surfaceColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.background,
+      dark: AppThemeDark.surfaceDefault,
+    );
     return InkWell(
       onTap: onSelected == null ? null : () => onSelected!(label),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.background,
+          color: selected ? selectedColor : surfaceColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.cardBorder,
+            color: selected
+                ? selectedColor
+                : AppThemeColors.resolve(
+                    context,
+                    light: AppColors.cardBorder,
+                    dark: AppThemeDark.borderSubtle,
+                  ),
           ),
         ),
         child: Row(
@@ -151,7 +243,13 @@ class MeetingPointTile extends StatelessWidget {
             Icon(
               Icons.location_on,
               size: 16,
-              color: selected ? const Color(0xFFF5C445) : AppColors.subtitle,
+              color: selected
+                  ? const Color(0xFFF5C445)
+                  : AppThemeColors.resolve(
+                      context,
+                      light: AppColors.subtitle,
+                      dark: AppThemeDark.homeGuideSecondary,
+                    ),
             ),
             const SizedBox(width: 8),
             Text(
@@ -159,7 +257,17 @@ class MeetingPointTile extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: selected ? Colors.white : AppColors.title,
+                color: selected
+                    ? AppThemeColors.resolve(
+                        context,
+                        light: Colors.white,
+                        dark: AppThemeDark.backgroundPrimary,
+                      )
+                    : AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.textSecondary,
+                      ),
               ),
             ),
           ],
@@ -195,7 +303,14 @@ class SummaryRow extends StatelessWidget {
             child: Text(
               label,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+              style: TextStyle(
+                fontSize: 13,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.subtitle,
+                  dark: AppThemeDark.homeGuideSecondary,
+                ),
+              ),
             ),
           ),
           const Spacer(),
@@ -204,7 +319,11 @@ class SummaryRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
-              color: AppColors.title,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeGuideName,
+              ),
             ),
           ),
         ],

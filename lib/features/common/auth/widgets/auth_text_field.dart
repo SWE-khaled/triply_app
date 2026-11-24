@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 
 class AuthTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -15,6 +17,7 @@ class AuthTextField extends StatefulWidget {
   /// the field next to [icon] without changing the existing design.
   final Widget? prefix;
   final List<TextInputFormatter>? inputFormatters;
+  final bool themeAware;
 
   const AuthTextField({
     super.key,
@@ -26,6 +29,7 @@ class AuthTextField extends StatefulWidget {
     this.validator,
     this.prefix,
     this.inputFormatters,
+    this.themeAware = false,
   });
 
   @override
@@ -37,17 +41,29 @@ class _AuthTextFieldState extends State<AuthTextField> {
 
   @override
   Widget build(BuildContext context) {
+    Color fieldColor(Color light, Color dark) => widget.themeAware
+        ? AppThemeColors.resolve(context, light: light, dark: dark)
+        : light;
+
     return TextFormField(
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       validator: widget.validator,
-      style: const TextStyle(color: AppColors.textDark, fontSize: 15),
+      style: TextStyle(
+        color: fieldColor(AppColors.textDark, AppThemeDark.textPrimary),
+        fontSize: 15,
+      ),
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: const TextStyle(color: AppColors.textGrey),
-        prefixIcon: Icon(widget.icon, color: AppColors.iconGrey),
+        hintStyle: TextStyle(
+          color: fieldColor(AppColors.textGrey, AppThemeDark.textDisabled),
+        ),
+        prefixIcon: Icon(
+          widget.icon,
+          color: fieldColor(AppColors.iconGrey, AppThemeDark.iconSecondary),
+        ),
         prefix: widget.prefix,
         suffixIcon: widget.isPassword
             ? IconButton(
@@ -55,28 +71,50 @@ class _AuthTextFieldState extends State<AuthTextField> {
                   _obscureText
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
-                  color: AppColors.iconGrey,
+                  color: fieldColor(
+                    AppColors.iconGrey,
+                    AppThemeDark.iconSecondary,
+                  ),
                 ),
                 onPressed: () => setState(() => _obscureText = !_obscureText),
               )
             : null,
         filled: true,
-        fillColor: AppColors.fieldBackground,
+        fillColor: fieldColor(
+          AppColors.fieldBackground,
+          AppThemeDark.backgroundSecondary,
+        ),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 18,
           horizontal: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.fieldBorder),
+          borderSide: BorderSide(
+            color: fieldColor(
+              AppColors.fieldBorder,
+              AppThemeDark.borderDefault,
+            ),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.fieldBorder),
+          borderSide: BorderSide(
+            color: fieldColor(
+              AppColors.fieldBorder,
+              AppThemeDark.borderDefault,
+            ),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.signInDark, width: 1.5),
+          borderSide: BorderSide(
+            color: fieldColor(
+              AppColors.signInDark,
+              AppThemeDark.actionSecondary,
+            ),
+            width: 1.5,
+          ),
         ),
       ),
     );

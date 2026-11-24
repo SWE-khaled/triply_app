@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 class SeatsStepper extends StatelessWidget {
   final int seats;
@@ -22,7 +24,18 @@ class SeatsStepper extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.cardBorder),
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.transparent,
+          dark: AppThemeDark.homeGuideSurface,
+        ),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.homeGuideBorder,
+          ),
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -33,13 +46,22 @@ class SeatsStepper extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 17,
               fontWeight: FontWeight.w700,
-              color: AppColors.title,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           const SizedBox(height: 14),
           Row(
             children: [
-              _stepBtn(Icons.remove, onDecrement),
+              _stepBtn(
+                context,
+                Icons.remove,
+                onDecrement,
+                darkIconColor: AppThemeDark.iconSecondary,
+              ),
               Expanded(
                 child: Column(
                   children: [
@@ -48,7 +70,11 @@ class SeatsStepper extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.title,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.title,
+                          dark: AppThemeDark.homeGuideName,
+                        ),
                         height: 1.1,
                       ),
                     ),
@@ -57,16 +83,22 @@ class SeatsStepper extends StatelessWidget {
                       personWord,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.homeGuideSecondary,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
               _stepBtn(
+                context,
                 Icons.add,
                 onIncrement,
                 iconColor: AppColors.tabSelectedBg,
+                darkIconColor: AppThemeDark.homeSeeAll,
               ),
             ],
           ),
@@ -76,7 +108,11 @@ class SeatsStepper extends StatelessWidget {
               '$spotsAvailable spots available',
               style: GoogleFonts.poppins(
                 fontSize: 13,
-                color: AppColors.subtitle,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.subtitle,
+                  dark: AppThemeDark.homeGuideSecondary,
+                ),
               ),
             ),
           ),
@@ -86,9 +122,11 @@ class SeatsStepper extends StatelessWidget {
   }
 
   Widget _stepBtn(
+    BuildContext context,
     IconData icon,
     VoidCallback onTap, {
     Color iconColor = AppColors.dateText,
+    required Color darkIconColor,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -97,11 +135,23 @@ class SeatsStepper extends StatelessWidget {
         width: 48,
         height: 48,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: Color(0xFFF1F4F5),
+        decoration: BoxDecoration(
+          color: AppThemeColors.resolve(
+            context,
+            light: const Color(0xFFF1F4F5),
+            dark: AppThemeDark.surfaceElevated,
+          ),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 20, color: iconColor),
+        child: Icon(
+          icon,
+          size: 20,
+          color: AppThemeColors.resolve(
+            context,
+            light: iconColor,
+            dark: darkIconColor,
+          ),
+        ),
       ),
     );
   }

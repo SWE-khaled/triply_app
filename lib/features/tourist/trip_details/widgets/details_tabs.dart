@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 class DetailsTabs extends StatelessWidget {
   final List<String> tabs;
@@ -42,7 +44,13 @@ class DetailsTabs extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: selected ? Colors.white : AppColors.subtitle,
+                    color: selected
+                        ? Colors.white
+                        : AppThemeColors.resolve(
+                            context,
+                            light: AppColors.subtitle,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                   ),
                 ),
               ),

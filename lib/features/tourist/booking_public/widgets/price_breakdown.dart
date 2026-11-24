@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/helper/price_format.dart';
 
 class PriceBreakdown extends StatelessWidget {
@@ -22,7 +24,18 @@ class PriceBreakdown extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.cardBorder),
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.transparent,
+          dark: AppThemeDark.homeGuideSurface,
+        ),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.homeGuideBorder,
+          ),
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -33,18 +46,30 @@ class PriceBreakdown extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: AppColors.title,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           const SizedBox(height: 10),
           _line(
+            context,
             'EGP ${formatEgp(unitPrice)} × $seats seat${seats == 1 ? '' : 's'}',
             'EGP ${formatEgp(unitPrice * seats)}',
           ),
           const SizedBox(height: 6),
-          _line('Service fee (5%)', 'EGP ${formatEgp(fee)}'),
+          _line(context, 'Service fee (5%)', 'EGP ${formatEgp(fee)}'),
           const SizedBox(height: 5),
-          const Divider(height: 24),
+          Divider(
+            height: 24,
+            color: AppThemeColors.resolve(
+              context,
+              light: Theme.of(context).dividerColor,
+              dark: AppThemeDark.borderSubtle,
+            ),
+          ),
           const SizedBox(height: 5),
           Row(
             children: [
@@ -53,7 +78,11 @@ class PriceBreakdown extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.title,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.homeSectionTitle,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -62,7 +91,11 @@ class PriceBreakdown extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.title,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.homeGuidePrice,
+                  ),
                 ),
               ),
             ],
@@ -72,13 +105,20 @@ class PriceBreakdown extends StatelessWidget {
     );
   }
 
-  Widget _line(String left, String right) {
+  Widget _line(BuildContext context, String left, String right) {
     return Row(
       children: [
         Expanded(
           child: Text(
             left,
-            style: GoogleFonts.poppins(fontSize: 12, color: AppColors.dateText),
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.dateText,
+                dark: AppThemeDark.homeGuideSecondary,
+              ),
+            ),
           ),
         ),
         Text(
@@ -86,7 +126,11 @@ class PriceBreakdown extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppColors.title,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.title,
+              dark: AppThemeDark.homeGuideName,
+            ),
           ),
         ),
       ],

@@ -5,6 +5,8 @@ import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/data/guide_trip_details_source.dart';
 import '../../../../core/widgets/state_views.dart';
@@ -117,7 +119,11 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppThemeColors.resolve(
+            context,
+            light: Colors.white,
+            dark: AppThemeDark.surfaceDefault,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -126,14 +132,22 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.title,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           content: Text(
             '"${trip.title}" will be removed permanently, together with its details.',
             style: GoogleFonts.poppins(
               fontSize: 13,
-              color: AppColors.subtitle,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
               height: 1.4,
             ),
           ),
@@ -145,14 +159,22 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.subtitle,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.subtitle,
+                    dark: AppThemeDark.textSecondary,
+                  ),
                 ),
               ),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: AppThemeColors.resolve(
+                  context,
+                  light: Colors.redAccent,
+                  dark: AppThemeDark.statusErrorPressed,
+                ),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -184,7 +206,11 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,10 +221,25 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 5,
                 children: [
-                  Text('My Trips', style: AppTextStyles.screenTitle),
+                  Text(
+                    'My Trips',
+                    style: AppTextStyles.screenTitle.copyWith(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.primary,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
+                    ),
+                  ),
                   Text(
                     'Create and manage all your trips.',
-                    style: AppTextStyles.screenSubtitle,
+                    style: AppTextStyles.screenSubtitle.copyWith(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.guideLabel,
+                        dark: AppThemeDark.textSecondary,
+                      ),
+                    ),
                   ),
                   SizedBox(height: 5),
                 ],
@@ -291,7 +332,11 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                             decoration: BoxDecoration(
                               color: selected
                                   ? AppColors.tabSelectedBg
-                                  : AppColors.tabUnselected,
+                                  : AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.tabUnselected,
+                                      dark: AppThemeDark.surfaceElevated,
+                                    ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -301,7 +346,11 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                                 fontWeight: FontWeight.w600,
                                 color: selected
                                     ? Colors.white
-                                    : AppColors.primary,
+                                    : AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.primary,
+                                        dark: AppThemeDark.textPrimary,
+                                      ),
                               ),
                             ),
                           ),
@@ -324,7 +373,11 @@ class _GuideTripsViewState extends State<_GuideTripsView> {
                                 'No ${GuideTripsCubit.label(state.selectedStatus).toLowerCase()} trips yet',
                                 style: GoogleFonts.poppins(
                                   fontSize: 13,
-                                  color: AppColors.subtitle,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.subtitle,
+                                    dark: AppThemeDark.textSecondary,
+                                  ),
                                 ),
                               ),
                             )

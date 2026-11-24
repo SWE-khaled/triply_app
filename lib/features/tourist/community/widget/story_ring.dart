@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/community_story.dart';
 
 /// Story ring extracted from `_StoryRing` in `community_view.dart`.
@@ -30,13 +32,21 @@ class StoryRing extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 36,
-              backgroundColor: AppColors.chipGrey,
+              backgroundColor: AppThemeColors.resolve(
+                context,
+                light: AppColors.chipGrey,
+                dark: AppThemeDark.surfaceElevated,
+              ),
               foregroundImage: _avatarImage(story.authorAvatarUrl),
               onForegroundImageError: (_, _) {},
               child: Text(
                 story.userName.isEmpty ? '?' : story.userName[0].toUpperCase(),
-                style: const TextStyle(
-                  color: AppColors.textGrey,
+                style: TextStyle(
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.textGrey,
+                    dark: AppThemeDark.textSecondary,
+                  ),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -50,11 +60,15 @@ class StoryRing extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
                 letterSpacing: 0,
-                color: AppColors.textDark,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.textDark,
+                  dark: AppThemeDark.textPrimary,
+                ),
               ),
             ),
           ),

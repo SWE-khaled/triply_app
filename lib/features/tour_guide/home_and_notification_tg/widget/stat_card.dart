@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 
 /// Cream tint from Figma (banner, earnings card, public pill). Local const
 /// only — the global theme in `core/theme/` is left untouched.
@@ -31,9 +33,25 @@ class StatCard extends StatelessWidget {
     final card = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: highlighted ? _cream : Colors.white,
+        color: highlighted
+            ? AppThemeColors.resolve(
+                context,
+                light: _cream,
+                dark: AppThemeDark.homeGuideSurface,
+              )
+            : AppThemeColors.resolve(
+                context,
+                light: Colors.white,
+                dark: AppThemeDark.surfaceDefault,
+              ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,11 +59,23 @@ class StatCard extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: const BoxDecoration(
-              color: AppColors.searchBg,
+            decoration: BoxDecoration(
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.searchBg,
+                dark: AppThemeDark.surfaceElevated,
+              ),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 30, color: AppColors.title),
+            child: Icon(
+              icon,
+              size: 30,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           // Long values (e.g. "EGP 12,345.67") scale down on narrow cards
@@ -59,7 +89,17 @@ class StatCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
-                color: valueTeal ? AppColors.priceTeal : AppColors.title,
+                color: valueTeal
+                    ? AppThemeColors.resolve(
+                        context,
+                        light: AppColors.priceTeal,
+                        dark: AppThemeDark.homeSeeAll,
+                      )
+                    : AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
               ),
             ),
           ),
@@ -68,7 +108,14 @@ class StatCard extends StatelessWidget {
             label,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, color: AppColors.subtitle),
+            style: TextStyle(
+              fontSize: 12,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
+            ),
           ),
         ],
       ),

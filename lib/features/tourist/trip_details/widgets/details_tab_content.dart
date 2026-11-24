@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/trip_details.dart';
 
 class DetailsTabContent extends StatelessWidget {
@@ -20,7 +22,7 @@ class DetailsTabContent extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle('Highlights'),
+            _sectionTitle(context, 'Highlights'),
             const SizedBox(height: 8),
             ...details.highlights.map(
               (h) => Padding(
@@ -43,7 +45,11 @@ class DetailsTabContent extends StatelessWidget {
                         h,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
-                          color: AppColors.dateText,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.dateText,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                         ),
                       ),
                     ),
@@ -85,8 +91,12 @@ class DetailsTabContent extends StatelessWidget {
                                   margin: const EdgeInsets.symmetric(
                                     vertical: 4,
                                   ),
-                                  color: AppColors.guidedTourBg.withValues(
-                                    alpha: 0.40,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.guidedTourBg.withValues(
+                                      alpha: 0.40,
+                                    ),
+                                    dark: AppThemeDark.borderDefault,
                                   ),
                                 ),
                               ),
@@ -105,7 +115,11 @@ class DetailsTabContent extends StatelessWidget {
                               stop.time,
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
-                                color: AppColors.subtitle,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.subtitle,
+                                  dark: AppThemeDark.textSecondary,
+                                ),
                               ),
                             ),
                             Text(
@@ -113,7 +127,11 @@ class DetailsTabContent extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.titleDetails,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.titleDetails,
+                                  dark: AppThemeDark.textPrimary,
+                                ),
                               ),
                             ),
                           ],
@@ -151,7 +169,11 @@ class DetailsTabContent extends StatelessWidget {
                           n,
                           style: GoogleFonts.poppins(
                             fontSize: 13,
-                            color: AppColors.dateText,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.dateText,
+                              dark: AppThemeDark.textSecondary,
+                            ),
                           ),
                         ),
                       ),
@@ -166,14 +188,18 @@ class DetailsTabContent extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle('About this trip'),
+            _sectionTitle(context, 'About this trip'),
             const SizedBox(height: 6),
             Text(
               details.about,
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 height: 1.6,
-                color: AppColors.dateText,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.dateText,
+                  dark: AppThemeDark.textSecondary,
+                ),
               ),
             ),
           ],
@@ -181,13 +207,17 @@ class DetailsTabContent extends StatelessWidget {
     }
   }
 
-  Widget _sectionTitle(String text) {
+  Widget _sectionTitle(BuildContext context, String text) {
     return Text(
       text,
       style: GoogleFonts.poppins(
         fontSize: 15,
         fontWeight: FontWeight.w700,
-        color: AppColors.title,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.title,
+          dark: AppThemeDark.textPrimary,
+        ),
       ),
     );
   }

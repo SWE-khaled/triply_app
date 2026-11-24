@@ -3,13 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/notification_toruist/notification_target.dart';
+
 import '../cubit/notifications_cubit.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../model/notification_item.dart';
 import '../widget/notification_tile.dart';
+
+Color _notificationColor(BuildContext context, Color light, Color dark) =>
+    AppThemeColors.resolve(context, light: light, dark: dark);
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -58,6 +64,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           final unread = controller.unreadCount;
           final warning = state is NotificationsSuccess ? state.warning : null;
           return Scaffold(
+            backgroundColor: _notificationColor(
+              context,
+              AppColors.background,
+              AppThemeDark.backgroundPrimary,
+            ),
             body: SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,24 +77,47 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                     child: Row(
                       children: [
-                        const CircleBackButton(),
+                        CircleBackButton(
+                          backgroundColor: _notificationColor(
+                            context,
+                            Colors.white,
+                            AppThemeDark.surfaceElevated,
+                          ),
+                          iconColor: _notificationColor(
+                            context,
+                            Colors.black,
+                            AppThemeDark.iconPrimary,
+                          ),
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Notifications',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
+                                  color: _notificationColor(
+                                    context,
+                                    Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.color ??
+                                        Colors.black87,
+                                    AppThemeDark.homeSectionTitle,
+                                  ),
                                 ),
                               ),
                               Text(
                                 unread > 0 ? '$unread new' : 'All caught up',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  color: AppColors.textGrey,
+                                  color: _notificationColor(
+                                    context,
+                                    AppColors.textGrey,
+                                    AppThemeDark.homeGuideSecondary,
+                                  ),
                                 ),
                               ),
                             ],
@@ -99,9 +133,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         onRetry: controller.load,
                       ),
                       NotificationsInitial() ||
-                      NotificationsLoading() => const Center(
+                      NotificationsLoading() => Center(
                         child: CircularProgressIndicator(
-                          color: AppColors.primaryTeal,
+                          color: _notificationColor(
+                            context,
+                            AppColors.primaryTeal,
+                            AppThemeDark.iconPrimary,
+                          ),
                         ),
                       ),
                       _ => SingleChildScrollView(
@@ -114,22 +152,30 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   'Today',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryTeal,
+                                    color: _notificationColor(
+                                      context,
+                                      AppColors.primaryTeal,
+                                      AppThemeDark.homeSectionTitle,
+                                    ),
                                   ),
                                 ),
                                 GestureDetector(
                                   onTap: controller.markAllRead,
-                                  child: const Text(
+                                  child: Text(
                                     'Mark all read',
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryTeal,
+                                      color: _notificationColor(
+                                        context,
+                                        AppColors.primaryTeal,
+                                        AppThemeDark.homeSeeAll,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -138,12 +184,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             for (final n in controller.today)
                               NotificationTile(item: n, onTap: () => _open(n)),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               'Earlier',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTeal,
+                                color: _notificationColor(
+                                  context,
+                                  AppColors.primaryTeal,
+                                  AppThemeDark.homeSectionTitle,
+                                ),
                               ),
                             ),
                             for (final n in controller.earlier)
@@ -177,17 +227,36 @@ class _SourceWarning extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDECEC),
+        color: _notificationColor(
+          context,
+          const Color(0xFFFDECEC),
+          AppThemeDark.surfaceDefault,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 16, color: Colors.redAccent),
+          Icon(
+            Icons.info_outline,
+            size: 16,
+            color: _notificationColor(
+              context,
+              Colors.redAccent,
+              AppThemeDark.statusError,
+            ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(fontSize: 11, color: Colors.redAccent),
+              style: TextStyle(
+                fontSize: 11,
+                color: _notificationColor(
+                  context,
+                  Colors.redAccent,
+                  AppThemeDark.statusError,
+                ),
+              ),
             ),
           ),
         ],

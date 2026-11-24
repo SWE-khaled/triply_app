@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_header.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../widget/location_row.dart';
@@ -161,7 +163,11 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     final shareLabel = isStory ? 'Share Story' : 'Share Post';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),

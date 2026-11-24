@@ -1,8 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
+import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 
@@ -42,7 +46,11 @@ class GuideSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -51,14 +59,29 @@ class GuideSettingsScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const CircleBackButton(),
+                  CircleBackButton(
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: Colors.white,
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: Colors.black,
+                      dark: AppThemeDark.textPrimary,
+                    ),
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     'Settings',
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.title,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
                     ),
                   ),
                 ],
@@ -66,8 +89,18 @@ class GuideSettingsScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.cardBorder),
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: Colors.white,
+                    dark: AppThemeDark.surfaceDefault,
+                  ),
+                  border: Border.all(
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.cardBorder,
+                      dark: AppThemeDark.borderSubtle,
+                    ),
+                  ),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
@@ -76,6 +109,14 @@ class GuideSettingsScreen extends StatelessWidget {
                       icon: Icons.lock_reset_outlined,
                       label: 'Reset password',
                       onTap: () => _resetPassword(context),
+                    ),
+                    BlocBuilder<ThemeCubit, bool>(
+                      builder: (context, isDark) => _SettingsThemeRow(
+                        isDark: isDark,
+                        onChanged: (value) => context
+                            .read<ThemeCubit>()
+                            .setDarkMode(value, role: 'guide'),
+                      ),
                     ),
                   ],
                 ),
@@ -86,14 +127,28 @@ class GuideSettingsScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.title,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.homeSectionTitle,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.cardBorder),
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: Colors.white,
+                    dark: AppThemeDark.surfaceDefault,
+                  ),
+                  border: Border.all(
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.cardBorder,
+                      dark: AppThemeDark.borderSubtle,
+                    ),
+                  ),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: _SettingsRow(
@@ -108,12 +163,59 @@ class GuideSettingsScreen extends StatelessWidget {
                 'Triply for Guides · Version 1.0.0',
                 style: GoogleFonts.poppins(
                   fontSize: 12,
-                  color: AppColors.subtitle,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.subtitle,
+                    dark: AppThemeDark.textSecondary,
+                  ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SettingsThemeRow extends StatelessWidget {
+  final bool isDark;
+  final ValueChanged<bool> onChanged;
+
+  const _SettingsThemeRow({required this.isDark, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      child: Row(
+        children: [
+          Icon(
+            Icons.dark_mode_outlined,
+            size: 20,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.priceTeal,
+              dark: AppThemeDark.homeSeeAll,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Dark mode',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.priceTeal,
+                  dark: AppThemeDark.homeSectionTitle,
+                ),
+              ),
+            ),
+          ),
+          Switch(value: isDark, onChanged: onChanged),
+        ],
       ),
     );
   }
@@ -135,7 +237,15 @@ class _SettingsRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.priceTeal),
+            Icon(
+              icon,
+              size: 20,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.priceTeal,
+                dark: AppThemeDark.homeSeeAll,
+              ),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -143,14 +253,22 @@ class _SettingsRow extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.priceTeal,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.priceTeal,
+                    dark: AppThemeDark.textPrimary,
+                  ),
                 ),
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 18,
-              color: AppColors.subtitle,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
             ),
           ],
         ),

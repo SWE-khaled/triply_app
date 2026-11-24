@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:triply/core/routing/app_routes.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 
 import '../data/chat_roles.dart';
 
@@ -75,9 +77,19 @@ class MessageGuideButton extends StatelessWidget {
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
           ),
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.primary,
+            foregroundColor: AppThemeColors.resolve(
+              context,
+              light: AppColors.primary,
+              dark: AppThemeDark.homeSeeAll,
+            ),
             minimumSize: const Size(0, 52),
-            side: const BorderSide(color: AppColors.primary),
+            side: BorderSide(
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.primary,
+                dark: AppThemeDark.homeSeeAll,
+              ),
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(26),
             ),
@@ -99,13 +111,27 @@ class MessageGuideButton extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: const Color(0xFFFAF5EC),
-              border: Border.all(color: AppColors.guideLabel),
+              color: AppThemeColors.resolve(
+                context,
+                light: const Color(0xFFFAF5EC),
+                dark: AppThemeDark.surfaceDefault,
+              ),
+              border: Border.all(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.guideLabel,
+                  dark: AppThemeDark.homeGuideBorder,
+                ),
+              ),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.chat_bubble_outline,
-              color: AppColors.primary,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.primary,
+                dark: AppThemeDark.homeSeeAll,
+              ),
             ),
           ),
         ),

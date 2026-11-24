@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../map/model/place.dart';
 
 class AboutTab extends StatelessWidget {
@@ -24,12 +26,16 @@ class AboutTab extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           place.about,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w400,
             fontSize: 14,
             letterSpacing: 0,
             height: 1.6,
-            color: Color(0xFF374151),
+            color: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFF374151),
+              dark: AppThemeDark.textSecondary,
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -52,11 +58,15 @@ class AboutTab extends StatelessWidget {
                 Expanded(
                   child: Text(
                     h,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 14,
                       letterSpacing: 0,
-                      color: Color(0xFF526B72),
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: const Color(0xFF526B72),
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                 ),

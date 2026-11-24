@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../theme/app_theme_colors.dart';
+import '../theme/app_theme_dark.dart';
 
 /// Cream location chip (`community_screen.dart:574`, composer `new_share_screen.dart:292`).
 class LocationTagChip extends StatelessWidget {
@@ -18,16 +20,24 @@ class LocationTagChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F0DF),
+        color: AppThemeColors.resolve(
+          context,
+          light: const Color(0xFFF7F0DF),
+          dark: AppThemeDark.surfaceElevated,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         withSparkle ? '$label ✨' : label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           letterSpacing: 0,
-          color: AppColors.primaryTeal,
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.primaryTeal,
+            dark: AppThemeDark.actionSecondary,
+          ),
         ),
       ),
     );

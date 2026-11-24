@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 
 /// Skeleton for the traveler list of one trip. The screen header and trip
@@ -69,7 +71,11 @@ class _CheckedInCardSkeleton extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBF6EC),
+        color: AppThemeColors.resolve(
+          context,
+          light: const Color(0xFFFBF6EC),
+          dark: AppThemeDark.surfaceDefault,
+        ),
         borderRadius: BorderRadius.circular(14),
       ),
       child: AppShimmer(

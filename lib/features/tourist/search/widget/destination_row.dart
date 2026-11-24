@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 
@@ -18,13 +20,21 @@ class DestinationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFFF7F7F7),
+          color: AppThemeColors.resolve(
+            context,
+            light: const Color(0xFFF7F7F7),
+            dark: AppThemeDark.homeGuideSurface,
+          ),
+          border: isDark
+              ? Border.all(color: AppThemeDark.homeGuideBorder)
+              : null,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -36,6 +46,16 @@ class DestinationRow extends StatelessWidget {
                 width: 48,
                 height: 48,
                 fit: BoxFit.cover,
+                fallbackColor: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.chipGrey,
+                  dark: AppThemeDark.surfaceElevated,
+                ),
+                fallbackIconColor: AppThemeColors.resolve(
+                  context,
+                  light: Colors.grey,
+                  dark: AppThemeDark.homeGuideSecondary,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -45,27 +65,39 @@ class DestinationRow extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primaryTeal,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.primaryTeal,
+                        dark: AppThemeDark.homeGuideName,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textGrey,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.textGrey,
+                        dark: AppThemeDark.homeGuideSecondary,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 18,
-              color: AppColors.textGrey,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.textGrey,
+                dark: AppThemeDark.homeGuideSecondary,
+              ),
             ),
           ],
         ),

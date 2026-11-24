@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../../../../core/widgets/rating_badge.dart';
 import '../model/place.dart';
@@ -26,9 +28,22 @@ class PlacePreviewCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppThemeColors.resolve(
+            context,
+            light: Colors.white,
+            dark: AppThemeDark.surfaceDefault,
+          ),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8)],
+          boxShadow: [
+            BoxShadow(
+              color: AppThemeColors.resolve(
+                context,
+                light: Colors.black26,
+                dark: Colors.black54,
+              ),
+              blurRadius: 8,
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -52,25 +67,41 @@ class PlacePreviewCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           place.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                             letterSpacing: 0,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.textDark,
+                              dark: AppThemeDark.textPrimary,
+                            ),
                           ),
                         ),
                       ),
-                      RatingBadge.fromNum(place.rating),
+                      RatingBadge.fromNum(
+                        place.rating,
+                        backgroundColor: AppThemeColors.resolve(
+                          context,
+                          light: const Color(0xFFFFF3D6),
+                          dark: AppThemeDark.surfaceElevated,
+                        ),
+                      ),
                     ],
                   ),
                   Text(
                     place.shortDescription,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 0,
-                      color: AppColors.textGrey,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.textGrey,
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -81,11 +112,15 @@ class PlacePreviewCard extends StatelessWidget {
                         place.category == 'Historical'
                             ? 'Historical Landmark'
                             : place.category,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0,
-                          color: Color(0xFF4DA7A0),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFF4DA7A0),
+                            dark: AppThemeDark.actionSecondary,
+                          ),
                         ),
                       ),
                       GestureDetector(

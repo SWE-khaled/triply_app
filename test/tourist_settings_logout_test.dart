@@ -8,6 +8,7 @@ import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import 'package:triply/features/common/auth/data/auth_repository.dart';
 import 'package:triply/features/tourist/user_profile/cubit/profile_cubit.dart';
 import 'package:triply/features/tourist/user_profile/view/settings_screen.dart';
+import 'package:triply/core/theme/theme_cubit.dart';
 
 void main() {
   testWidgets('tourist settings logs out and navigates to sign in', (
@@ -25,6 +26,7 @@ void main() {
         providers: [
           BlocProvider.value(value: authCubit),
           BlocProvider(create: (_) => ProfileCubit()),
+          BlocProvider(create: (_) => ThemeCubit()),
         ],
         child: MaterialApp(
           home: const SettingsScreen(),

@@ -37,6 +37,7 @@ class RatingRow extends StatelessWidget {
   final int reviewCount;
   final Color ratingColor;
   final Color reviewCountColor;
+  final Color starColor;
 
   const RatingRow({
     super.key,
@@ -44,6 +45,7 @@ class RatingRow extends StatelessWidget {
     required this.reviewCount,
     required this.ratingColor,
     required this.reviewCountColor,
+    this.starColor = const Color(0xFFD8B66A),
   });
 
   @override
@@ -51,7 +53,7 @@ class RatingRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.star, size: 14, color: Color(0xFFD8B66A)),
+        Icon(Icons.star, size: 14, color: starColor),
         SizedBox(width: 4),
         Text(
           rating.toString(),

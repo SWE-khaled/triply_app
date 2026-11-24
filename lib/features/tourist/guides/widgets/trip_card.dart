@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import 'package:triply/features/tourist/guides/model/trip.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -19,7 +21,18 @@ class TripCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Color(0xFFFAF5EC),
+          color: AppThemeColors.resolve(
+            context,
+            light: const Color(0xFFFAF5EC),
+            dark: AppThemeDark.homeGuideSurface,
+          ),
+          border: Border.all(
+            color: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFFFAF5EC),
+              dark: AppThemeDark.homeGuideBorder,
+            ),
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,11 +50,19 @@ class TripCard extends StatelessWidget {
                 errorBuilder: (_, _, _) => Container(
                   width: 75,
                   height: 82,
-                  color: AppColors.primaryLight,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.primaryLight,
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
                   alignment: Alignment.center,
-                  child: const Icon(
+                  child: Icon(
                     Icons.landscape,
-                    color: Color(0xFF0E5261),
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: Color(0xFF0E5261),
+                      dark: AppThemeDark.homeGuideSecondary,
+                    ),
                     size: 28,
                   ),
                 ),
@@ -58,27 +79,39 @@ class TripCard extends StatelessWidget {
                   children: [
                     Text(
                       trip.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.title,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.title,
+                          dark: AppThemeDark.homeGuideName,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${trip.dateLabel} - ${trip.durationLabel}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.homeGuideSecondary,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       ' ${trip.price.toStringAsFixed(0)} ${trip.currency}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.price,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.price,
+                          dark: AppThemeDark.homeGuidePrice,
+                        ),
                       ),
                     ),
                   ],

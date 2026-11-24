@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart' as fmap;
 import 'package:latlong2/latlong.dart' as latlng;
 import 'package:triply/features/tourist/home/view/home_screen.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/state_views.dart';
 
@@ -104,7 +106,11 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true, // map extends under the glass nav
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         bottom: false, // <-- let the map reach the bottom of the screen
         child: BlocBuilder<MapCubit, MapState>(
@@ -182,8 +188,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 children: [
                   fmap.TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    urlTemplate:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.example.triply_app',
                   ),
                   fmap.MarkerLayer(markers: _markersFor(state.visiblePlaces)),
@@ -258,7 +263,11 @@ class _MapSkeleton extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
             borderRadius: BorderRadius.zero,
-            color: const Color(0xFFE7EDED),
+            color: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFFE7EDED),
+              dark: AppThemeDark.surfaceElevated,
+            ),
           ),
         ),
       ],

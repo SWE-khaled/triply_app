@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Dashed upload box (Figma). Shows the cover when there is one — the
 /// freshly picked file, or the URL the trip already has — and the
@@ -32,7 +34,7 @@ class CoverUploadBox extends StatelessWidget {
             SizedBox(
               height: 240,
               width: double.infinity,
-              child: _coverImage(image),
+              child: _coverImage(context, image),
             ),
             Positioned(
               top: 8,
@@ -62,7 +64,11 @@ class CoverUploadBox extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: CustomPaint(
         painter: _DashedRRectPainter(
-          color: AppColors.cardBorder,
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderDefault,
+          ),
           radius: 24,
           dash: 5,
           gap: 4,
@@ -81,13 +87,23 @@ class CoverUploadBox extends StatelessWidget {
                   height: 36,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.priceTeal),
+                    border: Border.all(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.priceTeal,
+                        dark: AppThemeDark.homeSeeAll,
+                      ),
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add,
                     size: 20,
-                    color: AppColors.priceTeal,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.priceTeal,
+                      dark: AppThemeDark.homeSeeAll,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -96,14 +112,22 @@ class CoverUploadBox extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.priceTeal,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.priceTeal,
+                      dark: AppThemeDark.homeSeeAll,
+                    ),
                   ),
                 ),
                 Text(
                   'This image appears on Tourist Home and Trip Details',
                   style: GoogleFonts.poppins(
                     fontSize: 11,
-                    color: AppColors.subtitle,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.subtitle,
+                      dark: AppThemeDark.textSecondary,
+                    ),
                   ),
                 ),
               ],
@@ -116,10 +140,21 @@ class CoverUploadBox extends StatelessWidget {
 
   /// Renders the cover: a local file that was just picked, or a URL the
   /// trip already has.
-  Widget _coverImage(String image) {
+  Widget _coverImage(BuildContext context, String image) {
     final placeholder = Container(
-      color: const Color(0xFFE6ECEF),
-      child: const Icon(Icons.image, color: AppColors.subtitle),
+      color: AppThemeColors.resolve(
+        context,
+        light: const Color(0xFFE6ECEF),
+        dark: AppThemeDark.surfaceElevated,
+      ),
+      child: Icon(
+        Icons.image,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.subtitle,
+          dark: AppThemeDark.textSecondary,
+        ),
+      ),
     );
     if (image.startsWith('http')) {
       return Image.network(

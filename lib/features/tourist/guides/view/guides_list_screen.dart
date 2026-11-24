@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/widgets/app_shimmer.dart';
 import 'package:triply/core/widgets/circle_back_button.dart';
 import 'package:triply/core/widgets/state_views.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import 'package:triply/features/tourist/guides/cubit/guides_cubit.dart';
 
 import 'package:triply/features/tourist/guides/view/guide_profile_screen.dart';
@@ -38,7 +40,11 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: BlocProvider.value(
           value: _controller,
@@ -102,7 +108,19 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
       padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Row(
         children: [
-          const CircleBackButton(size: 41),
+          CircleBackButton(
+            size: 41,
+            backgroundColor: AppThemeColors.resolve(
+              context,
+              light: Colors.white,
+              dark: AppThemeDark.surfaceDefault,
+            ),
+            iconColor: AppThemeColors.resolve(
+              context,
+              light: Colors.black,
+              dark: AppThemeDark.iconPrimary,
+            ),
+          ),
           SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,12 +130,23 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: Colors.black,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: Colors.black,
+                    dark: AppThemeDark.homeSectionTitle,
+                  ),
                 ),
               ),
               Text(
                 '${_controller.totalCount} guides available',
-                style: TextStyle(fontSize: 12, color: Color(0xFF8A9EA3)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFF8A9EA3),
+                    dark: AppThemeDark.homeGuideSecondary,
+                  ),
+                ),
               ),
             ],
           ),
@@ -135,10 +164,29 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
         onSubmitted: (_) {},
         decoration: InputDecoration(
           hintText: 'Search guides by name or specialty...',
-          hintStyle: TextStyle(fontSize: 13, color: Color(0xFFAAB8BC)),
-          prefixIcon: Icon(Icons.search, color: Color(0xFF8A9EA3), size: 20),
+          hintStyle: TextStyle(
+            fontSize: 13,
+            color: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFFAAB8BC),
+              dark: AppThemeDark.textDisabled,
+            ),
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFF8A9EA3),
+              dark: AppThemeDark.textSecondary,
+            ),
+            size: 20,
+          ),
           filled: true,
-          fillColor: Color(0xFFF5F5F5),
+          fillColor: AppThemeColors.resolve(
+            context,
+            light: const Color(0xFFF5F5F5),
+            dark: AppThemeDark.surfaceDefault,
+          ),
           contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -175,19 +223,55 @@ class _GuidesListScreenState extends State<GuidesListScreen> {
                 ? Icon(
                     Icons.translate,
                     size: 15,
-                    color: selected ? Colors.white : Color(0xFF526B72),
+                    color: selected
+                        ? AppThemeColors.resolve(
+                            context,
+                            light: Colors.white,
+                            dark: AppThemeDark.backgroundPrimary,
+                          )
+                        : AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFF526B72),
+                            dark: AppThemeDark.textSecondary,
+                          ),
                   )
                 : null,
             labelStyle: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: selected ? Colors.white : Color(0xFF526B72),
+              color: selected
+                  ? AppThemeColors.resolve(
+                      context,
+                      light: Colors.white,
+                      dark: AppThemeDark.backgroundPrimary,
+                    )
+                  : AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFF526B72),
+                      dark: AppThemeDark.textSecondary,
+                    ),
             ),
-            backgroundColor: Color(0xFFF5F5F5),
-            selectedColor: Color(0xFF0E5261),
+            backgroundColor: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFFF5F5F5),
+              dark: AppThemeDark.surfaceDefault,
+            ),
+            selectedColor: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFF0E5261),
+              dark: AppThemeDark.homeSeeAll,
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
-              side: BorderSide(color: Color(0xFFF5F5F5)),
+              side: BorderSide(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: const Color(0xFFF5F5F5),
+                  dark: selected
+                      ? AppThemeDark.homeSeeAll
+                      : AppThemeDark.borderSubtle,
+                ),
+              ),
             ),
           );
         },
@@ -325,27 +409,38 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(32),
+    return Padding(
+      padding: const EdgeInsets.all(32),
       child: Center(
         child: Column(
           spacing: 10,
           children: [
-            Text(
+            const Text(
               "🔍",
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
             ),
             Text(
               'No guides found',
               style: TextStyle(
-                color: Color(0xFF0E5261),
+                color: AppThemeColors.resolve(
+                  context,
+                  light: const Color(0xFF0E5261),
+                  dark: AppThemeDark.homeSectionTitle,
+                ),
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               "Try a different keyword or filter",
-              style: TextStyle(color: Color(0xFF8A9EA3), fontSize: 13),
+              style: TextStyle(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: const Color(0xFF8A9EA3),
+                  dark: AppThemeDark.homeGuideSecondary,
+                ),
+                fontSize: 13,
+              ),
             ),
           ],
         ),

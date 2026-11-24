@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../home_and_notification_tg/view/guide_notifications_screen.dart';
 import '../../home_and_notification_tg/widget/guide_bottom_nav.dart';
 import '../../../chat/widgets/chat_unread_builder.dart';
@@ -51,10 +53,14 @@ class _ProfileTourGuideView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline,
               size: 48,
-              color: AppColors.accentOrange,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.accentOrange,
+                dark: AppThemeDark.homeGuidePrice,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -62,13 +68,24 @@ class _ProfileTourGuideView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColors.title,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.title,
+                  dark: AppThemeDark.homeSectionTitle,
+                ),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               error,
-              style: TextStyle(fontSize: 13, color: AppColors.subtitle),
+              style: TextStyle(
+                fontSize: 13,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.subtitle,
+                  dark: AppThemeDark.textSecondary,
+                ),
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -96,9 +113,15 @@ class _ProfileTourGuideView extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text(
+            child: Text(
               'Logout',
-              style: TextStyle(color: AppColors.accentOrange),
+              style: TextStyle(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.accentOrange,
+                  dark: AppThemeDark.homeGuidePrice,
+                ),
+              ),
             ),
           ),
         ],
@@ -149,7 +172,11 @@ class _ProfileTourGuideView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: BlocBuilder<ProfileTgCubit, ProfileTgState>(
         builder: (context, state) {
           // While the profile is loading (initial or refresh) show a

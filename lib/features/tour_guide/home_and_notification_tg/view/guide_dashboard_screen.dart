@@ -5,6 +5,8 @@ import 'package:triply/features/common/auth/cubit/auth_cubit.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../common/auth/views/tour_guide/tour_guide_verification_screen.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 import '../../../../../core/widgets/circle_icon_button.dart';
 import '../../../../../core/widgets/app_snackbar.dart';
 import '../../../../../core/widgets/profile_avatar.dart';
@@ -155,7 +157,11 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
         ? firebaseName
         : (_firestoreName.isNotEmpty ? _firestoreName : 'Guide');
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -246,12 +252,16 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           const SizedBox(height: 20),
         ] else
           const SizedBox(height: 4),
-        const Text(
+        Text(
           'Dashboard',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w800,
-            color: AppColors.title,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.title,
+              dark: AppThemeDark.homeSectionTitle,
+            ),
           ),
         ),
         const SizedBox(height: 4),
@@ -259,7 +269,14 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           'Welcome back, $guideName',
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          style: TextStyle(
+            fontSize: 13,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.subtitle,
+              dark: AppThemeDark.textSecondary,
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         Row(
@@ -346,12 +363,16 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
           ],
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           'New bookings',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: AppColors.title,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.title,
+              dark: AppThemeDark.homeSectionTitle,
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -408,8 +429,16 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                 CircleIconButton(
                   icon: Icons.notifications_none_outlined,
                   onTap: () => _openNotifications(context),
-                  backgroundColor: Colors.white,
-                  iconColor: AppColors.title,
+                  backgroundColor: AppThemeColors.resolve(
+                    context,
+                    light: Colors.white,
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
+                  iconColor: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.homeSeeAll,
+                  ),
                   size: 50,
                   iconSize: 24,
                 ),
@@ -450,23 +479,41 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: _cream,
+          color: AppThemeColors.resolve(
+            context,
+            light: _cream,
+            dark: AppThemeDark.homeGuideSurface,
+          ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.cardBorder),
+          border: Border.all(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderSubtle,
+            ),
+          ),
         ),
         child: Row(
           children: [
             Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: Colors.white,
+                  dark: AppThemeDark.surfaceElevated,
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 pending ? Icons.hourglass_top : Icons.person_outline,
                 size: 22,
-                color: AppColors.title,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.title,
+                  dark: AppThemeDark.homeSectionTitle,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -481,7 +528,11 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.title,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
                     ),
                   ),
                   SizedBox(height: 2),
@@ -489,12 +540,27 @@ class _GuideDashboardViewState extends State<_GuideDashboardView> {
                     pending
                         ? 'Your documents are under review by the admin.'
                         : 'Verify your guide license to publish trips.',
-                    style: TextStyle(fontSize: 12, color: AppColors.subtitle),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.textSecondary,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, size: 20, color: AppColors.title),
+            Icon(
+              Icons.chevron_right,
+              size: 20,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSeeAll,
+              ),
+            ),
           ],
         ),
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/traveler.dart';
 
 class TravelerCard extends StatelessWidget {
@@ -13,8 +15,18 @@ class TravelerCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.cardBorder),
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.surfaceDefault,
+        ),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -30,8 +42,19 @@ class TravelerCard extends StatelessWidget {
                   errorBuilder: (_, _, _) => Container(
                     width: 44,
                     height: 44,
-                    color: const Color(0xFFE6ECEF),
-                    child: const Icon(Icons.person, color: AppColors.subtitle),
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFE6ECEF),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.textSecondary,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -45,14 +68,22 @@ class TravelerCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.titleDark,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.titleDark,
+                          dark: AppThemeDark.homeSectionTitle,
+                        ),
                       ),
                     ),
                     Text(
                       traveler.tagline,
                       style: GoogleFonts.poppins(
                         fontSize: 11,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     ),
                   ],
@@ -64,7 +95,11 @@ class TravelerCard extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFBF6EC),
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFFFBF6EC),
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -72,7 +107,11 @@ class TravelerCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.subtitle,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.subtitle,
+                      dark: AppThemeDark.textSecondary,
+                    ),
                   ),
                 ),
               ),

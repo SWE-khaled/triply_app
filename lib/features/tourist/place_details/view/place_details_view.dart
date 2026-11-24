@@ -13,6 +13,8 @@ import '../data/place_resolver.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
 import 'package:triply/core/routing/app_routes.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../../map/model/place.dart';
@@ -50,10 +52,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
   void initState() {
     super.initState();
     _resolver = PlaceResolver(placeId: widget.placeId);
-    _infoCubit = PlaceInfoCubit(
-      placeId: widget.placeId,
-      resolver: _resolver,
-    );
+    _infoCubit = PlaceInfoCubit(placeId: widget.placeId, resolver: _resolver);
     _guidesCubit = PlaceGuidesCubit(resolver: _resolver);
     _tripsCubit = PlaceTripsCubit(resolver: _resolver);
     _storiesCubit = PlaceStoriesCubit(resolver: _resolver);
@@ -125,10 +124,20 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
       ];
       final error = errors.isEmpty ? null : errors.first;
       if (error != null) {
-        return _buildError(error, infoState, guidesState, tripsState, storiesState);
+        return _buildError(
+          error,
+          infoState,
+          guidesState,
+          tripsState,
+          storiesState,
+        );
       }
-      return const Scaffold(
-        backgroundColor: Colors.white,
+      return Scaffold(
+        backgroundColor: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.backgroundPrimary,
+        ),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -151,7 +160,11 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
     List<Story> stories,
   ) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -171,7 +184,20 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [const CircleBackButton()],
+                      children: [
+                        CircleBackButton(
+                          backgroundColor: AppThemeColors.resolve(
+                            context,
+                            light: Colors.white,
+                            dark: AppThemeDark.surfaceElevated,
+                          ),
+                          iconColor: AppThemeColors.resolve(
+                            context,
+                            light: Colors.black,
+                            dark: AppThemeDark.iconPrimary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -182,8 +208,12 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: Colors.white,
+                    dark: AppThemeDark.backgroundPrimary,
+                  ),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
@@ -194,10 +224,15 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                   children: [
                     Text(
                       place.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.titleDark,
+                          dark: AppThemeDark.textPrimary,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -211,10 +246,14 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                         const SizedBox(width: 4),
                         Text(
                           '${place.city}  ·  ${place.category}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.textGrey,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.textGrey,
+                              dark: AppThemeDark.textSecondary,
+                            ),
                             letterSpacing: 0,
                           ),
                         ),
@@ -239,10 +278,14 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                         ),
                         Text(
                           ' (${place.reviewsCount.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},')} reviews)',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 13,
-                            color: AppColors.textGrey,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.textGrey,
+                              dark: AppThemeDark.textSecondary,
+                            ),
                             letterSpacing: 0,
                           ),
                         ),
@@ -251,12 +294,16 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                     const SizedBox(height: 10),
                     Text(
                       place.shortDescription,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 14,
                         letterSpacing: 0,
                         height: 2,
-                        color: Color(0xFF526B72),
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: const Color(0xFF526B72),
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -275,11 +322,19 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                               onSelected: (_) =>
                                   setState(() => _selectedTabIndex = i),
                               selectedColor: AppColors.primaryTeal,
-                              backgroundColor: AppColors.chipGrey,
+                              backgroundColor: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.chipGrey,
+                                dark: AppThemeDark.surfaceElevated,
+                              ),
                               labelStyle: TextStyle(
                                 color: selected
                                     ? Colors.white
-                                    : AppColors.chipTextGrey,
+                                    : AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.chipTextGrey,
+                                        dark: AppThemeDark.textSecondary,
+                                      ),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
                                 letterSpacing: 0,
@@ -315,7 +370,9 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
                         onViewDetails: (trip) {
                           Navigator.of(context).push(
                             AppRoutes.tripDetails(
-                              context.read<PlaceTripsCubit>().publicTripFor(trip),
+                              context.read<PlaceTripsCubit>().publicTripFor(
+                                trip,
+                              ),
                             ),
                           );
                         },
@@ -346,19 +403,38 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
     PlaceStoriesState storiesState,
   ) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.wifi_off_outlined, size: 48, color: Colors.grey),
+              Icon(
+                Icons.wifi_off_outlined,
+                size: 48,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: Colors.grey,
+                  dark: AppThemeDark.textSecondary,
+                ),
+              ),
               const SizedBox(height: 12),
               Text(
                 error,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13, color: Colors.black87),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: Colors.black87,
+                    dark: AppThemeDark.textPrimary,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(

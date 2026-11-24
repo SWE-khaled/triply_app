@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../common/auth/cubit/auth_cubit.dart'; // عدّل المسار لو مختلف
 
 class MyStoryBubble extends StatelessWidget {
@@ -35,20 +37,32 @@ class MyStoryBubble extends StatelessWidget {
                   border: Border.all(
                     color: hasStory
                         ? AppColors.accentOrange
-                        : AppColors.cardBorder,
+                        : AppThemeColors.resolve(
+                            context,
+                            light: AppColors.cardBorder,
+                            dark: AppThemeDark.borderDefault,
+                          ),
                     width: hasStory ? 3 : 0,
                   ),
                 ),
                 child: CircleAvatar(
                   radius: 36,
-                  backgroundColor: AppColors.chipGrey,
+                  backgroundColor: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.chipGrey,
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
                   backgroundImage: hasPhoto ? NetworkImage(photoUrl) : null,
                   onBackgroundImageError: hasPhoto ? (_, _) {} : null,
                   child: hasPhoto
                       ? null
-                      : const Icon(
+                      : Icon(
                           Icons.person,
-                          color: AppColors.textGrey,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.textGrey,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                           size: 28,
                         ),
                 ),
@@ -64,7 +78,14 @@ class MyStoryBubble extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.primaryTeal,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: Colors.white,
+                          dark: AppThemeDark.backgroundPrimary,
+                        ),
+                        width: 2,
+                      ),
                     ),
                     child: const Icon(Icons.add, color: Colors.white, size: 14),
                   ),
@@ -73,12 +94,17 @@ class MyStoryBubble extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Your Story',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
               letterSpacing: 0,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.textDark,
+                dark: AppThemeDark.textPrimary,
+              ),
             ),
           ),
         ],

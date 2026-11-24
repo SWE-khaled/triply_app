@@ -1,6 +1,8 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants/egypt_cities.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import 'guide_form_field.dart';
 
 /// Static form sections. Controllers stay in the screen State;
@@ -54,7 +56,11 @@ class BasicsSection extends StatelessWidget {
               fit: FlexFit.loose,
               constraints: const BoxConstraints(maxHeight: 300),
               menuProps: MenuProps(
-                backgroundColor: Colors.white,
+                backgroundColor: AppThemeColors.resolve(
+                  context,
+                  light: Colors.white,
+                  dark: AppThemeDark.surfaceDefault,
+                ),
                 surfaceTintColor: Colors.transparent,
                 borderRadius: BorderRadius.circular(14),
                 elevation: 4,
@@ -62,13 +68,21 @@ class BasicsSection extends StatelessWidget {
               searchFieldProps: TextFieldProps(
                 decoration: InputDecoration(
                   hintText: 'Search city',
-                  hintStyle: const TextStyle(
+                  hintStyle: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFFB8B2A5),
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFB8B2A5),
+                      dark: AppThemeDark.textDisabled,
+                    ),
                   ),
                   prefixIcon: const Icon(Icons.search, size: 20),
                   filled: true,
-                  fillColor: const Color(0xFFFBF6EA),
+                  fillColor: AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFFFBF6EA),
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -85,12 +99,20 @@ class BasicsSection extends StatelessWidget {
               baseStyle: const TextStyle(fontSize: 13),
               decoration: InputDecoration(
                 hintText: 'Select city',
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   fontSize: 13,
-                  color: Color(0xFFB8B2A5),
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFFB8B2A5),
+                    dark: AppThemeDark.textDisabled,
+                  ),
                 ),
                 filled: true,
-                fillColor: const Color(0xFFFBF6EA),
+                fillColor: AppThemeColors.resolve(
+                  context,
+                  light: const Color(0xFFFBF6EA),
+                  dark: AppThemeDark.surfaceElevated,
+                ),
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,

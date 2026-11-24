@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../common/auth/cubit/auth_cubit.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
+import '../../../../core/theme/theme_cubit.dart';
 import '../cubit/logout_cubit.dart';
 import '../cubit/logout_state.dart';
 import '../cubit/profile_cubit.dart';
@@ -31,24 +34,40 @@ class SettingsScreen extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: AppThemeColors.resolve(
+              context,
+              light: Colors.white,
+              dark: AppThemeDark.backgroundPrimary,
+            ),
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppThemeColors.resolve(
+                context,
+                light: Colors.white,
+                dark: AppThemeDark.backgroundPrimary,
+              ),
               elevation: 0,
               leading: IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back_ios_new,
                   size: 18,
-                  color: Color(0xFF0E5865),
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: Color(0xFF0E5865),
+                    dark: AppThemeDark.iconPrimary,
+                  ),
                 ),
               ),
-              title: const Text(
+              title: Text(
                 'Settings',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF263A40),
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: const Color(0xFF263A40),
+                    dark: AppThemeDark.homeSectionTitle,
+                  ),
                 ),
               ),
             ),
@@ -56,7 +75,7 @@ class SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.fromLTRB(14, 14, 14, 10),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -65,7 +84,11 @@ class SettingsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF263A40),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFF263A40),
+                            dark: AppThemeDark.homeSectionTitle,
+                          ),
                         ),
                       ),
                     ),
@@ -73,7 +96,13 @@ class SettingsScreen extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFE6EAEB)),
+                      border: Border.all(
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: const Color(0xFFE6EAEB),
+                          dark: AppThemeDark.homeGuideBorder,
+                        ),
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -84,6 +113,18 @@ class SettingsScreen extends StatelessWidget {
                             title: 'Notifications',
                             switchValue: state.notificationsEnabled,
                             onSwitchChanged: cubit.toggleNotifications,
+                          ),
+                        ),
+                        BlocBuilder<ThemeCubit, bool>(
+                          builder: (context, isDark) => AccountOptionTile(
+                            icon: Icons.dark_mode_outlined,
+                            title: 'Dark mode',
+                            switchValue: isDark,
+                            onSwitchChanged: (value) =>
+                                context.read<ThemeCubit>().setDarkMode(
+                                  value,
+                                  role: 'tourist',
+                                ),
                           ),
                         ),
                         AccountOptionTile(
@@ -116,7 +157,7 @@ class SettingsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.fromLTRB(14, 20, 14, 10),
                     child: Align(
                       alignment: Alignment.centerLeft,
@@ -125,7 +166,11 @@ class SettingsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF263A40),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFF263A40),
+                            dark: AppThemeDark.homeSectionTitle,
+                          ),
                         ),
                       ),
                     ),
@@ -133,7 +178,13 @@ class SettingsScreen extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFE6EAEB)),
+                      border: Border.all(
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: const Color(0xFFE6EAEB),
+                          dark: AppThemeDark.homeGuideBorder,
+                        ),
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AccountOptionTile(
@@ -147,12 +198,16 @@ class SettingsScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   TextButton(
                     onPressed: () => _logout(context),
-                    child: const Text(
+                    child: Text(
                       'Log out',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF0E5865),
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: Color(0xFF0E5865),
+                          dark: AppThemeDark.homeSeeAll,
+                        ),
                       ),
                     ),
                   ),

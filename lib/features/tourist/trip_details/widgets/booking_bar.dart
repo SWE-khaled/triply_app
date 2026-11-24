@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/helper/price_format.dart';
 import '../model/trip_details.dart';
 
@@ -36,7 +38,11 @@ class BookingBar extends StatelessWidget {
                     'Meeting Point',
                     style: GoogleFonts.poppins(
                       fontSize: 11,
-                      color: AppColors.subtitle,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                   Text(
@@ -44,7 +50,11 @@ class BookingBar extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.titleDetails,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.titleDetails,
+                        dark: AppThemeDark.textPrimary,
+                      ),
                     ),
                   ),
                 ],
@@ -72,7 +82,11 @@ class BookingBar extends StatelessWidget {
                       text: ' / person',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     ),
                   ],

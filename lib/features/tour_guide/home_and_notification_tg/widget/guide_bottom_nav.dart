@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 
 /// Cream tint from Figma (active tab circle). Local const only — the global
 /// theme in `core/theme/` is left untouched.
@@ -97,9 +99,21 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.cardBorder)),
+      decoration: BoxDecoration(
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.surfaceDefault,
+        ),
+        border: Border(
+          top: BorderSide(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderSubtle,
+            ),
+          ),
+        ),
       ),
       child: SafeArea(
         child: Padding(
@@ -109,8 +123,16 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
             children: List.generate(_items.length, (i) {
               final selected = i == _selected;
               final color = selected
-                  ? AppColors.title
-                  : AppColors.bottomNavUnselected;
+                  ? AppThemeColors.resolve(
+                      context,
+                      light: AppColors.title,
+                      dark: AppThemeDark.homeSectionTitle,
+                    )
+                  : AppThemeColors.resolve(
+                      context,
+                      light: AppColors.bottomNavUnselected,
+                      dark: AppThemeDark.textSecondary,
+                    );
               return GestureDetector(
                 onTap: () => _handleTap(i),
                 behavior: HitTestBehavior.opaque,
@@ -122,7 +144,13 @@ class _GuideBottomNavState extends State<GuideBottomNav> {
                       width: 44,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: selected ? _cream : Colors.transparent,
+                        color: selected
+                            ? AppThemeColors.resolve(
+                                context,
+                                light: _cream,
+                                dark: AppThemeDark.surfaceSelected,
+                              )
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: _icon(i, color),

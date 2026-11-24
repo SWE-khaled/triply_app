@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Composer text field extracted from `share_composer_view.dart:236`.
 class PostTextField extends StatelessWidget {
@@ -14,14 +16,20 @@ class PostTextField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderDefault,
+          ),
+        ),
       ),
       child: TextField(
         controller: controller,
         maxLines: 4,
         minLines: 3,
         onChanged: (_) {},
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           border: InputBorder.none,
           hintText:
               "What's on your mind? Share your magical travel moment... ✨🇪🇬",
@@ -29,7 +37,11 @@ class PostTextField extends StatelessWidget {
             fontWeight: FontWeight.w400,
             fontSize: 13,
             letterSpacing: 0,
-            color: AppColors.textGrey,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.textGrey,
+              dark: AppThemeDark.textDisabled,
+            ),
           ),
         ),
       ),

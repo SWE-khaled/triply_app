@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/data/repositories/guide_trips_repository.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../my_trips_tg/model/guide_trip.dart';
 
@@ -28,7 +30,11 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -37,14 +43,29 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
             children: [
               Row(
                 children: [
-                  const CircleBackButton(),
+                  CircleBackButton(
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: Colors.white,
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: Colors.black,
+                      dark: AppThemeDark.textPrimary,
+                    ),
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     'Availability',
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.title,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
                     ),
                   ),
                 ],
@@ -54,7 +75,11 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
                 'When you are available, based on your trips.',
                 style: GoogleFonts.poppins(
                   fontSize: 13,
-                  color: AppColors.subtitle,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.subtitle,
+                    dark: AppThemeDark.textSecondary,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -67,7 +92,11 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
                       'No trips yet — availability will appear here once you add trips.',
                       style: GoogleFonts.poppins(
                         fontSize: 13,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     );
                   }
@@ -78,16 +107,30 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: AppColors.cardBorder),
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: Colors.white,
+                              dark: AppThemeDark.surfaceDefault,
+                            ),
+                            border: Border.all(
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.cardBorder,
+                                dark: AppThemeDark.borderSubtle,
+                              ),
+                            ),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.calendar_today_outlined,
                                 size: 20,
-                                color: AppColors.priceTeal,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.priceTeal,
+                                  dark: AppThemeDark.homeSeeAll,
+                                ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -99,7 +142,11 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
                                       style: GoogleFonts.poppins(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.title,
+                                        color: AppThemeColors.resolve(
+                                          context,
+                                          light: AppColors.title,
+                                          dark: AppThemeDark.homeSectionTitle,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 2),
@@ -107,7 +154,11 @@ class _GuideAvailabilityScreenState extends State<GuideAvailabilityScreen> {
                                       trip.scheduleLabel,
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
-                                        color: AppColors.subtitle,
+                                        color: AppThemeColors.resolve(
+                                          context,
+                                          light: AppColors.subtitle,
+                                          dark: AppThemeDark.textSecondary,
+                                        ),
                                       ),
                                     ),
                                   ],

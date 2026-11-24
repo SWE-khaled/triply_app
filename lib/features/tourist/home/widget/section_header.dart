@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -9,17 +12,33 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.textDark,
+      dark: AppThemeDark.homeSectionTitle,
+    );
+    final seeAllColor = AppThemeColors.resolve(
+      context,
+      light: AppColors.primaryTeal,
+      dark: AppThemeDark.homeSeeAll,
+    );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: AppTextStyles.sectionTitle),
+        Text(
+          title,
+          style: AppTextStyles.sectionTitle.copyWith(color: titleColor),
+        ),
         GestureDetector(
           onTap: onSeeAllTap,
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('See all', style: AppTextStyles.seeAll),
-              Icon(Icons.chevron_right, size: 16, color: Color(0xFF0E5560)),
+              Text(
+                'See all',
+                style: AppTextStyles.seeAll.copyWith(color: seeAllColor),
+              ),
+              Icon(Icons.chevron_right, size: 16, color: seeAllColor),
             ],
           ),
         ),

@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/circle_back_button.dart';
@@ -37,7 +39,11 @@ class _TripsScreenState extends State<TripsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: BlocBuilder<TripsCubit, TripsState>(
           builder: (context, state) {
@@ -92,9 +98,29 @@ class _TripsScreenState extends State<TripsScreen> {
         padding: const EdgeInsets.fromLTRB(16, 20, 20, 0),
         child: Row(
           children: [
-            const CircleBackButton(),
+            CircleBackButton(
+              backgroundColor: AppThemeColors.resolve(
+                context,
+                light: Colors.white,
+                dark: AppThemeDark.surfaceElevated,
+              ),
+              iconColor: AppThemeColors.resolve(
+                context,
+                light: Colors.black,
+                dark: AppThemeDark.iconPrimary,
+              ),
+            ),
             const SizedBox(width: 12),
-            Text('Trips', style: AppTextStyles.screenTitle),
+            Text(
+              'Trips',
+              style: AppTextStyles.screenTitle.copyWith(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.primary,
+                  dark: AppThemeDark.textPrimary,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -102,7 +128,13 @@ class _TripsScreenState extends State<TripsScreen> {
         padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
         child: Text(
           'Your Egypt journey, tracked',
-          style: AppTextStyles.screenSubtitle,
+          style: AppTextStyles.screenSubtitle.copyWith(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.guideLabel,
+              dark: AppThemeDark.textSecondary,
+            ),
+          ),
         ),
       ),
       const SizedBox(height: 16),
@@ -114,7 +146,11 @@ class _TripsScreenState extends State<TripsScreen> {
     child: Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: AppColors.tabUnselectedBg,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.tabUnselectedBg,
+          dark: AppThemeDark.backgroundSecondary,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -139,7 +175,13 @@ class _TripsScreenState extends State<TripsScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: selected ? AppColors.background : AppColors.subtitle,
+                    color: selected
+                        ? AppColors.background
+                        : AppThemeColors.resolve(
+                            context,
+                            light: AppColors.subtitle,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                   ),
                 ),
               ),

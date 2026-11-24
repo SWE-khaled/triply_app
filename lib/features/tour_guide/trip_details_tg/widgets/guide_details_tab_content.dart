@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/guide_trip_details.dart';
 
 class GuideDetailsTabContent extends StatelessWidget {
@@ -20,7 +22,7 @@ class GuideDetailsTabContent extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle('Highlights'),
+            _sectionTitle(context, 'Highlights'),
             const SizedBox(height: 8),
             ...details.highlights.map(
               (h) => Padding(
@@ -32,8 +34,12 @@ class GuideDetailsTabContent extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 5),
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
-                        color: AppColors.priceTeal,
+                      decoration: BoxDecoration(
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.priceTeal,
+                          dark: AppThemeDark.homeSeeAll,
+                        ),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -43,7 +49,11 @@ class GuideDetailsTabContent extends StatelessWidget {
                         h,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
-                          color: AppColors.dateText,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.dateText,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                         ),
                       ),
                     ),
@@ -72,8 +82,12 @@ class GuideDetailsTabContent extends StatelessWidget {
                             width: 8,
                             height: 8,
                             margin: const EdgeInsets.only(top: 4),
-                            decoration: const BoxDecoration(
-                              color: AppColors.priceTeal,
+                            decoration: BoxDecoration(
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.priceTeal,
+                                dark: AppThemeDark.homeSeeAll,
+                              ),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -85,7 +99,11 @@ class GuideDetailsTabContent extends StatelessWidget {
                                   margin: const EdgeInsets.symmetric(
                                     vertical: 4,
                                   ),
-                                  color: AppColors.cardBorder,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.cardBorder,
+                                    dark: AppThemeDark.borderDefault,
+                                  ),
                                 ),
                               ),
                             ),
@@ -103,7 +121,11 @@ class GuideDetailsTabContent extends StatelessWidget {
                               stop.time,
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
-                                color: AppColors.subtitle,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.subtitle,
+                                  dark: AppThemeDark.textSecondary,
+                                ),
                               ),
                             ),
                             Text(
@@ -111,7 +133,11 @@ class GuideDetailsTabContent extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.titleDetails,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.titleDetails,
+                                  dark: AppThemeDark.homeSectionTitle,
+                                ),
                               ),
                             ),
                           ],
@@ -138,8 +164,12 @@ class GuideDetailsTabContent extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 5),
                         width: 6,
                         height: 6,
-                        decoration: const BoxDecoration(
-                          color: AppColors.accentOrange,
+                        decoration: BoxDecoration(
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.accentOrange,
+                            dark: AppThemeDark.homeGuidePrice,
+                          ),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -149,7 +179,11 @@ class GuideDetailsTabContent extends StatelessWidget {
                           n,
                           style: GoogleFonts.poppins(
                             fontSize: 13,
-                            color: AppColors.dateText,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.dateText,
+                              dark: AppThemeDark.textSecondary,
+                            ),
                           ),
                         ),
                       ),
@@ -164,14 +198,18 @@ class GuideDetailsTabContent extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle('About this trip'),
+            _sectionTitle(context, 'About this trip'),
             const SizedBox(height: 6),
             Text(
               details.about,
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 height: 1.6,
-                color: AppColors.dateText,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.dateText,
+                  dark: AppThemeDark.textSecondary,
+                ),
               ),
             ),
           ],
@@ -179,13 +217,17 @@ class GuideDetailsTabContent extends StatelessWidget {
     }
   }
 
-  Widget _sectionTitle(String text) {
+  Widget _sectionTitle(BuildContext context, String text) {
     return Text(
       text,
       style: GoogleFonts.poppins(
         fontSize: 15,
         fontWeight: FontWeight.w700,
-        color: AppColors.title,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.title,
+          dark: AppThemeDark.homeSectionTitle,
+        ),
       ),
     );
   }

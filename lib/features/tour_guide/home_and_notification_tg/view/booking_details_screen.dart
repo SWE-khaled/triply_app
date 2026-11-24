@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 import '../../../../../core/widgets/circle_back_button.dart';
 import '../../../../../core/widgets/network_image_fallback.dart';
 import '../../../../../core/widgets/state_views.dart';
@@ -40,33 +42,57 @@ class _BookingDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: Colors.white,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
                   CircleBackButton(
-                    backgroundColor: _cream,
-                    iconColor: AppColors.title,
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: _cream,
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.title,
+                      dark: AppThemeDark.textPrimary,
+                    ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Text(
                     'Booking Details',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.title,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 12),
-            const Divider(height: 1, thickness: 1, color: _hairline),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: AppThemeColors.resolve(
+                context,
+                light: _hairline,
+                dark: AppThemeDark.borderSubtle,
+              ),
+            ),
             const SizedBox(height: 18),
             // The builder sits outside the scroll view, so the loading
             // skeleton fills the same area the cards will occupy.
@@ -80,9 +106,9 @@ class _BookingDetailsView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _guestCard(details),
+                            _guestCard(context, details),
                             const SizedBox(height: 16),
-                            _tripCard(details),
+                            _tripCard(context, details),
                           ],
                         ),
                       ),
@@ -102,14 +128,24 @@ class _BookingDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _guestCard(BookingDetails details) {
+  Widget _guestCard(BuildContext context, BookingDetails details) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.surfaceDefault,
+        ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _hairline),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: _hairline,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
       ),
       child: Column(
         children: [
@@ -125,16 +161,27 @@ class _BookingDetailsView extends StatelessWidget {
           Text(
             details.guestName,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: AppColors.title,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '${details.country} · ${details.travelerLabel}',
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style: TextStyle(
+              fontSize: 13,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           BookingTypePill(isPrivate: details.isPrivate),
@@ -143,40 +190,75 @@ class _BookingDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _tripCard(BookingDetails details) {
+  Widget _tripCard(BuildContext context, BookingDetails details) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.surfaceDefault,
+        ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _hairline),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: _hairline,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             details.tourTitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: AppColors.title,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.title,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           const SizedBox(height: 10),
           Text(
             details.datetimeLabel,
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style: TextStyle(
+              fontSize: 13,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             details.location,
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style: TextStyle(
+              fontSize: 13,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             'Booking #${details.bookingCode} · ${details.priceLabel}',
-            style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+            style: TextStyle(
+              fontSize: 13,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
+            ),
           ),
         ],
       ),

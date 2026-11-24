@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 
@@ -35,8 +37,16 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                 children: [
                   CircleBackButton(
                     icon: Icons.chevron_left,
-                    iconColor: AppColors.titleDark,
-                    backgroundColor: const Color(0xFFF6F1E7),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.titleDark,
+                      dark: AppThemeDark.textPrimary,
+                    ),
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFF6F1E7),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
                     onTap: onBack ?? () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
@@ -48,7 +58,11 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.priceTeal,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.priceTeal,
+                          dark: AppThemeDark.homeSeeAll,
+                        ),
                       ),
                     ),
                   ),
@@ -66,8 +80,12 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
           Container(
             width: double.infinity,
             transform: Matrix4.translationValues(0, -24, 0),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppThemeColors.resolve(
+                context,
+                light: Colors.white,
+                dark: AppThemeDark.surfaceDefault,
+              ),
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Padding(
@@ -114,7 +132,11 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 color: i == 0
                                     ? Colors.white
-                                    : AppColors.subtitle,
+                                    : AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.subtitle,
+                                        dark: AppThemeDark.textSecondary,
+                                      ),
                               ),
                             ),
                           ),
@@ -142,7 +164,11 @@ class GuideTripDetailsSkeleton extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFBF6EC),
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: const Color(0xFFFBF6EC),
+                        dark: AppThemeDark.homeGuideSurface,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AppShimmer(

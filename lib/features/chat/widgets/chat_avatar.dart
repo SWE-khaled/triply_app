@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_theme_colors.dart';
+import '../../../core/theme/app_theme_dark.dart';
 
 /// Circular avatar with the participant's initial as the offline fallback.
 class ChatAvatar extends StatelessWidget {
@@ -23,9 +25,19 @@ class ChatAvatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.primaryLight,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.primaryLight,
+          dark: AppThemeDark.surfaceElevated,
+        ),
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: trimmed.isEmpty
@@ -35,7 +47,11 @@ class ChatAvatar extends StatelessWidget {
                 style: TextStyle(
                   fontSize: size * 0.36,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.primary,
+                    dark: AppThemeDark.homeSeeAll,
+                  ),
                 ),
               ),
             )
@@ -50,7 +66,11 @@ class ChatAvatar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: size * 0.36,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.primary,
+                      dark: AppThemeDark.homeSeeAll,
+                    ),
                   ),
                 ),
               ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Sticky Preview / Submit bar. Two equal flex halves adapt to the available
 /// width (including view insets) instead of assuming the full screen width.
@@ -32,7 +34,11 @@ class FormBottomBar extends StatelessWidget {
                   // no `alignment` here, it makes the Container expand
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF6F1E7),
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFF6F1E7),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -41,7 +47,11 @@ class FormBottomBar extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.primary,
+                        dark: AppThemeDark.textPrimary,
+                      ),
                     ),
                   ),
                 ),

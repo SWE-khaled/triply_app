@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../model/story.dart';
 
@@ -17,7 +19,11 @@ class StoryCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: AppColors.storyBg,
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.storyBg,
+            dark: AppThemeDark.surfaceDefault,
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -53,11 +59,15 @@ class StoryCard extends StatelessWidget {
                       ),
                       Text(
                         story.timeAgo,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                           letterSpacing: 0,
-                          color: AppColors.textGrey,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.textGrey,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -65,12 +75,16 @@ class StoryCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     story.text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
                       letterSpacing: 0,
                       height: 1.5,
-                      color: AppColors.textGrey,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.textGrey,
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                 ],

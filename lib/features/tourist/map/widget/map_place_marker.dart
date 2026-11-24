@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
-
+import 'package:triply/core/theme/app_theme_colors.dart';
 /// Marker child extracted from `map_view.dart:54-63`.
 class MapPlaceMarker extends StatelessWidget {
   final VoidCallback onTap;
@@ -12,9 +12,13 @@ class MapPlaceMarker extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: const Icon(
+      child: Icon(
         Icons.location_on,
-        color: AppColors.primaryTeal,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.primaryTeal,
+          dark: AppColors.primaryTeal,
+        ),
         size: 40,
       ),
     );

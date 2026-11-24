@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Designed empty state for trip lists (Figma: map icon + title + subtext).
 /// Title is dynamic per tab, e.g. "No Upcoming trips".
@@ -28,14 +30,22 @@ class EmptyTrips extends StatelessWidget {
               width: 72,
               height: 72,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF1F4F5),
+              decoration: BoxDecoration(
+                color: AppThemeColors.resolve(
+                  context,
+                  light: const Color(0xFFF1F4F5),
+                  dark: AppThemeDark.surfaceElevated,
+                ),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.map_outlined,
                 size: 30,
-                color: AppColors.subtitle,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.subtitle,
+                  dark: AppThemeDark.textSecondary,
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -44,7 +54,11 @@ class EmptyTrips extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: AppColors.title,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.title,
+                  dark: AppThemeDark.textPrimary,
+                ),
               ),
             ),
             const SizedBox(height: 4),
@@ -53,7 +67,11 @@ class EmptyTrips extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 13,
-                color: AppColors.subtitle,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.subtitle,
+                  dark: AppThemeDark.textSecondary,
+                ),
               ),
             ),
           ],

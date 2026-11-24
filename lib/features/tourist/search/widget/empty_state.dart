@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class EmptyState extends StatelessWidget {
@@ -17,17 +19,28 @@ class EmptyState extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppColors.primaryTeal,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.primaryTeal,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: AppColors.textGrey),
+            style: TextStyle(
+              fontSize: 14,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.textGrey,
+                dark: AppThemeDark.homeGuideSecondary,
+              ),
+            ),
           ),
         ],
       ),

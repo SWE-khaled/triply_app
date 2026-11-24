@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_theme_colors.dart';
+import '../theme/app_theme_dark.dart';
 
 /// Tourist bottom navigation.
 /// Screens set `extendBody: true`. Same tab order everywhere:
@@ -43,17 +45,36 @@ class AppBottomNav extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppThemeColors.resolve(
+              context,
+              light: Colors.white,
+              dark: AppThemeDark.surfaceDefault,
+            ),
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: AppColors.cardBorder, width: 1),
+            border: Border.all(
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.cardBorder,
+                dark: AppThemeDark.borderSubtle,
+              ),
+              width: 1,
+            ),
           ),
           child: Row(
             children: List.generate(_items.length, (i) {
               final item = _items[i];
               final selected = i == currentIndex;
               final color = selected
-                  ? AppColors.bottomNavSelected
-                  : AppColors.subtitle;
+                  ? AppThemeColors.resolve(
+                      context,
+                      light: AppColors.bottomNavSelected,
+                      dark: AppThemeDark.actionSecondary,
+                    )
+                  : AppThemeColors.resolve(
+                      context,
+                      light: AppColors.subtitle,
+                      dark: AppThemeDark.textSecondary,
+                    );
               return Expanded(
                 child: Semantics(
                   button: true,

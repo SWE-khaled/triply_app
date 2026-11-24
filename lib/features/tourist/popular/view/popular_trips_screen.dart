@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
@@ -26,7 +28,11 @@ class PopularTripsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,9 +41,29 @@ class PopularTripsScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 20, 20, 0),
               child: Row(
                 children: [
-                  const CircleBackButton(),
+                  CircleBackButton(
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: Colors.white,
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: Colors.black,
+                      dark: AppThemeDark.iconPrimary,
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Text(title, style: AppTextStyles.screenTitle),
+                  Text(
+                    title,
+                    style: AppTextStyles.screenTitle.copyWith(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.primary,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -45,7 +71,13 @@ class PopularTripsScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
               child: Text(
                 'Your Egypt journey, tracked',
-                style: AppTextStyles.screenSubtitle,
+                style: AppTextStyles.screenSubtitle.copyWith(
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.guideLabel,
+                    dark: AppThemeDark.textSecondary,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -77,13 +109,29 @@ class PopularTripsScreen extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: selected
-                                  ? AppColors.tabSelectedBg
-                                  : Colors.white,
+                                  ? AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.tabSelectedBg,
+                                      dark: AppThemeDark.homeSeeAll,
+                                    )
+                                  : AppThemeColors.resolve(
+                                      context,
+                                      light: Colors.white,
+                                      dark: AppThemeDark.surfaceDefault,
+                                    ),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: selected
-                                    ? AppColors.tabSelectedBg
-                                    : AppColors.cardBorder,
+                                    ? AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.tabSelectedBg,
+                                        dark: AppThemeDark.homeSeeAll,
+                                      )
+                                    : AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.cardBorder,
+                                        dark: AppThemeDark.borderSubtle,
+                                      ),
                               ),
                             ),
                             child: Text(
@@ -92,8 +140,16 @@ class PopularTripsScreen extends StatelessWidget {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: selected
-                                    ? Colors.white
-                                    : AppColors.subtitle,
+                                    ? AppThemeColors.resolve(
+                                        context,
+                                        light: Colors.white,
+                                        dark: AppThemeDark.backgroundPrimary,
+                                      )
+                                    : AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.subtitle,
+                                        dark: AppThemeDark.textSecondary,
+                                      ),
                               ),
                             ),
                           ),
@@ -111,11 +167,15 @@ class PopularTripsScreen extends StatelessWidget {
                   return switch (state) {
                     PopularSuccess(:final trips) =>
                       trips.isEmpty
-                          ? const Center(
+                          ? Center(
                               child: Text(
                                 'No trips here yet',
                                 style: TextStyle(
-                                  color: AppColors.subtitle,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.subtitle,
+                                    dark: AppThemeDark.textSecondary,
+                                  ),
                                   fontSize: 13,
                                 ),
                               ),

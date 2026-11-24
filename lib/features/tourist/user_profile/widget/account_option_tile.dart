@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 class AccountOptionTile extends StatelessWidget {
   final IconData icon;
@@ -35,42 +37,70 @@ class AccountOptionTile extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.inputFill,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.inputFill,
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, size: 22, color: AppColors.guidesName),
+                  child: Icon(
+                    icon,
+                    size: 22,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.guidesName,
+                      dark: AppThemeDark.homeSeeAll,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.guidesName,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.guidesName,
+                        dark: AppThemeDark.homeGuideName,
+                      ),
                     ),
                   ),
                 ),
                 if (switchValue != null)
                   Switch(
                     value: switchValue!,
-                    activeThumbColor: AppColors.guidesName,
+                    activeThumbColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.guidesName,
+                      dark: AppThemeDark.homeSeeAll,
+                    ),
                     onChanged: onSwitchChanged,
                   )
                 else ...[
                   if (trailingText != null)
                     Text(
                       trailingText!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textGrey,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.textGrey,
+                          dark: AppThemeDark.homeGuideSecondary,
+                        ),
                       ),
                     ),
                   const SizedBox(width: 4),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right,
                     size: 22,
-                    color: AppColors.textGrey,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.textGrey,
+                      dark: AppThemeDark.homeGuideSecondary,
+                    ),
                   ),
                 ],
               ],
@@ -78,7 +108,15 @@ class AccountOptionTile extends StatelessWidget {
           ),
         ),
         if (showDivider)
-          const Divider(height: 1, indent: 72, color: Color(0xFFEEEEEE)),
+          Divider(
+            height: 1,
+            indent: 72,
+            color: AppThemeColors.resolve(
+              context,
+              light: const Color(0xFFEEEEEE),
+              dark: AppThemeDark.borderSubtle,
+            ),
+          ),
       ],
     );
   }

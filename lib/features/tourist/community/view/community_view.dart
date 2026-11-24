@@ -16,6 +16,8 @@ import '../cubit/publish_content_cubit.dart';
 import '../cubit/publish_content_state.dart';
 import '../cubit/story_actions_cubit.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_shimmer.dart';
@@ -180,7 +182,11 @@ class _CommunityScreenState extends State<CommunityScreen>
 
               return Scaffold(
                 extendBody: true, // content extends under the glass nav
-                backgroundColor: Colors.white,
+                backgroundColor: AppThemeColors.resolve(
+                  context,
+                  light: Colors.white,
+                  dark: AppThemeDark.backgroundPrimary,
+                ),
                 body: SafeArea(
                   bottom:
                       false, // <-- let the content reach the bottom of the screen
@@ -292,8 +298,13 @@ class _CommunityScreenState extends State<CommunityScreen>
                                             ),
                                             child: Text(
                                               storyState.errorMessage!,
-                                              style: const TextStyle(
-                                                color: AppColors.textGrey,
+                                              style: TextStyle(
+                                                color: AppThemeColors.resolve(
+                                                  context,
+                                                  light: AppColors.textGrey,
+                                                  dark: AppThemeDark
+                                                      .textSecondary,
+                                                ),
                                                 fontSize: 12,
                                               ),
                                             ),
@@ -308,8 +319,13 @@ class _CommunityScreenState extends State<CommunityScreen>
                                             ),
                                             child: Text(
                                               postState.errorMessage!,
-                                              style: const TextStyle(
-                                                color: AppColors.textGrey,
+                                              style: TextStyle(
+                                                color: AppThemeColors.resolve(
+                                                  context,
+                                                  light: AppColors.textGrey,
+                                                  dark: AppThemeDark
+                                                      .textSecondary,
+                                                ),
                                                 fontSize: 12,
                                               ),
                                             ),

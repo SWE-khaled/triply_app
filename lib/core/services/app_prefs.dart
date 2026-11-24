@@ -22,6 +22,7 @@ class AppPrefs {
   static const String _guideOnboardingKey = 'onboarding_seen_guide';
   static const String _lastRoleKey = 'last_role';
   static const String _guideVerifiedKey = 'guide_verified';
+  static const String _themeModePrefix = 'theme_mode_';
 
   SharedPreferences? _cached;
   bool _unavailableLogged = false;
@@ -102,6 +103,57 @@ class AppPrefs {
     }
   }
 
+  Future<bool> darkModeForAccount(String accountId) async {
+    final prefs = await _prefs;
+    try {
+      return prefs?.getBool('$_themeModePrefix$accountId') ?? false;
+    } catch (error) {
+      debugPrint('AppPrefs.darkModeForAccount failed — $error');
+      return false;
+    }
+  }
+
+  Future<void> setDarkModeForAccount(String accountId, bool enabled) async {
+    final prefs = await _prefs;
+    try {
+      await prefs?.setBool('$_themeModePrefix$accountId', enabled);
+    } catch (error) {
+      debugPrint('AppPrefs.setDarkModeForAccount failed — $error');
+    }
+  }
+
+  Future<bool> darkModeForRole(String accountId, String role) async {
+    final prefs = await _prefs;
+    try {
+      final roleValue = prefs?.getBool(_roleThemeModeKey(accountId, role));
+      if (roleValue != null) return roleValue;
+      final legacyRole = prefs?.getString(_lastRoleKey);
+      if (legacyRole == role || (legacyRole == null && role == 'tourist')) {
+        return prefs?.getBool('$_themeModePrefix$accountId') ?? false;
+      }
+      return false;
+    } catch (error) {
+      debugPrint('AppPrefs.darkModeForRole failed — $error');
+      return false;
+    }
+  }
+
+  Future<void> setDarkModeForRole(
+    String accountId,
+    String role,
+    bool enabled,
+  ) async {
+    final prefs = await _prefs;
+    try {
+      await prefs?.setBool(_roleThemeModeKey(accountId, role), enabled);
+    } catch (error) {
+      debugPrint('AppPrefs.setDarkModeForRole failed — $error');
+    }
+  }
+
   String _onboardingKey(String role) =>
       role == 'guide' ? _guideOnboardingKey : _touristOnboardingKey;
+
+  String _roleThemeModeKey(String accountId, String role) =>
+      '$_themeModePrefix${role}_$accountId';
 }

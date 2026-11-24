@@ -5,6 +5,8 @@ import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/app_snackbar.dart';
@@ -116,7 +118,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
         // glass nav; the body container below provides the background.
         backgroundColor: Colors.transparent,
         body: Container(
-          color: AppColors.background,
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.background,
+            dark: AppThemeDark.backgroundPrimary,
+          ),
           child: SafeArea(
             // Let the content extend under the floating glass nav bar.
             bottom: false,
@@ -125,13 +131,28 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                  child: Text('My Trips', style: AppTextStyles.screenTitle),
+                  child: Text(
+                    'My Trips',
+                    style: AppTextStyles.screenTitle.copyWith(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.primary,
+                        dark: AppThemeDark.textPrimary,
+                      ),
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
                   child: Text(
                     'Your Egypt journey, tracked',
-                    style: AppTextStyles.screenSubtitle,
+                    style: AppTextStyles.screenSubtitle.copyWith(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.guideLabel,
+                        dark: AppThemeDark.textSecondary,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -140,7 +161,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: AppColors.tabUnselectedBg,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.tabUnselectedBg,
+                        dark: AppThemeDark.backgroundSecondary,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: BlocBuilder<MyTripsCubit, MyTripsState>(
@@ -176,7 +201,11 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                                       fontWeight: FontWeight.w600,
                                       color: selected
                                           ? AppColors.background
-                                          : AppColors.subtitle,
+                                          : AppThemeColors.resolve(
+                                              context,
+                                              light: AppColors.subtitle,
+                                              dark: AppThemeDark.textSecondary,
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -274,10 +303,14 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                                           ),
                                         ),
                                       ],
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.more_vert,
                                         size: 20,
-                                        color: AppColors.textDark,
+                                        color: AppThemeColors.resolve(
+                                          context,
+                                          light: AppColors.textDark,
+                                          dark: AppThemeDark.textSecondary,
+                                        ),
                                       ),
                                     ),
                                   ),

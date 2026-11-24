@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import '../../../../widgets/auth_button.dart';
 import '../../sign_in_screen.dart';
 
@@ -11,6 +13,11 @@ class PasswordResetSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -21,12 +28,20 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 width: 90,
                 height: 90,
                 decoration: BoxDecoration(
-                  color: AppColors.lightCircleBg,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.lightCircleBg,
+                    dark: AppThemeDark.surfaceElevated,
+                  ),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check,
-                  color: AppColors.successTeal,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.successTeal,
+                    dark: AppThemeDark.statusSuccess,
+                  ),
                   size: 44,
                 ),
               ),
@@ -36,14 +51,26 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Your password has been updated successfully. Sign in with your new password.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textGrey, fontSize: 15),
+                style: TextStyle(
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.textGrey,
+                    dark: AppThemeDark.homeGuideSecondary,
+                  ),
+                  fontSize: 15,
+                ),
               ),
               const SizedBox(height: 32),
               AuthButton(
                 label: 'Back to Sign In',
+                backgroundColor: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.signInDark,
+                  dark: AppThemeDark.actionPrimary,
+                ),
                 onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
                   SignInScreen.routeName,
                   (route) => false,

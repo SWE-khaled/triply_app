@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Story/Post segment control extracted from `share_composer_view.dart:189`.
 class ShareSegmentTabs extends StatelessWidget {
@@ -18,7 +20,11 @@ class ShareSegmentTabs extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.chipGrey,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.chipGrey,
+          dark: AppThemeDark.surfaceElevated,
+        ),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -67,7 +73,13 @@ class _SegmentOption extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: selected ? Colors.white : AppColors.primaryTeal,
+              color: selected
+                  ? Colors.white
+                  : AppThemeColors.resolve(
+                      context,
+                      light: AppColors.primaryTeal,
+                      dark: AppThemeDark.actionSecondary,
+                    ),
             ),
           ),
         ),

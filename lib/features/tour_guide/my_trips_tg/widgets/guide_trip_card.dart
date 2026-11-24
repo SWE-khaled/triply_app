@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/widgets/trip_image.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/guide_trip.dart';
 import '../cubit/guide_trips_cubit.dart';
 
@@ -24,8 +26,18 @@ class GuideTripCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.cardBorder),
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.surfaceDefault,
+        ),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       clipBehavior: Clip.antiAlias,
@@ -62,7 +74,11 @@ class GuideTripCard extends StatelessWidget {
                                     style: GoogleFonts.poppins(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.title,
+                                      color: AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.title,
+                                        dark: AppThemeDark.homeSectionTitle,
+                                      ),
                                       height: 1.25,
                                     ),
                                   ),
@@ -76,7 +92,11 @@ class GuideTripCard extends StatelessWidget {
                                       Icons.delete_outline,
                                       size: 20,
                                       color: onDelete == null
-                                          ? AppColors.subtitle
+                                          ? AppThemeColors.resolve(
+                                              context,
+                                              light: AppColors.subtitle,
+                                              dark: AppThemeDark.textSecondary,
+                                            )
                                           : Colors.redAccent,
                                     ),
                                   ),
@@ -86,10 +106,14 @@ class GuideTripCard extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.location_on,
                                   size: 12,
-                                  color: AppColors.subtitle,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.subtitle,
+                                    dark: AppThemeDark.textSecondary,
+                                  ),
                                 ),
                                 const SizedBox(width: 3),
                                 Expanded(
@@ -99,7 +123,11 @@ class GuideTripCard extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.poppins(
                                       fontSize: 11,
-                                      color: AppColors.subtitle,
+                                      color: AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.subtitle,
+                                        dark: AppThemeDark.textSecondary,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -115,7 +143,11 @@ class GuideTripCard extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.primary,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.primary,
+                                    dark: AppThemeDark.homeSeeAll,
+                                  ),
                                 ),
                               ),
                             ),
@@ -125,7 +157,11 @@ class GuideTripCard extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.guidedTourBg,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.guidedTourBg,
+                                  dark: AppThemeDark.surfaceElevated,
+                                ),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
@@ -133,7 +169,11 @@ class GuideTripCard extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.priceTeal,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.priceTeal,
+                                    dark: AppThemeDark.homeSeeAll,
+                                  ),
                                 ),
                               ),
                             ),
@@ -158,7 +198,11 @@ class GuideTripCard extends StatelessWidget {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF6F1E7),
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: const Color(0xFFF6F1E7),
+                          dark: AppThemeDark.surfaceElevated,
+                        ),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Text(
@@ -166,7 +210,11 @@ class GuideTripCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.titleDark,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.titleDark,
+                            dark: AppThemeDark.textPrimary,
+                          ),
                         ),
                       ),
                     ),

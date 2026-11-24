@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../model/guide.dart';
 
@@ -18,9 +20,19 @@ class GuideCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppThemeColors.resolve(
+            context,
+            light: Colors.white,
+            dark: AppThemeDark.surfaceDefault,
+          ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.cardBorder),
+          border: Border.all(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderSubtle,
+            ),
+          ),
         ),
         child: Row(
           children: [
@@ -44,31 +56,43 @@ class GuideCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           guide.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                             letterSpacing: 0,
-                            color: Color(0xFF0E5261),
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: const Color(0xFF0E5261),
+                              dark: AppThemeDark.textPrimary,
+                            ),
                           ),
                         ),
                       ),
                       if (guide.verified) ...[
                         const SizedBox(width: 4),
-                        const Icon(
+                        Icon(
                           Icons.verified,
                           size: 14,
-                          color: Color(0xFF4DA7A0),
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: const Color(0xFF4DA7A0),
+                            dark: AppThemeDark.actionSecondary,
+                          ),
                         ),
                       ],
                     ],
                   ),
                   Text(
                     guide.specialty,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 12,
                       letterSpacing: 0,
-                      color: AppColors.textGrey,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.textGrey,
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -86,20 +110,28 @@ class GuideCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             guide.rating.toStringAsFixed(2),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
                               letterSpacing: 0,
-                              color: Color(0xFF0E5261),
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: const Color(0xFF0E5261),
+                                dark: AppThemeDark.textPrimary,
+                              ),
                             ),
                           ),
                           Text(
                             ' (${guide.reviewsCount})',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 12,
                               letterSpacing: 0,
-                              color: AppColors.textGrey,
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.textGrey,
+                                dark: AppThemeDark.textSecondary,
+                              ),
                             ),
                           ),
                         ],
@@ -109,7 +141,7 @@ class GuideCard extends StatelessWidget {
                           children: [
                             TextSpan(
                               text:
-                                  'From \$${guide.pricePerHour.toStringAsFixed(0)}',
+                                  'From \$${guide.pricePerHour.toStringAsFixed(0)}/hr',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
@@ -117,15 +149,7 @@ class GuideCard extends StatelessWidget {
                                 color: AppColors.accentOrange,
                               ),
                             ),
-                            const TextSpan(
-                              text: '/hr',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12,
-                                letterSpacing: 0,
-                                color: AppColors.textGrey,
-                              ),
-                            ),
+                            
                           ],
                         ),
                       ),

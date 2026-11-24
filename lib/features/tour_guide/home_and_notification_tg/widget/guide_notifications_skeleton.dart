@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 import '../../../../../core/widgets/app_shimmer.dart';
 
 /// Skeleton for the guide notification list. The screen header stays real;
@@ -14,8 +16,14 @@ class GuideNotificationsSkeleton extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 5,
-      separatorBuilder: (_, _) =>
-          const Divider(height: 1, color: AppColors.cardBorder),
+      separatorBuilder: (_, _) => Divider(
+        height: 1,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.cardBorder,
+          dark: AppThemeDark.borderSubtle,
+        ),
+      ),
       itemBuilder: (_, _) => const _NotificationRowSkeleton(),
     );
   }

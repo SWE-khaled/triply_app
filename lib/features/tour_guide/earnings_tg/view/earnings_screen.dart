@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
@@ -29,7 +31,11 @@ class _EarningsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,8 +47,16 @@ class _EarningsView extends StatelessWidget {
                 children: [
                   CircleBackButton(
                     icon: Icons.chevron_left,
-                    iconColor: AppColors.titleDark,
-                    backgroundColor: const Color(0xFFF6F1E7),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.titleDark,
+                      dark: AppThemeDark.textPrimary,
+                    ),
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFF6F1E7),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
@@ -51,7 +65,11 @@ class _EarningsView extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.priceTeal,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.priceTeal,
+                        dark: AppThemeDark.homeSeeAll,
+                      ),
                     ),
                   ),
                 ],
@@ -111,7 +129,11 @@ class _EarningsView extends StatelessWidget {
                                       vertical: 10,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: AppThemeColors.resolve(
+                                        context,
+                                        light: Colors.white,
+                                        dark: AppThemeDark.surfaceElevated,
+                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
@@ -119,7 +141,11 @@ class _EarningsView extends StatelessWidget {
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.priceTeal,
+                                        color: AppThemeColors.resolve(
+                                          context,
+                                          light: AppColors.priceTeal,
+                                          dark: AppThemeDark.homeSeeAll,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -135,7 +161,11 @@ class _EarningsView extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.priceTeal,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.priceTeal,
+                                    dark: AppThemeDark.homeSectionTitle,
+                                  ),
                                 ),
                               ),
                               const Spacer(),
@@ -143,15 +173,19 @@ class _EarningsView extends StatelessWidget {
                                 summary.month,
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
-                                  color: AppColors.subtitle,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.subtitle,
+                                    dark: AppThemeDark.textSecondary,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 8),
                           if (summary.activities.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 28),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 28),
                               child: Center(
                                 child: Text(
                                   'No earnings yet.\nBookings will show up here.',
@@ -159,7 +193,11 @@ class _EarningsView extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 13,
                                     height: 1.5,
-                                    color: AppColors.subtitle,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.subtitle,
+                                      dark: AppThemeDark.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -181,7 +219,11 @@ class _EarningsView extends StatelessWidget {
                                             style: GoogleFonts.poppins(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              color: AppColors.priceTeal,
+                                              color: AppThemeColors.resolve(
+                                                context,
+                                                light: AppColors.priceTeal,
+                                                dark: AppThemeDark.homeSeeAll,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -190,14 +232,25 @@ class _EarningsView extends StatelessWidget {
                                           style: GoogleFonts.poppins(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w700,
-                                            color: AppColors.priceTeal,
+                                            color: AppThemeColors.resolve(
+                                              context,
+                                              light: AppColors.priceTeal,
+                                              dark: AppThemeDark.homeSeeAll,
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
                                   if (i != summary.activities.length - 1)
-                                    const Divider(height: 1),
+                                    Divider(
+                                      height: 1,
+                                      color: AppThemeColors.resolve(
+                                        context,
+                                        light: AppColors.cardBorder,
+                                        dark: AppThemeDark.borderSubtle,
+                                      ),
+                                    ),
                                 ],
                               );
                             }),

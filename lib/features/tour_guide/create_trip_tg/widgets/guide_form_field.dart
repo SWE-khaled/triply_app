@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Cream form field + teal section label shared by the Create Trip form.
 class GuideFormLabel extends StatelessWidget {
@@ -15,7 +17,11 @@ class GuideFormLabel extends StatelessWidget {
       style: GoogleFonts.poppins(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: AppColors.priceTeal,
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.priceTeal,
+          dark: AppThemeDark.homeSeeAll,
+        ),
       ),
     );
   }
@@ -46,7 +52,11 @@ class GuideFormField extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBF6EC),
+        color: AppThemeColors.resolve(
+          context,
+          light: const Color(0xFFFBF6EC),
+          dark: AppThemeDark.surfaceElevated,
+        ),
         borderRadius: BorderRadius.circular(14),
       ),
       child: TextField(
@@ -59,10 +69,24 @@ class GuideFormField extends StatelessWidget {
         onTap: onTap,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.poppins(fontSize: 12, color: AppColors.hint),
+          hintStyle: GoogleFonts.poppins(
+            fontSize: 12,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.hint,
+              dark: AppThemeDark.textDisabled,
+            ),
+          ),
           border: InputBorder.none,
         ),
-        style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textDark),
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.textDark,
+            dark: AppThemeDark.textPrimary,
+          ),
+        ),
       ),
     );
   }
@@ -130,7 +154,11 @@ class GuideAddRow extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.priceTeal,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.priceTeal,
+                dark: AppThemeDark.homeSeeAll,
+              ),
             ),
           ),
         ),
@@ -154,11 +182,23 @@ class GuideRemoveButton extends StatelessWidget {
         width: 32,
         height: 32,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFDE8E0),
+        decoration: BoxDecoration(
+          color: AppThemeColors.resolve(
+            context,
+            light: const Color(0xFFFDE8E0),
+            dark: AppThemeDark.surfaceElevated,
+          ),
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.close, size: 15, color: AppColors.accentOrange),
+        child: Icon(
+          Icons.close,
+          size: 15,
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.accentOrange,
+            dark: AppThemeDark.homeGuidePrice,
+          ),
+        ),
       ),
     );
   }

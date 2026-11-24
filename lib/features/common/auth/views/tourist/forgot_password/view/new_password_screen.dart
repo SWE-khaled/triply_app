@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import '../../../../widgets/auth_button.dart';
 import '../../../../widgets/auth_step_icon.dart';
 import '../../../../widgets/auth_text_field.dart';
@@ -61,6 +63,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -86,6 +93,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   hintText: 'Min. 6 characters',
                   icon: Icons.lock_outline,
                   isPassword: true,
+                  themeAware: true,
                   validator: (value) => (value == null || value.length < 6)
                       ? 'Minimum 6 characters'
                       : null,
@@ -101,6 +109,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   hintText: 'Repeat your password',
                   icon: Icons.check_circle_outline,
                   isPassword: true,
+                  themeAware: true,
                   validator: (value) => value != _passwordController.text
                       ? 'Passwords do not match'
                       : null,
@@ -108,7 +117,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                 const SizedBox(height: 28),
                 AuthButton(
                   label: 'Reset Password',
-                  backgroundColor: AppColors.mutedTeal,
+                  backgroundColor: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.mutedTeal,
+                    dark: AppThemeDark.actionPrimary,
+                  ),
                   isLoading: _isLoading,
                   onPressed: _handleResetPassword,
                 ),

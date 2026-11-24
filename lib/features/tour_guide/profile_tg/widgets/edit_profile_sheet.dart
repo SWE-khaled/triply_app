@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 import 'package:triply/core/constants/egypt_cities.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/profile_avatar.dart';
@@ -185,9 +187,17 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Edit profile',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.title,
+                  dark: AppThemeDark.homeSectionTitle,
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             GestureDetector(
@@ -196,7 +206,11 @@ class _EditProfileSheetState extends State<EditProfileSheet> {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: const Color(0xFFE6ECEF),
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFE6ECEF),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
                     child: picked != null
                         ? ClipOval(
                             child: Image.file(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// White overlapping stats card: Reviews | Languages | Price/hr.
 class ProfileStatsCard extends StatelessWidget {
@@ -23,7 +25,11 @@ class ProfileStatsCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xffFAF5EC),
+        color: AppThemeColors.resolve(
+          context,
+          light: const Color(0xffFAF5EC),
+          dark: AppThemeDark.homeGuideSurface,
+        ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -36,17 +42,25 @@ class ProfileStatsCard extends StatelessWidget {
       child: Row(
         children: [
           _StatItem(value: reviews, label: 'Reviews'),
-          _divider(),
+          _divider(context),
           _StatItem(value: languages, label: 'Languages'),
-          _divider(),
+          _divider(context),
           _StatItem(value: price, label: 'Price/hr'),
         ],
       ),
     );
   }
 
-  Widget _divider() {
-    return Container(width: 1, height: 32, color: AppColors.cardBorder);
+  Widget _divider(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 32,
+      color: AppThemeColors.resolve(
+        context,
+        light: AppColors.cardBorder,
+        dark: AppThemeDark.borderDefault,
+      ),
+    );
   }
 }
 
@@ -68,12 +82,23 @@ class _StatItem extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: AppColors.titleDark,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.titleDark,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           Text(
             label,
-            style: GoogleFonts.poppins(fontSize: 11, color: AppColors.subtitle),
+            style: GoogleFonts.poppins(
+              fontSize: 11,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
+            ),
           ),
         ],
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import 'package:triply/core/theme/app_theme_colors.dart';
+import 'package:triply/core/theme/app_theme_dark.dart';
 
 /// Search field extracted from `map_view.dart:119-155`.
 class MapSearchField extends StatelessWidget {
@@ -28,8 +30,12 @@ class MapSearchField extends StatelessWidget {
       onSubmitted: onSubmitted,
       decoration: InputDecoration(
         hintText: 'Search this area...',
-        hintStyle: const TextStyle(
-          color: AppColors.chipTextGrey,
+        hintStyle: TextStyle(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.chipTextGrey,
+            dark: AppThemeDark.textDisabled,
+          ),
           fontSize: 14,
           fontWeight: FontWeight.w400,
           letterSpacing: 0,
@@ -42,15 +48,31 @@ class MapSearchField extends StatelessWidget {
               )
             : null,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.backgroundSecondary,
+        ),
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(color: AppColors.cardBorder),
+          borderSide: BorderSide(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderDefault,
+            ),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: const BorderSide(color: AppColors.cardBorder),
+          borderSide: BorderSide(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderDefault,
+            ),
+          ),
         ),
       ),
     );

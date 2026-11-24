@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/trip_details.dart';
 
 class DetailsInfo extends StatelessWidget {
@@ -16,7 +18,11 @@ class DetailsInfo extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: AppColors.guidedTourBg,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.guidedTourBg,
+              dark: AppThemeDark.surfaceElevated,
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -24,7 +30,11 @@ class DetailsInfo extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: AppColors.guidedTourText,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.guidedTourText,
+                dark: AppThemeDark.actionSecondary,
+              ),
               letterSpacing: 0.5,
             ),
           ),
@@ -35,7 +45,11 @@ class DetailsInfo extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: AppColors.titleDetails,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.titleDetails,
+              dark: AppThemeDark.textPrimary,
+            ),
             height: 1.25,
           ),
         ),
@@ -55,14 +69,22 @@ class DetailsInfo extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: AppColors.titleDetails,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.titleDetails,
+                  dark: AppThemeDark.textPrimary,
+                ),
               ),
             ),
             Text(
               ' (${details.reviewsCount} reviews)',
               style: GoogleFonts.poppins(
                 fontSize: 11,
-                color: AppColors.subtitle,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.subtitle,
+                  dark: AppThemeDark.textSecondary,
+                ),
               ),
             ),
             const SizedBox(width: 6),
@@ -71,7 +93,11 @@ class DetailsInfo extends StatelessWidget {
               details.location,
               style: GoogleFonts.poppins(
                 fontSize: 11,
-                color: AppColors.subtitle,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.subtitle,
+                  dark: AppThemeDark.textSecondary,
+                ),
               ),
             ),
           ],
@@ -80,20 +106,28 @@ class DetailsInfo extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _meta(Icons.access_time_filled, details.duration),
-            _meta(Icons.group_outlined, details.groupType),
-            _meta(Icons.translate, details.languages),
+            _meta(context, Icons.access_time_filled, details.duration),
+            _meta(context, Icons.group_outlined, details.groupType),
+            _meta(context, Icons.translate, details.languages),
           ],
         ),
       ],
     );
   }
 
-  Widget _meta(IconData icon, String label) {
+  Widget _meta(BuildContext context, IconData icon, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 15, color: AppColors.iconDetails),
+        Icon(
+          icon,
+          size: 15,
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.iconDetails,
+            dark: AppThemeDark.iconSecondary,
+          ),
+        ),
         const SizedBox(width: 4),
         Flexible(
           child: Text(
@@ -102,7 +136,11 @@ class DetailsInfo extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: AppColors.titleDetails,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.titleDetails,
+                dark: AppThemeDark.textPrimary,
+              ),
             ),
           ),
         ),

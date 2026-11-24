@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/trip_details.dart';
 
 class GuideCard extends StatelessWidget {
@@ -25,7 +27,14 @@ class GuideCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.cardBorder, width: 1.5),
+          border: Border.all(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderSubtle,
+            ),
+            width: 1.5,
+          ),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -41,10 +50,18 @@ class GuideCard extends StatelessWidget {
                     errorBuilder: (_, _, _) => Container(
                       width: 44,
                       height: 44,
-                      color: const Color(0xFFE6ECEF),
-                      child: const Icon(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: const Color(0xFFE6ECEF),
+                        dark: AppThemeDark.backgroundTertiary,
+                      ),
+                      child: Icon(
                         Icons.person,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     ),
                   ),
@@ -58,7 +75,14 @@ class GuideCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0xFF25C05D),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: Colors.white,
+                          dark: AppThemeDark.backgroundPrimary,
+                        ),
+                        width: 2,
+                      ),
                     ),
                   ),
                 ),
@@ -78,7 +102,11 @@ class GuideCard extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.titleDetails,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.titleDetails,
+                              dark: AppThemeDark.textPrimary,
+                            ),
                           ),
                         ),
                       ),
@@ -112,7 +140,11 @@ class GuideCard extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.titleDetails,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.titleDetails,
+                                  dark: AppThemeDark.textPrimary,
+                                ),
                               ),
                             ),
                             TextSpan(
@@ -120,8 +152,12 @@ class GuideCard extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.titleDetails.withValues(
-                                  alpha: 0.40,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.titleDetails.withValues(
+                                    alpha: 0.40,
+                                  ),
+                                  dark: AppThemeDark.textSecondary,
                                 ),
                               ),
                             ),
@@ -145,7 +181,11 @@ class GuideCard extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.titleDetails,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.titleDetails,
+                              dark: AppThemeDark.textPrimary,
+                            ),
                           ),
                         ),
                       ],
@@ -154,9 +194,13 @@ class GuideCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: AppColors.subtitle,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.subtitle,
+                dark: AppThemeDark.textSecondary,
+              ),
               size: 18,
             ),
           ],

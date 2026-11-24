@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../widgets/travelers_skeleton.dart';
@@ -34,7 +36,11 @@ class _TravelersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppThemeColors.resolve(
+        context,
+        light: AppColors.background,
+        dark: AppThemeDark.backgroundPrimary,
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,8 +51,16 @@ class _TravelersView extends StatelessWidget {
                 children: [
                   CircleBackButton(
                     icon: Icons.chevron_left,
-                    iconColor: AppColors.titleDark,
-                    backgroundColor: const Color(0xFFF6F1E7),
+                    iconColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.titleDark,
+                      dark: AppThemeDark.textPrimary,
+                    ),
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFF6F1E7),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 10),
@@ -55,7 +69,11 @@ class _TravelersView extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.priceTeal,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.priceTeal,
+                        dark: AppThemeDark.homeSeeAll,
+                      ),
                     ),
                   ),
                 ],
@@ -102,15 +120,19 @@ class _TravelersView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 14),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 'TRAVELER LIST',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
-                  color: AppColors.subtitle,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.subtitle,
+                    dark: AppThemeDark.textSecondary,
+                  ),
                 ),
               ),
             ),
@@ -126,14 +148,18 @@ class _TravelersView extends StatelessWidget {
                       child: Column(
                         children: [
                           if (travelers.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 24),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 24),
                               child: Center(
                                 child: Text(
                                   'No travelers yet',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: AppColors.subtitle,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.subtitle,
+                                      dark: AppThemeDark.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -145,7 +171,7 @@ class _TravelersView extends StatelessWidget {
                                 const SizedBox(height: 10),
                             ],
                           const SizedBox(height: 12),
-                          _checkedInCard(travelers.length),
+                          _checkedInCard(context, travelers.length),
                         ],
                       ),
                     ),
@@ -167,11 +193,15 @@ class _TravelersView extends StatelessWidget {
   }
 
   /// The "checked in" progress card under the traveler list.
-  Widget _checkedInCard(int total) {
+  Widget _checkedInCard(BuildContext context, int total) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBF6EC),
+        color: AppThemeColors.resolve(
+          context,
+          light: const Color(0xFFFBF6EC),
+          dark: AppThemeDark.surfaceDefault,
+        ),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -182,7 +212,11 @@ class _TravelersView extends StatelessWidget {
                 'Checked in',
                 style: GoogleFonts.poppins(
                   fontSize: 13,
-                  color: AppColors.subtitle,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.subtitle,
+                    dark: AppThemeDark.textSecondary,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -191,7 +225,11 @@ class _TravelersView extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.titleDark,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.titleDark,
+                    dark: AppThemeDark.textPrimary,
+                  ),
                 ),
               ),
             ],
@@ -202,7 +240,11 @@ class _TravelersView extends StatelessWidget {
             child: LinearProgressIndicator(
               value: 0,
               minHeight: 6,
-              backgroundColor: AppColors.cardBorder,
+              backgroundColor: AppThemeColors.resolve(
+                context,
+                light: AppColors.cardBorder,
+                dark: AppThemeDark.borderSubtle,
+              ),
               valueColor: const AlwaysStoppedAnimation(AppColors.tabSelectedBg),
             ),
           ),

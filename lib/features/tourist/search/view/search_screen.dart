@@ -4,6 +4,8 @@ import 'package:triply/features/tourist/place_details/view/place_details_view.da
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../widget/destination_row.dart';
 import '../widget/empty_state.dart';
@@ -42,6 +44,11 @@ class _SearchScreenState extends State<SearchScreen> {
       child: BlocBuilder<SearchCubit, SearchState>(
         builder: (context, _) {
           return Scaffold(
+            backgroundColor: AppThemeColors.resolve(
+              context,
+              light: Colors.white,
+              dark: AppThemeDark.backgroundPrimary,
+            ),
             body: SafeArea(
               child: Column(
                 children: [
@@ -49,7 +56,18 @@ class _SearchScreenState extends State<SearchScreen> {
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                     child: Row(
                       children: [
-                        const CircleBackButton(),
+                        CircleBackButton(
+                          backgroundColor: AppThemeColors.resolve(
+                            context,
+                            light: Colors.white,
+                            dark: AppThemeDark.surfaceDefault,
+                          ),
+                          iconColor: AppThemeColors.resolve(
+                            context,
+                            light: Colors.black,
+                            dark: AppThemeDark.iconPrimary,
+                          ),
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextField(
@@ -58,13 +76,21 @@ class _SearchScreenState extends State<SearchScreen> {
                             onSubmitted: controller.submit,
                             decoration: InputDecoration(
                               hintText: 'Search places, guides, trips...',
-                              hintStyle: const TextStyle(
+                              hintStyle: TextStyle(
                                 fontSize: 14,
-                                color: AppColors.textGrey,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.textGrey,
+                                  dark: AppThemeDark.textDisabled,
+                                ),
                               ),
-                              prefixIcon: const Icon(
+                              prefixIcon: Icon(
                                 Icons.search,
-                                color: AppColors.textDark,
+                                color: AppThemeColors.resolve(
+                                  context,
+                                  light: AppColors.textDark,
+                                  dark: AppThemeDark.textSecondary,
+                                ),
                               ),
                               suffixIcon: controller.query.isNotEmpty
                                   ? IconButton(
@@ -72,15 +98,23 @@ class _SearchScreenState extends State<SearchScreen> {
                                         textController.clear();
                                         controller.clearQuery();
                                       },
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.cancel,
                                         size: 18,
-                                        color: AppColors.textGrey,
+                                        color: AppThemeColors.resolve(
+                                          context,
+                                          light: AppColors.textGrey,
+                                          dark: AppThemeDark.textSecondary,
+                                        ),
                                       ),
                                     )
                                   : null,
                               filled: true,
-                              fillColor: AppColors.inputFill,
+                              fillColor: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.inputFill,
+                                dark: AppThemeDark.surfaceDefault,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                 vertical: 12,
                               ),
@@ -124,10 +158,14 @@ class _SearchScreenState extends State<SearchScreen> {
         children: [
           Text(
             'Results (${controller.results.length})',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.guidesName,
+              color: AppThemeColors.resolve(
+                context,
+                light: AppColors.guidesName,
+                dark: AppThemeDark.homeSectionTitle,
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -153,22 +191,30 @@ class _SearchScreenState extends State<SearchScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Recent Searches',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.guidesName,
+                color: AppThemeColors.resolve(
+                  context,
+                  light: AppColors.guidesName,
+                  dark: AppThemeDark.homeSectionTitle,
+                ),
               ),
             ),
             GestureDetector(
               onTap: controller.clearRecents,
-              child: const Text(
+              child: Text(
                 'Clear all',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.accentOrange,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.accentOrange,
+                    dark: AppThemeDark.homeGuidePrice,
+                  ),
                 ),
               ),
             ),
@@ -180,15 +226,23 @@ class _SearchScreenState extends State<SearchScreen> {
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF7F7F7),
+              color: AppThemeColors.resolve(
+                context,
+                light: const Color(0xFFF7F7F7),
+                dark: AppThemeDark.homeGuideSurface,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.access_time,
                   size: 18,
-                  color: AppColors.textGrey,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.textGrey,
+                    dark: AppThemeDark.homeGuideSecondary,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -199,31 +253,43 @@ class _SearchScreenState extends State<SearchScreen> {
                     },
                     child: Text(
                       r,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.primaryTeal,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.primaryTeal,
+                          dark: AppThemeDark.homeGuideName,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 GestureDetector(
                   onTap: () => controller.removeRecent(r),
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
                     size: 16,
-                    color: AppColors.textGrey,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.textGrey,
+                      dark: AppThemeDark.homeGuideSecondary,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Popular Searches',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: AppColors.guidesName,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.guidesName,
+              dark: AppThemeDark.homeSectionTitle,
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -243,21 +309,48 @@ class _SearchScreenState extends State<SearchScreen> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: Colors.transparent,
+                      dark: AppThemeDark.surfaceDefault,
+                    ),
+                    border: Border.all(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: const Color(0xFFE0E0E0),
+                        dark: AppThemeDark.borderSubtle,
+                      ),
+                    ),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(place.name, style: const TextStyle(fontSize: 13)),
+                  child: Text(
+                    place.name,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light:
+                            Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.black87,
+                        dark: AppThemeDark.textSecondary,
+                      ),
+                    ),
+                  ),
                 ),
               ),
           ],
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Popular Destinations',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: AppColors.guidesName,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.guidesName,
+              dark: AppThemeDark.homeSectionTitle,
+            ),
           ),
         ),
         const SizedBox(height: 12),

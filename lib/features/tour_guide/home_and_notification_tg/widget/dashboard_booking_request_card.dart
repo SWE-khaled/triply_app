@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 import '../../../../../core/widgets/network_image_fallback.dart';
 import '../model/guide_dashboard_booking_request.dart';
 
@@ -25,9 +27,19 @@ class BookingRequestCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppThemeColors.resolve(
+            context,
+            light: Colors.white,
+            dark: AppThemeDark.surfaceDefault,
+          ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.cardBorder),
+          border: Border.all(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderSubtle,
+            ),
+          ),
         ),
         child: Row(
           children: [
@@ -49,10 +61,14 @@ class BookingRequestCard extends StatelessWidget {
                     booking.guestName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.title,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -60,18 +76,26 @@ class BookingRequestCard extends StatelessWidget {
                     booking.tourTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.subtitle,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                   Text(
                     booking.detailLabel,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.subtitle,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -81,7 +105,17 @@ class BookingRequestCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: booking.isPrivate ? AppColors.primaryLight : _cream,
+                color: booking.isPrivate
+                    ? AppThemeColors.resolve(
+                        context,
+                        light: AppColors.primaryLight,
+                        dark: AppThemeDark.surfaceElevated,
+                      )
+                    : AppThemeColors.resolve(
+                        context,
+                        light: _cream,
+                        dark: AppThemeDark.surfaceElevated,
+                      ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -89,7 +123,17 @@ class BookingRequestCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: booking.isPrivate ? AppColors.primary : _tanText,
+                  color: booking.isPrivate
+                      ? AppThemeColors.resolve(
+                          context,
+                          light: AppColors.primary,
+                          dark: AppThemeDark.homeSeeAll,
+                        )
+                      : AppThemeColors.resolve(
+                          context,
+                          light: _tanText,
+                          dark: AppThemeDark.statusWarning,
+                        ),
                 ),
               ),
             ),

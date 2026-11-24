@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/network_image_fallback.dart';
 import '../model/trip.dart';
 
@@ -21,9 +23,19 @@ class TripCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.surfaceDefault,
+        ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,14 +75,22 @@ class TripCard extends StatelessWidget {
                         onTap: onChat,
                         child: Container(
                           padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: AppColors.chipGrey,
+                          decoration: BoxDecoration(
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.chipGrey,
+                              dark: AppThemeDark.surfaceElevated,
+                            ),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.chat_bubble_outline,
                             size: 14,
-                            color: Color(0xFF526B72),
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: const Color(0xFF526B72),
+                              dark: AppThemeDark.textSecondary,
+                            ),
                           ),
                         ),
                       ),
@@ -87,11 +107,15 @@ class TripCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         trip.dateTime,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
                           letterSpacing: 0,
-                          color: AppColors.textGrey,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.textGrey,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -100,20 +124,28 @@ class TripCard extends StatelessWidget {
                     children: [
                       Text(
                         'Guide: ',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w400,
                           fontSize: 12,
                           letterSpacing: 0,
-                          color: AppColors.textGrey,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.textGrey,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                         ),
                       ),
                       Text(
                         trip.guideName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
                           letterSpacing: 0,
-                          color: AppColors.textGrey,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.textGrey,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                         ),
                       ),
                     ],
@@ -121,29 +153,41 @@ class TripCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.people,
                         size: 14,
-                        color: AppColors.textGrey,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.textGrey,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${trip.maxPeople}\nPeople',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 11,
                           letterSpacing: 0,
-                          color: AppColors.textGrey,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.textGrey,
+                            dark: AppThemeDark.textSecondary,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 7),
                       Text(
                         '${trip.currency}\n${trip.price.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},')}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
                           letterSpacing: 0,
-                          color: AppColors.primaryTeal,
+                          color: AppThemeColors.resolve(
+                            context,
+                            light: AppColors.primaryTeal,
+                            dark: AppThemeDark.textPrimary,
+                          ),
                         ),
                       ),
                       const Spacer(),

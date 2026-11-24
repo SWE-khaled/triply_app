@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_theme_colors.dart';
+import '../../../../../core/theme/app_theme_dark.dart';
 import '../model/guide_notification.dart';
 
 /// One notification row: coloured circle icon, bold title, grey body,
@@ -13,7 +15,7 @@ class GuideNotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (bg, icon, iconColor) = _styleForType(item.type);
+    final (bg, icon, iconColor) = _styleForType(context, item.type);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -37,10 +39,14 @@ class GuideNotificationTile extends StatelessWidget {
                     item.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.title,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.title,
+                        dark: AppThemeDark.homeSectionTitle,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -48,19 +54,27 @@ class GuideNotificationTile extends StatelessWidget {
                     item.body,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       height: 1.4,
-                      color: AppColors.subtitle,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.textSecondary,
+                      ),
                     ),
                   ),
                   if (item.timeLabel.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       item.timeLabel,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.subtitle,
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.subtitle,
+                          dark: AppThemeDark.textSecondary,
+                        ),
                       ),
                     ),
                   ],
@@ -72,8 +86,12 @@ class GuideNotificationTile extends StatelessWidget {
                 width: 8,
                 height: 8,
                 margin: const EdgeInsets.only(top: 6, left: 8),
-                decoration: const BoxDecoration(
-                  color: AppColors.accentOrange,
+                decoration: BoxDecoration(
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.accentOrange,
+                    dark: AppThemeDark.homeGuidePrice,
+                  ),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -84,45 +102,57 @@ class GuideNotificationTile extends StatelessWidget {
   }
 
   /// The colour and icon of a notification, per its type.
-  (Color, IconData, Color) _styleForType(String type) {
+  (Color, IconData, Color) _styleForType(BuildContext context, String type) {
+    Color background(Color light) => AppThemeColors.resolve(
+      context,
+      light: light,
+      dark: AppThemeDark.surfaceElevated,
+    );
+    Color foreground(Color light, Color dark) =>
+        AppThemeColors.resolve(context, light: light, dark: dark);
+
     switch (type) {
       case 'booking':
-        return (const Color(0xFFE3F3E7), Icons.check, const Color(0xFF2E9E5B));
+        return (
+          background(const Color(0xFFE3F3E7)),
+          Icons.check,
+          foreground(const Color(0xFF2E9E5B), AppThemeDark.statusSuccess),
+        );
       case 'trip_decided':
         return (
-          const Color(0xFFE6F3F3),
+          background(const Color(0xFFE6F3F3)),
           Icons.verified_outlined,
-          AppColors.priceTeal,
+          foreground(AppColors.priceTeal, AppThemeDark.homeSeeAll),
         );
       case 'approval':
         return (
-          const Color(0xFFE6F3F3),
+          background(const Color(0xFFE6F3F3)),
           Icons.verified_outlined,
-          AppColors.priceTeal,
+          foreground(AppColors.priceTeal, AppThemeDark.homeSeeAll),
         );
       case 'payment':
         return (
-          const Color(0xFFFFEBDC),
+          background(const Color(0xFFFFEBDC)),
           Icons.credit_card_outlined,
-          AppColors.accentOrange,
+          foreground(AppColors.accentOrange, AppThemeDark.homeGuidePrice),
         );
       case 'like':
         return (
-          const Color(0xFFFFE8E8),
+          background(const Color(0xFFFFE8E8)),
           Icons.favorite_border,
-          const Color(0xFFE86A6A),
+          foreground(const Color(0xFFE86A6A), AppThemeDark.statusError),
         );
       case 'message':
         return (
-          const Color(0xFFE6F3F3),
+          background(const Color(0xFFE6F3F3)),
           Icons.chat_bubble_outline,
-          AppColors.priceTeal,
+          foreground(AppColors.priceTeal, AppThemeDark.homeSeeAll),
         );
       default:
         return (
-          const Color(0xFFF2F2F2),
+          background(const Color(0xFFF2F2F2)),
           Icons.notifications_none,
-          AppColors.subtitle,
+          foreground(AppColors.subtitle, AppThemeDark.textSecondary),
         );
     }
   }

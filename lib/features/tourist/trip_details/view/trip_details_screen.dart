@@ -4,6 +4,8 @@ import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/data/my_bookings_public.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../guides/view/guide_profile_screen.dart';
@@ -33,16 +35,11 @@ class TripDetailsScreen extends StatelessWidget {
     this.isBooked = false,
   });
 
-  static const List<String> tabs = [
-    'About',
-    'Highlight',
-    'Itinerary',
-    'Notes',
-  ];
+  static const List<String> tabs = ['About', 'Highlight', 'Itinerary', 'Notes'];
 
   /// Booking summary shown when opened from My Trips (already booked).
   /// The Book button stays hidden via [isBooked] — no re-booking.
-  Widget _buildBookingCard(Trip trip) {
+  Widget _buildBookingCard(BuildContext context, Trip trip) {
     final entry = MyBookingsPublic.entryFor(trip.id);
     if (entry == null) return const SizedBox.shrink();
     final isPrivate = entry.kind == 'private';
@@ -50,8 +47,18 @@ class TripDetailsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.cardBorder),
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.white,
+          dark: AppThemeDark.surfaceDefault,
+        ),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.borderSubtle,
+          ),
+        ),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -59,12 +66,16 @@ class TripDetailsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text(
+              Text(
                 'Your booking',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.title,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.textPrimary,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -73,17 +84,29 @@ class TripDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _bookingRow(
+            context,
             'People',
             '${entry.seats} ${entry.seats == 1 ? 'person' : 'people'}',
           ),
           const SizedBox(height: 6),
-          _bookingRow('Total paid', 'EGP ${formatEgp(entry.totalPaid)}'),
+          _bookingRow(
+            context,
+            'Total paid',
+            'EGP ${formatEgp(entry.totalPaid)}',
+          ),
           const SizedBox(height: 6),
           Row(
             children: [
-              const Text(
+              Text(
                 'Status',
-                style: TextStyle(fontSize: 13, color: AppColors.subtitle),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.subtitle,
+                    dark: AppThemeDark.textSecondary,
+                  ),
+                ),
               ),
               const Spacer(),
               if (isPending)
@@ -91,10 +114,14 @@ class TripDetailsScreen extends StatelessWidget {
               else
                 Text(
                   entry.status,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.title,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.title,
+                      dark: AppThemeDark.textPrimary,
+                    ),
                   ),
                 ),
             ],
@@ -104,20 +131,31 @@ class TripDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _bookingRow(String label, String value) {
+  Widget _bookingRow(BuildContext context, String label, String value) {
     return Row(
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, color: AppColors.subtitle),
+          style: TextStyle(
+            fontSize: 13,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.subtitle,
+              dark: AppThemeDark.textSecondary,
+            ),
+          ),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.title,
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.title,
+              dark: AppThemeDark.textPrimary,
+            ),
           ),
         ),
       ],
@@ -140,101 +178,109 @@ class TripDetailsScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppThemeColors.resolve(
+          context,
+          light: AppColors.background,
+          dark: AppThemeDark.backgroundPrimary,
+        ),
         body: BlocBuilder<TripDetailsCubit, TripDetailsState>(
-        builder: (context, state) {
-          if (state is! TripDetailsSuccess) {
-            return state is TripDetailsError
-                ? AppErrorView(
-                    message: state.error,
-                    onRetry: () =>
-                        context.read<TripDetailsCubit>().loadTrip(trip),
-                  )
-                : const _TripDetailsSkeleton();
-          }
-          final details = state.details;
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                DetailsHeader(
-                  imageUrl: details.imageUrl,
-                  onBack: () => Navigator.of(context).pop(),
-                ),
-                Container(
-                  width: double.infinity,
-                  transform: Matrix4.translationValues(0, -24, 0),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(24),
-                    ),
+          builder: (context, state) {
+            if (state is! TripDetailsSuccess) {
+              return state is TripDetailsError
+                  ? AppErrorView(
+                      message: state.error,
+                      onRetry: () =>
+                          context.read<TripDetailsCubit>().loadTrip(trip),
+                    )
+                  : const _TripDetailsSkeleton();
+            }
+            final details = state.details;
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  DetailsHeader(
+                    imageUrl: details.imageUrl,
+                    onBack: () => Navigator.of(context).pop(),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        DetailsInfo(details: details),
-                        const SizedBox(height: 18),
-                        DetailsTabs(
-                          tabs: tabs,
-                          selectedIndex: state.selectedTab,
-                          onSelected: (i) =>
-                              context.read<TripDetailsCubit>().selectTab(i),
-                        ),
-                        const SizedBox(height: 14),
-                        DetailsTabContent(
-                          details: details,
-                          selectedTab: state.selectedTab,
-                        ),
-                        const SizedBox(height: 16),
-                        BookingBar(
-                          details: details,
-                          showBookNow: !isBooked,
-                          onBookNow: () => Navigator.of(
-                            context,
-                          ).push(AppRoutes.booking(trip)),
-                        ),
-                        if (details.guideId.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          MessageGuideButton(
-                            expanded: true,
-                            guideId: details.guideId,
-                            guideName: details.guideName,
-                            guideAvatar: details.guideAvatarUrl,
+                  Container(
+                    width: double.infinity,
+                    transform: Matrix4.translationValues(0, -24, 0),
+                    decoration: BoxDecoration(
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: Colors.white,
+                        dark: AppThemeDark.backgroundPrimary,
+                      ),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(24),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DetailsInfo(details: details),
+                          const SizedBox(height: 18),
+                          DetailsTabs(
+                            tabs: tabs,
+                            selectedIndex: state.selectedTab,
+                            onSelected: (i) =>
+                                context.read<TripDetailsCubit>().selectTab(i),
                           ),
-                        ],
-                        const SizedBox(height: 14),
-                        BlocBuilder<GuidePhoneCubit, GuidePhoneState>(
-                          builder: (context, phoneState) {
-                            final phone = phoneState is GuidePhoneSuccess
-                                ? phoneState.phone
-                                : null;
-                            return GuideCard(
-                              details: details,
-                              guidePhone: phone,
-                              onTap: details.guideId.isEmpty
-                                  ? null
-                                  : () => _openGuideProfile(
-                                      context,
-                                      details.guideId,
-                                    ),
-                            );
-                          },
-                        ),
-                        if (isBooked) ...[
+                          const SizedBox(height: 14),
+                          DetailsTabContent(
+                            details: details,
+                            selectedTab: state.selectedTab,
+                          ),
                           const SizedBox(height: 16),
-                          _buildBookingCard(trip),
+                          BookingBar(
+                            details: details,
+                            showBookNow: !isBooked,
+                            onBookNow: () => Navigator.of(
+                              context,
+                            ).push(AppRoutes.booking(trip)),
+                          ),
+                          if (details.guideId.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            MessageGuideButton(
+                              expanded: true,
+                              guideId: details.guideId,
+                              guideName: details.guideName,
+                              guideAvatar: details.guideAvatarUrl,
+                            ),
+                          ],
+                          const SizedBox(height: 14),
+                          BlocBuilder<GuidePhoneCubit, GuidePhoneState>(
+                            builder: (context, phoneState) {
+                              final phone = phoneState is GuidePhoneSuccess
+                                  ? phoneState.phone
+                                  : null;
+                              return GuideCard(
+                                details: details,
+                                guidePhone: phone,
+                                onTap: details.guideId.isEmpty
+                                    ? null
+                                    : () => _openGuideProfile(
+                                        context,
+                                        details.guideId,
+                                      ),
+                              );
+                            },
+                          ),
+                          if (isBooked) ...[
+                            const SizedBox(height: 16),
+                            _buildBookingCard(context, trip),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

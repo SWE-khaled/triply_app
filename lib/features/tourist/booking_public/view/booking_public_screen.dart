@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/helper/price_format.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/circle_back_button.dart';
 import '../../checkout/view/payment_view.dart';
 import '../../trips/models/trip.dart';
@@ -100,13 +102,32 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppThemeColors.resolve(
+          context,
+          light: AppColors.background,
+          dark: AppThemeDark.backgroundPrimary,
+        ),
         appBar: AppBar(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppThemeColors.resolve(
+            context,
+            light: AppColors.background,
+            dark: AppThemeDark.backgroundPrimary,
+          ),
           elevation: 0,
-          leading: const Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: CircleBackButton(),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: CircleBackButton(
+              backgroundColor: AppThemeColors.resolve(
+                context,
+                light: Colors.white,
+                dark: AppThemeDark.surfaceDefault,
+              ),
+              iconColor: AppThemeColors.resolve(
+                context,
+                light: Colors.black,
+                dark: AppThemeDark.iconPrimary,
+              ),
+            ),
           ),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,14 +137,22 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.title,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.homeSectionTitle,
+                  ),
                 ),
               ),
               Text(
                 widget.trip.title,
                 style: GoogleFonts.poppins(
                   fontSize: 12,
-                  color: AppColors.subtitle,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.subtitle,
+                    dark: AppThemeDark.homeGuideSecondary,
+                  ),
                 ),
               ),
             ],
@@ -154,7 +183,18 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.cardBorder),
+                      border: Border.all(
+                        color: AppThemeColors.resolve(
+                          context,
+                          light: AppColors.cardBorder,
+                          dark: AppThemeDark.homeGuideBorder,
+                        ),
+                      ),
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: Colors.transparent,
+                        dark: AppThemeDark.homeGuideSurface,
+                      ),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -168,14 +208,22 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.title,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.title,
+                                    dark: AppThemeDark.homeGuideName,
+                                  ),
                                 ),
                               ),
                               TextSpan(
                                 text: '(optional)',
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
-                                  color: AppColors.subtitle,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.subtitle,
+                                    dark: AppThemeDark.homeGuideSecondary,
+                                  ),
                                 ),
                               ),
                             ],
@@ -191,14 +239,22 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                                 'Any dietary needs, accessibility requirements, or special requests...',
                             hintStyle: GoogleFonts.poppins(
                               fontSize: 12,
-                              color: AppColors.subtitle,
+                              color: AppThemeColors.resolve(
+                                context,
+                                light: AppColors.subtitle,
+                                dark: AppThemeDark.textDisabled,
+                              ),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.only(top: 8),
                           ),
                           style: GoogleFonts.poppins(
                             fontSize: 13,
-                            color: AppColors.title,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.title,
+                              dark: AppThemeDark.textPrimary,
+                            ),
                           ),
                         ),
                       ],
@@ -230,8 +286,16 @@ class _BookingPublicScreenState extends State<BookingPublicScreen> {
                         ? null
                         : _confirm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.tabSelectedBg,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.tabSelectedBg,
+                        dark: AppThemeDark.homeSeeAll,
+                      ),
+                      foregroundColor: AppThemeColors.resolve(
+                        context,
+                        light: Colors.white,
+                        dark: AppThemeDark.backgroundPrimary,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(28),

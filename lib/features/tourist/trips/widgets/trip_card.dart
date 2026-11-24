@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_asset.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/helper/price_format.dart';
 import '../models/trip.dart';
 
@@ -30,8 +32,18 @@ class TripCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppColors.cardBorder),
+          color: AppThemeColors.resolve(
+            context,
+            light: Colors.white,
+            dark: AppThemeDark.surfaceDefault,
+          ),
+          border: Border.all(
+            color: AppThemeColors.resolve(
+              context,
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderSubtle,
+            ),
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
         clipBehavior: Clip.antiAlias,
@@ -46,8 +58,19 @@ class TripCard extends StatelessWidget {
                   trip.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) => Container(
-                    color: const Color(0xFFE6ECEF),
-                    child: const Icon(Icons.image, color: AppColors.subtitle),
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFE6ECEF),
+                      dark: AppThemeDark.backgroundTertiary,
+                    ),
+                    child: Icon(
+                      Icons.image,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.textSecondary,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -73,7 +96,11 @@ class TripCard extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.title,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.title,
+                                      dark: AppThemeDark.textPrimary,
+                                    ),
                                     height: 1.25,
                                   ),
                                 ),
@@ -97,7 +124,11 @@ class TripCard extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.dateText,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.dateText,
+                                      dark: AppThemeDark.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -113,7 +144,11 @@ class TripCard extends StatelessWidget {
                                   text: 'Guide: ',
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
-                                    color: AppColors.guideLabel,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.guideLabel,
+                                      dark: AppThemeDark.textSecondary,
+                                    ),
                                   ),
                                 ),
                                 TextSpan(
@@ -121,7 +156,11 @@ class TripCard extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.dateText,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.dateText,
+                                      dark: AppThemeDark.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -136,6 +175,14 @@ class TripCard extends StatelessWidget {
                             AppAsset.iconPeople,
                             width: 14,
                             height: 14,
+                            colorFilter: ColorFilter.mode(
+                              AppThemeColors.resolve(
+                                context,
+                                light: const Color(0xFF526B72),
+                                dark: AppThemeDark.textSecondary,
+                              ),
+                              BlendMode.srcIn,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           Column(
@@ -147,7 +194,11 @@ class TripCard extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.dateText,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.dateText,
+                                    dark: AppThemeDark.textSecondary,
+                                  ),
                                   height: 1.2,
                                 ),
                               ),
@@ -156,7 +207,11 @@ class TripCard extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w400,
-                                  color: AppColors.dateText,
+                                  color: AppThemeColors.resolve(
+                                    context,
+                                    light: AppColors.dateText,
+                                    dark: AppThemeDark.textSecondary,
+                                  ),
                                   height: 1.2,
                                 ),
                               ),
@@ -173,7 +228,11 @@ class TripCard extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.price,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.price,
+                                      dark: AppThemeDark.homeGuidePrice,
+                                    ),
                                     height: 1.2,
                                   ),
                                 ),
@@ -182,7 +241,11 @@ class TripCard extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.price,
+                                    color: AppThemeColors.resolve(
+                                      context,
+                                      light: AppColors.price,
+                                      dark: AppThemeDark.homeGuidePrice,
+                                    ),
                                     height: 1.15,
                                   ),
                                 ),

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../model/community_post.dart';
 
 /// Single image provider: local device file (composer posts) vs network URL.
@@ -15,8 +17,19 @@ Widget postImage(String path, bool isLocal, double height) {
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) => Container(
         height: height,
-        color: AppColors.chipGrey,
-        child: const Icon(Icons.broken_image, color: Colors.grey),
+        color: AppThemeColors.resolve(
+          context,
+          light: AppColors.chipGrey,
+          dark: AppThemeDark.surfaceElevated,
+        ),
+        child: Icon(
+          Icons.broken_image,
+          color: AppThemeColors.resolve(
+            context,
+            light: Colors.grey,
+            dark: AppThemeDark.textSecondary,
+          ),
+        ),
       ),
     );
   }
@@ -27,8 +40,19 @@ Widget postImage(String path, bool isLocal, double height) {
     fit: BoxFit.cover,
     errorBuilder: (context, error, stackTrace) => Container(
       height: height,
-      color: AppColors.chipGrey,
-      child: const Icon(Icons.image, color: Colors.grey),
+      color: AppThemeColors.resolve(
+        context,
+        light: AppColors.chipGrey,
+        dark: AppThemeDark.surfaceElevated,
+      ),
+      child: Icon(
+        Icons.image,
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.grey,
+          dark: AppThemeDark.textSecondary,
+        ),
+      ),
     ),
   );
 }

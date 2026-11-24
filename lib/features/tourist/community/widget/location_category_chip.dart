@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:triply/core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 
 /// Category chip extracted from `location_picker_view.dart:131`.
 class LocationCategoryChip extends StatelessWidget {
@@ -24,7 +26,13 @@ class LocationCategoryChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primaryTeal : AppColors.chipGrey,
+          color: selected
+              ? AppColors.primaryTeal
+              : AppThemeColors.resolve(
+                  context,
+                  light: AppColors.chipGrey,
+                  dark: AppThemeDark.surfaceElevated,
+                ),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -33,7 +41,13 @@ class LocationCategoryChip extends StatelessWidget {
             Icon(
               icon,
               size: 16,
-              color: selected ? Colors.white : AppColors.primaryTeal,
+              color: selected
+                  ? Colors.white
+                  : AppThemeColors.resolve(
+                      context,
+                      light: AppColors.primaryTeal,
+                      dark: AppThemeDark.actionSecondary,
+                    ),
             ),
             const SizedBox(width: 6),
             Text(
@@ -41,7 +55,13 @@ class LocationCategoryChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: selected ? Colors.white : AppColors.primaryTeal,
+                color: selected
+                    ? Colors.white
+                    : AppThemeColors.resolve(
+                        context,
+                        light: AppColors.primaryTeal,
+                        dark: AppThemeDark.actionSecondary,
+                      ),
               ),
             ),
           ],

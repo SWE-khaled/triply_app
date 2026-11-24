@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_asset.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../trip_details/model/trip_details.dart';
 
 class BookingSummaryCard extends StatelessWidget {
@@ -19,7 +21,18 @@ class BookingSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.cardBorder),
+        color: AppThemeColors.resolve(
+          context,
+          light: Colors.transparent,
+          dark: AppThemeDark.homeGuideSurface,
+        ),
+        border: Border.all(
+          color: AppThemeColors.resolve(
+            context,
+            light: AppColors.cardBorder,
+            dark: AppThemeDark.homeGuideBorder,
+          ),
+        ),
         borderRadius: BorderRadius.circular(16),
       ),
       clipBehavior: Clip.antiAlias,
@@ -34,10 +47,18 @@ class BookingSummaryCard extends StatelessWidget {
                   details.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (_, _, _) => Container(
-                    color: const Color(0xFFE6ECEF),
-                    child: const Icon(
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: const Color(0xFFE6ECEF),
+                      dark: AppThemeDark.surfaceElevated,
+                    ),
+                    child: Icon(
                       Icons.image,
-                      color: AppColors.subtitle,
+                      color: AppThemeColors.resolve(
+                        context,
+                        light: AppColors.subtitle,
+                        dark: AppThemeDark.homeGuideSecondary,
+                      ),
                       size: 36,
                     ),
                   ),
@@ -78,24 +99,30 @@ class BookingSummaryCard extends StatelessWidget {
             child: Column(
               children: [
                 _row(
+                  context,
                   icon: Icons.location_on,
                   iconColor: AppColors.pin,
+                  darkIconColor: AppThemeDark.homeGuidePrice,
                   label: 'Date & Time',
                   value: dateLabel,
                 ),
                 const SizedBox(height: 14),
-                _peopleRow(),
+                _peopleRow(context),
                 const SizedBox(height: 14),
                 _row(
+                  context,
                   icon: Icons.schedule,
                   iconColor: AppColors.starGold,
+                  darkIconColor: AppThemeDark.homeGuideRating,
                   label: 'Duration',
                   value: details.duration,
                 ),
                 const SizedBox(height: 14),
                 _row(
+                  context,
                   icon: Icons.location_on,
                   iconColor: AppColors.dateText,
+                  darkIconColor: AppThemeDark.homeGuideSecondary,
                   label: 'Meeting Point',
                   value: details.meetingPoint,
                 ),
@@ -107,29 +134,46 @@ class BookingSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _tile(Widget child) {
+  Widget _tile(BuildContext context, Widget child) {
     return Container(
       width: 44,
       height: 44,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7F8),
+        color: AppThemeColors.resolve(
+          context,
+          light: const Color(0xFFF5F7F8),
+          dark: AppThemeDark.surfaceElevated,
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: child,
     );
   }
 
-  Widget _row({
+  Widget _row(
+    BuildContext context, {
     required IconData icon,
     required Color iconColor,
+    required Color darkIconColor,
     required String label,
     required String value,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _tile(Icon(icon, size: 16, color: iconColor)),
+        _tile(
+          context,
+          Icon(
+            icon,
+            size: 16,
+            color: AppThemeColors.resolve(
+              context,
+              light: iconColor,
+              dark: darkIconColor,
+            ),
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -139,7 +183,11 @@ class BookingSummaryCard extends StatelessWidget {
                 label,
                 style: GoogleFonts.poppins(
                   fontSize: 11,
-                  color: AppColors.guideLabel,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.guideLabel,
+                    dark: AppThemeDark.homeGuideSecondary,
+                  ),
                 ),
               ),
               const SizedBox(height: 2),
@@ -148,7 +196,11 @@ class BookingSummaryCard extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.title,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.homeGuideName,
+                  ),
                 ),
               ),
             ],
@@ -158,17 +210,22 @@ class BookingSummaryCard extends StatelessWidget {
     );
   }
 
-  Widget _peopleRow() {
+  Widget _peopleRow(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _tile(
+          context,
           SvgPicture.asset(
             AppAsset.iconPeople,
             width: 14,
             height: 14,
-            colorFilter: const ColorFilter.mode(
-              AppColors.guidedTourText,
+            colorFilter: ColorFilter.mode(
+              AppThemeColors.resolve(
+                context,
+                light: AppColors.guidedTourText,
+                dark: AppThemeDark.homeGuideVerified,
+              ),
               BlendMode.srcIn,
             ),
           ),
@@ -182,7 +239,11 @@ class BookingSummaryCard extends StatelessWidget {
                 'Guide',
                 style: GoogleFonts.poppins(
                   fontSize: 11,
-                  color: AppColors.guideLabel,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.guideLabel,
+                    dark: AppThemeDark.homeGuideSecondary,
+                  ),
                 ),
               ),
               const SizedBox(height: 2),
@@ -191,7 +252,11 @@ class BookingSummaryCard extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.title,
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.title,
+                    dark: AppThemeDark.homeGuideName,
+                  ),
                 ),
               ),
             ],
