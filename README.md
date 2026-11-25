@@ -8,6 +8,10 @@ A travel marketplace and social platform connecting tourists with verified local
 
 Triply brings trip discovery, booking, payment, chat and community content into one Flutter app with three roles: **Tourist**, **Tour Guide** and **Admin**. Built during the DEPI × eYouth internship program.
 
+## Download
+
+Get the latest Android APK from the [Releases](../../releases) page.
+
 ## Key Features
 
 ### Tourist
@@ -74,24 +78,13 @@ cd triply_app
 flutter pub get
 ```
 
-Create a `.env` file in the project root with your Paymob **sandbox** values:
-
-```
-PAYMOB_API_KEY=your_sandbox_api_key
-PAYMOB_INTEGRATION_ID=your_card_integration_id
-PAYMOB_IFRAME_ID=your_iframe_id
-PAYMOB_WALLET_INTEGRATION_ID=your_wallet_integration_id
-```
-
-Then run:
+Run the app:
 
 ```bash
 flutter run
 ```
 
 To use your own Firebase project, run `flutterfire configure` and deploy `firestore.rules` and `firestore.indexes.json`.
-
-> Never commit real credentials. `.env` is bundled as a Flutter asset, so use sandbox values only.
 
 ## Future Improvements
 
@@ -106,11 +99,11 @@ To use your own Firebase project, run `flutterfire configure` and deploy `firest
 
 ## Team
 
-- Khaled Mohamed: Team Lead
+- Khaled Mohamed : Team Lead
 - Amr Khaled
 - Rawda Ellithy
 - Aya Emad
-- Shrouk Atef: UI/UX Design
+- Shrouk Atef : UI/UX Design
 
 ## License
 
