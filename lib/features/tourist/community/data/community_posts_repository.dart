@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/data/repositories/tourist_notifications_repository.dart';
@@ -179,16 +182,24 @@ class FirestoreCommunityPostsRepository implements CommunityPostsRepository {
         });
       });
 
-      // Separate write AFTER the like committed: the rules verify likedBy with
-      // get(), which reads the pre-request state. Unlikes never write here,
-      // and a duplicate id is silently ignored by the shared repository.
+      // Do not keep the like action pending on this separate notification
+      // write; the like transaction has already committed.
       if (liked && authorId != null && authorId!.isNotEmpty) {
         final user = _auth.currentUser;
-        await _notifications.createLikeNotification(
-          recipientId: authorId!,
-          postId: postId,
-          actorName: user == null ? null : _displayName(user),
-          actorAvatarUrl: user?.photoURL ?? '',
+        unawaited(
+          _notifications
+              .createLikeNotification(
+                recipientId: authorId!,
+                postId: postId,
+                actorName: user == null ? null : _displayName(user),
+                actorAvatarUrl: user?.photoURL ?? '',
+              )
+              .catchError((Object error, StackTrace stackTrace) {
+                debugPrint(
+                  'FirestoreCommunityPostsRepository: like notification failed: $error',
+                );
+                debugPrintStack(stackTrace: stackTrace);
+              }),
         );
       }
     } on CommunityPostsException {

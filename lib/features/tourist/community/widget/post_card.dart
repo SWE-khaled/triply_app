@@ -46,116 +46,91 @@ class PostCard extends StatelessWidget {
         ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
       },
       child: Container(
-          decoration: BoxDecoration(
+        decoration: BoxDecoration(
+          color: AppThemeColors.resolve(
+            context,
+            light: Colors.white,
+            dark: AppThemeDark.surfaceDefault,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
             color: AppThemeColors.resolve(
               context,
-              light: Colors.white,
-              dark: AppThemeDark.surfaceDefault,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppThemeColors.resolve(
-                context,
-                light: AppColors.cardBorder,
-                dark: AppThemeDark.borderSubtle,
-              ),
+              light: AppColors.cardBorder,
+              dark: AppThemeDark.borderSubtle,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor: AppThemeColors.resolve(
-                        context,
-                        light: AppColors.chipGrey,
-                        dark: AppThemeDark.surfaceElevated,
-                      ),
-                      backgroundImage: hasAvatar
-                          ? NetworkImage(avatarUrl)
-                          : null,
-                      onBackgroundImageError: hasAvatar ? (_, _) {} : null,
-                      child: hasAvatar
-                          ? null
-                          : Icon(
-                              Icons.person,
-                              color: AppThemeColors.resolve(
-                                context,
-                                light: AppColors.textGrey,
-                                dark: AppThemeDark.textSecondary,
-                              ),
-                            ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.chipGrey,
+                      dark: AppThemeDark.surfaceElevated,
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            post.authorName,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0,
-                              color: AppThemeColors.resolve(
-                                context,
-                                light: const Color(0xFF17343B),
-                                dark: AppThemeDark.textPrimary,
-                              ),
+                    backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
+                    onBackgroundImageError: hasAvatar ? (_, _) {} : null,
+                    child: hasAvatar
+                        ? null
+                        : Icon(
+                            Icons.person,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.textGrey,
+                              dark: AppThemeDark.textSecondary,
                             ),
                           ),
-                          Text(
-                            post.timeAgo,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                              letterSpacing: 0,
-                              color: AppThemeColors.resolve(
-                                context,
-                                light: AppColors.textGrey,
-                                dark: AppThemeDark.textSecondary,
-                              ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.authorName,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: const Color(0xFF17343B),
+                              dark: AppThemeDark.textPrimary,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (post.location.isNotEmpty)
-                      LocationTagChip(label: post.location),
-                    if (post.isMine) ...[
-                      const SizedBox(width: 6),
-                      GestureDetector(
-                        onTap: () => _confirmDelete(context),
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 20,
-                          color: AppThemeColors.resolve(
-                            context,
-                            light: AppColors.textGrey,
-                            dark: AppThemeDark.textSecondary,
                           ),
                         ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              if (post.imageUrls.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: PostImages(post: post),
-                ),
-                if (post.imageUrls.length > 1)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
-                    child: Text(
-                      '${post.imageUrls.length} photos',
-                      style: TextStyle(
-                        fontSize: 11,
+                        Text(
+                          post.timeAgo,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            letterSpacing: 0,
+                            color: AppThemeColors.resolve(
+                              context,
+                              light: AppColors.textGrey,
+                              dark: AppThemeDark.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (post.location.isNotEmpty)
+                    LocationTagChip(label: post.location),
+                  if (post.isMine) ...[
+                    const SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: () => _confirmDelete(context),
+                      child: Icon(
+                        Icons.delete_outline,
+                        size: 20,
                         color: AppThemeColors.resolve(
                           context,
                           light: AppColors.textGrey,
@@ -163,60 +138,93 @@ class PostCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-              ],
-              if (post.text.isNotEmpty)
+                  ],
+                ],
+              ),
+            ),
+            if (post.imageUrls.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: PostImages(post: post),
+              ),
+              if (post.imageUrls.length > 1)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+                  padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
                   child: Text(
-                    post.text,
+                    '${post.imageUrls.length} photos',
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0,
-                      height: 1.5,
+                      fontSize: 11,
                       color: AppThemeColors.resolve(
                         context,
-                        light: AppColors.chipTextGrey,
+                        light: AppColors.textGrey,
                         dark: AppThemeDark.textSecondary,
                       ),
                     ),
                   ),
                 ),
-              const Divider(height: 20, indent: 12, endIndent: 12),
+            ],
+            if (post.text.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () =>
-                          context.read<PostActionsCubit>().toggleLike(),
-                      child: Row(
-                        children: [
-                          Icon(
-                            post.isLiked
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            size: 16,
-                            color: AppColors.accentOrange,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${post.likesCount}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0,
-                            ),
-                          ),
-                        ],
-                      ),
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+                child: Text(
+                  post.text,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0,
+                    height: 1.5,
+                    color: AppThemeColors.resolve(
+                      context,
+                      light: AppColors.chipTextGrey,
+                      dark: AppThemeDark.textSecondary,
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            const Divider(height: 20, indent: 12, endIndent: 12),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: Row(
+                children: [
+                  BlocBuilder<PostActionsCubit, PostActionsState>(
+                    builder: (context, state) {
+                      final isLiked = state.isLiked ?? post.isLiked;
+                      final likesCount = state.likesCount ?? post.likesCount;
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () =>
+                            context.read<PostActionsCubit>().toggleLike(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Row(
+                            children: [
+                              Icon(
+                                isLiked
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                size: 20,
+                                color: AppColors.accentOrange,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '$likesCount',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -15,6 +15,8 @@ class PostActionsCubit extends Cubit<PostActionsState>
     CommunityPostsRepository? postsRepository,
     this.onDeleted,
   }) : _repository = postsRepository ?? FirestoreCommunityPostsRepository(),
+       _isLiked = post.isLiked,
+       _likesCount = post.likesCount,
        super(const PostActionsInitial());
 
   static const likeAction = 'like';
@@ -22,6 +24,8 @@ class PostActionsCubit extends Cubit<PostActionsState>
 
   final CommunityPost post;
   final CommunityPostsRepository _repository;
+  bool _isLiked;
+  int _likesCount;
 
   /// Lets the feed perform its optimistic removal after a confirmed delete.
   final void Function()? onDeleted;
@@ -33,16 +37,36 @@ class PostActionsCubit extends Cubit<PostActionsState>
   Future<void> toggleLike() async {
     if (_busy) return;
     _busy = true;
-    safeEmit(const PostActionInProgress(action: likeAction));
+    final previousIsLiked = _isLiked;
+    final previousLikesCount = _likesCount;
+    _isLiked = !_isLiked;
+    _likesCount += _isLiked ? 1 : -1;
+    if (_likesCount < 0) _likesCount = 0;
+    safeEmit(
+      PostActionInProgress(
+        action: likeAction,
+        isLiked: _isLiked,
+        likesCount: _likesCount,
+      ),
+    );
     try {
-      await _repository.toggleLike(postId: post.id, liked: !post.isLiked);
-      // The Firestore snapshot updates the count and isLiked state.
-      safeEmit(const PostActionSucceeded(action: likeAction));
+      await _repository.toggleLike(postId: post.id, liked: _isLiked);
+      safeEmit(
+        PostActionSucceeded(
+          action: likeAction,
+          isLiked: _isLiked,
+          likesCount: _likesCount,
+        ),
+      );
     } catch (error) {
+      _isLiked = previousIsLiked;
+      _likesCount = previousLikesCount;
       safeEmit(
         PostActionFailed(
           action: likeAction,
           message: communityActionErrorMessage(error),
+          isLiked: _isLiked,
+          likesCount: _likesCount,
         ),
       );
     } finally {

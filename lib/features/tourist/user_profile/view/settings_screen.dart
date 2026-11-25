@@ -201,7 +201,7 @@ class SettingsScreen extends StatelessWidget {
                     child: Text(
                       'Log out',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: AppThemeColors.resolve(
                           context,

@@ -84,7 +84,7 @@ class AdminSidebar extends StatelessWidget {
             ),
           ),
 
-          // â”€â”€ Bottom: admin profile + log out â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+          
           _SidebarFooter(onLogout: onLogout, adminName: adminName),
         ],
       ),
