@@ -46,7 +46,7 @@ class TripCard extends StatelessWidget {
                       style: AppTextStyles.cardSubtitle,
                     ),
                   ),
-                  Text('\$${trip.price.toInt()}', style: AppTextStyles.price),
+                  Text('EGP ${trip.price.toInt()}', style: AppTextStyles.price),
                 ],
               ),
             ],

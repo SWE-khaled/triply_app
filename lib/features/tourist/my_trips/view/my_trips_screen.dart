@@ -274,7 +274,7 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
                                 children: [
                                   TripCard(
                                     trip: trip,
-                                    currencyLabel: isPrivate ? '\$' : 'EGP',
+                                    currencyLabel:  'EGP',
                                     onTap: () => _openDetails(trip),
                                     onViewDetails: () => _openDetails(trip),
                                     // Chat: placeholder — no chat screen exists yet.
