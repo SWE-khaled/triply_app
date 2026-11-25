@@ -10,6 +10,8 @@ import 'package:triply/features/tourist/trips/models/trip.dart' as trips_model;
 import 'package:triply/core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/theme/app_theme_colors.dart';
+import '../../../../core/theme/app_theme_dark.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/state_views.dart';
@@ -98,16 +100,17 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             _buildTripsSection(context),
             const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Travelers in Egypt',
-                    style: AppTextStyles.sectionTitle,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Travelers in Egypt',
+                style: AppTextStyles.sectionTitle.copyWith(
+                  color: AppThemeColors.resolve(
+                    context,
+                    light: AppColors.textDark,
+                    dark: AppThemeDark.homeSectionTitle,
                   ),
-                ],
+                ),
               ),
             ),
             const SizedBox(height: 12),
