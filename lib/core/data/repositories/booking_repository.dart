@@ -72,9 +72,14 @@ class BookingRepository {
   /// from [confirmPayment], once the payment has actually been paid.
   /// Throws a [BookingException] when the trip is full, not approved or gone.
   String _avatarFor(Map<String, dynamic>? guest) {
-    final saved = guest?['photoUrl'];
-    if (saved is String && saved.trim().isNotEmpty) return saved.trim();
-    return _firebaseAuth.currentUser?.photoURL ?? '';
+    for (final value in [
+      guest?['avatarUrl'],
+      guest?['photoUrl'],
+      guest?['photoURL'],
+    ]) {
+      if (value is String && value.trim().isNotEmpty) return value.trim();
+    }
+    return _firebaseAuth.currentUser?.photoURL?.trim() ?? '';
   }
 
   /// The actor name stored on the guide's notification. The booking's guest
@@ -259,10 +264,7 @@ class BookingRepository {
       'country': '',
       'traveler_count': travelers,
       'seats': travelers,
-      'avatar_url':
-          guest?['photoUrl'] ??
-          FirebaseAuth.instance.currentUser?.photoURL ??
-          '',
+      'avatar_url': _avatarFor(guest),
       'is_private': true,
       'totalPrice': totalPrice,
       'price_label': 'EGP ${totalPrice.toStringAsFixed(0)}',

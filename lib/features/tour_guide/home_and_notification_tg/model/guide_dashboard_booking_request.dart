@@ -21,7 +21,13 @@ class BookingRequest {
       guestName: json['guest_name'] as String? ?? '',
       tourTitle: json['tour_title'] as String? ?? '',
       detailLabel: json['detail_label'] as String? ?? '',
-      avatarUrl: json['avatar_url'] as String? ?? '',
+      avatarUrl: _firstNonEmptyString([
+        json['avatar_url'],
+        json['avatarUrl'],
+        json['photoUrl'],
+        json['photoURL'],
+        json['guestAvatarUrl'],
+      ]),
       isPrivate: json['is_private'] as bool? ?? true,
     );
   }
@@ -36,4 +42,11 @@ class BookingRequest {
       'is_private': isPrivate,
     };
   }
+}
+
+String _firstNonEmptyString(Iterable<Object?> values) {
+  for (final value in values) {
+    if (value is String && value.trim().isNotEmpty) return value.trim();
+  }
+  return '';
 }

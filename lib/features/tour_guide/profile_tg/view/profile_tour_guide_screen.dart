@@ -27,7 +27,7 @@ class ProfileTourGuideScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ProfileTgCubit(guideId: guideId)..loadRemoteProfile(),
+      create: (_) => ProfileTgCubit(guideId: guideId),
       child: const _ProfileTourGuideView(),
     );
   }

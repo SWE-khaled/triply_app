@@ -21,11 +21,30 @@ part 'profile_tg_state.dart';
 /// is persisted).
 class ProfileTgCubit extends Cubit<ProfileTgState>
     with SafeEmitMixin<ProfileTgState> {
+  static final Map<String, TourGuideProfile?> _profileCache = {};
+
   /// The id the profile was opened for.
   final String guideId;
 
   ProfileTgCubit({required this.guideId}) : super(const ProfileTgInitial()) {
-    loadRemoteProfile();
+    if (_profileCache.containsKey(guideId)) {
+      _profile = _profileCache[guideId];
+      final profile = _profile;
+      safeEmit(
+        ProfileTgSuccess(
+          nameOverride: null,
+          photoOverride: null,
+          coverPath: null,
+          bookmarked: false,
+          remotePhone: _nonEmpty(profile?.phone),
+          remoteAbout: _nonEmpty(profile?.about),
+          remoteLocation: _nonEmpty(profile?.location),
+        ),
+      );
+      loadRemoteProfile(showLoading: false);
+    } else {
+      loadRemoteProfile();
+    }
     // Live verification: the VERIFIED badge follows the admin's approve /
     // reject decision through Firestore snapshots — no reload needed.
     // Lives on guideVerifications/{uid}, exactly the document the admin
@@ -107,12 +126,15 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
 
   /// Reads phone/about/location from Firestore. Safe to call repeatedly;
   /// failures leave the previous values in place.
-  Future<void> loadRemoteProfile() async {
-    safeEmit(const ProfileTgLoading());
+  Future<void> loadRemoteProfile({bool showLoading = true}) async {
+    if (showLoading && state is! ProfileTgSuccess) {
+      safeEmit(const ProfileTgLoading());
+    }
     try {
       final service = TourGuideProfileService();
       final profile = await service.fetchMyProfile();
       _profile = profile;
+      _profileCache[guideId] = profile;
       // Publish the public profile the tourists browse — without it the
       // guide is invisible to them.
       await service.ensurePublicProfile();
@@ -151,6 +173,11 @@ class ProfileTgCubit extends Cubit<ProfileTgState>
         ),
       );
     }
+  }
+
+  static String? _nonEmpty(String? value) {
+    final trimmed = value?.trim() ?? '';
+    return trimmed.isEmpty ? null : trimmed;
   }
 
   bool get remoteLoaded => state is ProfileTgSuccess;

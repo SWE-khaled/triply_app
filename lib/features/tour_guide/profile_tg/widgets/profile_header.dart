@@ -79,10 +79,12 @@ class ProfileHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // Long Firestore display names must shrink instead of
                     // pushing the verified badge off the card.
-                    Expanded(
+                    Flexible(
                       child: GestureDetector(
                         onTap: onEdit,
                         behavior: HitTestBehavior.opaque,
@@ -90,6 +92,7 @@ class ProfileHeader extends StatelessWidget {
                           displayName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -128,6 +131,8 @@ class ProfileHeader extends StatelessWidget {
                 ],
                 const SizedBox(height: 10),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (reviewCount > 0) ...[
                       const Icon(
@@ -175,6 +180,8 @@ class ProfileHeader extends StatelessWidget {
                 if (displayPhone != null && displayPhone!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.phone, size: 13, color: Colors.white),
                       const SizedBox(width: 4),

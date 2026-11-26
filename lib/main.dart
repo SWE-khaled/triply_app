@@ -76,25 +76,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // One session cubit for both roles. Not lazy: it starts listening
-        // to Firebase at launch, so the restored user is ready by the time
-        // any screen reads it (and the profile self-heal can run).
         BlocProvider(lazy: false, create: (_) => AuthCubit()),
         BlocProvider(lazy: false, create: (_) => ThemeCubit()),
-        // Resolves the restored Firebase session while the splash animates.
-        // Not lazy: the work must start at launch, not when the gate mounts.
         BlocProvider(lazy: false, create: (_) => StartupCubit()..resolve()),
-        // Tourist page Cubits live for this app session. They are created on
-        // the first tourist page opening and keep their loaded data until
-        // the process restarts, so revisiting a page never reloads it.
-        // The badge keeps its existing provider. The three content sections
-        // are independent so one section cannot overwrite another's state.
         BlocProvider(create: (_) => HomeCubit()),
         BlocProvider(create: (_) => HomePlacesCubit()),
         BlocProvider(create: (_) => HomeGuidesCubit()),
         BlocProvider(create: (_) => HomeTripsCubit()),
-        // The badge/compatibility cubit keeps its original provider shape.
-        // Profile data, posts and writes are independent session cubits.
         BlocProvider(
           create: (context) =>
               ProfileCubit(userId: context.read<AuthCubit>().user?.uid),
